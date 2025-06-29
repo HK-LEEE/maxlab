@@ -1,0 +1,8 @@
+{
+  "module_type": "analytics",
+  "features": {
+    "metrics": true,
+    "trends": true,
+    "export": true
+  }
+}

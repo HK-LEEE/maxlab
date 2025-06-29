@@ -1,0 +1,52 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+
+export const {module_title}Page: React.FC = () => {
+  return (
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Analytics</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Page Views</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">15,234</div>
+            <div className="flex items-center text-sm text-green-600">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              12.5%
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Unique Visitors</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">3,421</div>
+            <div className="flex items-center text-sm text-red-600">
+              <TrendingDown className="h-4 w-4 mr-1" />
+              2.3%
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Traffic Trends</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 flex items-center justify-center text-muted-foreground">
+            Chart will be displayed here
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default {module_title}Page;

@@ -1,0 +1,40 @@
+"""
+{module_name} Report Module
+"""
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Dict, Any, List
+from datetime import datetime
+
+router = APIRouter()
+
+@router.get("/")
+async def get_reports():
+    """리포트 목록 조회"""
+    return {
+        "reports": [
+            {
+                "id": "1",
+                "title": "Monthly Sales Report",
+                "type": "sales",
+                "created_at": datetime.now().isoformat(),
+                "status": "completed"
+            },
+            {
+                "id": "2", 
+                "title": "User Activity Analysis",
+                "type": "analytics",
+                "created_at": datetime.now().isoformat(),
+                "status": "processing"
+            }
+        ],
+        "total": 2
+    }
+
+@router.post("/generate")
+async def generate_report(report_config: Dict[str, Any]):
+    """새 리포트 생성"""
+    return {
+        "id": "3",
+        "status": "queued",
+        "message": "Report generation started"
+    }

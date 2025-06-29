@@ -1,0 +1,61 @@
+@import '@fontsource/inter/300.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-black;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-black border border-gray-200 rounded hover:bg-gray-50 transition-colors;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent;
+  }
+  
+  .card {
+    @apply bg-white border border-gray-200 rounded shadow-sm;
+  }
+}
+
+/* Hide scrollbar for auto-scrolling measurements */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Animated flow effect for active connections */
+.react-flow__edge-path {
+  animation: flow 2s linear infinite;
+}
+
+@keyframes flow {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 8 4;
+}

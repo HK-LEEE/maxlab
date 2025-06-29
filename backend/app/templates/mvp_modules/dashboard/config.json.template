@@ -1,0 +1,9 @@
+{
+  "module_type": "dashboard",
+  "features": {
+    "stats": true,
+    "charts": true,
+    "activities": true
+  },
+  "refresh_interval": 30000
+}

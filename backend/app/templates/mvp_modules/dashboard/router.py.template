@@ -1,0 +1,40 @@
+"""
+{module_name} Dashboard Module
+"""
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Dict, Any, List
+from datetime import datetime, timedelta
+
+router = APIRouter()
+
+@router.get("/stats")
+async def get_dashboard_stats():
+    """대시보드 통계 조회"""
+    return {
+        "total_items": 150,
+        "active_users": 25,
+        "recent_activities": 89,
+        "performance_score": 92.5
+    }
+
+@router.get("/charts/overview")
+async def get_overview_chart_data():
+    """개요 차트 데이터"""
+    return {
+        "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        "datasets": [{
+            "label": "Activity",
+            "data": [65, 59, 80, 81, 56, 55, 40]
+        }]
+    }
+
+@router.get("/recent-activities")
+async def get_recent_activities():
+    """최근 활동 목록"""
+    return {
+        "activities": [
+            {"id": 1, "action": "Created", "target": "Report #123", "timestamp": datetime.now().isoformat()},
+            {"id": 2, "action": "Updated", "target": "Dataset A", "timestamp": datetime.now().isoformat()},
+        ],
+        "total": 2
+    }

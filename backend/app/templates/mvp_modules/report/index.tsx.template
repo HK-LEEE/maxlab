@@ -1,0 +1,53 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, Download, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+export const {module_title}Page: React.FC = () => {
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Reports</h1>
+        <Button>Generate New Report</Button>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Reports</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded">
+              <div className="flex items-center space-x-4">
+                <FileText className="h-8 w-8 text-muted-foreground" />
+                <div>
+                  <h3 className="font-medium">Monthly Sales Report</h3>
+                  <p className="text-sm text-muted-foreground">Generated 2 hours ago</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 border rounded">
+              <div className="flex items-center space-x-4">
+                <Clock className="h-8 w-8 text-muted-foreground animate-pulse" />
+                <div>
+                  <h3 className="font-medium">User Activity Analysis</h3>
+                  <p className="text-sm text-muted-foreground">Processing...</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" disabled>
+                Processing
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default {module_title}Page;
