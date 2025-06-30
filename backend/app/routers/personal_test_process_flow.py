@@ -8,6 +8,7 @@ from sqlalchemy import text
 from typing import List, Dict, Any, Optional
 import uuid
 import json
+import secrets
 from datetime import datetime
 import logging
 
@@ -40,6 +41,14 @@ class ProcessFlow(BaseModel):
     created_by: Optional[str]
     created_at: datetime
     updated_at: datetime
+    is_published: Optional[bool] = False
+    published_at: Optional[datetime] = None
+    publish_token: Optional[str] = None
+
+class PublishResponse(BaseModel):
+    message: str
+    publish_url: str
+    publish_token: str
 
 class EquipmentStatus(BaseModel):
     equipment_type: str
@@ -57,6 +66,13 @@ class MeasurementData(BaseModel):
     measurement_value: float
     timestamp: datetime
 
+class EquipmentStatusResponse(BaseModel):
+    items: List[EquipmentStatus]
+    total: int
+    limit: int
+    offset: int
+    has_more: bool
+
 
 # Process Flow endpoints
 @router.get("/flows", response_model=List[ProcessFlow])
@@ -69,7 +85,8 @@ async def list_process_flows(
 ):
     """워크스페이스의 공정도 목록 조회"""
     query = """
-        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at
+        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at,
+               is_published, published_at, publish_token
         FROM personal_test_process_flows
         WHERE workspace_id = :workspace_id
         ORDER BY updated_at DESC
@@ -90,7 +107,10 @@ async def list_process_flows(
             flow_data=row.flow_data,
             created_by=row.created_by,
             created_at=row.created_at,
-            updated_at=row.updated_at
+            updated_at=row.updated_at,
+            is_published=row.is_published if hasattr(row, 'is_published') else False,
+            published_at=row.published_at if hasattr(row, 'published_at') else None,
+            publish_token=row.publish_token if hasattr(row, 'publish_token') else None
         ))
     
     return flows
@@ -110,7 +130,7 @@ async def create_process_flow(
         INSERT INTO personal_test_process_flows 
         (id, workspace_id, name, flow_data, created_by, created_at, updated_at)
         VALUES (:id, :workspace_id, :name, CAST(:flow_data AS jsonb), :created_by, NOW(), NOW())
-        RETURNING id, workspace_id, name, flow_data, created_by, created_at, updated_at
+        RETURNING id, workspace_id, name, flow_data, created_by, created_at, updated_at, is_published, published_at, publish_token
     """
     
     result = await db.execute(
@@ -133,7 +153,10 @@ async def create_process_flow(
         flow_data=row.flow_data,
         created_by=row.created_by,
         created_at=row.created_at,
-        updated_at=row.updated_at
+        updated_at=row.updated_at,
+        is_published=False,
+        published_at=None,
+        publish_token=None
     )
 
 
@@ -145,7 +168,8 @@ async def get_process_flow(
 ):
     """공정도 상세 조회"""
     query = """
-        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at
+        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at,
+               is_published, published_at, publish_token
         FROM personal_test_process_flows
         WHERE id = :flow_id
     """
@@ -166,7 +190,10 @@ async def get_process_flow(
         flow_data=row.flow_data,
         created_by=row.created_by,
         created_at=row.created_at,
-        updated_at=row.updated_at
+        updated_at=row.updated_at,
+        is_published=row.is_published if hasattr(row, 'is_published') else False,
+        published_at=row.published_at if hasattr(row, 'published_at') else None,
+        publish_token=row.publish_token if hasattr(row, 'publish_token') else None
     )
 
 
@@ -201,7 +228,7 @@ async def update_process_flow(
         UPDATE personal_test_process_flows
         SET {', '.join(update_parts)}
         WHERE id = :flow_id
-        RETURNING id, workspace_id, name, flow_data, created_by, created_at, updated_at
+        RETURNING id, workspace_id, name, flow_data, created_by, created_at, updated_at, is_published, published_at, publish_token
     """
     
     result = await db.execute(text(query), params)
@@ -221,7 +248,10 @@ async def update_process_flow(
         flow_data=row.flow_data,
         created_by=row.created_by,
         created_at=row.created_at,
-        updated_at=row.updated_at
+        updated_at=row.updated_at,
+        is_published=row.is_published if hasattr(row, 'is_published') else False,
+        published_at=row.published_at if hasattr(row, 'published_at') else None,
+        publish_token=row.publish_token if hasattr(row, 'publish_token') else None
     )
 
 
@@ -243,13 +273,145 @@ async def delete_process_flow(
         )
 
 
-# Equipment Status endpoints
-class EquipmentStatusResponse(BaseModel):
-    items: List[EquipmentStatus]
-    total: int
-    limit: int
-    offset: int
-    has_more: bool
+@router.put("/flows/{flow_id}/publish", response_model=PublishResponse)
+async def publish_process_flow(
+    flow_id: uuid.UUID,
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """공정도 게시 (관리자 전용)"""
+    # Generate unique publish token
+    publish_token = secrets.token_urlsafe(32)
+    
+    query = """
+        UPDATE personal_test_process_flows
+        SET is_published = true, 
+            published_at = NOW(),
+            publish_token = :publish_token
+        WHERE id = :flow_id
+        RETURNING name
+    """
+    
+    result = await db.execute(
+        text(query),
+        {"flow_id": str(flow_id), "publish_token": publish_token}
+    )
+    await db.commit()
+    
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Process flow not found"
+        )
+    
+    # Construct the public URL
+    publish_url = f"/public/monitor/{publish_token}"
+    
+    return PublishResponse(
+        message=f"Process flow '{row.name}' has been published",
+        publish_url=publish_url,
+        publish_token=publish_token
+    )
+
+
+@router.put("/flows/{flow_id}/unpublish")
+async def unpublish_process_flow(
+    flow_id: uuid.UUID,
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """공정도 게시 취소 (관리자 전용)"""
+    query = """
+        UPDATE personal_test_process_flows
+        SET is_published = false, 
+            publish_token = NULL
+        WHERE id = :flow_id
+        RETURNING name
+    """
+    
+    result = await db.execute(text(query), {"flow_id": str(flow_id)})
+    await db.commit()
+    
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Process flow not found"
+        )
+    
+    return {"message": f"Process flow '{row.name}' has been unpublished"}
+
+
+# Public endpoints (no authentication required)
+@router.get("/public/{publish_token}", response_model=ProcessFlow)
+async def get_public_process_flow(
+    publish_token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """게시된 공정도 조회 (공개 접근)"""
+    query = """
+        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at,
+               is_published, published_at, publish_token
+        FROM personal_test_process_flows
+        WHERE publish_token = :publish_token AND is_published = true
+    """
+    
+    result = await db.execute(text(query), {"publish_token": publish_token})
+    row = result.fetchone()
+    
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Published flow not found"
+        )
+    
+    return ProcessFlow(
+        id=row.id,
+        workspace_id=row.workspace_id,
+        name=row.name,
+        flow_data=row.flow_data,
+        created_by=row.created_by,
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+        is_published=row.is_published,
+        published_at=row.published_at,
+        publish_token=row.publish_token
+    )
+
+
+@router.get("/public/{publish_token}/status", response_model=EquipmentStatusResponse)
+async def get_public_equipment_status(
+    publish_token: str,
+    equipment_type: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db)
+):
+    """게시된 공정도의 설비 상태 조회 (공개 접근)"""
+    # First verify the publish token
+    verify_query = """
+        SELECT 1 FROM personal_test_process_flows
+        WHERE publish_token = :publish_token AND is_published = true
+    """
+    verify_result = await db.execute(text(verify_query), {"publish_token": publish_token})
+    if not verify_result.fetchone():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Published flow not found"
+        )
+    
+    # Use the existing get_equipment_status logic
+    return await get_equipment_status(
+        equipment_type=equipment_type,
+        status=status,
+        limit=limit,
+        offset=offset,
+        db=db
+    )
+
+
 
 
 @router.get("/equipment/status", response_model=EquipmentStatusResponse)
@@ -440,4 +602,180 @@ async def get_equipment_types(db: AsyncSession = Depends(get_db)):
             {"code": "F1", "name": "밸브", "icon": "git-merge"},
             {"code": "G1", "name": "히터", "icon": "flame"}
         ]
+    }
+
+
+# Publish/Unpublish endpoints
+@router.put("/flows/{flow_id}/publish", response_model=PublishResponse)
+async def publish_process_flow(
+    flow_id: uuid.UUID,
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """공정도 게시 (관리자 전용)"""
+    # Generate a secure token for public access
+    publish_token = secrets.token_urlsafe(32)
+    
+    query = """
+        UPDATE personal_test_process_flows
+        SET is_published = true, 
+            published_at = NOW(), 
+            publish_token = :publish_token,
+            updated_at = NOW()
+        WHERE id = :flow_id
+        RETURNING id, name
+    """
+    
+    result = await db.execute(
+        text(query),
+        {"flow_id": str(flow_id), "publish_token": publish_token}
+    )
+    await db.commit()
+    
+    row = result.first()
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Process flow not found"
+        )
+    
+    # TODO: Replace with actual domain
+    base_url = "http://localhost:3000"
+    publish_url = f"{base_url}/public/monitor/{publish_token}"
+    
+    return PublishResponse(
+        message=f"Process flow '{row.name}' published successfully",
+        publish_url=publish_url,
+        publish_token=publish_token
+    )
+
+
+@router.put("/flows/{flow_id}/unpublish")
+async def unpublish_process_flow(
+    flow_id: uuid.UUID,
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """공정도 게시 취소 (관리자 전용)"""
+    query = """
+        UPDATE personal_test_process_flows
+        SET is_published = false, 
+            publish_token = NULL,
+            updated_at = NOW()
+        WHERE id = :flow_id
+        RETURNING id, name
+    """
+    
+    result = await db.execute(text(query), {"flow_id": str(flow_id)})
+    await db.commit()
+    
+    row = result.first()
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Process flow not found"
+        )
+    
+    return {"message": f"Process flow '{row.name}' unpublished successfully"}
+
+
+# Public endpoints (no authentication required)
+@router.get("/public/{publish_token}", response_model=ProcessFlow)
+async def get_public_process_flow(
+    publish_token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """게시된 공정도 조회 (공개)"""
+    query = """
+        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at,
+               is_published, published_at, publish_token
+        FROM personal_test_process_flows
+        WHERE publish_token = :publish_token AND is_published = true
+    """
+    
+    result = await db.execute(text(query), {"publish_token": publish_token})
+    row = result.first()
+    
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Published flow not found"
+        )
+    
+    return ProcessFlow(
+        id=row.id,
+        workspace_id=row.workspace_id,
+        name=row.name,
+        flow_data=row.flow_data,
+        created_by=row.created_by,
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+        is_published=row.is_published,
+        published_at=row.published_at,
+        publish_token=row.publish_token
+    )
+
+
+@router.get("/public/{publish_token}/status")
+async def get_public_flow_status(
+    publish_token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """게시된 공정도의 설비 상태 조회 (공개)"""
+    # First verify the token is valid
+    verify_query = """
+        SELECT id FROM personal_test_process_flows
+        WHERE publish_token = :publish_token AND is_published = true
+    """
+    
+    verify_result = await db.execute(text(verify_query), {"publish_token": publish_token})
+    if not verify_result.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Published flow not found"
+        )
+    
+    # Get equipment status and measurements
+    equipment_query = """
+        SELECT equipment_type, equipment_code, equipment_name, status, last_run_time
+        FROM personal_test_equipment_status
+        ORDER BY equipment_type, equipment_code
+    """
+    
+    measurement_query = """
+        SELECT id, equipment_type, equipment_code, measurement_code, 
+               measurement_desc, measurement_value, timestamp
+        FROM personal_test_measurement_data
+        ORDER BY timestamp DESC
+        LIMIT 1000
+    """
+    
+    equipment_result = await db.execute(text(equipment_query))
+    measurement_result = await db.execute(text(measurement_query))
+    
+    equipment_list = []
+    for row in equipment_result:
+        equipment_list.append({
+            "equipment_type": row.equipment_type,
+            "equipment_code": row.equipment_code,
+            "equipment_name": row.equipment_name,
+            "status": row.status,
+            "last_run_time": row.last_run_time.isoformat() if row.last_run_time else None
+        })
+    
+    measurements = []
+    for row in measurement_result:
+        measurements.append({
+            "id": row.id,
+            "equipment_type": row.equipment_type,
+            "equipment_code": row.equipment_code,
+            "measurement_code": row.measurement_code,
+            "measurement_desc": row.measurement_desc,
+            "measurement_value": float(row.measurement_value),
+            "timestamp": row.timestamp.isoformat()
+        })
+    
+    return {
+        "equipment_status": equipment_list,
+        "measurements": measurements
     }
