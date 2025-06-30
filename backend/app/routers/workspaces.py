@@ -245,7 +245,20 @@ async def list_workspace_users(
     workspace_user_crud = WorkspaceUserCRUD()
     
     users = await workspace_user_crud.get_by_workspace(db=db, workspace_id=workspace_id)
-    return users
+    
+    # Convert WorkspaceUser objects to dictionaries
+    return [
+        {
+            "id": str(user.id),
+            "workspace_id": str(user.workspace_id),
+            "user_id": user.user_id,
+            "user_display_name": user.user_display_name,
+            "permission_level": user.permission_level,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+            "created_by": user.created_by
+        }
+        for user in users
+    ]
 
 
 @router.post("/workspaces/{workspace_id}/users/", response_model=Dict[str, Any], status_code=status.HTTP_201_CREATED)
@@ -304,7 +317,7 @@ async def delete_workspace_user(
 
 
 # 워크스페이스 그룹 관리 API
-@router.get("/workspaces/{workspace_id}/groups/", response_model=List[WorkspaceGroup])
+@router.get("/workspaces/{workspace_id}/groups/", response_model=List[Dict[str, Any]])
 async def list_workspace_groups(
     workspace_id: uuid.UUID,
     current_user: Dict[str, Any] = Depends(require_workspace_permission("admin")),
@@ -313,7 +326,20 @@ async def list_workspace_groups(
     """워크스페이스 그룹 목록 조회"""
     
     groups = await workspace_group_crud.get_by_workspace(db=db, workspace_id=workspace_id)
-    return groups
+    
+    # Convert WorkspaceGroup objects to dictionaries
+    return [
+        {
+            "id": str(group.id),
+            "workspace_id": str(group.workspace_id),
+            "group_name": group.group_name,
+            "group_display_name": group.group_display_name,
+            "permission_level": group.permission_level,
+            "created_at": group.created_at.isoformat() if group.created_at else None,
+            "created_by": group.created_by
+        }
+        for group in groups
+    ]
 
 
 @router.post("/workspaces/{workspace_id}/groups/", response_model=WorkspaceGroup, status_code=status.HTTP_201_CREATED)

@@ -4,6 +4,7 @@ import type { Workspace, WorkspaceUpdate } from '../../types/workspace';
 import { toast } from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../../api/auth';
+import { apiClient } from '../../api/client';
 import type { User, Group } from '../../api/auth';
 
 interface EditWorkspaceModalProps {
@@ -72,13 +73,8 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
     queryKey: ['workspace-groups', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await fetch(`/api/v1/workspaces/${workspace.id}/groups/`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch groups');
-      return response.json();
+      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/groups/`);
+      return response.data;
     },
     enabled: !!workspace && isOpen,
   });
@@ -88,13 +84,8 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
     queryKey: ['workspace-users', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await fetch(`/api/v1/workspaces/${workspace.id}/users/`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch users');
-      return response.json();
+      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/users/`);
+      return response.data;
     },
     enabled: !!workspace && isOpen,
   });
@@ -103,13 +94,8 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   const { data: availableGroups } = useQuery({
     queryKey: ['available-groups'],
     queryFn: async () => {
-      const response = await fetch('/api/v1/external/groups', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch available groups');
-      return response.json();
+      const response = await apiClient.get('/api/v1/external/groups');
+      return response.data;
     },
     enabled: isOpen,
   });
@@ -153,16 +139,8 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Add user mutation
   const addUserMutation = useMutation({
     mutationFn: async (data: { user_id: string; permission_level: string }) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/users/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to add user');
-      return response.json();
+      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/users/`, data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
@@ -179,13 +157,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Remove user mutation
   const removeUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to remove user');
+      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
@@ -199,16 +171,8 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Add group mutation
   const addGroupMutation = useMutation({
     mutationFn: async (data: { group_name: string; permission_level: string }) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/groups/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to add group');
-      return response.json();
+      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });
@@ -224,13 +188,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Remove group mutation
   const removeGroupMutation = useMutation({
     mutationFn: async (groupId: string) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to remove group');
+      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });

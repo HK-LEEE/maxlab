@@ -7,39 +7,29 @@ import {
   AlignVerticalJustifyEnd,
   AlignVerticalJustifyCenter,
   AlignHorizontalDistributeCenter,
-  AlignVerticalDistributeCenter
+  AlignVerticalDistributeCenter,
+  Grid3X3,
+  Maximize2,
+  Circle
 } from 'lucide-react';
 
 interface AlignmentMenuProps {
-  position: { x: number; y: number } | null;
   onAlign: (alignment: string) => void;
-  onClose: () => void;
 }
 
 export const AlignmentMenu: React.FC<AlignmentMenuProps> = ({
-  position,
   onAlign,
-  onClose,
 }) => {
-  if (!position) return null;
-
   const handleAlign = (alignment: string) => {
     onAlign(alignment);
-    onClose();
   };
 
   return (
-    <>
-      <div 
-        className="fixed inset-0 z-40" 
-        onClick={onClose}
-      />
-      <div
-        className="absolute bg-white rounded-lg shadow-lg p-2 z-50"
-        style={{ left: position.x, top: position.y }}
-      >
+    <div
+      className="fixed right-4 top-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-2 z-40"
+    >
         <div className="text-xs font-medium text-gray-700 px-2 py-1 mb-1">Align Nodes</div>
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-3 gap-1 mb-2">
           <button
             onClick={() => handleAlign('left')}
             className="p-2 hover:bg-gray-100 rounded flex items-center justify-center"
@@ -97,7 +87,31 @@ export const AlignmentMenu: React.FC<AlignmentMenuProps> = ({
             <AlignVerticalDistributeCenter size={16} />
           </button>
         </div>
+        
+        <div className="text-xs font-medium text-gray-700 px-2 py-1 mb-1 mt-2 border-t pt-2">Advanced</div>
+        <div className="grid grid-cols-3 gap-1">
+          <button
+            onClick={() => handleAlign('grid')}
+            className="p-2 hover:bg-gray-100 rounded flex items-center justify-center"
+            title="Align to Grid"
+          >
+            <Grid3X3 size={16} />
+          </button>
+          <button
+            onClick={() => handleAlign('canvas-center')}
+            className="p-2 hover:bg-gray-100 rounded flex items-center justify-center"
+            title="Center on Canvas"
+          >
+            <Maximize2 size={16} />
+          </button>
+          <button
+            onClick={() => handleAlign('circular')}
+            className="p-2 hover:bg-gray-100 rounded flex items-center justify-center"
+            title="Arrange in Circle"
+          >
+            <Circle size={16} />
+          </button>
+        </div>
       </div>
-    </>
   );
 };

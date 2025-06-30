@@ -4,6 +4,7 @@ import { X, Plus, Trash2, Search, Users, UserPlus, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast';
 import type { Workspace } from '../../types/workspace';
 import { authApi } from '../../api/auth';
+import { apiClient } from '../../api/client';
 import type { User, Group } from '../../api/auth';
 
 interface PermissionManagementModalProps {
@@ -51,13 +52,10 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     queryKey: ['workspace-groups', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await fetch(`/api/v1/workspaces/${workspace.id}/groups/`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch groups');
-      return response.json();
+      console.log(`Fetching groups for workspace: ${workspace.id}`);
+      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/groups/`);
+      console.log('Workspace groups response:', response.data);
+      return response.data;
     },
     enabled: !!workspace && isOpen,
   });
@@ -67,13 +65,10 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     queryKey: ['workspace-users', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await fetch(`/api/v1/workspaces/${workspace.id}/users/`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch users');
-      return response.json();
+      console.log(`Fetching users for workspace: ${workspace.id}`);
+      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/users/`);
+      console.log('Workspace users response:', response.data);
+      return response.data;
     },
     enabled: !!workspace && isOpen,
   });
@@ -82,13 +77,10 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   const { data: availableGroups } = useQuery({
     queryKey: ['available-groups'],
     queryFn: async () => {
-      const response = await fetch('/api/v1/external/groups', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch available groups');
-      return response.json();
+      console.log('Fetching available groups from external API');
+      const response = await apiClient.get('/api/v1/external/groups');
+      console.log('Available groups response:', response.data);
+      return response.data;
     },
     enabled: isOpen,
   });
@@ -132,16 +124,8 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Add user mutation
   const addUserMutation = useMutation({
     mutationFn: async (data: { user_id: string; permission_level: string }) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/users/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to add user');
-      return response.json();
+      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/users/`, data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
@@ -158,13 +142,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Remove user mutation
   const removeUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to remove user');
+      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
@@ -178,16 +156,14 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Add group mutation
   const addGroupMutation = useMutation({
     mutationFn: async (data: { group_name: string; permission_level: string }) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/groups/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to add group');
-      return response.json();
+      const requestData = {
+        workspace_id: workspace?.id,
+        group_name: data.group_name,
+        permission_level: data.permission_level
+      };
+      console.log('Sending group creation request:', requestData);
+      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, requestData);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });
@@ -203,13 +179,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Remove group mutation
   const removeGroupMutation = useMutation({
     mutationFn: async (groupId: string) => {
-      const response = await fetch(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to remove group');
+      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });
@@ -252,7 +222,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
 
   const filteredAvailableGroups = availableGroups?.filter((group: Group) => 
     group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    group.display_name.toLowerCase().includes(searchTerm.toLowerCase())
+    (group.display_name && group.display_name.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   const assignedGroupNames = workspaceGroups?.map((g: WorkspaceGroup) => g.group_name) || [];
@@ -436,7 +406,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
                 <option value="">Select a group</option>
                 {unassignedGroups.map((group: Group) => (
                   <option key={group.name} value={group.name}>
-                    {group.display_name} ({group.name})
+                    {group.display_name || group.name} ({group.name})
                   </option>
                 ))}
               </select>

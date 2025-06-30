@@ -12,6 +12,8 @@ import {
   Archive, 
   GitMerge, 
   Flame,
+  Snowflake,
+  Settings,
   AlertCircle,
   CheckCircle,
   PauseCircle
@@ -44,6 +46,8 @@ const iconMap: Record<string, React.ReactNode> = {
   archive: <Archive size={20} />,
   'git-merge': <GitMerge size={20} />,
   flame: <Flame size={20} />,
+  snowflake: <Snowflake size={20} />,
+  settings: <Settings size={20} />,
 };
 
 const statusConfig = {
@@ -136,40 +140,40 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
         className="w-3 h-3 bg-gray-400"
       />
       
-      {/* Equipment Information Section */}
-      <div className={`px-4 py-3 border-b ${window.location.pathname.includes('monitor') ? status.headerBg : data.equipmentType ? 'bg-gray-50' : 'bg-gray-100'}`}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2">
-            <div className="text-gray-600">{icon}</div>
-            <div className={`font-semibold text-sm ${window.location.pathname.includes('monitor') ? status.headerText : ''}`}>
-              {data.equipmentType ? data.label : '공통설비 (미지정)'}
-            </div>
+      {/* Tier 1: Equipment Name (Center aligned) */}
+      <div className={`px-3 py-2 border-b ${window.location.pathname.includes('monitor') ? status.headerBg : data.equipmentType ? 'bg-gray-50' : 'bg-gray-100'}`}>
+        <div className="flex items-center justify-center space-x-1">
+          <div className={window.location.pathname.includes('monitor') ? status.headerText : "text-gray-600"}>{icon}</div>
+          <div className={`font-semibold text-sm text-center ${window.location.pathname.includes('monitor') ? status.headerText : ''}`}>
+            {data.equipmentType ? data.label : '공통설비 (미지정)'}
           </div>
-          <div className={`flex items-center ${window.location.pathname.includes('monitor') ? status.headerText : status.color}`}>
+        </div>
+      </div>
+      
+      {/* Tier 2: Status and Code (Split layout) */}
+      <div className={`flex border-b divide-x ${window.location.pathname.includes('monitor') ? 'bg-gray-100' : 'bg-white'}`}>
+        <div className="flex-1 px-2 py-1.5 flex items-center justify-center">
+          <div className={`flex items-center space-x-1 ${window.location.pathname.includes('monitor') ? status.color : status.color}`}>
             {status.icon}
+            <span className="text-xs font-medium">{data.status}</span>
           </div>
         </div>
-        
-        <div className={`text-xs px-2 py-1 rounded inline-block ${window.location.pathname.includes('monitor') ? 'bg-white/20 ' + status.headerText : status.bgColor + ' ' + status.color}`}>
-          {data.status}
-        </div>
-        
         {data.equipmentCode && (
-          <div className={`text-xs mt-1 ${window.location.pathname.includes('monitor') ? status.headerText : 'text-gray-500'}`}>
-            Code: {data.equipmentCode}
+          <div className="flex-1 px-2 py-1.5 flex items-center justify-center">
+            <span className="text-xs text-gray-600">Code: {data.equipmentCode}</span>
           </div>
         )}
       </div>
       
-      {/* Measurements Section */}
+      {/* Tier 3: Measurements Section (with minimal spacing) */}
       {data.measurements && data.measurements.length > 0 && (
-        <div className="px-4 py-3 flex-1 overflow-hidden">
+        <div className="px-2 py-1.5 flex-1 overflow-hidden">
           <div 
             ref={scrollRef}
             className={`${isScrolling ? 'h-full overflow-y-auto scrollbar-hide' : ''}`}
-            style={{ maxHeight: isScrolling ? 'calc(100% - 20px)' : 'auto' }}
+            style={{ maxHeight: isScrolling ? 'calc(100% - 8px)' : 'auto' }}
           >
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {(() => {
               const filteredMeasurements = data.measurements
                 .filter(m => !data.displayMeasurements || data.displayMeasurements.length === 0 || data.displayMeasurements.includes(m.code));
@@ -180,9 +184,9 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
                 : filteredMeasurements;
               
               return measurementsToShow.map((measurement, index) => (
-                <div key={`${measurement.code}-${index}`} className="text-xs bg-gray-100 rounded px-2 py-1.5">
-                  <div className="text-gray-600">{measurement.code}: {measurement.desc}</div>
-                  <div className="font-bold text-gray-800">
+                <div key={`${measurement.code}-${index}`} className="text-xs bg-gray-50 rounded px-2 py-1">
+                  <div className="text-gray-600 text-[10px]">{measurement.code}: {measurement.desc}</div>
+                  <div className="font-semibold text-gray-800">
                     {measurement.value.toLocaleString()} {measurement.unit || ''}
                   </div>
                 </div>

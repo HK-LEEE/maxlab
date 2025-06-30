@@ -13,11 +13,12 @@ import { Save, FileText, Square, Trash2 } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
+import { TextNode } from '../components/common/TextNode';
 import { NodeConfigDialog } from '../components/common/NodeConfigDialog';
+import { TextConfigDialog } from '../components/common/TextConfigDialog';
 import { FloatingActionButton } from '../components/common/FloatingActionButton';
 
 import { EditorSidebar } from '../components/editor/EditorSidebar';
-import { EditorPanel } from '../components/editor/EditorPanel';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
 import { AlignmentMenu } from '../components/editor/AlignmentMenu';
 
@@ -28,6 +29,7 @@ import { Layout } from '../../../components/common/Layout';
 const nodeTypes = {
   equipment: EquipmentNode,
   group: GroupNode,
+  text: TextNode,
 };
 
 const equipmentTypes = [
@@ -44,8 +46,23 @@ const equipmentTypes = [
   { code: 'H1', name: '냉각기', icon: 'snowflake' },
 ];
 
+// Node color function for minimap
+const nodeColor = (node: Node) => {
+  switch (node.type) {
+    case 'equipment':
+      return node.data.equipmentType ? '#3b82f6' : '#9ca3af'; // Blue for typed, gray for untyped
+    case 'group':
+      return '#8b5cf6'; // Purple
+    case 'text':
+      return '#10b981'; // Green
+    default:
+      return '#6b7280'; // Gray
+  }
+};
+
 const ProcessFlowEditorContent: React.FC = () => {
   const workspaceId = 'personal_test';
+  const { screenToFlowPosition } = useReactFlow();
   
   const {
     nodes,
@@ -83,7 +100,7 @@ const ProcessFlowEditorContent: React.FC = () => {
 
   const [isLoadFlowOpen, setIsLoadFlowOpen] = useState(false);
   const [configNode, setConfigNode] = useState<Node | null>(null);
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [textConfigNode, setTextConfigNode] = useState<Node | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -95,52 +112,86 @@ const ProcessFlowEditorContent: React.FC = () => {
     (event: React.DragEvent) => {
       event.preventDefault();
 
-      const equipmentData = event.dataTransfer.getData('application/equipment');
-      if (!equipmentData) return;
+      const dragData = event.dataTransfer.getData('application/dragdata');
+      if (!dragData) return;
 
-      const type = JSON.parse(equipmentData);
+      const { type, data } = JSON.parse(dragData);
       
-      // Get the bounds of the ReactFlow wrapper
-      const reactFlowBounds = event.currentTarget.getBoundingClientRect();
-      
-      // Calculate position relative to the ReactFlow wrapper
-      const position = {
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      };
+      // Convert screen coordinates to flow coordinates
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-      const newNode: Node = {
-        id: `${type.code}_${Date.now()}`,
-        type: 'equipment',
-        position,
-        style: { width: 200, height: getNodeHeight(nodeSize) },
-        data: {
-          label: type.name,
-          equipmentType: type.code,
-          equipmentCode: '',
-          equipmentName: type.name,
-          status: 'STOP',
-          icon: type.icon,
-          displayMeasurements: [],
-        },
-      };
+      let newNode: Node;
+
+      if (type === 'equipment') {
+        newNode = {
+          id: `${data.code}_${Date.now()}`,
+          type: 'equipment',
+          position,
+          style: { width: 200, height: getNodeHeight(nodeSize) },
+          data: {
+            label: data.name,
+            equipmentType: data.code,
+            equipmentCode: '',
+            equipmentName: data.name,
+            status: 'STOP',
+            icon: data.icon,
+            displayMeasurements: [],
+          },
+        };
+      } else if (type === 'text') {
+        newNode = {
+          id: `text_${Date.now()}`,
+          type: 'text',
+          position,
+          data: {
+            text: data.text || 'Text',
+            fontSize: data.fontSize || 14,
+            color: data.color || '#000000',
+          },
+        };
+      } else if (type === 'group') {
+        newNode = {
+          id: `group_${Date.now()}`,
+          type: 'group',
+          position,
+          style: {
+            width: 300,
+            height: 200,
+          },
+          data: { 
+            label: 'Group',
+            color: '#6b7280',
+            backgroundColor: '#6b7280',
+            backgroundOpacity: 10,
+            titleSize: 14,
+            titleColor: '#374151',
+            titlePosition: 'top',
+            zIndex: 0,
+            borderStyle: 'dashed',
+          },
+        };
+      } else if (type === 'template') {
+        // Create node from template
+        const templateType = data.equipmentType ? 'equipment' : data.label !== undefined ? 'group' : 'text';
+        newNode = {
+          id: `${templateType}_${Date.now()}`,
+          type: templateType,
+          position,
+          style: templateType === 'group' ? { width: 300, height: 200 } : templateType === 'equipment' ? { width: 200, height: getNodeHeight(nodeSize) } : undefined,
+          data: { ...data },
+        };
+      } else {
+        return;
+      }
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [nodeSize, setNodes, getNodeHeight]
+    [nodeSize, setNodes, getNodeHeight, screenToFlowPosition]
   );
 
-  const onPaneContextMenu = useCallback((event: React.MouseEvent) => {
-    event.preventDefault();
-    const selected = nodes.filter(n => n.selected);
-    if (selected.length >= 2) {
-      setContextMenu({ x: event.clientX, y: event.clientY });
-    }
-  }, [nodes]);
-
-  const onPaneClick = useCallback(() => {
-    setContextMenu(null);
-  }, []);
 
   const handleNodeConfigSave = (nodeId: string, data: any) => {
     setNodes((nds) =>
@@ -162,13 +213,15 @@ const ProcessFlowEditorContent: React.FC = () => {
   };
 
   const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-    if (node.type === 'equipment') {
+    if (node.type === 'equipment' || node.type === 'group') {
       setConfigNode(node);
+    } else if (node.type === 'text') {
+      setTextConfigNode(node);
     }
   }, []);
 
-  const onDragStart = (event: React.DragEvent, equipment: any) => {
-    event.dataTransfer.setData('application/equipment', JSON.stringify(equipment));
+  const onDragStart = (event: React.DragEvent, dragData: any) => {
+    event.dataTransfer.setData('application/dragdata', JSON.stringify(dragData));
     event.dataTransfer.effectAllowed = 'move';
   };
 
@@ -223,8 +276,6 @@ const ProcessFlowEditorContent: React.FC = () => {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onNodeDoubleClick={onNodeDoubleClick}
-          onPaneClick={onPaneClick}
-          onPaneContextMenu={onPaneContextMenu}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={{
             type: edgeType,
@@ -232,49 +283,13 @@ const ProcessFlowEditorContent: React.FC = () => {
             style: { strokeWidth: 2, stroke: '#374151' },
           }}
           connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+          snapToGrid={true}
+          snapGrid={[15, 15]}
           fitView
         >
           <Background color="#aaa" gap={16} />
           <Controls />
-          <MiniMap />
-
-          {/* Toolbar for Group and Delete buttons */}
-          <Panel position="top-left">
-            <div className="bg-white p-3 rounded-lg shadow-lg">
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={addGroupNode}
-                  className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-                  title="Add group rectangle"
-                >
-                  <Square size={16} />
-                  <span>Group</span>
-                </button>
-                {(selectedElements.nodes > 0 || selectedElements.edges > 0) && (
-                  <button
-                    onClick={deleteSelectedNodes}
-                    className="flex items-center space-x-1 px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm"
-                  >
-                    <Trash2 size={16} />
-                    <span>Delete ({selectedElements.nodes + selectedElements.edges})</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </Panel>
-
-          {/* Settings Panel */}
-          <Panel position="bottom-right">
-            <EditorPanel
-              edgeType={edgeType}
-              nodeSize={nodeSize}
-              autoScroll={autoScroll}
-              selectedElements={selectedElements}
-              onEdgeTypeChange={setEdgeType}
-              onNodeSizeChange={setNodeSize}
-              onAutoScrollChange={setAutoScroll}
-            />
-          </Panel>
+          <MiniMap nodeColor={nodeColor} />
         </ReactFlow>
 
         {/* Sidebar */}
@@ -284,9 +299,17 @@ const ProcessFlowEditorContent: React.FC = () => {
           hasMoreEquipment={hasMoreEquipment}
           isLoadingEquipment={isLoadingEquipment}
           searchTerm={searchTerm}
+          edgeType={edgeType}
+          nodeSize={nodeSize}
+          autoScroll={autoScroll}
+          selectedElements={selectedElements}
           onSearchChange={setSearchTerm}
           onDragStart={onDragStart}
           onLoadMore={loadMoreEquipment}
+          onEdgeTypeChange={setEdgeType}
+          onAddGroup={addGroupNode}
+          onNodeSizeChange={setNodeSize}
+          onAutoScrollChange={setAutoScroll}
         />
 
         {/* Floating Action Button */}
@@ -296,12 +319,12 @@ const ProcessFlowEditorContent: React.FC = () => {
           onDelete={handleDeleteAction}
         />
 
-        {/* Alignment Menu */}
-        <AlignmentMenu
-          position={contextMenu}
-          onAlign={alignNodes}
-          onClose={() => setContextMenu(null)}
-        />
+        {/* Alignment Menu - Shows when multiple nodes are selected */}
+        {selectedElements.nodes >= 2 && (
+          <AlignmentMenu
+            onAlign={alignNodes}
+          />
+        )}
 
         {/* Dialogs */}
         <LoadFlowDialog
@@ -321,6 +344,15 @@ const ProcessFlowEditorContent: React.FC = () => {
             equipmentTypes={equipmentTypes}
             availableEquipment={equipmentList}
             availableMeasurements={measurementsList}
+          />
+        )}
+
+        {textConfigNode && (
+          <TextConfigDialog
+            node={textConfigNode}
+            isOpen={true}
+            onClose={() => setTextConfigNode(null)}
+            onSave={handleNodeConfigSave}
           />
         )}
       </div>

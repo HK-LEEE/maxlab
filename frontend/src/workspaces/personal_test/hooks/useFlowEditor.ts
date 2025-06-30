@@ -154,7 +154,100 @@ export const useFlowEditor = (workspaceId: string) => {
 
   const alignNodes = useCallback((alignment: string) => {
     const selectedNodes = nodes.filter(n => n.selected);
-    if (selectedNodes.length < 2) return;
+    if (selectedNodes.length < 2 && alignment !== 'canvas-center' && alignment !== 'grid') return;
+    if (selectedNodes.length < 1) return;
+
+    // Handle single node alignments
+    if (alignment === 'canvas-center') {
+      // Center selected nodes on canvas
+      const viewportBounds = { width: window.innerWidth - 320, height: window.innerHeight - 100 }; // Approximate viewport size
+      const centerX = viewportBounds.width / 2;
+      const centerY = viewportBounds.height / 2;
+      
+      if (selectedNodes.length === 1) {
+        // Center single node
+        setNodes((nds) => nds.map((node) => {
+          if (node.selected) {
+            return {
+              ...node,
+              position: {
+                x: centerX - ((node.style?.width || 200) / 2),
+                y: centerY - ((node.style?.height || 150) / 2)
+              }
+            };
+          }
+          return node;
+        }));
+      } else {
+        // Center group of nodes
+        const bounds = selectedNodes.reduce((acc, node) => ({
+          minX: Math.min(acc.minX, node.position.x),
+          minY: Math.min(acc.minY, node.position.y),
+          maxX: Math.max(acc.maxX, node.position.x + (node.style?.width || 200)),
+          maxY: Math.max(acc.maxY, node.position.y + (node.style?.height || 150))
+        }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+        
+        const groupWidth = bounds.maxX - bounds.minX;
+        const groupHeight = bounds.maxY - bounds.minY;
+        const offsetX = centerX - (groupWidth / 2) - bounds.minX;
+        const offsetY = centerY - (groupHeight / 2) - bounds.minY;
+        
+        setNodes((nds) => nds.map((node) => {
+          if (node.selected) {
+            return {
+              ...node,
+              position: {
+                x: node.position.x + offsetX,
+                y: node.position.y + offsetY
+              }
+            };
+          }
+          return node;
+        }));
+      }
+      return;
+    }
+
+    if (alignment === 'grid') {
+      // Snap to grid (15x15 grid as defined in ReactFlow)
+      setNodes((nds) => nds.map((node) => {
+        if (node.selected) {
+          return {
+            ...node,
+            position: {
+              x: Math.round(node.position.x / 15) * 15,
+              y: Math.round(node.position.y / 15) * 15
+            }
+          };
+        }
+        return node;
+      }));
+      return;
+    }
+
+    if (alignment === 'circular') {
+      // Arrange nodes in a circle
+      const centerNode = selectedNodes[Math.floor(selectedNodes.length / 2)];
+      const centerX = centerNode.position.x + ((centerNode.style?.width || 200) / 2);
+      const centerY = centerNode.position.y + ((centerNode.style?.height || 150) / 2);
+      const radius = Math.max(150, selectedNodes.length * 30);
+      
+      setNodes((nds) => nds.map((node, index) => {
+        const nodeIndex = selectedNodes.findIndex(n => n.id === node.id);
+        if (nodeIndex !== -1) {
+          const angle = (nodeIndex * 2 * Math.PI) / selectedNodes.length;
+          return {
+            ...node,
+            position: {
+              x: centerX + radius * Math.cos(angle) - ((node.style?.width || 200) / 2),
+              y: centerY + radius * Math.sin(angle) - ((node.style?.height || 150) / 2)
+            }
+          };
+        }
+        return node;
+      }));
+      return;
+    }
 
     const firstNode = selectedNodes[0];
     const firstNodeBounds = {
@@ -262,8 +355,8 @@ export const useFlowEditor = (workspaceId: string) => {
   useEffect(() => {
     // Load all equipment and measurements
     Promise.all([
-      apiClient.get('/api/v1/personal-test/process-flow/equipment/status?limit=1000'),
-      apiClient.get('/api/v1/personal-test/process-flow/measurements?limit=1000'),
+      apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?limit=100`),
+      apiClient.get(`/api/v1/personal-test/process-flow/measurements?limit=100`),
     ]).then(([equipmentRes, measurementsRes]) => {
       const items = equipmentRes.data.items || equipmentRes.data;
       setEquipmentList(items);
@@ -272,6 +365,9 @@ export const useFlowEditor = (workspaceId: string) => {
       setMeasurementsList(measurementsRes.data);
     }).catch((err) => {
       console.error('Failed to load equipment data:', err);
+      if (err.response?.data) {
+        console.error('Error details:', err.response.data);
+      }
     });
 
     // Load available flows
