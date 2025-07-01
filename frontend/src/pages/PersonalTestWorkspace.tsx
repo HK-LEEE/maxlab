@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/common/Layout';
-import { Activity, Monitor, Factory } from 'lucide-react';
+import { Activity, Monitor, Factory, Globe } from 'lucide-react';
 
 export const PersonalTestWorkspace: React.FC = () => {
   const navigate = useNavigate();
@@ -27,10 +27,26 @@ export const PersonalTestWorkspace: React.FC = () => {
       iconColor: 'text-green-600',
       adminOnly: false,
     },
+    {
+      id: 'public-monitor',
+      title: '공개 프로세스 모니터링',
+      description: '게시된 프로세스 플로우를 인증 없이 모니터링할 수 있습니다. 공개된 플로우는 누구나 접근 가능합니다.',
+      icon: Globe,
+      path: '#',
+      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+      adminOnly: false,
+      isPlaceholder: true,
+    },
   ];
 
-  const handleFeatureClick = (path: string) => {
-    navigate(path);
+  const handleFeatureClick = (feature: any) => {
+    if (feature.isPlaceholder) {
+      // Show info message
+      alert('게시된 공개 플로우에 접근하려면 편집기에서 플로우를 게시한 후 생성된 URL을 사용하세요.');
+      return;
+    }
+    navigate(feature.path);
   };
 
   return (
@@ -54,8 +70,10 @@ export const PersonalTestWorkspace: React.FC = () => {
             return (
               <button
                 key={feature.id}
-                onClick={() => handleFeatureClick(feature.path)}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 text-left border border-gray-200 hover:border-gray-300"
+                onClick={() => handleFeatureClick(feature)}
+                className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 text-left border border-gray-200 hover:border-gray-300 ${
+                  feature.isPlaceholder ? 'cursor-help' : ''
+                }`}
               >
                 <div className="flex items-start space-x-4">
                   <div className={`p-3 rounded-lg ${feature.bgColor}`}>

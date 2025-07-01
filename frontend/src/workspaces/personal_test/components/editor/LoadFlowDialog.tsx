@@ -1,11 +1,14 @@
-import React from 'react';
-import { X, FileText, Calendar, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, FileText, Calendar, Clock, Globe, Trash2 } from 'lucide-react';
 
 interface ProcessFlow {
   id: string;
   name: string;
   created_at: string;
   updated_at: string;
+  is_published?: boolean;
+  published_at?: string;
+  publish_token?: string;
 }
 
 interface LoadFlowDialogProps {
@@ -14,6 +17,7 @@ interface LoadFlowDialogProps {
   currentFlowId?: string;
   onClose: () => void;
   onLoad: (flow: ProcessFlow) => void;
+  onDelete?: (flowId: string) => void;
 }
 
 export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
@@ -22,8 +26,18 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
   currentFlowId,
   onClose,
   onLoad,
+  onDelete,
 }) => {
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
   if (!isOpen) return null;
+
+  const handleDelete = (flowId: string) => {
+    if (onDelete) {
+      onDelete(flowId);
+      setConfirmDelete(null);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -46,32 +60,73 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
               {flows.map((flow) => (
                 <div
                   key={flow.id}
-                  className={`p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
+                  className={`p-4 border rounded-lg transition-colors ${
                     flow.id === currentFlowId ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                  }`}
-                  onClick={() => onLoad(flow)}
+                  } ${confirmDelete === flow.id ? 'bg-red-50 border-red-300' : 'hover:bg-gray-50'}`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
-                      <FileText className="text-gray-400 mt-0.5" size={20} />
-                      <div>
-                        <h3 className="font-medium text-gray-900">{flow.name}</h3>
-                        <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
-                          <span className="flex items-center space-x-1">
-                            <Calendar size={12} />
-                            <span>{new Date(flow.created_at).toLocaleDateString()}</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <Clock size={12} />
-                            <span>{new Date(flow.updated_at).toLocaleTimeString()}</span>
-                          </span>
-                        </div>
+                  {confirmDelete === flow.id ? (
+                    <div className="flex items-center justify-between">
+                      <span className="text-red-600 font-medium">Delete this flow?</span>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleDelete(flow.id)}
+                          className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(null)}
+                          className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
-                    {flow.id === currentFlowId && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Current</span>
-                    )}
-                  </div>
+                  ) : (
+                    <div
+                      className="flex items-start justify-between cursor-pointer"
+                      onClick={() => onLoad(flow)}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <FileText className="text-gray-400 mt-0.5" size={20} />
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-medium text-gray-900">{flow.name}</h3>
+                            {flow.is_published && (
+                              <Globe size={14} className="text-green-600" title="Published" />
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
+                            <span className="flex items-center space-x-1">
+                              <Calendar size={12} />
+                              <span>{new Date(flow.created_at).toLocaleDateString()}</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <Clock size={12} />
+                              <span>{new Date(flow.updated_at).toLocaleTimeString()}</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {flow.id === currentFlowId && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Current</span>
+                        )}
+                        {onDelete && flow.id !== currentFlowId && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setConfirmDelete(flow.id);
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                            title="Delete flow"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

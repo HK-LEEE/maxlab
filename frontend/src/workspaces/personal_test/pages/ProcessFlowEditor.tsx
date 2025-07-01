@@ -9,7 +9,7 @@ import ReactFlow, {
 } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Save, FileText, Square, Trash2 } from 'lucide-react';
+import { Save, FileText, Square, Trash2, Globe } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
@@ -21,6 +21,7 @@ import { FloatingActionButton } from '../components/common/FloatingActionButton'
 import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
 import { AlignmentMenu } from '../components/editor/AlignmentMenu';
+import { PublishDialog } from '../components/editor/PublishDialog';
 
 import { useFlowEditor } from '../hooks/useFlowEditor';
 import { Layout } from '../../../components/common/Layout';
@@ -96,12 +97,16 @@ const ProcessFlowEditorContent: React.FC = () => {
     addGroupNode,
     alignNodes,
     getNodeHeight,
+    publishFlow,
+    unpublishFlow,
+    deleteFlow,
   } = useFlowEditor(workspaceId);
 
   const [isLoadFlowOpen, setIsLoadFlowOpen] = useState(false);
   const [configNode, setConfigNode] = useState<Node | null>(null);
   const [textConfigNode, setTextConfigNode] = useState<Node | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -258,6 +263,28 @@ const ProcessFlowEditorContent: React.FC = () => {
               <FileText size={16} />
               <span>Load</span>
             </button>
+            {currentFlow && (
+              <button
+                onClick={() => setIsPublishDialogOpen(true)}
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded text-sm ${
+                  currentFlow.is_published
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {currentFlow.is_published ? (
+                  <>
+                    <Globe size={16} />
+                    <span>Published</span>
+                  </>
+                ) : (
+                  <>
+                    <Globe size={16} />
+                    <span>Publish</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
           {error && (
             <div className="text-red-600 text-sm">{error}</div>
@@ -333,6 +360,7 @@ const ProcessFlowEditorContent: React.FC = () => {
           currentFlowId={currentFlow?.id}
           onClose={() => setIsLoadFlowOpen(false)}
           onLoad={handleLoadFlow}
+          onDelete={deleteFlow}
         />
 
         {configNode && (
@@ -353,6 +381,17 @@ const ProcessFlowEditorContent: React.FC = () => {
             isOpen={true}
             onClose={() => setTextConfigNode(null)}
             onSave={handleNodeConfigSave}
+          />
+        )}
+
+        {currentFlow && (
+          <PublishDialog
+            isOpen={isPublishDialogOpen}
+            flow={currentFlow}
+            onClose={() => setIsPublishDialogOpen(false)}
+            onPublish={publishFlow}
+            onUnpublish={unpublishFlow}
+            onDelete={deleteFlow}
           />
         )}
       </div>

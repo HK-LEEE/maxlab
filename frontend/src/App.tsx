@@ -11,6 +11,7 @@ import { UserManagement } from './pages/admin/UserManagement';
 import { PersonalTestWorkspace } from './pages/PersonalTestWorkspace';
 import { ProcessFlowEditor } from './workspaces/personal_test/pages/ProcessFlowEditor';
 import { ProcessFlowMonitor } from './workspaces/personal_test/pages/ProcessFlowMonitor';
+import { PublicProcessFlowMonitor } from './workspaces/personal_test/pages/PublicProcessFlowMonitor';
 import { Profile } from './pages/Profile';
 import './styles/index.css';
 
@@ -117,6 +118,10 @@ function App() {
                 <Profile />
               </PrivateRoute>
             }
+          />
+          <Route
+            path="/public/monitor/:publishToken"
+            element={<PublicProcessFlowMonitor />}
           />
         </Routes>
       </Router>

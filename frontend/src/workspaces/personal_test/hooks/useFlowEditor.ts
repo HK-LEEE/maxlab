@@ -13,6 +13,9 @@ interface ProcessFlow {
   };
   created_at: string;
   updated_at: string;
+  is_published?: boolean;
+  published_at?: string;
+  publish_token?: string;
 }
 
 interface Equipment {
@@ -150,6 +153,68 @@ export const useFlowEditor = (workspaceId: string) => {
 
   const loadMoreEquipment = async () => {
     // No longer needed - all equipment loaded at initialization
+  };
+
+  const publishFlow = async () => {
+    if (!currentFlow) return;
+    
+    try {
+      const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/publish`);
+      setCurrentFlow({
+        ...currentFlow,
+        is_published: true,
+        published_at: new Date().toISOString(),
+        publish_token: response.data.publish_token
+      });
+      toast.success('Flow published successfully');
+      return response.data;
+    } catch (err) {
+      toast.error('Failed to publish flow');
+      console.error('Publish error:', err);
+      throw err;
+    }
+  };
+
+  const unpublishFlow = async () => {
+    if (!currentFlow) return;
+    
+    try {
+      await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/unpublish`);
+      setCurrentFlow({
+        ...currentFlow,
+        is_published: false,
+        published_at: undefined,
+        publish_token: undefined
+      });
+      toast.success('Flow unpublished successfully');
+    } catch (err) {
+      toast.error('Failed to unpublish flow');
+      console.error('Unpublish error:', err);
+      throw err;
+    }
+  };
+
+  const deleteFlow = async (flowId: string) => {
+    try {
+      await apiClient.delete(`/api/v1/personal-test/process-flow/flows/${flowId}`);
+      
+      // Update flows list
+      setFlows((prevFlows) => prevFlows.filter(f => f.id !== flowId));
+      
+      // If deleting current flow, reset
+      if (currentFlow?.id === flowId) {
+        setCurrentFlow(null);
+        setFlowName('New Process Flow');
+        setNodes([]);
+        setEdges([]);
+      }
+      
+      toast.success('Flow deleted successfully');
+    } catch (err) {
+      toast.error('Failed to delete flow');
+      console.error('Delete error:', err);
+      throw err;
+    }
   };
 
   const alignNodes = useCallback((alignment: string) => {
@@ -425,5 +490,8 @@ export const useFlowEditor = (workspaceId: string) => {
     addGroupNode,
     alignNodes,
     getNodeHeight,
+    publishFlow,
+    unpublishFlow,
+    deleteFlow,
   };
 };
