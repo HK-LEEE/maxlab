@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .core.config import settings
 from .core.database import get_db, close_db, create_tables
+from .utils.auto_create_tables import ensure_tables_exist
 from .routers.workspaces import router as workspaces_router
 from .routers.health import router as health_router
 from .routers.auth_proxy import router as auth_proxy_router
@@ -46,6 +47,12 @@ async def lifespan(app: FastAPI):
         # 개발 환경에서 테이블 자동 생성
         if settings.ENVIRONMENT == "development":
             await create_tables()
+            
+        # Ensure data source management tables exist
+        from sqlalchemy.ext.asyncio import AsyncSession
+        async for db in get_db():
+            await ensure_tables_exist(db)
+            break
         
         # MVP 모듈 동적 로딩
         if settings.AUTO_LOAD_MODULES:

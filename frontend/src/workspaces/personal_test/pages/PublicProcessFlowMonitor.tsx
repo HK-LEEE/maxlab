@@ -17,13 +17,18 @@ import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
+import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { usePublicFlowMonitor } from '../hooks/usePublicFlowMonitor';
 
-// Define nodeTypes outside component to avoid re-creation
+// Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = {
   equipment: EquipmentNode,
   group: GroupNode,
   text: TextNode,
+};
+
+const edgeTypes = {
+  custom: CustomEdgeWithLabel,
 };
 
 // Node color function for minimap
@@ -45,12 +50,13 @@ const FlowCanvas: React.FC<{
   nodes: Node[];
   edges: any[];
   nodeTypes: any;
+  edgeTypes: any;
   onNodeClick: (event: React.MouseEvent, node: Node) => void;
   equipmentStatusCount: number;
   activeCount: number;
   onViewportChange?: (viewport: Viewport) => void;
   defaultViewport?: Viewport;
-}> = ({ nodes, edges, nodeTypes, onNodeClick, equipmentStatusCount, activeCount, onViewportChange, defaultViewport }) => {
+}> = ({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, onViewportChange, defaultViewport }) => {
   const { fitView, setViewport, getViewport } = useReactFlow();
   const viewportRef = useRef<Viewport>();
 
@@ -79,6 +85,7 @@ const FlowCanvas: React.FC<{
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
       fitView={false}
       nodesDraggable={false}
@@ -88,6 +95,8 @@ const FlowCanvas: React.FC<{
       zoomOnScroll={true}
       minZoom={0.1}
       maxZoom={4}
+      connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+      proOptions={{ hideAttribution: true }}
     >
       <Background color="#aaa" gap={16} />
       <Controls showInteractive={false} />
@@ -132,9 +141,16 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
 
   const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {
+      // console.log('Node clicked:', {
+      //   nodeId: node.id,
+      //   nodeType: node.type,
+      //   nodeData: node.data,
+      //   equipmentCode: node.data.equipmentCode,
+      //   availableStatuses: equipmentStatuses.map(s => s.equipment_code)
+      // });
       setSelectedNode(node);
     }
-  }, []);
+  }, [equipmentStatuses]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -276,6 +292,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onNodeClick={handleNodeClick}
             equipmentStatusCount={equipmentStatusCount}
             activeCount={activeCount}
@@ -288,11 +305,10 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
         {selectedNode && (
           <EquipmentDetailModal
             node={selectedNode}
-            measurements={measurements.filter(m => m.equipment_code === selectedNode.data.equipmentCode)}
             isOpen={true}
             onClose={() => setSelectedNode(null)}
-            onSave={() => {}} // Read-only in public view
-            readOnly={true}
+            equipmentStatus={equipmentStatuses.find(s => s.equipment_code === selectedNode.data.equipmentCode)}
+            measurements={measurements.filter(m => m.equipment_code === selectedNode.data.equipmentCode)}
           />
         )}
       </div>

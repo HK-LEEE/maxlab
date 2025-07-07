@@ -19,6 +19,7 @@ import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { MonitorHeader } from '../components/monitor/MonitorHeader';
 import { StatusSummary } from '../components/monitor/StatusSummary';
 import { EquipmentSidebar } from '../components/monitor/EquipmentSidebar';
+import { AlarmNotification } from '../components/monitor/AlarmNotification';
 
 import { useFlowMonitor } from '../hooks/useFlowMonitor';
 import { Layout } from '../../../components/common/Layout';
@@ -60,7 +61,8 @@ const FlowCanvas: React.FC<{
       zoomOnScroll={true}
       minZoom={0.1}
       maxZoom={4}
-      defaultEdgeOptions={{ type: 'custom' }}
+      connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+      proOptions={{ hideAttribution: true }}
     >
       <Background />
       <Controls showInteractive={false} />
@@ -110,13 +112,21 @@ const ProcessFlowMonitorContent: React.FC = () => {
 
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [showAlarms, setShowAlarms] = useState(true);
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {
+      // console.log('Monitor - Node clicked:', {
+      //   nodeId: node.id,
+      //   nodeType: node.type,
+      //   nodeData: node.data,
+      //   equipmentCode: node.data.equipmentCode,
+      //   availableStatuses: equipmentStatuses.map(s => s.equipment_code)
+      // });
       setSelectedNode(node);
       setIsDetailModalOpen(true);
     }
-  }, []);
+  }, [equipmentStatuses]);
 
   const selectedEquipmentStatus = selectedNode 
     ? equipmentStatuses.find(s => s.equipment_code === selectedNode.data.equipmentCode)
@@ -193,6 +203,11 @@ const ProcessFlowMonitorContent: React.FC = () => {
         equipmentStatus={selectedEquipmentStatus}
         measurements={selectedEquipmentMeasurements}
       />
+
+      {/* Alarm Notification */}
+      {showAlarms && (
+        <AlarmNotification onClose={() => setShowAlarms(false)} />
+      )}
     </div>
   );
 };

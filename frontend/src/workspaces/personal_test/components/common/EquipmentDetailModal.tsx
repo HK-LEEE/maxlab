@@ -19,6 +19,14 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
 }) => {
   if (!isOpen || !node) return null;
 
+  // console.log('EquipmentDetailModal props:', {
+  //   node: node,
+  //   nodeData: node.data,
+  //   equipmentCode: node.data.equipmentCode,
+  //   equipmentStatus: equipmentStatus,
+  //   measurementsCount: measurements.length
+  // });
+
   const statusConfig = {
     ACTIVE: { text: '운행중', bgColor: 'bg-green-100', textColor: 'text-green-800' },
     PAUSE: { text: '일시정지', bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },

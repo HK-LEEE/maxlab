@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Node, Edge } from 'reactflow';
 import { apiClient } from '../../../api/client';
+import { useWebSocket } from './useWebSocket';
 
 interface ProcessFlow {
   id: string;
@@ -27,6 +28,10 @@ interface MeasurementData {
   measurement_desc: string;
   measurement_value: number;
   timestamp: string;
+  spec_status?: 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC';
+  upper_spec_limit?: number;
+  lower_spec_limit?: number;
+  target_value?: number;
 }
 
 export const useFlowMonitor = (workspaceId: string) => {
@@ -45,6 +50,28 @@ export const useFlowMonitor = (workspaceId: string) => {
   const [autoScroll, setAutoScroll] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // WebSocket connection (optional)
+  const { isConnected: wsConnected } = useWebSocket({
+    workspace_id: workspaceUuid,
+    onMessage: (data) => {
+      // Handle real-time updates from WebSocket
+      if (data.type === 'equipment_update') {
+        setEquipmentStatuses(prev => {
+          const updated = [...prev];
+          const index = updated.findIndex(e => e.equipment_code === data.equipment_code);
+          if (index >= 0) {
+            updated[index] = { ...updated[index], ...data.data };
+          }
+          return updated;
+        });
+        setLastUpdate(new Date());
+      } else if (data.type === 'measurement_update') {
+        setMeasurements(data.measurements);
+        setLastUpdate(new Date());
+      }
+    }
+  });
 
   // Set global auto-scroll state
   useEffect(() => {
@@ -65,22 +92,117 @@ export const useFlowMonitor = (workspaceId: string) => {
       .catch((err) => console.error('Failed to load flows:', err));
   }, [workspaceId, selectedFlow]);
 
-  // Load equipment status and measurements
-  const loadData = async () => {
+  // Track visible equipment codes to optimize API calls
+  const [visibleEquipmentCodes, setVisibleEquipmentCodes] = useState<Set<string>>(new Set());
+  const [previousData, setPreviousData] = useState<{
+    statuses: Map<string, any>,
+    measurements: Map<string, any>
+  }>({
+    statuses: new Map(),
+    measurements: new Map()
+  });
+
+  // Load equipment status and measurements (optimized)
+  const loadData = useCallback(async () => {
+    // Don't skip if no equipment codes - still load all statuses
     setIsLoading(true);
     try {
+      // Build equipment codes parameter
+      const equipmentCodesParam = visibleEquipmentCodes.size > 0 
+        ? Array.from(visibleEquipmentCodes).join(',')
+        : '';
+      
       const [statusResponse, measurementResponse] = await Promise.all([
-        apiClient.get('/api/v1/personal-test/process-flow/equipment/status?limit=100'),
-        apiClient.get('/api/v1/personal-test/process-flow/measurements?limit=100'),
+        apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}&limit=100`),
+        apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}&equipment_codes=${equipmentCodesParam}&limit=500`),
       ]);
       
       const equipmentStatusList = statusResponse.data.items || statusResponse.data;
-      setEquipmentStatuses(equipmentStatusList);
-      setMeasurements(measurementResponse.data);
-      setLastUpdate(new Date());
+      const newMeasurements = measurementResponse.data;
       
-      // Update nodes with real-time data
-      setNodes((currentNodes) => {
+      // Debug logging (commented out for production)
+      // console.log('Equipment Status Response:', equipmentStatusList);
+      // console.log('Total equipment count:', equipmentStatusList.length);
+      // console.log('Measurements Response:', newMeasurements.length, 'items');
+      
+      // Check if data has actually changed
+      let hasStatusChanged = false;
+      let hasMeasurementChanged = false;
+      
+      // Compare statuses
+      const newStatusMap = new Map();
+      equipmentStatusList.forEach((status: any) => {
+        newStatusMap.set(status.equipment_code, status);
+        const prevStatus = previousData.statuses.get(status.equipment_code);
+        if (!prevStatus || prevStatus.status !== status.status || 
+            prevStatus.last_run_time !== status.last_run_time) {
+          hasStatusChanged = true;
+        }
+      });
+      
+      // Compare measurements
+      const newMeasurementMap = new Map();
+      newMeasurements.forEach((measurement: any) => {
+        const key = `${measurement.equipment_code}_${measurement.measurement_code}`;
+        newMeasurementMap.set(key, measurement);
+        const prevMeasurement = previousData.measurements.get(key);
+        if (!prevMeasurement || prevMeasurement.measurement_value !== measurement.measurement_value ||
+            prevMeasurement.spec_status !== measurement.spec_status) {
+          hasMeasurementChanged = true;
+        }
+      });
+      
+      // Only update state if data has changed
+      if (hasStatusChanged) {
+        setEquipmentStatuses(equipmentStatusList);
+      }
+      if (hasMeasurementChanged) {
+        setMeasurements(newMeasurements);
+        
+        // Check for spec violations and trigger alarms
+        newMeasurements.forEach((measurement: MeasurementData) => {
+          if (measurement.spec_status && measurement.spec_status !== 'IN_SPEC') {
+            // Check if this is a new alarm or status change
+            const key = `${measurement.equipment_code}_${measurement.measurement_code}`;
+            const prevMeasurement = previousData.measurements.get(key);
+            
+            if (!prevMeasurement || prevMeasurement.spec_status !== measurement.spec_status) {
+              // Find equipment info
+              const equipment = equipmentStatusList.find((e: EquipmentStatus) => 
+                e.equipment_code === measurement.equipment_code
+              );
+              
+              // Trigger spec alarm event
+              const alarmEvent = new CustomEvent('specAlarm', {
+                detail: {
+                  id: `${measurement.equipment_code}_${measurement.measurement_code}_${Date.now()}`,
+                  equipment_code: measurement.equipment_code,
+                  equipment_name: equipment?.equipment_name || measurement.equipment_code,
+                  measurement_code: measurement.measurement_code,
+                  measurement_desc: measurement.measurement_desc,
+                  value: measurement.measurement_value,
+                  spec_type: measurement.spec_status,
+                  spec_limit: measurement.spec_status === 'ABOVE_SPEC' 
+                    ? measurement.upper_spec_limit 
+                    : measurement.lower_spec_limit,
+                  timestamp: new Date()
+                }
+              });
+              window.dispatchEvent(alarmEvent);
+            }
+          }
+        });
+      }
+      
+      if (hasStatusChanged || hasMeasurementChanged) {
+        setPreviousData({
+          statuses: newStatusMap,
+          measurements: newMeasurementMap
+        });
+        setLastUpdate(new Date());
+      
+        // Update nodes with real-time data
+        setNodes((currentNodes) => {
         const updatedNodes = currentNodes.map((node) => {
           if (node.type === 'equipment' && node.data.equipmentCode) {
             const status = equipmentStatusList.find((s: EquipmentStatus) => 
@@ -100,11 +222,34 @@ export const useFlowMonitor = (workspaceId: string) => {
               }
             });
             
-            const latestMeasurements = Array.from(measurementMap.values()).map((m) => ({
-              code: m.measurement_code,
-              desc: m.measurement_desc,
-              value: m.measurement_value,
-            }));
+            const latestMeasurements = Array.from(measurementMap.values()).map((m) => {
+              // Trigger alarm if spec_status is 1 (out of spec)
+              if (m.spec_status === 1) {
+                const alarmEvent = new CustomEvent('specAlarm', {
+                  detail: {
+                    id: `${m.equipment_code}-${m.measurement_code}-${Date.now()}`,
+                    equipment_code: m.equipment_code,
+                    equipment_name: equipmentList.find(e => e.equipment_code === m.equipment_code)?.equipment_name || m.equipment_code,
+                    measurement_code: m.measurement_code,
+                    measurement_desc: m.measurement_desc,
+                    value: m.measurement_value,
+                    spec_type: m.usl !== undefined && m.measurement_value > m.usl ? 'ABOVE_SPEC' : 'BELOW_SPEC',
+                    spec_limit: m.usl !== undefined && m.measurement_value > m.usl ? m.usl : m.lsl || 0,
+                    timestamp: new Date()
+                  }
+                });
+                window.dispatchEvent(alarmEvent);
+              }
+              
+              return {
+                code: m.measurement_code,
+                desc: m.measurement_desc,
+                value: m.measurement_value,
+                spec_status: m.spec_status,
+                usl: m.usl,
+                lsl: m.lsl
+              };
+            });
             
             return {
               ...node,
@@ -145,42 +290,42 @@ export const useFlowMonitor = (workspaceId: string) => {
               case 'ACTIVE-PAUSE':
                 edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
                 animated = true;
-                label = 'Target Pause';
+                label = '대상 일시정지';
                 break;
               case 'ACTIVE-STOP':
                 edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
                 animated = false;
-                label = 'Target Stop';
+                label = '대상 정지';
                 break;
               case 'PAUSE-ACTIVE':
                 edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
                 animated = true;
-                label = 'Source Pause';
+                label = '출발 일시정지';
                 break;
               case 'PAUSE-PAUSE':
                 edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
                 animated = true;
-                label = 'Both Pause';
+                label = '모두 일시정지';
                 break;
               case 'PAUSE-STOP':
                 edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
                 animated = false;
-                label = 'Target Stop';
+                label = '대상 정지';
                 break;
               case 'STOP-ACTIVE':
                 edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
                 animated = false;
-                label = 'Source Stop';
+                label = '출발 정지';
                 break;
               case 'STOP-PAUSE':
                 edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
                 animated = false;
-                label = 'Source Stop';
+                label = '출발 정지';
                 break;
               case 'STOP-STOP':
                 edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
                 animated = false;
-                label = 'Both Stop';
+                label = '모두 정지';
                 break;
               default:
                 edgeStyle = { stroke: '#000', strokeWidth: 2 };
@@ -188,7 +333,7 @@ export const useFlowMonitor = (workspaceId: string) => {
             
             return {
               ...edge,
-              type: 'custom',
+              type: 'custom', // Keep custom type for CustomEdgeWithLabel component
               animated: animated,
               style: {
                 ...edge.style,
@@ -196,7 +341,7 @@ export const useFlowMonitor = (workspaceId: string) => {
               },
               data: {
                 ...edge.data,
-                type: edge.type || 'step',
+                type: edge.type || edge.data?.type || 'smoothstep', // Preserve original edge type
                 label: label,
                 animated: animated,
               }
@@ -206,28 +351,58 @@ export const useFlowMonitor = (workspaceId: string) => {
         
         return updatedNodes;
       });
+      } // Close the if (hasStatusChanged || hasMeasurementChanged) block
     } catch (err) {
       console.error('Failed to load data:', err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [workspaceId, visibleEquipmentCodes]);
+
+  // Update visible equipment codes when nodes change
+  useEffect(() => {
+    const codes = new Set<string>();
+    nodes.forEach(node => {
+      if (node.type === 'equipment' && node.data.equipmentCode) {
+        codes.add(node.data.equipmentCode);
+      }
+    });
+    setVisibleEquipmentCodes(codes);
+  }, [nodes]);
+
+  // Load data when visible equipment codes change or on initial flow selection
+  useEffect(() => {
+    if (selectedFlow) {
+      const timer = setTimeout(() => {
+        loadData();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [visibleEquipmentCodes, selectedFlow, loadData]);
 
   // Auto-refresh
   useEffect(() => {
-    if (autoRefresh) {
+    if (autoRefresh && selectedFlow) {
       loadData();
       const interval = setInterval(loadData, refreshInterval);
       return () => clearInterval(interval);
     }
-  }, [autoRefresh, refreshInterval, selectedFlow]);
+  }, [autoRefresh, refreshInterval, selectedFlow, loadData]);
 
   // Update view when flow is selected
   useEffect(() => {
     if (selectedFlow) {
+      // Clear previous data when switching flows
+      setPreviousData({
+        statuses: new Map(),
+        measurements: new Map()
+      });
+      setEquipmentStatuses([]);
+      setMeasurements([]);
+      
+      // Set new nodes and edges
       setNodes(selectedFlow.flow_data.nodes || []);
       setEdges(selectedFlow.flow_data.edges || []);
-      loadData();
     }
   }, [selectedFlow]);
 
@@ -236,6 +411,7 @@ export const useFlowMonitor = (workspaceId: string) => {
     equipmentStatuses.forEach((status) => {
       counts[status.status]++;
     });
+    // console.log('Status Counts:', counts, 'from', equipmentStatuses.length, 'equipment');
     return counts;
   };
 

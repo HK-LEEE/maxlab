@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface EquipmentStatus {
   equipment_type: string;
@@ -13,6 +13,9 @@ interface MeasurementData {
   equipment_code: string;
   measurement_desc: string;
   measurement_value: number;
+  spec_status?: number;
+  usl?: number;
+  lsl?: number;
 }
 
 interface EquipmentSidebarProps {
@@ -60,17 +63,25 @@ export const EquipmentSidebar: React.FC<EquipmentSidebarProps> = ({
             ) : (
               <div className="space-y-2">
                 {equipmentStatuses.map((equipment) => {
-                  const measurement = measurements.find(
+                  const equipmentMeasurements = measurements.filter(
                     (m) => m.equipment_code === equipment.equipment_code
                   );
+                  const hasAlarm = equipmentMeasurements.some(m => m.spec_status === 1);
                   
                   return (
                     <div
                       key={equipment.equipment_code}
-                      className="p-3 border rounded-lg hover:bg-gray-50"
+                      className={`p-3 border rounded-lg hover:bg-gray-50 ${
+                        hasAlarm ? 'border-red-300 bg-red-50' : ''
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <div className="font-medium">{equipment.equipment_name}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium">{equipment.equipment_name}</div>
+                          {hasAlarm && (
+                            <AlertCircle className="w-4 h-4 text-red-500" title="Out of Spec" />
+                          )}
+                        </div>
                         <span
                           className={`text-xs px-2 py-1 rounded ${
                             statusConfig[equipment.status]
@@ -82,12 +93,19 @@ export const EquipmentSidebar: React.FC<EquipmentSidebarProps> = ({
                       <div className="text-xs text-gray-600">
                         Code: {equipment.equipment_code}
                       </div>
-                      {measurement && (
-                        <div className="mt-2 text-xs bg-gray-50 rounded p-2">
-                          <div>{measurement.measurement_desc}</div>
-                          <div className="font-bold">
-                            {measurement.measurement_value.toLocaleString()}
-                          </div>
+                      {equipmentMeasurements.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {equipmentMeasurements.slice(0, 2).map((measurement, idx) => (
+                            <div key={idx} className="text-xs bg-gray-50 rounded p-2">
+                              <div>{measurement.measurement_desc}</div>
+                              <div className={`font-bold ${
+                                measurement.spec_status === 1 ? 'text-red-600' : ''
+                              }`}>
+                                {measurement.measurement_value.toLocaleString()}
+                                {measurement.spec_status === 1 && ' ⚠️'}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                       {equipment.last_run_time && (

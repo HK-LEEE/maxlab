@@ -31,8 +31,13 @@ interface EquipmentNodeData {
     desc: string;
     value: number;
     unit?: string;
+    spec_status?: 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC';
+    upper_spec_limit?: number;
+    lower_spec_limit?: number;
+    target_value?: number;
   }>;
   displayMeasurements?: string[];
+  hasSpecOut?: boolean;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -79,6 +84,11 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
   const icon = data.icon ? iconMap[data.icon] : <Gauge size={20} />;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
+  
+  // Check if any measurements are out of spec
+  const hasSpecOut = data.measurements?.some(m => 
+    m.spec_status === 'ABOVE_SPEC' || m.spec_status === 'BELOW_SPEC'
+  ) || false;
   
   // Auto-scroll measurements if enabled
   useEffect(() => {
@@ -141,12 +151,17 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
       />
       
       {/* Tier 1: Equipment Name (Center aligned) */}
-      <div className={`px-3 py-2 border-b ${window.location.pathname.includes('monitor') ? status.headerBg : data.equipmentType ? 'bg-gray-50' : 'bg-gray-100'}`}>
+      <div className={`px-3 py-2 border-b ${window.location.pathname.includes('monitor') ? status.headerBg : data.equipmentType ? 'bg-gray-50' : 'bg-gray-100'} relative`}>
         <div className="flex items-center justify-center space-x-1">
           <div className={window.location.pathname.includes('monitor') ? status.headerText : "text-gray-600"}>{icon}</div>
           <div className={`font-semibold text-sm text-center ${window.location.pathname.includes('monitor') ? status.headerText : ''}`}>
             {data.equipmentType ? data.label : '공통설비 (미지정)'}
           </div>
+          {hasSpecOut && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              <AlertCircle className="w-4 h-4 text-red-500 animate-pulse" />
+            </div>
+          )}
         </div>
       </div>
       
@@ -183,14 +198,36 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
                 ? [...filteredMeasurements, ...filteredMeasurements]
                 : filteredMeasurements;
               
-              return measurementsToShow.map((measurement, index) => (
-                <div key={`${measurement.code}-${index}`} className="text-xs bg-gray-50 rounded px-2 py-1">
-                  <div className="text-gray-600 text-[10px]">{measurement.code}: {measurement.desc}</div>
-                  <div className="font-semibold text-gray-800">
-                    {measurement.value.toLocaleString()} {measurement.unit || ''}
+              return measurementsToShow.map((measurement, index) => {
+                const isAboveSpec = measurement.spec_status === 'ABOVE_SPEC';
+                const isBelowSpec = measurement.spec_status === 'BELOW_SPEC';
+                const isOutOfSpec = isAboveSpec || isBelowSpec;
+                
+                return (
+                  <div 
+                    key={`${measurement.code}-${index}`} 
+                    className={`text-xs rounded px-2 py-1 ${
+                      isOutOfSpec ? 'bg-red-50 border border-red-300' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="text-gray-600 text-[10px]">{measurement.code}: {measurement.desc}</div>
+                      {isOutOfSpec && (
+                        <AlertCircle className="w-3 h-3 text-red-500" />
+                      )}
+                    </div>
+                    <div className={`font-semibold ${isOutOfSpec ? 'text-red-700' : 'text-gray-800'}`}>
+                      {measurement.value.toLocaleString()} {measurement.unit || ''}
+                      {isAboveSpec && measurement.upper_spec_limit !== undefined && (
+                        <span className="text-[10px] ml-1">(USL: {measurement.upper_spec_limit})</span>
+                      )}
+                      {isBelowSpec && measurement.lower_spec_limit !== undefined && (
+                        <span className="text-[10px] ml-1">(LSL: {measurement.lower_spec_limit})</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ));
+                );
+              });
             })()}
           </div>
           </div>

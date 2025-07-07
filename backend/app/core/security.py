@@ -12,6 +12,9 @@ import logging
 from datetime import datetime, timedelta
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
+from cryptography.fernet import Fernet
+import os
+import base64
 
 from .config import settings
 from .database import get_db
@@ -300,3 +303,76 @@ class WorkspacePermissionChecker:
 def require_workspace_permission(permission: str = "read"):
     """워크스페이스 권한 확인 의존성 팩토리"""
     return WorkspacePermissionChecker(permission)
+
+
+# Encryption/Decryption for sensitive data
+_encryption_key: Optional[bytes] = None
+
+
+def get_or_create_encryption_key() -> bytes:
+    """Get or create encryption key for sensitive data"""
+    global _encryption_key
+    
+    if _encryption_key:
+        return _encryption_key
+    
+    # Try to get from environment
+    key_str = os.getenv("ENCRYPTION_KEY")
+    
+    if not key_str:
+        # Generate new key
+        key = Fernet.generate_key()
+        key_str = key.decode()
+        
+        # Save to .env file
+        env_path = os.path.join(os.path.dirname(__file__), "../../.env")
+        try:
+            with open(env_path, "a") as f:
+                f.write(f"\n# Auto-generated encryption key for sensitive data\n")
+                f.write(f"ENCRYPTION_KEY={key_str}\n")
+            logger.info("Generated new encryption key and saved to .env")
+        except Exception as e:
+            logger.warning(f"Could not save encryption key to .env: {e}")
+    
+    # Convert to bytes if needed
+    if isinstance(key_str, str):
+        _encryption_key = key_str.encode()
+    else:
+        _encryption_key = key_str
+    
+    return _encryption_key
+
+
+def encrypt_connection_string(value: Optional[str]) -> Optional[str]:
+    """Encrypt a connection string or API key"""
+    if not value:
+        return None
+    
+    try:
+        key = get_or_create_encryption_key()
+        f = Fernet(key)
+        encrypted = f.encrypt(value.encode())
+        # Return as base64 string for easy storage
+        return base64.b64encode(encrypted).decode()
+    except Exception as e:
+        logger.error(f"Encryption failed: {e}")
+        # In case of error, return original value (not recommended for production)
+        return value
+
+
+def decrypt_connection_string(encrypted_value: Optional[str]) -> Optional[str]:
+    """Decrypt a connection string or API key"""
+    if not encrypted_value:
+        return None
+    
+    try:
+        key = get_or_create_encryption_key()
+        f = Fernet(key)
+        # Decode from base64 first
+        encrypted_bytes = base64.b64decode(encrypted_value.encode())
+        decrypted = f.decrypt(encrypted_bytes)
+        return decrypted.decode()
+    except Exception as e:
+        logger.warning(f"Decryption failed, returning original value: {e}")
+        # If decryption fails, assume it's not encrypted (for backward compatibility)
+        return encrypted_value

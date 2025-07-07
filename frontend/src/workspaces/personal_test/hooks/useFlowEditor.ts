@@ -41,6 +41,7 @@ export const useFlowEditor = (workspaceId: string) => {
   const [flows, setFlows] = useState<ProcessFlow[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastAutoSaveTime, setLastAutoSaveTime] = useState<Date | null>(null);
   
   // Equipment states
   const [equipmentList, setEquipmentList] = useState<EquipmentItem[]>([]);
@@ -92,11 +93,16 @@ export const useFlowEditor = (workspaceId: string) => {
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes]);
 
-  const saveFlow = async () => {
+  const saveFlow = async (isAutoSave = false) => {
     if (!workspaceId) return;
     
-    setIsSaving(true);
+    if (!isAutoSave) {
+      setIsSaving(true);
+    }
     setError(null);
+    
+    console.log('Saving flow with nodes:', nodes);
+    console.log('Node types:', nodes.map(n => ({ id: n.id, type: n.type, data: n.data })));
     
     try {
       const flowData = {
@@ -106,47 +112,86 @@ export const useFlowEditor = (workspaceId: string) => {
       };
 
       if (currentFlow) {
-        await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
+        const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
           name: flowName,
           flow_data: { nodes, edges },
         });
-        toast.success('Flow updated successfully');
+        // Update currentFlow with the response to ensure we have the latest data
+        console.log('Update response:', response.data);
+        setCurrentFlow(response.data);
+        if (!isAutoSave) {
+          toast.success('Flow updated successfully');
+        }
       } else {
         const response = await apiClient.post('/api/v1/personal-test/process-flow/flows', flowData);
         setCurrentFlow(response.data);
-        toast.success('Flow created successfully');
+        if (!isAutoSave) {
+          toast.success('Flow created successfully');
+        }
+      }
+      
+      if (isAutoSave) {
+        setLastAutoSaveTime(new Date());
       }
     } catch (err) {
       setError('Failed to save process flow');
-      toast.error('Failed to save flow');
+      if (!isAutoSave) {
+        toast.error('Failed to save flow');
+      }
       console.error('Save error:', err);
     } finally {
-      setIsSaving(false);
+      if (!isAutoSave) {
+        setIsSaving(false);
+      }
     }
   };
 
   const loadFlow = async (flow: ProcessFlow) => {
+    console.log('Loading flow:', flow);
+    console.log('Flow nodes:', flow.flow_data?.nodes);
+    
     setCurrentFlow(flow);
     setFlowName(flow.name);
     
-    const nodesWithSizes = (flow.flow_data.nodes || []).map((node: Node) => {
+    const nodesWithDefaults = (flow.flow_data.nodes || []).map((node: Node) => {
+      // Ensure all nodes have proper structure
+      const baseNode = {
+        ...node,
+        position: node.position || { x: 0, y: 0 },
+        data: node.data || {}
+      };
+
+      // Add default styles based on node type
       if (node.type === 'equipment' && !node.style?.width) {
         return {
-          ...node,
+          ...baseNode,
           style: {
-            ...node.style,
+            ...baseNode.style,
             width: 200,
             height: 150
           }
         };
+      } else if (node.type === 'group') {
+        return {
+          ...baseNode,
+          style: {
+            width: 300,
+            height: 200,
+            ...baseNode.style // Preserve saved styles
+          }
+        };
+      } else if (node.type === 'text') {
+        // Text nodes typically don't need explicit size
+        return baseNode;
       }
-      return node;
+      
+      return baseNode;
     });
-    setNodes(nodesWithSizes);
+    setNodes(nodesWithDefaults);
     
     const edgesWithType = (flow.flow_data.edges || []).map((edge: Edge) => ({
       ...edge,
-      type: edge.type || 'step'
+      type: edge.type === 'bezier' ? 'default' : (edge.type || 'step')
     }));
     setEdges(edgesWithType);
   };
@@ -155,17 +200,29 @@ export const useFlowEditor = (workspaceId: string) => {
     // No longer needed - all equipment loaded at initialization
   };
 
-  const publishFlow = async () => {
-    if (!currentFlow) return;
+  const publishFlow = async (flowId?: string, versionId?: string) => {
+    const targetFlowId = flowId || currentFlow?.id;
+    if (!targetFlowId) return;
     
     try {
-      const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/publish`);
-      setCurrentFlow({
-        ...currentFlow,
-        is_published: true,
-        published_at: new Date().toISOString(),
-        publish_token: response.data.publish_token
-      });
+      let response;
+      if (versionId) {
+        // Publish specific version
+        response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${targetFlowId}/versions/${versionId}/publish`);
+      } else {
+        // Publish current version
+        response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${targetFlowId}/publish`);
+      }
+      
+      if (targetFlowId === currentFlow?.id) {
+        setCurrentFlow({
+          ...currentFlow,
+          is_published: true,
+          published_at: new Date().toISOString(),
+          publish_token: response.data.publish_token
+        });
+      }
+      
       toast.success('Flow published successfully');
       return response.data;
     } catch (err) {
@@ -216,6 +273,48 @@ export const useFlowEditor = (workspaceId: string) => {
       throw err;
     }
   };
+
+  // Validate equipment mappings
+  const validateMappings = useCallback(() => {
+    const issues: string[] = [];
+    const equipmentCodes = new Set<string>();
+    const unmappedNodes: Node[] = [];
+    
+    nodes.forEach(node => {
+      if (node.type === 'equipment') {
+        const code = node.data.equipmentCode;
+        
+        // Check for unmapped nodes
+        if (!code && node.id !== 'common-equipment') {
+          unmappedNodes.push(node);
+        }
+        
+        // Check for duplicate mappings
+        if (code && equipmentCodes.has(code)) {
+          issues.push(`Duplicate mapping: Equipment ${code} is mapped to multiple nodes`);
+        }
+        if (code) equipmentCodes.add(code);
+        
+        // Check if equipment still exists
+        if (code && equipmentList.length > 0) {
+          const exists = equipmentList.some(eq => eq.equipment_code === code);
+          if (!exists) {
+            issues.push(`Missing equipment: ${code} no longer exists in database`);
+          }
+        }
+      }
+    });
+    
+    if (unmappedNodes.length > 0) {
+      // Highlight unmapped nodes
+      setNodes((nds) => nds.map(n => ({
+        ...n,
+        className: unmappedNodes.includes(n) ? 'ring-2 ring-yellow-400' : ''
+      })));
+    }
+    
+    return { isValid: issues.length === 0, issues, unmappedNodes };
+  }, [nodes, equipmentList]);
 
   const alignNodes = useCallback((alignment: string) => {
     const selectedNodes = nodes.filter(n => n.selected);
@@ -406,6 +505,17 @@ export const useFlowEditor = (workspaceId: string) => {
     setSelectedElements({ nodes: selectedNodes, edges: selectedEdges });
   }, [nodes, edges]);
 
+  // Auto-save feature
+  useEffect(() => {
+    if (!currentFlow) return;
+
+    const autoSaveTimer = setTimeout(() => {
+      saveFlow(true);
+    }, 300000); // 5 minutes
+
+    return () => clearTimeout(autoSaveTimer);
+  }, [nodes, edges, currentFlow, flowName]);
+
   // Update selected edges' type when edgeType changes
   useEffect(() => {
     setEdges((eds) => eds.map((edge) => {
@@ -483,8 +593,11 @@ export const useFlowEditor = (workspaceId: string) => {
     setAutoScroll,
     setNodes,
     setEdges,
+    setFlows,
+    setCurrentFlow,
     saveFlow,
     loadFlow,
+    validateMappings,
     loadMoreEquipment,
     deleteSelectedNodes,
     addGroupNode,
@@ -493,5 +606,6 @@ export const useFlowEditor = (workspaceId: string) => {
     publishFlow,
     unpublishFlow,
     deleteFlow,
+    lastAutoSaveTime,
   };
 };

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -9,11 +9,12 @@ import ReactFlow, {
 } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Save, FileText, Square, Trash2, Globe } from 'lucide-react';
+import { Save, FileText, Square, Trash2, Globe, FolderOpen, Download, Database, Ruler } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
+import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { NodeConfigDialog } from '../components/common/NodeConfigDialog';
 import { TextConfigDialog } from '../components/common/TextConfigDialog';
 import { FloatingActionButton } from '../components/common/FloatingActionButton';
@@ -22,16 +23,14 @@ import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
 import { AlignmentMenu } from '../components/editor/AlignmentMenu';
 import { PublishDialog } from '../components/editor/PublishDialog';
+import { MeasurementSpecDialog } from '../components/editor/MeasurementSpecDialog';
+import { DataSourceDialog } from '../components/editor/DataSourceDialog';
 
 import { useFlowEditor } from '../hooks/useFlowEditor';
 import { Layout } from '../../../components/common/Layout';
+import { apiClient } from '../../../api/client';
+import { toast } from 'react-hot-toast';
 
-// Define nodeTypes outside component to avoid re-creation
-const nodeTypes = {
-  equipment: EquipmentNode,
-  group: GroupNode,
-  text: TextNode,
-};
 
 const equipmentTypes = [
   { code: 'A1', name: '감압기', icon: 'gauge' },
@@ -65,6 +64,17 @@ const ProcessFlowEditorContent: React.FC = () => {
   const workspaceId = 'personal_test';
   const { screenToFlowPosition } = useReactFlow();
   
+  // Memoize nodeTypes and edgeTypes to avoid React Flow warnings
+  const nodeTypes = useMemo(() => ({
+    equipment: EquipmentNode,
+    group: GroupNode,
+    text: TextNode,
+  }), []);
+
+  const edgeTypes = useMemo(() => ({
+    custom: CustomEdgeWithLabel,
+  }), []);
+  
   const {
     nodes,
     edges,
@@ -90,6 +100,8 @@ const ProcessFlowEditorContent: React.FC = () => {
     setAutoScroll,
     setNodes,
     setEdges,
+    setFlows,
+    setCurrentFlow,
     saveFlow,
     loadFlow,
     loadMoreEquipment,
@@ -100,13 +112,17 @@ const ProcessFlowEditorContent: React.FC = () => {
     publishFlow,
     unpublishFlow,
     deleteFlow,
+    lastAutoSaveTime,
   } = useFlowEditor(workspaceId);
 
-  const [isLoadFlowOpen, setIsLoadFlowOpen] = useState(false);
+  const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
   const [configNode, setConfigNode] = useState<Node | null>(null);
   const [textConfigNode, setTextConfigNode] = useState<Node | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+  const [versionManagementAvailable, setVersionManagementAvailable] = useState(true);
+  const [isDataSourceDialogOpen, setIsDataSourceDialogOpen] = useState(false);
+  const [isMeasurementSpecDialogOpen, setIsMeasurementSpecDialogOpen] = useState(false);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -230,10 +246,78 @@ const ProcessFlowEditorContent: React.FC = () => {
     event.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleLoadFlow = async (flow: any) => {
+  const handleLoadFlow = async (flow: any, version?: any) => {
     await loadFlow(flow);
-    setIsLoadFlowOpen(false);
+    setIsLoadDialogOpen(false);
   };
+
+  const handleExportFlow = () => {
+    const exportData = {
+      name: flowName,
+      flow_data: { nodes, edges },
+      exported_at: new Date().toISOString(),
+      version: currentFlow?.current_version || 1
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `${flowName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    toast.success('Flow exported successfully');
+  };
+
+  const handleSaveAsNewVersion = async () => {
+    const versionName = `${flowName} - Version ${new Date().toLocaleString()}`;
+    const description = `Saved from editor at ${new Date().toLocaleString()}`;
+    
+    try {
+      const versionResponse = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${currentFlow?.id}/versions`, {
+        name: versionName,
+        description,
+        flow_data: { nodes, edges }
+      });
+      
+      // Update the current version number in currentFlow
+      if (versionResponse.data && currentFlow) {
+        const updatedFlow = {
+          ...currentFlow,
+          current_version: versionResponse.data.version_number,
+          flow_data: { nodes, edges }  // Include current editor state
+        };
+        // Update flows list to reflect new version
+        setFlows(prevFlows => 
+          prevFlows.map(f => f.id === currentFlow.id ? updatedFlow : f)
+        );
+        // Also update currentFlow in the editor
+        setCurrentFlow(updatedFlow);
+      }
+      
+      toast.success('Saved as new version successfully');
+    } catch (error: any) {
+      console.error('Failed to save as new version:', error);
+      if (error.response?.status === 503 || error.response?.status === 500) {
+        setVersionManagementAvailable(false);
+        toast.error('Version management is not available. The flow has been saved normally.', {
+          duration: 5000,
+          icon: '⚠️'
+        });
+      } else {
+        toast.error('Failed to save as new version');
+      }
+    }
+  };
+
+  // Memoize default edge options
+  const defaultEdgeOptions = useMemo(() => ({
+    type: 'custom',
+    animated: false,
+    style: { strokeWidth: 2, stroke: '#374151' },
+    data: { type: edgeType }, // Pass edge type in data for CustomEdgeWithLabel
+  }), [edgeType]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -241,13 +325,20 @@ const ProcessFlowEditorContent: React.FC = () => {
       <div className="bg-white border-b px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <input
-              type="text"
-              value={flowName}
-              onChange={(e) => setFlowName(e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-              placeholder="Flow name"
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={flowName}
+                onChange={(e) => setFlowName(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                placeholder="Flow name"
+              />
+              {currentFlow && (
+                <span className="text-sm text-gray-500">
+                  v{currentFlow.current_version || 1}
+                </span>
+              )}
+            </div>
             <button
               onClick={saveFlow}
               disabled={isSaving}
@@ -257,11 +348,28 @@ const ProcessFlowEditorContent: React.FC = () => {
               <span>{isSaving ? 'Saving...' : 'Save'}</span>
             </button>
             <button
-              onClick={() => setIsLoadFlowOpen(true)}
+              onClick={() => setIsLoadDialogOpen(true)}
               className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
             >
-              <FileText size={16} />
+              <FolderOpen size={16} />
               <span>Load</span>
+            </button>
+            {currentFlow && versionManagementAvailable && (
+              <button
+                onClick={handleSaveAsNewVersion}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+                title={!versionManagementAvailable ? "Version management not available" : ""}
+              >
+                <Save size={16} />
+                <span>Save as Version</span>
+              </button>
+            )}
+            <button
+              onClick={handleExportFlow}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+            >
+              <Download size={16} />
+              <span>Export</span>
             </button>
             {currentFlow && (
               <button
@@ -285,10 +393,32 @@ const ProcessFlowEditorContent: React.FC = () => {
                 )}
               </button>
             )}
+            <div className="w-px h-6 bg-gray-300" />
+            <button
+              onClick={() => setIsDataSourceDialogOpen(true)}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+            >
+              <Database size={16} />
+              <span>Data Sources</span>
+            </button>
+            <button
+              onClick={() => setIsMeasurementSpecDialogOpen(true)}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+            >
+              <Ruler size={16} />
+              <span>Measurement Specs</span>
+            </button>
           </div>
-          {error && (
-            <div className="text-red-600 text-sm">{error}</div>
-          )}
+          <div className="flex items-center space-x-4">
+            {lastAutoSaveTime && (
+              <span className="text-xs text-gray-500">
+                Auto-saved {lastAutoSaveTime.toLocaleTimeString()}
+              </span>
+            )}
+            {error && (
+              <div className="text-red-600 text-sm">{error}</div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -304,11 +434,8 @@ const ProcessFlowEditorContent: React.FC = () => {
           onDragOver={onDragOver}
           onNodeDoubleClick={onNodeDoubleClick}
           nodeTypes={nodeTypes}
-          defaultEdgeOptions={{
-            type: edgeType,
-            animated: false,
-            style: { strokeWidth: 2, stroke: '#374151' },
-          }}
+          edgeTypes={edgeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
           connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
           snapToGrid={true}
           snapGrid={[15, 15]}
@@ -355,11 +482,12 @@ const ProcessFlowEditorContent: React.FC = () => {
 
         {/* Dialogs */}
         <LoadFlowDialog
-          isOpen={isLoadFlowOpen}
+          isOpen={isLoadDialogOpen}
           flows={flows}
           currentFlowId={currentFlow?.id}
-          onClose={() => setIsLoadFlowOpen(false)}
+          onClose={() => setIsLoadDialogOpen(false)}
           onLoad={handleLoadFlow}
+          onPublish={publishFlow}
           onDelete={deleteFlow}
         />
 
@@ -394,6 +522,17 @@ const ProcessFlowEditorContent: React.FC = () => {
             onDelete={deleteFlow}
           />
         )}
+
+        <DataSourceDialog
+          isOpen={isDataSourceDialogOpen}
+          onClose={() => setIsDataSourceDialogOpen(false)}
+          workspaceId={workspaceId}
+        />
+
+        <MeasurementSpecDialog
+          isOpen={isMeasurementSpecDialogOpen}
+          onClose={() => setIsMeasurementSpecDialogOpen(false)}
+        />
       </div>
     </div>
   );

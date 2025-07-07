@@ -1,0 +1,23 @@
+{
+  "module_name": "sdf",
+  "display_name": "Sdf",
+  "version": "1.0.0",
+  "template": "dashboard",
+  "created_at": "2025-07-02T12:41:35.144368",
+  "routes": {
+    "main": "/sdf",
+    "api": "/api/sdf"
+  },
+  "permissions": {
+    "view": [
+      "*"
+    ],
+    "edit": [
+      "admin",
+      "editor"
+    ],
+    "delete": [
+      "admin"
+    ]
+  }
+}

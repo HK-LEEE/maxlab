@@ -81,47 +81,131 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         `/api/v1/personal-test/process-flow/public/${publishToken}/status?limit=100`
       );
       const statuses = statusResponse.data.items || statusResponse.data;
+      // console.log('Public Equipment Status Response:', statuses);
       setEquipmentStatuses(statuses);
 
-      // Get measurements
+      // Get measurements using the public endpoint
       const measurementResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/measurements?limit=100`
+        `/api/v1/personal-test/process-flow/public/${publishToken}/measurements?limit=100`
       );
       setMeasurements(measurementResponse.data);
 
       // Update nodes with real-time data
-      setNodes((currentNodes) => {
-        // Use current nodes for updates, not flowData nodes
-        const nodesToUpdate = isInitialLoad ? flowData.flow_data?.nodes || [] : currentNodes;
-        
-        return nodesToUpdate.map((node: Node) => {
-          if (node.type === 'equipment' && node.data.equipmentCode) {
-            const status = statuses.find(
-              (s: EquipmentStatus) => s.equipment_code === node.data.equipmentCode
-            );
-            const nodeMeasurements = measurementResponse.data.filter(
-              (m: Measurement) => m.equipment_code === node.data.equipmentCode
-            );
+      const updatedNodes = isInitialLoad ? flowData.flow_data?.nodes || [] : nodes;
+      const finalNodes = updatedNodes.map((node: Node) => {
+        if (node.type === 'equipment' && node.data.equipmentCode) {
+          const status = statuses.find(
+            (s: EquipmentStatus) => s.equipment_code === node.data.equipmentCode
+          );
+          const nodeMeasurements = measurementResponse.data.filter(
+            (m: Measurement) => m.equipment_code === node.data.equipmentCode
+          );
 
-            if (status) {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  status: status.status,
-                  measurements: nodeMeasurements.map((m: Measurement) => ({
-                    code: m.measurement_code,
-                    desc: m.measurement_desc,
-                    value: m.measurement_value,
-                    unit: 'units',
-                  })),
-                },
-              };
-            }
+          if (status) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                status: status.status,
+                measurements: nodeMeasurements.map((m: Measurement) => ({
+                  code: m.measurement_code,
+                  desc: m.measurement_desc,
+                  value: m.measurement_value,
+                  unit: 'units',
+                })),
+              },
+            };
           }
-          return node;
-        });
+        }
+        return node;
       });
+      setNodes(finalNodes);
+
+      // Update edges based on node statuses
+      const edgesToUpdate = isInitialLoad ? flowData.flow_data?.edges || [] : edges;
+      const nodeStatusMap = new Map<string, string>();
+      finalNodes.forEach(node => {
+        if (node.type === 'equipment' && node.data.status) {
+          nodeStatusMap.set(node.id, node.data.status);
+        }
+      });
+      
+      const updatedEdges = edgesToUpdate.map(edge => {
+        const sourceStatus = nodeStatusMap.get(edge.source) || 'STOP';
+        const targetStatus = nodeStatusMap.get(edge.target) || 'STOP';
+        
+        // Define edge styles based on status combinations
+        const statusKey = `${sourceStatus}-${targetStatus}`;
+        let edgeStyle = {};
+        let label = null;
+        let animated = false;
+        
+        switch (statusKey) {
+          case 'ACTIVE-ACTIVE':
+            edgeStyle = { stroke: '#10b981', strokeWidth: 3 };
+            animated = true;
+            break;
+          case 'ACTIVE-PAUSE':
+            edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+            animated = true;
+            label = '대상 일시정지';
+            break;
+          case 'ACTIVE-STOP':
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            animated = false;
+            label = '대상 정지';
+            break;
+          case 'PAUSE-ACTIVE':
+            edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+            animated = true;
+            label = '출발 일시정지';
+            break;
+          case 'PAUSE-PAUSE':
+            edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+            animated = true;
+            label = '모두 일시정지';
+            break;
+          case 'PAUSE-STOP':
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            animated = false;
+            label = '대상 정지';
+            break;
+          case 'STOP-ACTIVE':
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            animated = false;
+            label = '출발 정지';
+            break;
+          case 'STOP-PAUSE':
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            animated = false;
+            label = '출발 정지';
+            break;
+          case 'STOP-STOP':
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            animated = false;
+            label = '모두 정지';
+            break;
+          default:
+            edgeStyle = { stroke: '#000', strokeWidth: 2 };
+        }
+        
+        return {
+          ...edge,
+          type: 'custom', // Keep custom type for CustomEdgeWithLabel component
+          animated: animated,
+          style: {
+            ...edge.style,
+            ...edgeStyle,
+          },
+          data: {
+            ...edge.data,
+            type: edge.type || edge.data?.type || 'smoothstep', // Preserve original edge type
+            label: label,
+            animated: animated,
+          }
+        };
+      });
+      setEdges(updatedEdges);
 
       setLastUpdate(new Date());
       setIsInitialLoad(false);
