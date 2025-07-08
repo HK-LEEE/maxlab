@@ -63,7 +63,7 @@ class MSSQLProvider(IDataProvider):
             "MSSQL_CONNECTION_STRING",
             "DRIVER={ODBC Driver 17 for SQL Server};"
             "SERVER=localhost\\SQLEXPRESS;"
-            "DATABASE=equipment_db;"
+            "DATABASE=AIDB;"
             "UID=mss;"
             "PWD=2300;"
             "TrustServerCertificate=yes;"
@@ -95,7 +95,7 @@ class MSSQLProvider(IDataProvider):
         
         # Extract components
         server = parts.get('server', 'localhost\\SQLEXPRESS')
-        database = parts.get('database', 'equipment_db')
+        database = parts.get('database', 'AIDB')
         uid = parts.get('id', parts.get('uid', 'mss'))
         pwd = parts.get('password', parts.get('pwd', '2300'))
         
@@ -612,21 +612,17 @@ class MSSQLProvider(IDataProvider):
                 else:
                     version = server_name = db_name = user = current_time = "Unknown"
                 
-                # Test basic query on equipment table
+                # Test basic query - just check if we can run a simple query
                 try:
-                    await cursor.execute("SELECT COUNT(*) FROM personal_test_equipment_status")
-                    count_result = await cursor.fetchone()
-                    equipment_count = count_result[0] if count_result else 0
-                except Exception:
-                    equipment_count = "N/A - Table not found"
+                    await cursor.execute("SELECT 1 as test_query")
+                    test_result = await cursor.fetchone()
+                    basic_query_test = "Success" if test_result else "Failed"
+                except Exception as e:
+                    basic_query_test = f"Failed: {str(e)}"
                 
-                # Test measurement data table
-                try:
-                    await cursor.execute("SELECT COUNT(*) FROM personal_test_measurement_data")
-                    measurement_result = await cursor.fetchone()
-                    measurement_count = measurement_result[0] if measurement_result else 0
-                except Exception:
-                    measurement_count = "N/A - Table not found"
+                # Optional: Test specific tables if they exist
+                equipment_count = "N/A - Test skipped"
+                measurement_count = "N/A - Test skipped"
             
             logger.info("MSSQL connection test successful")
             
@@ -640,6 +636,7 @@ class MSSQLProvider(IDataProvider):
                     "database_name": db_name,
                     "system_user": user,
                     "current_time": str(current_time),
+                    "basic_query_test": basic_query_test,
                     "equipment_count": equipment_count,
                     "measurement_count": measurement_count,
                     "workspace_id": self.workspace_id,
