@@ -599,11 +599,11 @@ class MSSQLProvider(IDataProvider):
                 # Get SQL Server version and instance info
                 await cursor.execute("""
                     SELECT 
-                        @@VERSION as version,
-                        @@SERVERNAME as server_name,
-                        DB_NAME() as database_name,
+                        @@VERSION as [version],
+                        @@SERVERNAME as [server_name],
+                        DB_NAME() as [database_name],
                         SYSTEM_USER as [system_user],
-                        GETDATE() as current_time
+                        GETDATE() as [current_time]
                 """)
                 result = await cursor.fetchone()
                 
