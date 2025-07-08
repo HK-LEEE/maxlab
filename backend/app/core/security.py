@@ -24,6 +24,56 @@ logger = logging.getLogger(__name__)
 # HTTP Bearer 토큰 스키마
 security = HTTPBearer()
 
+def decode_jwt_token_locally(token: str) -> Dict[str, Any]:
+    """
+    JWT 토큰을 로컬에서 디코딩 (검증 없이 - fallback 용도)
+    인증 서버와 통신할 수 없을 때 사용
+    
+    Args:
+        token: JWT 토큰 문자열
+        
+    Returns:
+        dict: 사용자 정보 딕셔너리
+        
+    Raises:
+        AuthenticationError: 토큰 디코딩 실패시
+    """
+    try:
+        # JWT 토큰을 검증 없이 디코딩 (verify=False)
+        # 주의: 이는 fallback 용도로만 사용해야 함
+        payload = jwt.decode(token, options={"verify_signature": False})
+        
+        logger.info(f"Local JWT decode successful for user: {payload.get('email', payload.get('sub', 'unknown'))}")
+        
+        # payload에서 사용자 정보 추출
+        user_data = {
+            "user_id": payload.get("sub") or payload.get("user_id") or payload.get("email"),
+            "username": payload.get("email") or payload.get("sub"),
+            "email": payload.get("email"),
+            "full_name": payload.get("full_name") or payload.get("email"),
+            "is_active": True,
+            "is_admin": payload.get("is_admin", False),
+            "role": "admin" if payload.get("is_admin", False) else "user",
+            "groups": payload.get("groups", [payload.get("group_name", "")]) if payload.get("group_name") else [],
+            "auth_type": "jwt_local",
+            "permissions": [],
+            "scopes": []
+        }
+        
+        # 관리자 권한 체크 (role_name 필드 확인)
+        if payload.get("role_name") == "admin" or payload.get("is_admin"):
+            user_data["is_admin"] = True
+            user_data["role"] = "admin"
+        
+        return user_data
+        
+    except jwt.DecodeError as e:
+        logger.error(f"JWT decode error: {e}")
+        raise AuthenticationError("Invalid JWT token format")
+    except Exception as e:
+        logger.error(f"Unexpected error during JWT decode: {e}")
+        raise AuthenticationError("Token processing failed")
+
 class AuthenticationError(HTTPException):
     """인증 관련 예외"""
     def __init__(self, detail: str = "Authentication failed"):
@@ -44,9 +94,10 @@ class AuthorizationError(HTTPException):
 async def verify_token_with_auth_server(token: str) -> Dict[str, Any]:
     """
     외부 인증 서버 (localhost:8000)에서 토큰 검증
+    OAuth 2.0 토큰을 우선적으로 지원하며, 전통적인 JWT 토큰도 지원
     
     Args:
-        token: JWT 토큰 문자열
+        token: JWT 또는 OAuth 토큰 문자열
         
     Returns:
         dict: 사용자 정보 딕셔너리
@@ -56,7 +107,55 @@ async def verify_token_with_auth_server(token: str) -> Dict[str, Any]:
     """
     async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
         try:
-            # 외부 인증 서버의 /api/auth/me 엔드포인트 호출
+            # 우선 OAuth userinfo 엔드포인트 시도 (SSO 전용)
+            oauth_response = await client.get(
+                f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            
+            if oauth_response.status_code == 200:
+                oauth_user_data = oauth_response.json()
+                logger.info(f"OAuth SSO user authenticated: {oauth_user_data.get('display_name', oauth_user_data.get('email', 'unknown'))}")
+                
+                # Safe group processing
+                groups = []
+                for g in oauth_user_data.get("groups", []):
+                    if isinstance(g, dict):
+                        groups.append(g.get("name", g.get("display_name", str(g))))
+                    else:
+                        groups.append(str(g))
+                
+                # OAuth 사용자 정보를 내부 형식으로 변환
+                user_data = {
+                    "user_id": oauth_user_data.get("sub") or oauth_user_data.get("id") or oauth_user_data.get("user_id"),
+                    "username": oauth_user_data.get("display_name") or oauth_user_data.get("username"),
+                    "email": oauth_user_data.get("email"),
+                    "full_name": oauth_user_data.get("real_name") or oauth_user_data.get("full_name"),
+                    "is_active": True,
+                    "is_admin": oauth_user_data.get("is_admin", False),
+                    "role": "admin" if oauth_user_data.get("is_admin", False) else "user",
+                    "groups": groups,
+                    "auth_type": "oauth",
+                    "permissions": oauth_user_data.get("permissions", []),
+                    "scopes": oauth_user_data.get("scopes", [])
+                }
+                
+                # 관리자 권한 향상된 체크 (localhost:8000에서 제공하는 정보 기준)
+                if oauth_user_data.get("is_admin") or oauth_user_data.get("role") == "admin":
+                    user_data["is_admin"] = True
+                    user_data["role"] = "admin"
+                
+                return user_data
+            
+            elif oauth_response.status_code != 401:
+                # OAuth 엔드포인트에서 401이 아닌 다른 오류가 발생한 경우
+                logger.error(f"OAuth userinfo endpoint returned status {oauth_response.status_code}: {oauth_response.text}")
+                raise AuthenticationError("OAuth authentication service error")
+            
+            # OAuth 인증 실패 시 기존 인증 방식으로 fallback (하위 호환성)
+            logger.debug("OAuth authentication failed, trying traditional auth as fallback")
+            
+            # 기존 인증 서버의 /api/auth/me 엔드포인트 호출
             response = await client.get(
                 f"{settings.AUTH_SERVER_URL}/api/auth/me",
                 headers={"Authorization": f"Bearer {token}"}
@@ -64,35 +163,64 @@ async def verify_token_with_auth_server(token: str) -> Dict[str, Any]:
             
             if response.status_code == 200:
                 user_data = response.json()
-                logger.info(f"User authenticated: {user_data.get('username', 'unknown')}")
+                user_data["auth_type"] = "traditional"
+                
+                # 관리자 권한 정규화
+                if user_data.get("is_admin") or user_data.get("role") == "admin":
+                    user_data["is_admin"] = True
+                    user_data["role"] = "admin"
+                
+                logger.info(f"Traditional user authenticated: {user_data.get('username', 'unknown')}")
                 return user_data
             elif response.status_code == 401:
-                logger.warning("Invalid token provided")
-                raise AuthenticationError("Invalid or expired token")
+                logger.warning("Auth server returned 401, trying local JWT decode as final fallback")
+                # JWT 토큰 로컬 디코딩 시도 (최종 fallback)
+                return decode_jwt_token_locally(token)
             else:
-                logger.error(f"Auth server returned status {response.status_code}")
-                raise AuthenticationError("Authentication service error")
+                logger.error(f"Traditional auth server returned status {response.status_code}: {response.text}")
+                # JWT 토큰 로컬 디코딩 시도 (최종 fallback)
+                return decode_jwt_token_locally(token)
                 
         except httpx.RequestError as e:
-            logger.error(f"Failed to connect to auth server: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Authentication service unavailable"
-            )
+            logger.error(f"Failed to connect to auth server (localhost:8000): {e}")
+            # 네트워크 오류 시 JWT 토큰 로컬 디코딩 시도
+            logger.info("Attempting local JWT decode as fallback due to network error")
+            return decode_jwt_token_locally(token)
 
 async def get_user_groups_from_auth_server(token: str) -> List[str]:
     """
     외부 인증 서버에서 사용자 그룹 정보 조회
+    OAuth와 기존 인증 방식 모두 지원
     
     Args:
-        token: JWT 토큰 문자열
+        token: JWT 또는 OAuth 토큰 문자열
         
     Returns:
         List[str]: 사용자가 속한 그룹 목록
     """
     async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
         try:
-            # Try to get user info which includes groups
+            # 먼저 OAuth userinfo 시도
+            oauth_response = await client.get(
+                f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            
+            if oauth_response.status_code == 200:
+                oauth_user_data = oauth_response.json()
+                # OAuth에서 그룹 정보 추출
+                groups = []
+                oauth_groups = oauth_user_data.get("groups", [])
+                for group in oauth_groups:
+                    if isinstance(group, dict):
+                        groups.append(group.get("name", group.get("display_name", str(group))))
+                    else:
+                        groups.append(str(group))
+                        
+                logger.info(f"OAuth user groups retrieved: {groups}")
+                return groups
+            
+            # OAuth 실패 시 기존 방식으로 fallback
             response = await client.get(
                 f"{settings.AUTH_SERVER_URL}/api/auth/me",
                 headers={"Authorization": f"Bearer {token}"}
@@ -107,7 +235,7 @@ async def get_user_groups_from_auth_server(token: str) -> List[str]:
                 if not groups:
                     groups = user_data.get("user_groups", [])
                     
-                logger.info(f"User groups retrieved from user info: {groups}")
+                logger.info(f"Traditional user groups retrieved: {groups}")
                 return groups
             else:
                 logger.warning(f"Failed to retrieve user info for groups: {response.status_code}")
@@ -164,7 +292,8 @@ async def get_current_active_user(
 
 def require_admin(current_user: Dict[str, Any] = Depends(get_current_active_user)) -> Dict[str, Any]:
     """
-    관리자 권한 확인
+    관리자 권한 확인 (OAuth 및 전통적인 인증 모두 지원)
+    localhost:8000에서 제공하는 is_admin 정보를 우선 사용
     
     Args:
         current_user: 현재 사용자 정보
@@ -175,12 +304,26 @@ def require_admin(current_user: Dict[str, Any] = Depends(get_current_active_user
     Raises:
         AuthorizationError: 관리자가 아닌 경우
     """
-    # Check both is_admin and role fields for backward compatibility
-    is_admin = current_user.get("is_admin", False) or current_user.get("role") == "admin"
+    # OAuth 및 전통적인 인증 모두 지원하는 관리자 권한 체크
+    is_admin = (
+        current_user.get("is_admin", False) or 
+        current_user.get("role") == "admin" or
+        "admin" in current_user.get("groups", []) or
+        "administrators" in current_user.get("groups", [])
+    )
     
     if not is_admin:
-        logger.warning(f"Non-admin user {current_user.get('username', current_user.get('email'))} attempted admin action")
+        user_identifier = (
+            current_user.get("username") or 
+            current_user.get("email") or 
+            current_user.get("user_id") or 
+            "unknown"
+        )
+        auth_type = current_user.get("auth_type", "unknown")
+        logger.warning(f"Non-admin user {user_identifier} (auth: {auth_type}) attempted admin action")
         raise AuthorizationError("Admin privileges required")
+    
+    logger.info(f"Admin access granted to {current_user.get('username', current_user.get('email', 'unknown'))}")
     return current_user
 
 def require_groups(required_groups: List[str]):

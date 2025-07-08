@@ -18,7 +18,8 @@ const authClient = axios.create({
 
 // Add auth token to requests for both clients
 apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
+  // OAuth 토큰은 localStorage에서 가져옴
+  const token = localStorage.getItem('accessToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -26,7 +27,8 @@ apiClient.interceptors.request.use((config) => {
 });
 
 authClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
+  // OAuth 토큰은 localStorage에서 가져옴
+  const token = localStorage.getItem('accessToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

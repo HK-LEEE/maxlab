@@ -179,7 +179,9 @@ class DynamicProvider(IDataProvider):
                 if not config.get("connection_string"):
                     raise ValueError("MSSQL provider requires connection_string")
                 self._provider = MSSQLProvider(
-                    connection_string=config.get("connection_string")
+                    connection_string=config.get("connection_string"),
+                    workspace_id=self.workspace_id,
+                    custom_queries=config.get("custom_queries")
                 )
             elif source_type == "api":
                 from .api import APIProvider

@@ -11,6 +11,8 @@ asyncpg==0.29.0
 # Auth & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+PyJWT==2.8.0
+cryptography==41.0.7
 
 # Validation & Settings
 pydantic==2.5.0
@@ -41,5 +43,10 @@ python-dotenv==1.0.0
 structlog==23.1.0
 
 # MSSQL Support (for multi-database data providers)
+# Enhanced ODBC 17 support with improved async capabilities
 aioodbc==0.5.0
 pyodbc==5.2.0
+
+# Additional MSSQL optimization dependencies
+sqlalchemy-pyodbc-mssql==1.3.7
+pymssql==2.3.1
