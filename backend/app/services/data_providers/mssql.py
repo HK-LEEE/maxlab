@@ -602,7 +602,7 @@ class MSSQLProvider(IDataProvider):
                         @@VERSION as version,
                         @@SERVERNAME as server_name,
                         DB_NAME() as database_name,
-                        SYSTEM_USER as current_user,
+                        SYSTEM_USER as system_user,
                         GETDATE() as current_time
                 """)
                 result = await cursor.fetchone()
@@ -638,7 +638,7 @@ class MSSQLProvider(IDataProvider):
                     "version": version.split('\n')[0] if version else "Unknown",
                     "server_name": server_name,
                     "database_name": db_name,
-                    "current_user": user,
+                    "system_user": user,
                     "current_time": str(current_time),
                     "equipment_count": equipment_count,
                     "measurement_count": measurement_count,

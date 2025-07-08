@@ -55,7 +55,7 @@ async def test_direct_mssql_provider():
             details = connection_result.get("details", {})
             print(f"   📊 Server: {details.get('server_name', 'N/A')}")
             print(f"   🗄️  Database: {details.get('database_name', 'N/A')}")
-            print(f"   👤 User: {details.get('current_user', 'N/A')}")
+            print(f"   👤 User: {details.get('system_user', 'N/A')}")
             print(f"   📈 Equipment Count: {details.get('equipment_count', 'N/A')}")
             print(f"   📏 Measurement Count: {details.get('measurement_count', 'N/A')}")
         else:

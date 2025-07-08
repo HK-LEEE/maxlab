@@ -349,7 +349,7 @@ async def test_mssql_configuration():
                     details = result["details"]
                     print(f"   🏷️  Server: {details.get('server_name', 'N/A')}")
                     print(f"   🗄️  Database: {details.get('database_name', 'N/A')}")
-                    print(f"   👤 User: {details.get('current_user', 'N/A')}")
+                    print(f"   👤 User: {details.get('system_user', 'N/A')}")
             else:
                 print(f"❌ MSSQL connection test failed: {result.get('message', 'Unknown error')}")
             
