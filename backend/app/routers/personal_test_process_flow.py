@@ -1954,8 +1954,56 @@ async def execute_query(
                     # Fallback to default connection
                     logger.info("Falling back to default database connection")
                     result = await db.execute(text(query_to_execute))
+        elif config.source_type.upper() == "MSSQL":
+            # MSSQL query execution
+            try:
+                from app.services.data_providers.mssql import MSSQLProvider
+                
+                # Decrypt connection string
+                decrypted_connection = decrypt_connection_string(config.mssql_connection_string)
+                
+                # Create MSSQL provider
+                provider = MSSQLProvider(connection_string=decrypted_connection)
+                
+                # Execute query using the provider's connection
+                async with provider.get_connection() as cursor:
+                    await cursor.execute(query_to_execute)
+                    
+                    # Get column names
+                    columns = [column[0] for column in cursor.description]
+                    
+                    # Fetch results
+                    rows = await cursor.fetchall()
+                    
+                    # Convert to list of tuples for compatibility
+                    result_rows = [tuple(row) for row in rows]
+                    
+                    # Create a mock result object for consistency
+                    class MockResult:
+                        def __init__(self, columns, rows):
+                            self.columns = columns
+                            self.rows = rows
+                            
+                        def keys(self):
+                            return self.columns
+                            
+                        def fetchall(self):
+                            return self.rows
+                    
+                    result = MockResult(columns, result_rows)
+                    
+                await provider.disconnect()
+                
+            except Exception as e:
+                logger.error(f"MSSQL query execution failed: {e}")
+                return QueryExecutionResponse(
+                    columns=[],
+                    sample_data=[],
+                    row_count=0,
+                    error=f"MSSQL query execution failed: {str(e)}"
+                )
         else:
-            # MSSQL support would go here
+            # Unsupported source type
             return QueryExecutionResponse(
                 columns=[],
                 sample_data=[],
