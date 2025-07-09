@@ -18,6 +18,7 @@ import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
+import { AlarmNotification } from '../components/monitor/AlarmNotification';
 import { usePublicFlowMonitor } from '../hooks/usePublicFlowMonitor';
 
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
@@ -107,6 +108,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport, setViewport] = useState<Viewport | undefined>();
+  const [showAlarms, setShowAlarms] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const {
@@ -291,10 +293,15 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
                 return selectedNode.data.displayMeasurements.includes(m.measurement_code);
               }
               
-              // Otherwise show no measurements (empty array)
-              return false;
+              // Otherwise show measurements for this equipment
+              return m.equipment_code === selectedNode.data.equipmentCode;
             })}
           />
+        )}
+
+        {/* Alarm Notification */}
+        {showAlarms && (
+          <AlarmNotification onClose={() => setShowAlarms(false)} />
         )}
       </div>
     </div>
