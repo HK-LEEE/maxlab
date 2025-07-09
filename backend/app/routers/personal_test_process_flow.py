@@ -836,7 +836,7 @@ async def get_public_measurements(
 
 @router.get("/equipment/status", response_model=EquipmentStatusResponse)
 async def get_equipment_status(
-    workspace_id: str = Query('personal_test', description="Workspace ID"),
+    workspace_id: str = Query('personaltest', description="Workspace ID"),
     equipment_type: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
@@ -850,16 +850,41 @@ async def get_equipment_status(
     provider = DynamicProvider(db, workspace_id)
     
     try:
+        logger.info(f"🔍 Starting equipment status query for workspace: {workspace_id}")
+        
+        # Load config first to debug
+        config = await provider._load_config()
+        logger.info(f"📋 Config loaded - Source type: {config.get('source_type')}, Active: {config.get('is_active')}")
+        
+        # Test connection
+        connection_test = await provider.test_connection()
+        logger.info(f"🔌 Connection test result: {connection_test}")
+        
+        if not connection_test.get('success'):
+            logger.error(f"❌ Connection test failed: {connection_test.get('message')}")
+            # Don't fallback, raise the error
+            raise Exception(f"Data source connection failed: {connection_test.get('message')}")
+        
         # Connect to data source
+        logger.info(f"🔗 Connecting to data source...")
         await provider.connect()
+        logger.info(f"✅ Connected to data source")
         
         # Get equipment status data with filters and pagination
+        logger.info(f"🎯 Calling provider.get_equipment_status()")
         response_data = await provider.get_equipment_status(
             equipment_type=equipment_type,
             status=status,
             limit=limit,
             offset=offset
         )
+        logger.info(f"✅ Provider response received: {type(response_data)}")
+        
+        # Debug the response
+        if hasattr(response_data, 'equipment'):
+            logger.info(f"📊 Equipment data count: {len(response_data.equipment)}")
+        else:
+            logger.info(f"📊 Response data keys: {list(response_data.keys()) if isinstance(response_data, dict) else 'Not a dict'}")
         
         # Convert dict response back to EquipmentStatusResponse
         equipment_list = []
@@ -881,7 +906,42 @@ async def get_equipment_status(
         )
         
     except Exception as e:
-        logger.error(f"Error getting equipment status from provider: {e}")
+        logger.error(f"❌ Error getting equipment status from provider: {e}")
+        logger.error(f"❌ Exception type: {type(e)}")
+        import traceback
+        logger.error(f"❌ Full traceback: {traceback.format_exc()}")
+        
+        # Check if we have a configured data source - if MSSQL is configured but failing, don't fallback
+        try:
+            # Get active data source configuration
+            from app.services.data_providers.dynamic import DynamicProvider
+            dynamic_provider = DynamicProvider(db, workspace_id)
+            config = await dynamic_provider._load_config()
+            
+            logger.info(f"🔍 Checking fallback conditions - Source type: {config.get('source_type')}")
+            
+            if config and config.get('source_type') == 'mssql':
+                # MSSQL is configured but failing - don't fallback, return proper error
+                logger.error(f"🚫 MSSQL configured but failing - NO FALLBACK")
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"MSSQL data source connection failed: {str(e)}. Please check your MSSQL server configuration."
+                )
+            elif config and config.get('source_type') != 'postgresql':
+                # Any other configured data source failing - don't fallback
+                logger.error(f"🚫 {config.get('source_type')} configured but failing - NO FALLBACK")
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"{config.get('source_type')} data source connection failed: {str(e)}. Please check your configuration."
+                )
+        except HTTPException:
+            raise
+        except Exception as config_error:
+            logger.warning(f"⚠️ Could not check data source configuration: {config_error}")
+        
+        # Only fallback to PostgreSQL if no specific data source is configured or if PostgreSQL is configured
+        logger.warning("🔄 Falling back to PostgreSQL for equipment status")
+        
         # Fallback to direct database query
         # First, get the total count
         count_query = """
@@ -976,7 +1036,7 @@ async def update_equipment_status(
 # Measurement Data endpoints
 @router.get("/measurements", response_model=List[MeasurementData])
 async def get_measurement_data(
-    workspace_id: str = Query('personal_test', description="Workspace ID"),
+    workspace_id: str = Query('personaltest', description="Workspace ID"),
     equipment_code: Optional[str] = Query(None),
     equipment_codes: Optional[str] = Query(None, description="Comma-separated equipment codes"),
     equipment_type: Optional[str] = Query(None),
@@ -1026,6 +1086,38 @@ async def get_measurement_data(
         
     except Exception as e:
         logger.error(f"Error getting measurements from provider: {e}")
+        
+        # Check if we have a configured data source - if MSSQL is configured but failing, don't fallback
+        try:
+            # Get active data source configuration
+            from app.services.data_providers.dynamic import DynamicProvider
+            dynamic_provider = DynamicProvider(db, workspace_id)
+            config = await dynamic_provider._load_config()
+            
+            logger.info(f"🔍 Checking fallback conditions - Source type: {config.get('source_type')}")
+            
+            if config and config.get('source_type') == 'mssql':
+                # MSSQL is configured but failing - don't fallback, return proper error
+                logger.error(f"🚫 MSSQL configured but failing - NO FALLBACK")
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"MSSQL data source connection failed: {str(e)}. Please check your MSSQL server configuration."
+                )
+            elif config and config.get('source_type') != 'postgresql':
+                # Any other configured data source failing - don't fallback
+                logger.error(f"🚫 {config.get('source_type')} configured but failing - NO FALLBACK")
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"{config.get('source_type')} data source connection failed: {str(e)}. Please check your configuration."
+                )
+        except HTTPException:
+            raise
+        except Exception as config_error:
+            logger.warning(f"⚠️ Could not check data source configuration: {config_error}")
+        
+        # Only fallback to PostgreSQL if no specific data source is configured or if PostgreSQL is configured
+        logger.warning("🔄 Falling back to PostgreSQL for measurement data")
+        
         # Fallback to direct database query
         base_query = """
             SELECT id, equipment_type, equipment_code, measurement_code, 
@@ -1240,8 +1332,8 @@ async def get_data_sources(
     """Get all data source configurations for a workspace."""
     # Convert string workspace_id to UUID format
     try:
-        # If workspace_id is 'personal_test', use a predefined UUID
-        if workspace_id == 'personal_test':
+        # If workspace_id is 'personal_test' or 'personaltest', use a predefined UUID
+        if workspace_id in ['personal_test', 'personaltest']:
             workspace_uuid = '21ee03db-90c4-4592-b00f-c44801e0b164'
         else:
             workspace_uuid = str(uuid.UUID(workspace_id))
@@ -1289,7 +1381,7 @@ async def create_data_source(
     source_id = str(uuid.uuid4())
     
     # Convert string workspace_id to UUID format
-    if config.workspace_id == 'personal_test':
+    if config.workspace_id in ['personal_test', 'personaltest']:
         workspace_uuid = '21ee03db-90c4-4592-b00f-c44801e0b164'
     else:
         try:
@@ -1392,7 +1484,7 @@ async def update_data_source(
         workspace_id_str = str(config.workspace_id)
         logger.info(f"Updating data source with workspace_id: {workspace_id_str}")
         
-        if workspace_id_str == 'personal_test':
+        if workspace_id_str in ['personal_test', 'personaltest']:
             workspace_uuid = '21ee03db-90c4-4592-b00f-c44801e0b164'
         else:
             try:
@@ -1462,8 +1554,8 @@ async def delete_data_source(
         WHERE id = :id AND workspace_id = :workspace_id
     """
     
-    # Convert workspace_id if it's 'personal_test'
-    if workspace_id == 'personal_test':
+    # Convert workspace_id if it's 'personal_test' or 'personaltest'
+    if workspace_id in ['personal_test', 'personaltest']:
         workspace_uuid = '21ee03db-90c4-4592-b00f-c44801e0b164'
     else:
         try:
@@ -1924,9 +2016,18 @@ async def execute_query(
                     error=f"Unknown query type: {request.query_type}"
                 )
         
-        # Add LIMIT to the query if not present
-        if 'limit' not in query_to_execute.lower():
-            query_to_execute += f" LIMIT {request.limit}"
+        # Add LIMIT/TOP to the query if not present based on source type
+        if 'limit' not in query_to_execute.lower() and 'top' not in query_to_execute.lower():
+            if config.source_type.upper() == 'MSSQL':
+                # For SQL Server, use TOP clause at the beginning
+                if query_to_execute.strip().upper().startswith('SELECT'):
+                    query_to_execute = query_to_execute.replace('SELECT', f'SELECT TOP {request.limit}', 1)
+                else:
+                    # If it's not a SELECT statement, don't add TOP
+                    pass
+            else:
+                # For PostgreSQL and other databases, use LIMIT
+                query_to_execute += f" LIMIT {request.limit}"
         
         # Execute the query
         if config.source_type == 'POSTGRESQL':

@@ -119,9 +119,21 @@ class DynamicProvider(IDataProvider):
                     
                 # Decrypt sensitive data
                 if self._config.get('api_url'):
-                    self._config['connection_string'] = decrypt_connection_string(self._config['api_url'])
+                    decrypted = decrypt_connection_string(self._config['api_url'])
+                    # If decryption fails, it returns the original value
+                    if decrypted != self._config['api_url']:
+                        self._config['connection_string'] = decrypted
+                    else:
+                        # Try using as plain text if decryption failed
+                        self._config['connection_string'] = self._config['api_url']
                 elif self._config.get('mssql_connection_string'):
-                    self._config['connection_string'] = decrypt_connection_string(self._config['mssql_connection_string'])
+                    decrypted = decrypt_connection_string(self._config['mssql_connection_string'])
+                    # If decryption fails, it returns the original value
+                    if decrypted != self._config['mssql_connection_string']:
+                        self._config['connection_string'] = decrypted
+                    else:
+                        # Try using as plain text if decryption failed
+                        self._config['connection_string'] = self._config['mssql_connection_string']
                 else:
                     self._config['connection_string'] = None
                     
@@ -177,12 +189,17 @@ class DynamicProvider(IDataProvider):
             elif source_type == "mssql":
                 from .mssql import MSSQLProvider
                 if not config.get("connection_string"):
+                    logger.error(f"❌ MSSQL provider requires connection_string")
                     raise ValueError("MSSQL provider requires connection_string")
+                    
+                logger.info(f"🔧 Creating MSSQL provider with connection string length: {len(config.get('connection_string'))}")
                 self._provider = MSSQLProvider(
                     connection_string=config.get("connection_string"),
                     workspace_id=self.workspace_id,
-                    custom_queries=config.get("custom_queries")
+                    custom_queries=config.get("custom_queries"),
+                    db_session=self.db_session
                 )
+                logger.info(f"✅ MSSQL provider created successfully")
             elif source_type == "api":
                 from .api import APIProvider
                 if not config.get("connection_string"):
@@ -200,17 +217,13 @@ class DynamicProvider(IDataProvider):
             logger.info(f"Created {source_type} provider for workspace {self.workspace_id}")
             
         except ImportError as e:
-            logger.error(f"Failed to import {source_type} provider: {e}")
-            # Fallback to PostgreSQL provider
-            from .postgresql_provider import PostgreSQLProvider
-            self._provider = PostgreSQLProvider(self.db_session)
-            logger.info(f"Falling back to PostgreSQL provider due to import error")
+            logger.error(f"❌ Failed to import {source_type} provider: {e}")
+            # DON'T fallback to PostgreSQL - raise the error with proper type
+            raise ImportError(f"Failed to import {source_type} provider: {e}")
         except Exception as e:
-            logger.error(f"Failed to create {source_type} provider: {e}")
-            # Fallback to PostgreSQL provider
-            from .postgresql_provider import PostgreSQLProvider
-            self._provider = PostgreSQLProvider(self.db_session)
-            logger.info(f"Falling back to PostgreSQL provider due to error")
+            logger.error(f"❌ Failed to create {source_type} provider: {e}")
+            # DON'T fallback to PostgreSQL - raise the error with proper type
+            raise RuntimeError(f"Failed to create {source_type} provider: {e}")
             
         return self._provider
     
@@ -247,7 +260,7 @@ class DynamicProvider(IDataProvider):
         self,
         equipment_code: Optional[str] = None,
         equipment_type: Optional[str] = None,
-        limit: int = 100
+        limit: int = 1000
     ) -> List[Dict[str, Any]]:
         """Get measurement data using configured provider."""
         provider = await self._get_provider()
