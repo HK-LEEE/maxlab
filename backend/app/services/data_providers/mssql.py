@@ -11,6 +11,7 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from .base import IDataProvider, EquipmentStatusResponse, MeasurementData
+from ..status_normalizer import StatusNormalizer
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,8 @@ class MSSQLProvider(IDataProvider):
         self, 
         connection_string: Optional[str] = None,
         workspace_id: Optional[str] = None,
-        custom_queries: Optional[Dict[str, Any]] = None
+        custom_queries: Optional[Dict[str, Any]] = None,
+        db_session: Optional[Any] = None
     ):
         """
         Initialize enhanced MSSQL provider.
@@ -34,12 +36,18 @@ class MSSQLProvider(IDataProvider):
             connection_string: ODBC connection string for SQL Server
             workspace_id: Workspace identifier for connection pooling
             custom_queries: Custom query configurations from database
+            db_session: Database session for status normalization
         """
+        super().__init__()
         self.connection_string = self._convert_connection_string(connection_string or "")
         self.workspace_id = workspace_id or "default"
         self.custom_queries = custom_queries or {}
         self.pool: Optional[aioodbc.Pool] = None
         self._connection_lock = asyncio.Lock()
+        
+        # Initialize status normalizer
+        if db_session:
+            self.status_normalizer = StatusNormalizer(db_session)
         
         # Connection pool settings optimized for ODBC 17
         self.pool_settings = {
@@ -61,14 +69,16 @@ class MSSQLProvider(IDataProvider):
         # Support localhost\SQLEXPRESS with mss user and password 2300
         return os.getenv(
             "MSSQL_CONNECTION_STRING",
-            "DRIVER={ODBC Driver 17 for SQL Server};"
-            "SERVER=localhost\\SQLEXPRESS;"
+            "DRIVER={FreeTDS};"
+            "SERVER=172.28.32.1;"
             "DATABASE=AIDB;"
             "UID=mss;"
             "PWD=2300;"
             "TrustServerCertificate=yes;"
             "Connection Timeout=30;"
-            "Command Timeout=60"
+            "Command Timeout=60;"
+            "TDS_Version=8.0;"
+            "Port=1433"
         )
     
     def _convert_connection_string(self, raw_connection_string: str) -> str:
@@ -94,7 +104,7 @@ class MSSQLProvider(IDataProvider):
                 parts[key.lower().strip()] = value.strip()
         
         # Extract components
-        server = parts.get('server', 'localhost\\SQLEXPRESS')
+        server = parts.get('server', '127.0.0.1')
         database = parts.get('database', 'AIDB')
         uid = parts.get('id', parts.get('uid', 'mss'))
         pwd = parts.get('password', parts.get('pwd', '2300'))
@@ -103,27 +113,35 @@ class MSSQLProvider(IDataProvider):
         if '/' in server:
             server = server.replace('/', '\\')
         
+        # Convert named instances to IP addresses for better FreeTDS compatibility
+        if 'localhost\\SQLEXPRESS' in server:
+            server = '127.0.0.1'
+        elif 'localhost' in server and '\\' not in server:
+            server = '127.0.0.1'
+        
         # Try to detect available drivers
         available_drivers = []
         try:
             import pyodbc
             available_drivers = pyodbc.drivers()
-        except:
-            pass
+            logger.info(f"Available ODBC drivers: {available_drivers}")
+        except Exception as e:
+            logger.warning(f"Failed to detect ODBC drivers: {e}")
+            available_drivers = []
         
-        # Choose best available driver with ODBC 17 priority
+        # Choose best available driver with FreeTDS priority for Linux
         driver = None
-        if "ODBC Driver 17 for SQL Server" in available_drivers:
+        if "FreeTDS" in available_drivers:
+            driver = "FreeTDS"
+        elif "ODBC Driver 17 for SQL Server" in available_drivers:
             driver = "ODBC Driver 17 for SQL Server"
         elif "ODBC Driver 18 for SQL Server" in available_drivers:
             driver = "ODBC Driver 18 for SQL Server"
         elif "ODBC Driver 13 for SQL Server" in available_drivers:
             driver = "ODBC Driver 13 for SQL Server"
-        elif "FreeTDS" in available_drivers:
-            driver = "FreeTDS"
         else:
-            # Default fallback - assuming ODBC 17 is installed
-            driver = "ODBC Driver 17 for SQL Server"
+            # Default fallback - use FreeTDS for Linux systems
+            driver = "FreeTDS"
         
         # Build ODBC connection string optimized for ODBC 17
         odbc_string = (
@@ -144,9 +162,15 @@ class MSSQLProvider(IDataProvider):
         
         if driver == "FreeTDS":
             # FreeTDS specific options for SQL Server Express
-            # Try common Express ports or let SQL Server Browser find the port
             if "SQLEXPRESS" in server:
-                odbc_string += ";TDS_Version=8.0"  # Let SQL Server Browser find the port
+                # For SQL Server Express, try multiple approaches
+                # 1. First try with explicit port 1433
+                # 2. If that fails, try common Express ports or dynamic discovery
+                odbc_string += ";TDS_Version=8.0"
+                # Try different port strategies
+                if "Port=" not in odbc_string:
+                    # Try standard port first, then let SQL Server Browser find it
+                    odbc_string += ";Port=1433"
             else:
                 odbc_string += ";Port=1433;TDS_Version=8.0"
         elif "ODBC Driver 17" in driver or "ODBC Driver 18" in driver:
@@ -302,14 +326,18 @@ class MSSQLProvider(IDataProvider):
                 async for row in cursor:
                     row_dict = dict(zip(columns, row))
                     # Convert to standard format
-                    equipment_data.append({
+                    equipment_item = {
                         "equipment_type": row_dict.get("equipment_type"),
                         "equipment_code": row_dict.get("equipment_code"), 
                         "equipment_name": row_dict.get("equipment_name"),
                         "status": row_dict.get("status"),
                         "last_run_time": row_dict.get("last_run_time"),
                         "active_alarm_count": row_dict.get("active_alarm_count", 0)
-                    })
+                    }
+                    
+                    # Normalize status if normalizer is available
+                    equipment_item = await self._normalize_equipment_status(equipment_item)
+                    equipment_data.append(equipment_item)
                 
                 # Get total count for pagination
                 count_query = """
@@ -332,10 +360,11 @@ class MSSQLProvider(IDataProvider):
                 total_count = total_result[0] if total_result else 0
                 
                 return EquipmentStatusResponse(
-                    equipment=equipment_data,
-                    total_count=total_count,
-                    page_size=limit,
-                    current_page=(offset // limit) + 1 if limit > 0 else 1
+                    items=equipment_data,
+                    total=total_count,
+                    limit=limit,
+                    offset=offset,
+                    has_more=total_count > (offset + limit)
                 )
                 
         except Exception as e:
@@ -386,13 +415,26 @@ class MSSQLProvider(IDataProvider):
                 
                 async for row in cursor:
                     row_dict = dict(zip(columns, row))
-                    equipment_data.append(row_dict)
+                    # Map database fields to expected model fields
+                    equipment_item = {
+                        "equipment_type": row_dict.get("equipment_type", ""),
+                        "equipment_code": row_dict.get("equipment_code") or row_dict.get("equipment_id", ""),
+                        "equipment_name": row_dict.get("equipment_name", ""),
+                        "status": row_dict.get("status", ""),
+                        "last_run_time": row_dict.get("last_run_time"),
+                        "active_alarm_count": row_dict.get("active_alarm_count", 0)
+                    }
+                    
+                    # Normalize status if normalizer is available
+                    equipment_item = await self._normalize_equipment_status(equipment_item)
+                    equipment_data.append(equipment_item)
                 
                 return EquipmentStatusResponse(
-                    equipment=equipment_data,
-                    total_count=len(equipment_data),
-                    page_size=limit,
-                    current_page=(offset // limit) + 1 if limit > 0 else 1
+                    items=equipment_data,
+                    total=len(equipment_data),
+                    limit=limit,
+                    offset=offset,
+                    has_more=False  # Custom query doesn't support pagination
                 )
                 
         except Exception as e:
@@ -440,8 +482,10 @@ class MSSQLProvider(IDataProvider):
     async def get_measurement_data(
         self,
         equipment_code: Optional[str] = None,
+        equipment_codes: Optional[str] = None,
         equipment_type: Optional[str] = None,
-        limit: int = 100
+        measurement_code: Optional[str] = None,
+        limit: int = 1000
     ) -> List[MeasurementData]:
         """Get measurement data with optional filtering and spec calculations."""
         try:
@@ -449,7 +493,7 @@ class MSSQLProvider(IDataProvider):
             if self.custom_queries and "measurement_data" in self.custom_queries:
                 custom_results = await self._execute_custom_query(
                     "measurement_data",
-                    {"equipment_code": equipment_code, "equipment_type": equipment_type, "limit": limit}
+                    {"equipment_code": equipment_code, "equipment_codes": equipment_codes, "equipment_type": equipment_type, "measurement_code": measurement_code, "limit": limit}
                 )
                 # Convert to MeasurementData objects
                 return [self._dict_to_measurement_data(row) for row in custom_results]
@@ -483,10 +527,20 @@ class MSSQLProvider(IDataProvider):
                 if equipment_code:
                     base_query += " AND m.equipment_code = ?"
                     params.append(equipment_code)
+                elif equipment_codes:
+                    # Handle multiple equipment codes
+                    code_list = [code.strip() for code in equipment_codes.split(',')]
+                    placeholders = ','.join(['?' for _ in code_list])
+                    base_query += f" AND m.equipment_code IN ({placeholders})"
+                    params.extend(code_list)
                 
                 if equipment_type:
                     base_query += " AND m.equipment_type = ?"
                     params.append(equipment_type)
+                
+                if measurement_code:
+                    base_query += " AND m.measurement_code = ?"
+                    params.append(measurement_code)
                 
                 base_query += " ORDER BY m.timestamp DESC"
                 
@@ -508,6 +562,19 @@ class MSSQLProvider(IDataProvider):
     
     def _dict_to_measurement_data(self, row_dict: Dict[str, Any]) -> MeasurementData:
         """Convert database row to MeasurementData object."""
+        # Convert spec_status safely
+        spec_status = row_dict.get("spec_status", 0)
+        if isinstance(spec_status, str):
+            # Handle Korean number characters or other string formats
+            try:
+                # Try to parse as integer first
+                spec_status = int(spec_status)
+            except ValueError:
+                # If string parsing fails, use default value
+                spec_status = 0
+        elif spec_status is None:
+            spec_status = 0
+        
         return MeasurementData(
             id=row_dict.get("id", 0),
             equipment_type=row_dict.get("equipment_type", ""),
@@ -516,7 +583,7 @@ class MSSQLProvider(IDataProvider):
             measurement_desc=row_dict.get("measurement_desc", ""),
             measurement_value=float(row_dict.get("measurement_value", 0.0)),
             timestamp=row_dict.get("timestamp", datetime.now()),
-            spec_status=row_dict.get("spec_status", 0),
+            spec_status=spec_status,
             usl=row_dict.get("usl"),
             lsl=row_dict.get("lsl"),
             target=row_dict.get("target")
@@ -592,6 +659,7 @@ class MSSQLProvider(IDataProvider):
         """Enhanced test connection with detailed diagnostics."""
         try:
             logger.info(f"Testing MSSQL connection for workspace: {self.workspace_id}")
+            logger.info(f"Connection string: {self._mask_connection_string()}")
             
             await self.connect()
             
@@ -645,15 +713,28 @@ class MSSQLProvider(IDataProvider):
             }
             
         except Exception as e:
+            error_msg = str(e)
             logger.error(f"MSSQL connection test failed: {e}")
+            
+            # Provide more helpful error messages
+            if "Unable to connect" in error_msg and "Adaptive Server is unavailable" in error_msg:
+                helpful_msg = "SQL Server is not running or not accessible. Please check: 1) SQL Server service is running, 2) Network connectivity, 3) Firewall settings, 4) SQL Server Browser service for named instances"
+            elif "Login failed" in error_msg:
+                helpful_msg = "Authentication failed. Please check username/password and user permissions."
+            elif "database" in error_msg and "cannot be opened" in error_msg:
+                helpful_msg = "Database does not exist or user lacks permissions. Please check database name and user access."
+            else:
+                helpful_msg = error_msg
+            
             return {
                 "success": False,
                 "source_type": "mssql",
-                "message": str(e),
+                "message": helpful_msg,
                 "details": {
                     "workspace_id": self.workspace_id,
                     "connection_string_masked": self._mask_connection_string(),
-                    "error_type": type(e).__name__
+                    "error_type": type(e).__name__,
+                    "original_error": error_msg
                 }
             }
         finally:

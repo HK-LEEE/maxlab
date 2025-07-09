@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from ..data_source_mapping import MappingService
+    from ..status_normalizer import StatusNormalizer
 
 class EquipmentData(BaseModel):
     """설비 데이터 모델"""
@@ -17,6 +18,7 @@ class EquipmentData(BaseModel):
     equipment_name: str
     status: str
     last_run_time: Optional[datetime]
+    active_alarm_count: Optional[int] = 0
 
 class MeasurementData(BaseModel):
     """측정 데이터 모델"""
@@ -51,12 +53,36 @@ class IDataProvider(ABC):
         self.mapping_service: Optional['MappingService'] = None
         self.data_source_id: Optional[str] = None
         self.workspace_id: Optional[str] = None
+        self.status_normalizer: Optional['StatusNormalizer'] = None
     
     def set_mapping_service(self, mapping_service: 'MappingService', data_source_id: str, workspace_id: str):
         """Set mapping service for code translation"""
         self.mapping_service = mapping_service
         self.data_source_id = data_source_id
         self.workspace_id = workspace_id
+    
+    def set_status_normalizer(self, status_normalizer: 'StatusNormalizer'):
+        """Set status normalizer for flexible status handling"""
+        self.status_normalizer = status_normalizer
+    
+    async def _normalize_equipment_status(self, equipment_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Normalize equipment status in data
+        
+        Args:
+            equipment_data: Equipment data dictionary
+            
+        Returns:
+            Dict[str, Any]: Equipment data with normalized status
+        """
+        if "status" in equipment_data and self.status_normalizer:
+            original_status = equipment_data["status"]
+            normalized_status = await self.status_normalizer.normalize_status(
+                original_status, 
+                self.workspace_id
+            )
+            equipment_data["status"] = normalized_status
+        return equipment_data
     
     @abstractmethod
     async def get_equipment_status(
@@ -85,7 +111,7 @@ class IDataProvider(ABC):
         self,
         equipment_code: Optional[str] = None,
         equipment_type: Optional[str] = None,
-        limit: int = 100
+        limit: int = 1000
     ) -> List[MeasurementData]:
         """
         측정 데이터 조회

@@ -38,7 +38,9 @@ export const useWebSocket = (options: WebSocketOptions) => {
 
     try {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = import.meta.env.VITE_API_URL || window.location.host;
+      const apiUrl = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.host}`;
+      // Extract host from API URL if it includes protocol
+      const host = apiUrl.replace(/^https?:\/\//, '');
       const wsUrl = `${protocol}//${host}/api/v1/personal-test/process-flow/ws/${workspace_id}?token=${token}`;
       
       const ws = new WebSocket(wsUrl);

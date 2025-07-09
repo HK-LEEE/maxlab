@@ -13,6 +13,7 @@ import { UserManagement } from './pages/admin/UserManagement';
 import { PersonalTestWorkspace } from './pages/PersonalTestWorkspace';
 import { ProcessFlowEditor } from './workspaces/personal_test/pages/ProcessFlowEditor';
 import { ProcessFlowMonitor } from './workspaces/personal_test/pages/ProcessFlowMonitor';
+import { ProcessFlowPublish } from './workspaces/personal_test/pages/ProcessFlowPublish';
 import { PublicProcessFlowMonitor } from './workspaces/personal_test/pages/PublicProcessFlowMonitor';
 import { Profile } from './pages/Profile';
 import './styles/index.css';
@@ -178,6 +179,14 @@ function App() {
             }
           />
           <Route
+            path="/workspaces/personal_test/process-flow/publish"
+            element={
+              <PrivateRoute>
+                <ProcessFlowPublish />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <PrivateRoute>
@@ -186,7 +195,7 @@ function App() {
             }
           />
           <Route
-            path="/public/monitor/:publishToken"
+            path="/public/flow/:publishToken"
             element={<PublicProcessFlowMonitor />}
           />
         </Routes>

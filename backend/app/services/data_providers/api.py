@@ -315,7 +315,7 @@ class APIProvider(IDataProvider):
         self,
         equipment_code: Optional[str] = None,
         equipment_type: Optional[str] = None,
-        limit: int = 100
+        limit: int = 1000
     ) -> List[MeasurementData]:
         """Get measurement data from API."""
         # Get endpoint mapping

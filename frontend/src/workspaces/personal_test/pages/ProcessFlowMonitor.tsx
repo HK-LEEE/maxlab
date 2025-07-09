@@ -13,6 +13,7 @@ import { ZoomIn } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
+import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 
@@ -25,14 +26,15 @@ import { useFlowMonitor } from '../hooks/useFlowMonitor';
 import { Layout } from '../../../components/common/Layout';
 
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
-const nodeTypes = {
+const nodeTypes = Object.freeze({
   equipment: EquipmentNode,
   group: GroupNode,
-};
+  text: TextNode,
+});
 
-const edgeTypes = {
+const edgeTypes = Object.freeze({
   custom: CustomEdgeWithLabel,
-};
+});
 
 // Separate component to use useReactFlow hook
 const FlowCanvas: React.FC<{
@@ -98,6 +100,7 @@ const ProcessFlowMonitorContent: React.FC = () => {
     autoRefresh,
     refreshInterval,
     autoScroll,
+    alarmCheck,
     isSidebarOpen,
     isFullscreen,
     statusCounts,
@@ -105,8 +108,10 @@ const ProcessFlowMonitorContent: React.FC = () => {
     setAutoRefresh,
     setRefreshInterval,
     setAutoScroll,
+    setAlarmCheck,
     setIsSidebarOpen,
     loadData,
+    forceRefresh,
     toggleFullscreen,
   } = useFlowMonitor(workspaceId);
 
@@ -133,7 +138,15 @@ const ProcessFlowMonitorContent: React.FC = () => {
     : undefined;
 
   const selectedEquipmentMeasurements = selectedNode
-    ? measurements.filter(m => m.equipment_code === selectedNode.data.equipmentCode)
+    ? measurements.filter(m => {
+        // If displayMeasurements is configured, only show those measurements
+        if (selectedNode.data.displayMeasurements && selectedNode.data.displayMeasurements.length > 0) {
+          return selectedNode.data.displayMeasurements.includes(m.measurement_code);
+        }
+        
+        // Otherwise show no measurements (empty array)
+        return false;
+      })
     : [];
 
   const handleFlowChange = (flowId: string) => {
@@ -153,13 +166,15 @@ const ProcessFlowMonitorContent: React.FC = () => {
         refreshInterval={refreshInterval}
         autoRefresh={autoRefresh}
         autoScroll={autoScroll}
+        alarmCheck={alarmCheck}
         isLoading={isLoading}
         isFullscreen={isFullscreen}
         onFlowChange={handleFlowChange}
         onRefreshIntervalChange={setRefreshInterval}
         onAutoRefreshChange={setAutoRefresh}
         onAutoScrollChange={setAutoScroll}
-        onRefresh={loadData}
+        onAlarmCheckChange={setAlarmCheck}
+        onRefresh={forceRefresh}
         onToggleFullscreen={toggleFullscreen}
       />
 
@@ -205,7 +220,7 @@ const ProcessFlowMonitorContent: React.FC = () => {
       />
 
       {/* Alarm Notification */}
-      {showAlarms && (
+      {showAlarms && alarmCheck && (
         <AlarmNotification onClose={() => setShowAlarms(false)} />
       )}
     </div>

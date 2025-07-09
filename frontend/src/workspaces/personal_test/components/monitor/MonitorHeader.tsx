@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, RefreshCw, Maximize2, Minimize2 } from 'lucide-react';
+import { Clock, RefreshCw, Maximize2, Minimize2, Bell, BellOff } from 'lucide-react';
 
 interface MonitorHeaderProps {
   flows: any[];
@@ -8,12 +8,14 @@ interface MonitorHeaderProps {
   refreshInterval: number;
   autoRefresh: boolean;
   autoScroll: boolean;
+  alarmCheck: boolean;
   isLoading: boolean;
   isFullscreen: boolean;
   onFlowChange: (flowId: string) => void;
   onRefreshIntervalChange: (interval: number) => void;
   onAutoRefreshChange: (enabled: boolean) => void;
   onAutoScrollChange: (enabled: boolean) => void;
+  onAlarmCheckChange: (enabled: boolean) => void;
   onRefresh: () => void;
   onToggleFullscreen: () => void;
 }
@@ -25,12 +27,14 @@ export const MonitorHeader: React.FC<MonitorHeaderProps> = ({
   refreshInterval,
   autoRefresh,
   autoScroll,
+  alarmCheck,
   isLoading,
   isFullscreen,
   onFlowChange,
   onRefreshIntervalChange,
   onAutoRefreshChange,
   onAutoScrollChange,
+  onAlarmCheckChange,
   onRefresh,
   onToggleFullscreen,
 }) => {
@@ -67,6 +71,7 @@ export const MonitorHeader: React.FC<MonitorHeaderProps> = ({
             onChange={(e) => onRefreshIntervalChange(Number(e.target.value))}
             className="px-2 py-1 border rounded text-sm"
           >
+            <option value={10000}>10초</option>
             <option value={30000}>30초</option>
             <option value={60000}>1분</option>
             <option value={180000}>3분</option>
@@ -89,6 +94,18 @@ export const MonitorHeader: React.FC<MonitorHeaderProps> = ({
               className="rounded"
             />
             <span className="text-sm">Auto-scroll</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={alarmCheck}
+              onChange={(e) => onAlarmCheckChange(e.target.checked)}
+              className="rounded"
+            />
+            <span className="text-sm flex items-center space-x-1">
+              {alarmCheck ? <Bell size={14} /> : <BellOff size={14} />}
+              <span>Alarm Check</span>
+            </span>
           </label>
           <button
             onClick={onRefresh}

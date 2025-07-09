@@ -10,6 +10,8 @@ interface Alarm {
   value: number;
   spec_type: 'ABOVE_SPEC' | 'BELOW_SPEC';
   spec_limit: number;
+  usl?: number;
+  lsl?: number;
   timestamp: Date;
 }
 
@@ -121,9 +123,21 @@ export const AlarmNotification: React.FC<AlarmNotificationProps> = ({ onClose })
                     </span>
                   </div>
                   <div className="mt-1 text-sm text-gray-600">
-                    {alarm.measurement_desc}: {alarm.value.toLocaleString()} 
-                    {alarm.spec_type === 'ABOVE_SPEC' ? ' > ' : ' < '}
-                    {alarm.spec_limit.toLocaleString()}
+                    <span className="font-medium">{alarm.measurement_desc}</span> ({alarm.measurement_code})
+                  </div>
+                  <div className="mt-1 text-sm">
+                    <span className="text-gray-700">위반 내용: </span>
+                    <span className={`font-medium ${alarm.spec_type === 'ABOVE_SPEC' ? 'text-red-600' : 'text-orange-600'}`}>
+                      {alarm.spec_type === 'ABOVE_SPEC' ? 'ABOVE_SPEC' : 'BELOW_SPEC'}
+                    </span>
+                    <span className="text-gray-600 ml-2">
+                      ({alarm.value?.toLocaleString() || 'N/A'} 
+                      {alarm.spec_type === 'ABOVE_SPEC' ? ' > ' : ' < '}
+                      {alarm.spec_type === 'ABOVE_SPEC' 
+                        ? (alarm.usl?.toLocaleString() || 'N/A')
+                        : (alarm.lsl?.toLocaleString() || 'N/A')
+                      })
+                    </span>
                   </div>
                   <div className="mt-1 text-xs text-gray-500">
                     {alarm.timestamp.toLocaleTimeString()}

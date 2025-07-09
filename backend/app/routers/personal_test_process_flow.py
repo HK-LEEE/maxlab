@@ -29,10 +29,12 @@ class ProcessFlowCreate(BaseModel):
     workspace_id: uuid.UUID
     name: str
     flow_data: Dict[str, Any]
+    data_source_id: Optional[str] = None
 
 class ProcessFlowUpdate(BaseModel):
     name: Optional[str] = None
     flow_data: Optional[Dict[str, Any]] = None
+    data_source_id: Optional[str] = None
 
 class ProcessFlow(BaseModel):
     id: uuid.UUID
@@ -46,6 +48,7 @@ class ProcessFlow(BaseModel):
     published_at: Optional[datetime] = None
     publish_token: Optional[str] = None
     current_version: Optional[int] = None
+    data_source_id: Optional[str] = None
 
 class PublishResponse(BaseModel):
     message: str
@@ -112,7 +115,7 @@ async def list_process_flows(
 ):
     """워크스페이스의 공정도 목록 조회"""
     query = """
-        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at,
+        SELECT id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at,
                is_published, published_at, publish_token, current_version
         FROM personal_test_process_flows
         WHERE workspace_id = :workspace_id
@@ -132,6 +135,7 @@ async def list_process_flows(
             workspace_id=row.workspace_id,
             name=row.name,
             flow_data=row.flow_data,
+            data_source_id=row.data_source_id,
             created_by=row.created_by,
             created_at=row.created_at,
             updated_at=row.updated_at,
@@ -156,9 +160,9 @@ async def create_process_flow(
     
     query = """
         INSERT INTO personal_test_process_flows 
-        (id, workspace_id, name, flow_data, created_by, created_at, updated_at)
-        VALUES (:id, :workspace_id, :name, CAST(:flow_data AS jsonb), :created_by, NOW(), NOW())
-        RETURNING id, workspace_id, name, flow_data, created_by, created_at, updated_at, is_published, published_at, publish_token
+        (id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at)
+        VALUES (:id, :workspace_id, :name, CAST(:flow_data AS jsonb), :data_source_id, :created_by, NOW(), NOW())
+        RETURNING id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at, is_published, published_at, publish_token
     """
     
     result = await db.execute(
@@ -168,6 +172,7 @@ async def create_process_flow(
             "workspace_id": str(flow_data.workspace_id),
             "name": flow_data.name,
             "flow_data": json.dumps(flow_data.flow_data),
+            "data_source_id": flow_data.data_source_id,
             "created_by": user_id
         }
     )
@@ -179,6 +184,7 @@ async def create_process_flow(
         workspace_id=row.workspace_id,
         name=row.name,
         flow_data=row.flow_data,
+        data_source_id=row.data_source_id,
         created_by=row.created_by,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -196,7 +202,7 @@ async def get_process_flow(
 ):
     """공정도 상세 조회"""
     query = """
-        SELECT id, workspace_id, name, flow_data, created_by, created_at, updated_at,
+        SELECT id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at,
                is_published, published_at, publish_token
         FROM personal_test_process_flows
         WHERE id = :flow_id
@@ -216,6 +222,7 @@ async def get_process_flow(
         workspace_id=row.workspace_id,
         name=row.name,
         flow_data=row.flow_data,
+        data_source_id=row.data_source_id,
         created_by=row.created_by,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -244,6 +251,10 @@ async def update_process_flow(
         update_parts.append("flow_data = CAST(:flow_data AS jsonb)")
         params["flow_data"] = json.dumps(flow_update.flow_data)
     
+    if flow_update.data_source_id is not None:
+        update_parts.append("data_source_id = :data_source_id")
+        params["data_source_id"] = flow_update.data_source_id
+    
     if not update_parts:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -256,7 +267,7 @@ async def update_process_flow(
         UPDATE personal_test_process_flows
         SET {', '.join(update_parts)}
         WHERE id = :flow_id
-        RETURNING id, workspace_id, name, flow_data, created_by, created_at, updated_at, is_published, published_at, publish_token
+        RETURNING id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at, is_published, published_at, publish_token
     """
     
     result = await db.execute(text(query), params)
@@ -274,6 +285,7 @@ async def update_process_flow(
         workspace_id=row.workspace_id,
         name=row.name,
         flow_data=row.flow_data,
+        data_source_id=row.data_source_id,
         created_by=row.created_by,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -469,6 +481,7 @@ async def create_flow_version(
         name=row.name,
         description=row.description,
         flow_data=row.flow_data,
+        data_source_id=row.data_source_id,
         created_by=row.created_by,
         created_at=row.created_at,
         is_published=row.is_published,
@@ -530,6 +543,7 @@ async def restore_flow_version(
         workspace_id=row.workspace_id,
         name=row.name,
         flow_data=row.flow_data,
+        data_source_id=row.data_source_id,
         created_by=row.created_by,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -698,7 +712,7 @@ async def get_public_process_flow(
     # Try to get published version data first
     version_query = """
         SELECT 
-            f.id, f.workspace_id, f.name, v.flow_data, f.created_by, 
+            f.id, f.workspace_id, f.name, f.data_source_id, v.flow_data, f.created_by, 
             f.created_at, f.updated_at, v.is_published, v.published_at, v.publish_token
         FROM personal_test_process_flows f
         JOIN personal_test_process_flow_versions v ON f.id = v.flow_id
@@ -712,7 +726,7 @@ async def get_public_process_flow(
     if not row:
         main_query = """
             SELECT 
-                id, workspace_id, name, flow_data, created_by, 
+                id, workspace_id, name, data_source_id, flow_data, created_by, 
                 created_at, updated_at, is_published, published_at, publish_token
             FROM personal_test_process_flows
             WHERE publish_token = :publish_token AND is_published = true
@@ -731,6 +745,7 @@ async def get_public_process_flow(
         workspace_id=row.workspace_id,
         name=row.name,
         flow_data=row.flow_data,
+        data_source_id=row.data_source_id,
         created_by=row.created_by,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -740,7 +755,7 @@ async def get_public_process_flow(
     )
 
 
-@router.get("/public/{publish_token}/status", response_model=EquipmentStatusResponse)
+@router.get("/public/{publish_token}/equipment/status", response_model=EquipmentStatusResponse)
 async def get_public_equipment_status(
     publish_token: str,
     equipment_type: Optional[str] = Query(None),
@@ -750,20 +765,20 @@ async def get_public_equipment_status(
     db: AsyncSession = Depends(get_db)
 ):
     """게시된 공정도의 설비 상태 조회 (공개 접근)"""
-    # First get workspace_id from the published flow
-    # For versions table, we need to join with flows table to get workspace_id
-    workspace_query = """
-        SELECT f.workspace_id 
+    # First get workspace_id and data_source_id from the published flow
+    # For versions table, we need to join with flows table to get workspace_id and data_source_id
+    flow_info_query = """
+        SELECT f.workspace_id, f.data_source_id 
         FROM personal_test_process_flow_versions v
         JOIN personal_test_process_flows f ON v.flow_id = f.id
         WHERE v.publish_token = :publish_token AND v.is_published = true
         UNION
-        SELECT workspace_id 
+        SELECT workspace_id, data_source_id 
         FROM personal_test_process_flows
         WHERE publish_token = :publish_token AND is_published = true
         LIMIT 1
     """
-    result = await db.execute(text(workspace_query), {"publish_token": publish_token})
+    result = await db.execute(text(flow_info_query), {"publish_token": publish_token})
     row = result.fetchone()
     
     if not row:
@@ -773,16 +788,87 @@ async def get_public_equipment_status(
         )
     
     workspace_id = row.workspace_id
+    data_source_id = row.data_source_id
     
-    # Use the existing get_equipment_status logic with the actual workspace_id
-    return await get_equipment_status(
-        workspace_id=workspace_id,
-        equipment_type=equipment_type,
-        status=status,
-        limit=limit,
-        offset=offset,
-        db=db
-    )
+    # If data_source_id is specified, use it for data provider routing
+    if data_source_id:
+        # Use flow-specific data source
+        # Use flow-specific data source
+        from app.services.data_providers.dynamic import DynamicProvider
+        
+        # Create dynamic provider with specific data source
+        provider = DynamicProvider(db, workspace_id, data_source_id)
+        
+        try:
+            logger.info(f"🔍 Starting equipment status query for workspace: {workspace_id}, data_source: {data_source_id}")
+            
+            # Connect to data source
+            await provider.connect()
+            
+            # Get equipment status
+            equipment_data = await provider.get_equipment_status(
+                equipment_type=equipment_type,
+                status=status,
+                limit=limit,
+                offset=offset
+            )
+            
+            # Convert to response format
+            equipment_list = []
+            total_count = 0
+            
+            if equipment_data:
+                if isinstance(equipment_data, dict) and 'items' in equipment_data:
+                    equipment_list = [
+                        EquipmentStatus(
+                            equipment_type=row['equipment_type'],
+                            equipment_code=row['equipment_code'],
+                            equipment_name=row['equipment_name'],
+                            status=row['status'],
+                            last_run_time=row.get('last_run_time')
+                        ) for row in equipment_data['items']
+                    ]
+                    total_count = equipment_data.get('total', len(equipment_list))
+                else:
+                    equipment_list = [
+                        EquipmentStatus(
+                            equipment_type=row['equipment_type'],
+                            equipment_code=row['equipment_code'],
+                            equipment_name=row['equipment_name'],
+                            status=row['status'],
+                            last_run_time=row.get('last_run_time')
+                        ) for row in equipment_data
+                    ]
+                    total_count = len(equipment_list)
+            
+            return EquipmentStatusResponse(
+                items=equipment_list,
+                total=total_count,
+                limit=limit,
+                offset=offset,
+                has_more=(offset + limit) < total_count
+            )
+        except Exception as e:
+            logger.error(f"Error getting equipment status for public flow: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to get equipment status: {str(e)}"
+            )
+        finally:
+            try:
+                await provider.disconnect()
+            except Exception as e:
+                logger.warning(f"Error disconnecting provider: {e}")
+    else:
+        # Fall back to workspace default data source
+        return await get_equipment_status(
+            workspace_id=workspace_id,
+            equipment_type=equipment_type,
+            status=status,
+            limit=limit,
+            offset=offset,
+            db=db
+        )
 
 
 @router.get("/public/{publish_token}/measurements", response_model=List[MeasurementData])
@@ -796,20 +882,20 @@ async def get_public_measurements(
     db: AsyncSession = Depends(get_db)
 ):
     """게시된 공정도의 측정 데이터 조회 (공개 접근)"""
-    # First get workspace_id from the published flow
-    # For versions table, we need to join with flows table to get workspace_id
-    workspace_query = """
-        SELECT f.workspace_id 
+    # First get workspace_id and data_source_id from the published flow
+    # For versions table, we need to join with flows table to get workspace_id and data_source_id
+    flow_info_query = """
+        SELECT f.workspace_id, f.data_source_id 
         FROM personal_test_process_flow_versions v
         JOIN personal_test_process_flows f ON v.flow_id = f.id
         WHERE v.publish_token = :publish_token AND v.is_published = true
         UNION
-        SELECT workspace_id 
+        SELECT workspace_id, data_source_id 
         FROM personal_test_process_flows
         WHERE publish_token = :publish_token AND is_published = true
         LIMIT 1
     """
-    result = await db.execute(text(workspace_query), {"publish_token": publish_token})
+    result = await db.execute(text(flow_info_query), {"publish_token": publish_token})
     row = result.fetchone()
     
     if not row:
@@ -819,17 +905,124 @@ async def get_public_measurements(
         )
     
     workspace_id = row.workspace_id
+    data_source_id = row.data_source_id
     
-    # Use the existing get_measurement_data logic with the actual workspace_id
-    return await get_measurement_data(
-        workspace_id=workspace_id,
-        equipment_code=equipment_code,
-        equipment_codes=equipment_codes,
-        equipment_type=equipment_type,
-        measurement_code=measurement_code,
-        limit=limit,
-        db=db
-    )
+    logger.info(f"🔍 Public measurements - workspace: {workspace_id}, data_source: {data_source_id}")
+    
+    # Always use DynamicProvider - it will handle fallback logic internally
+    from app.services.data_providers.dynamic import DynamicProvider
+    
+    # Create dynamic provider with optional data_source_id
+    provider = DynamicProvider(db, workspace_id, data_source_id)
+    
+    try:
+        logger.info(f"🔍 Starting measurement data query for workspace: {workspace_id}, data_source: {data_source_id}")
+        
+        # Connect to data source
+        await provider.connect()
+        
+        # Get measurement data
+        try:
+            measurement_data = await provider.get_measurement_data(
+                equipment_code=equipment_code,
+                equipment_codes=equipment_codes,
+                equipment_type=equipment_type,
+                measurement_code=measurement_code,
+                limit=limit
+            )
+            logger.info(f"✅ Successfully retrieved {len(measurement_data)} measurements")
+        except Exception as provider_error:
+            logger.error(f"❌ Provider error in public measurements: {provider_error}")
+            import traceback
+            logger.error(f"Provider error traceback: {traceback.format_exc()}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to get measurement data: {str(provider_error)}"
+            )
+        
+        # Check if measurement_data is already a list of MeasurementData objects
+        if measurement_data and len(measurement_data) > 0:
+            first_item = measurement_data[0]
+            if hasattr(first_item, 'spec_status'):
+                # Already MeasurementData objects - need to convert
+                result = []
+                for item in measurement_data:
+                    if hasattr(item, 'dict'):
+                        # Convert to dict first
+                        item_dict = item.dict()
+                    else:
+                        # Already a dict
+                        item_dict = item
+                    
+                    # Fix spec_status
+                    spec_status = item_dict.get('spec_status', 0)
+                    if isinstance(spec_status, str):
+                        spec_status_mapping = {
+                            'IN_SPEC': 0,
+                            'BELOW_SPEC': 1,
+                            'ABOVE_SPEC': 2,
+                            'NO_SPEC': 9
+                        }
+                        spec_status = spec_status_mapping.get(spec_status, 0)
+                    
+                    # Create new MeasurementData object with corrected spec_status
+                    result.append(MeasurementData(
+                        id=item_dict.get('id', 0),
+                        equipment_type=item_dict.get('equipment_type', ''),
+                        equipment_code=item_dict.get('equipment_code', ''),
+                        measurement_code=item_dict.get('measurement_code', ''),
+                        measurement_desc=item_dict.get('measurement_desc', ''),
+                        measurement_value=item_dict.get('measurement_value', 0.0),
+                        timestamp=item_dict.get('timestamp', datetime.now()),
+                        spec_status=spec_status,
+                        usl=item_dict.get('usl'),
+                        lsl=item_dict.get('lsl')
+                    ))
+                return result
+        
+        # Convert to response format - with explicit spec_status conversion
+        result = []
+        for row in (measurement_data or []):
+            # Ensure spec_status is an integer
+            spec_status = row.get('spec_status', 0)
+            if isinstance(spec_status, str):
+                spec_status_mapping = {
+                    'IN_SPEC': 0,
+                    'BELOW_SPEC': 1,
+                    'ABOVE_SPEC': 2,
+                    'NO_SPEC': 9
+                }
+                spec_status = spec_status_mapping.get(spec_status, 0)
+            elif spec_status is None:
+                spec_status = 0
+            
+            # Create measurement object with proper type conversion
+            measurement_obj = MeasurementData(
+                id=int(row.get('id', 0)),
+                equipment_type=str(row.get('equipment_type', '')),
+                equipment_code=str(row.get('equipment_code', '')),
+                measurement_code=str(row.get('measurement_code', '')),
+                measurement_desc=str(row.get('measurement_desc', '')),
+                measurement_value=float(row.get('measurement_value', 0.0)),
+                timestamp=row.get('timestamp', datetime.now()),
+                spec_status=int(spec_status),
+                usl=row.get('usl'),
+                lsl=row.get('lsl')
+            )
+            result.append(measurement_obj)
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error getting measurement data for public flow: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get measurement data: {str(e)}"
+        )
+    finally:
+        try:
+            await provider.disconnect()
+        except Exception as e:
+            logger.warning(f"Error disconnecting provider: {e}")
 
 
 
@@ -841,13 +1034,14 @@ async def get_equipment_status(
     status: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    data_source_id: Optional[str] = Query(None, description="Data Source ID"),
     db: AsyncSession = Depends(get_db)
 ):
     """설비 운행 상태 조회 (Dynamic Provider 사용)"""
     from app.services.data_providers.dynamic import DynamicProvider
     
-    # Create dynamic provider
-    provider = DynamicProvider(db, workspace_id)
+    # Create dynamic provider with optional data_source_id
+    provider = DynamicProvider(db, workspace_id, data_source_id)
     
     try:
         logger.info(f"🔍 Starting equipment status query for workspace: {workspace_id}")
@@ -1042,13 +1236,14 @@ async def get_measurement_data(
     equipment_type: Optional[str] = Query(None),
     measurement_code: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=1000),
+    data_source_id: Optional[str] = Query(None, description="Data Source ID"),
     db: AsyncSession = Depends(get_db)
 ):
     """측정 데이터 조회 (Dynamic Provider 사용)"""
     from app.services.data_providers.dynamic import DynamicProvider
     
-    # Create dynamic provider
-    provider = DynamicProvider(db, workspace_id)
+    # Create dynamic provider with optional data_source_id
+    provider = DynamicProvider(db, workspace_id, data_source_id)
     
     try:
         # Connect to data source

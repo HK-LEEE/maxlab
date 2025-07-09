@@ -107,7 +107,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   const { publishToken } = useParams<{ publishToken: string }>();
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [viewport, setViewport] = useState<Viewport | undefined>();
+  const [viewport] = useState<Viewport | undefined>();
   const [showAlarms, setShowAlarms] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -123,6 +123,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
     setAutoRefresh,
     refreshInterval,
     setRefreshInterval,
+    forceRefresh,
     error,
   } = usePublicFlowMonitor(publishToken || '');
 
@@ -181,6 +182,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   }
 
   const refreshIntervalOptions = [
+    { value: 10000, label: '10 seconds' },
     { value: 30000, label: '30 seconds' },
     { value: 60000, label: '1 minute' },
     { value: 180000, label: '3 minutes' },
@@ -223,7 +225,14 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
 
             {/* Refresh Controls */}
             <div className="flex items-center space-x-2">
-              <RefreshCw size={16} className={`text-gray-500 ${autoRefresh ? 'animate-spin' : ''}`} />
+              <button
+                onClick={forceRefresh}
+                disabled={isLoading}
+                className="p-2 hover:bg-gray-100 rounded disabled:opacity-50"
+                title="Force refresh data"
+              >
+                <RefreshCw size={16} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
+              </button>
               <select
                 value={refreshInterval}
                 onChange={(e) => setRefreshInterval(Number(e.target.value))}

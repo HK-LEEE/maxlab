@@ -79,8 +79,23 @@ const statusConfig = {
   },
 };
 
+// Get status configuration with fallback for unknown statuses
+const getStatusConfig = (status: string) => {
+  const config = statusConfig[status as keyof typeof statusConfig];
+  if (config) return config;
+  
+  // Fallback for unknown statuses - default to STOP styling
+  return {
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    headerBg: 'bg-gray-500',
+    headerText: 'text-white',
+    icon: <AlertCircle size={16} />
+  };
+};
+
 export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeData>) => {
-  const status = statusConfig[data.status] || statusConfig.STOP;
+  const status = getStatusConfig(data.status);
   const icon = data.icon ? iconMap[data.icon] : <Gauge size={20} />;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -175,7 +190,7 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
         </div>
         {data.equipmentCode && (
           <div className="flex-1 px-2 py-1.5 flex items-center justify-center">
-            <span className="text-xs text-gray-600">Code: {data.equipmentCode}</span>
+            <span className="text-xs text-gray-600">{data.equipmentCode}</span>
           </div>
         )}
       </div>

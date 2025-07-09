@@ -13,7 +13,7 @@ interface MeasurementData {
   equipment_code: string;
   measurement_desc: string;
   measurement_value: number;
-  spec_status?: number;
+  spec_status?: number | 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC';
   usl?: number;
   lsl?: number;
 }
@@ -37,6 +37,11 @@ export const EquipmentSidebar: React.FC<EquipmentSidebarProps> = ({
     ACTIVE: 'bg-green-100 text-green-800',
     PAUSE: 'bg-yellow-100 text-yellow-800',
     STOP: 'bg-red-100 text-red-800',
+  };
+
+  // Get status styling with fallback for unknown statuses
+  const getStatusStyling = (status: string) => {
+    return statusConfig[status as keyof typeof statusConfig] || 'bg-gray-100 text-gray-800';
   };
 
   return (
@@ -83,9 +88,7 @@ export const EquipmentSidebar: React.FC<EquipmentSidebarProps> = ({
                           )}
                         </div>
                         <span
-                          className={`text-xs px-2 py-1 rounded ${
-                            statusConfig[equipment.status]
-                          }`}
+                          className={`text-xs px-2 py-1 rounded ${getStatusStyling(equipment.status)}`}
                         >
                           {equipment.status}
                         </span>

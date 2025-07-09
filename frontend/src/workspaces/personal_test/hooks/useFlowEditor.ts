@@ -16,6 +16,7 @@ interface ProcessFlow {
   is_published?: boolean;
   published_at?: string;
   publish_token?: string;
+  data_source_id?: string;
 }
 
 interface Equipment {
@@ -42,6 +43,7 @@ export const useFlowEditor = (workspaceId: string) => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastAutoSaveTime, setLastAutoSaveTime] = useState<Date | null>(null);
+  const [selectedDataSourceId, setSelectedDataSourceId] = useState<string | null>(null);
   
   // Equipment states
   const [equipmentList, setEquipmentList] = useState<EquipmentItem[]>([]);
@@ -109,12 +111,14 @@ export const useFlowEditor = (workspaceId: string) => {
         workspace_id: workspaceUuid,
         name: flowName,
         flow_data: { nodes, edges },
+        data_source_id: selectedDataSourceId,
       };
 
       if (currentFlow) {
         const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
           name: flowName,
           flow_data: { nodes, edges },
+          data_source_id: selectedDataSourceId,
         });
         // Update currentFlow with the response to ensure we have the latest data
         console.log('Update response:', response.data);
@@ -149,9 +153,14 @@ export const useFlowEditor = (workspaceId: string) => {
   const loadFlow = async (flow: ProcessFlow) => {
     console.log('Loading flow:', flow);
     console.log('Flow nodes:', flow.flow_data?.nodes);
+    console.log('Flow data_source_id:', flow.data_source_id);
     
     setCurrentFlow(flow);
     setFlowName(flow.name);
+    setSelectedDataSourceId(flow.data_source_id || null);
+    
+    // Debug: Log the selected data source ID
+    console.log('Selected data source ID set to:', flow.data_source_id || null);
     
     const nodesWithDefaults = (flow.flow_data.nodes || []).map((node: Node) => {
       // Ensure all nodes have proper structure
@@ -584,6 +593,7 @@ export const useFlowEditor = (workspaceId: string) => {
     nodeSize,
     autoScroll,
     selectedElements,
+    selectedDataSourceId,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -595,6 +605,7 @@ export const useFlowEditor = (workspaceId: string) => {
     setEdges,
     setFlows,
     setCurrentFlow,
+    setSelectedDataSourceId,
     saveFlow,
     loadFlow,
     validateMappings,

@@ -28,15 +28,15 @@ export const PersonalTestWorkspace: React.FC = () => {
       adminOnly: false,
     },
     {
-      id: 'public-monitor',
-      title: '공개 프로세스 모니터링',
-      description: '게시된 프로세스 플로우를 인증 없이 모니터링할 수 있습니다. 공개된 플로우는 누구나 접근 가능합니다.',
+      id: 'publish-settings',
+      title: 'Publish 설정',
+      description: '프로세스 플로우를 게시하거나 게시 취소할 수 있습니다. 게시된 플로우는 공개 링크로 누구나 접근 가능합니다.',
       icon: Globe,
-      path: '#',
+      path: '/workspaces/personal_test/process-flow/publish',
       bgColor: 'bg-purple-100',
       iconColor: 'text-purple-600',
       adminOnly: false,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
   ];
 

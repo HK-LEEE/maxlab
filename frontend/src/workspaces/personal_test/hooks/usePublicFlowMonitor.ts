@@ -51,7 +51,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(30000); // Default 30 seconds
+  const [refreshInterval, setRefreshInterval] = useState(10000); // Default 10 seconds for better real-time updates
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [alarmCheck, setAlarmCheck] = useState(true);
   const [previousData, setPreviousData] = useState<{
@@ -65,6 +65,11 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   // Create a public axios instance without auth headers
   const publicClient = axios.create({
     baseURL: apiClient.defaults.baseURL,
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
   });
 
   // WebSocket connection for real-time updates
@@ -99,9 +104,9 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       }
       setError(null);
 
-      // Get the published flow
+      // Get the published flow with cache-busting
       const flowResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}`
+        `/api/v1/personal-test/process-flow/public/${publishToken}?_t=${Date.now()}`
       );
       const flowData = flowResponse.data;
       setFlow(flowData);
@@ -112,17 +117,17 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         setEdges(flowData.flow_data.edges || []);
       }
 
-      // Get equipment statuses
+      // Get equipment statuses with cache-busting
       const statusResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}/status?limit=100`
+        `/api/v1/personal-test/process-flow/public/${publishToken}/status?limit=100&_t=${Date.now()}`
       );
       const statuses = statusResponse.data.items || statusResponse.data;
       // console.log('Public Equipment Status Response:', statuses);
       setEquipmentStatuses(statuses);
 
-      // Get measurements using the public endpoint
+      // Get measurements using the public endpoint with cache-busting
       const measurementResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}/measurements?limit=100`
+        `/api/v1/personal-test/process-flow/public/${publishToken}/measurements?limit=100&_t=${Date.now()}`
       );
       setMeasurements(measurementResponse.data);
 
@@ -399,5 +404,6 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     setAutoRefresh,
     refreshInterval,
     setRefreshInterval,
+    forceRefresh: loadFlow,
   };
 };

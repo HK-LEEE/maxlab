@@ -88,22 +88,18 @@ async def add_mssql_configuration():
                 # Update existing configuration
                 print("🔄 Updating existing MSSQL configuration...")
                 
-                # MSSQL connection string with localhost\SQLEXPRESS - Enhanced for ODBC 17
+                # MSSQL connection string with localhost\SQLEXPRESS - Enhanced for FreeTDS
                 mssql_connection_string = (
-                    "DRIVER={ODBC Driver 17 for SQL Server};"
+                    "DRIVER={FreeTDS};"
                     "SERVER=localhost\\SQLEXPRESS;"
-                    "DATABASE=equipment_db;"
+                    "DATABASE=AIDB;"
                     "UID=mss;"
                     "PWD=2300;"
                     "TrustServerCertificate=yes;"
-                    "Encrypt=yes;"
                     "Connection Timeout=30;"
                     "Command Timeout=60;"
-                    "MultipleActiveResultSets=true;"
-                    "ApplicationIntent=ReadWrite;"
-                    "ConnectRetryCount=3;"
-                    "ConnectRetryInterval=10;"
-                    "Connection Pooling=true"
+                    "TDS_Version=8.0;"
+                    "Port=1433"
                 )
                 
                 # Encrypt the connection string
@@ -197,22 +193,18 @@ async def add_mssql_configuration():
                 
                 config_id = str(uuid.uuid4())
                 
-                # MSSQL connection string with localhost\SQLEXPRESS - Enhanced for ODBC 17
+                # MSSQL connection string with localhost\SQLEXPRESS - Enhanced for FreeTDS
                 mssql_connection_string = (
-                    "DRIVER={ODBC Driver 17 for SQL Server};"
+                    "DRIVER={FreeTDS};"
                     "SERVER=localhost\\SQLEXPRESS;"
-                    "DATABASE=equipment_db;"
+                    "DATABASE=AIDB;"
                     "UID=mss;"
                     "PWD=2300;"
                     "TrustServerCertificate=yes;"
-                    "Encrypt=yes;"
                     "Connection Timeout=30;"
                     "Command Timeout=60;"
-                    "MultipleActiveResultSets=true;"
-                    "ApplicationIntent=ReadWrite;"
-                    "ConnectRetryCount=3;"
-                    "ConnectRetryInterval=10;"
-                    "Connection Pooling=true"
+                    "TDS_Version=8.0;"
+                    "Port=1433"
                 )
                 
                 # Encrypt the connection string

@@ -143,7 +143,7 @@ class WorkspaceCRUD:
         self, 
         db: AsyncSession, 
         skip: int = 0, 
-        limit: int = 100,
+        limit: int = 1000,
         active_only: bool = True,
         user_id: Optional[str] = None,
         user_groups: Optional[List[str]] = None,

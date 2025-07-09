@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Node, Edge } from 'reactflow';
 import { apiClient } from '../../../api/client';
 import { useWebSocket } from './useWebSocket';
@@ -46,10 +46,12 @@ export const useFlowMonitor = (workspaceId: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(30000);
+  const [refreshInterval, setRefreshInterval] = useState(10000); // 10 seconds for better real-time updates
   const [autoScroll, setAutoScroll] = useState(false);
+  const [alarmCheck, setAlarmCheck] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const isDataLoadingRef = useRef(false);
   
   // WebSocket connection (optional)
   const { isConnected: wsConnected } = useWebSocket({
@@ -82,7 +84,7 @@ export const useFlowMonitor = (workspaceId: string) => {
   useEffect(() => {
     if (!workspaceId) return;
     
-    apiClient.get(`/api/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}`)
+    apiClient.get(`/api/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}&_t=${Date.now()}`)
       .then((response) => {
         setFlows(response.data);
         if (response.data.length > 0 && !selectedFlow) {
@@ -94,6 +96,7 @@ export const useFlowMonitor = (workspaceId: string) => {
 
   // Track visible equipment codes to optimize API calls
   const [visibleEquipmentCodes, setVisibleEquipmentCodes] = useState<Set<string>>(new Set());
+  const visibleEquipmentCodesRef = useRef<Set<string>>(new Set());
   const [previousData, setPreviousData] = useState<{
     statuses: Map<string, any>,
     measurements: Map<string, any>
@@ -104,17 +107,29 @@ export const useFlowMonitor = (workspaceId: string) => {
 
   // Load equipment status and measurements (optimized)
   const loadData = useCallback(async () => {
-    // Don't skip if no equipment codes - still load all statuses
+    // Prevent duplicate API calls with stricter timing control
+    if (isDataLoadingRef.current) {
+      return;
+    }
+    
+    // Rate limiting - prevent calls more frequent than every 5 seconds
+    const now = Date.now();
+    const lastCallTime = (window as any).lastApiCallTime || 0;
+    if (now - lastCallTime < 5000) {
+      return;
+    }
+    
+    isDataLoadingRef.current = true;
+    (window as any).lastApiCallTime = now;
     setIsLoading(true);
+    
     try {
-      // Build equipment codes parameter
-      const equipmentCodesParam = visibleEquipmentCodes.size > 0 
-        ? Array.from(visibleEquipmentCodes).join(',')
-        : '';
+      // Build API URLs with data_source_id if available
+      const dataSourceParam = selectedFlow?.data_source_id ? `&data_source_id=${selectedFlow.data_source_id}` : '';
       
       const [statusResponse, measurementResponse] = await Promise.all([
-        apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}&limit=100`),
-        apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}&equipment_codes=${equipmentCodesParam}&limit=500`),
+        apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}&limit=100${dataSourceParam}&_t=${Date.now()}`),
+        apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}&limit=500${dataSourceParam}&_t=${Date.now()}`),
       ]);
       
       const equipmentStatusList = statusResponse.data.items || statusResponse.data;
@@ -159,39 +174,69 @@ export const useFlowMonitor = (workspaceId: string) => {
       if (hasMeasurementChanged) {
         setMeasurements(newMeasurements);
         
-        // Check for spec violations and trigger alarms
-        newMeasurements.forEach((measurement: MeasurementData) => {
-          if (measurement.spec_status && measurement.spec_status !== 'IN_SPEC') {
-            // Check if this is a new alarm or status change
-            const key = `${measurement.equipment_code}_${measurement.measurement_code}`;
-            const prevMeasurement = previousData.measurements.get(key);
-            
-            if (!prevMeasurement || prevMeasurement.spec_status !== measurement.spec_status) {
-              // Find equipment info
-              const equipment = equipmentStatusList.find((e: EquipmentStatus) => 
-                e.equipment_code === measurement.equipment_code
-              );
-              
-              // Trigger spec alarm event
-              const alarmEvent = new CustomEvent('specAlarm', {
-                detail: {
-                  id: `${measurement.equipment_code}_${measurement.measurement_code}_${Date.now()}`,
-                  equipment_code: measurement.equipment_code,
-                  equipment_name: equipment?.equipment_name || measurement.equipment_code,
-                  measurement_code: measurement.measurement_code,
-                  measurement_desc: measurement.measurement_desc,
-                  value: measurement.measurement_value,
-                  spec_type: measurement.spec_status,
-                  spec_limit: measurement.spec_status === 'ABOVE_SPEC' 
-                    ? measurement.upper_spec_limit 
-                    : measurement.lower_spec_limit,
-                  timestamp: new Date()
-                }
+        // Check for spec violations and trigger alarms (only if alarm check is enabled)
+        // Only trigger alarms for measurements that are visible on current screen nodes
+        if (alarmCheck) {
+          // Get all measurement codes that are configured to be displayed on current screen nodes
+          const visibleMeasurementCodes = new Set<string>();
+          nodes.forEach(node => {
+            if (node.type === 'equipment' && node.data.displayMeasurements) {
+              node.data.displayMeasurements.forEach((code: string) => {
+                visibleMeasurementCodes.add(code);
               });
-              window.dispatchEvent(alarmEvent);
             }
-          }
-        });
+          });
+          
+          newMeasurements.forEach((measurement: MeasurementData) => {
+            // Only trigger alarms for measurements that are visible on current screen
+            if (!visibleMeasurementCodes.has(measurement.measurement_code)) {
+              return;
+            }
+            
+            // Only trigger alarms for spec_status 1 (BELOW_SPEC) and 2 (ABOVE_SPEC)
+            // Exclude spec_status 9 (NO_SPEC) and 0 (IN_SPEC) from alarms
+            if (measurement.spec_status === 1 || measurement.spec_status === 2) {
+              // Check if this is a new alarm or status change
+              const key = `${measurement.equipment_code}_${measurement.measurement_code}`;
+              const prevMeasurement = previousData.measurements.get(key);
+              
+              if (!prevMeasurement || prevMeasurement.spec_status !== measurement.spec_status) {
+                // Find equipment info
+                const equipment = equipmentStatusList.find((e: EquipmentStatus) => 
+                  e.equipment_code === measurement.equipment_code
+                );
+                
+                // Additional validation: only trigger alarm if relevant spec limit exists
+                const hasValidLimit = measurement.spec_status === 2 
+                  ? (measurement.upper_spec_limit != null || measurement.usl != null)
+                  : (measurement.lower_spec_limit != null || measurement.lsl != null);
+                
+                if (hasValidLimit) {
+                  // Trigger spec alarm event
+                  const alarmEvent = new CustomEvent('specAlarm', {
+                    detail: {
+                      id: `${measurement.equipment_code}_${measurement.measurement_code}_${Date.now()}`,
+                      equipment_code: measurement.equipment_code,
+                      equipment_name: equipment?.equipment_name || measurement.equipment_code,
+                      measurement_code: measurement.measurement_code,
+                      measurement_desc: measurement.measurement_desc,
+                      value: measurement.measurement_value,
+                      spec_type: measurement.spec_status === 2 ? 'ABOVE_SPEC' : 'BELOW_SPEC',
+                      spec_limit: measurement.spec_status === 2 
+                        ? (measurement.upper_spec_limit || measurement.usl)
+                        : (measurement.lower_spec_limit || measurement.lsl),
+                      usl: measurement.upper_spec_limit || measurement.usl,
+                      lsl: measurement.lower_spec_limit || measurement.lsl,
+                      timestamp: new Date()
+                    }
+                  });
+                  
+                  window.dispatchEvent(alarmEvent);
+                }
+              }
+            }
+          });
+        }
       }
       
       if (hasStatusChanged || hasMeasurementChanged) {
@@ -209,13 +254,19 @@ export const useFlowMonitor = (workspaceId: string) => {
               s.equipment_code === node.data.equipmentCode
             );
             
-            const equipmentMeasurements = measurementResponse.data.filter(
-              (m: MeasurementData) => m.equipment_code === node.data.equipmentCode
-            );
+            // Filter measurements based on displayMeasurements configuration only
+            const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+              // If displayMeasurements is not set or empty, show no measurements
+              if (!node.data.displayMeasurements || node.data.displayMeasurements.length === 0) {
+                return false;
+              }
+              // Only show measurements that are in displayMeasurements (equipment code independent)
+              return node.data.displayMeasurements.includes(m.measurement_code);
+            });
             
             // Group measurements by code and take the latest
             const measurementMap = new Map<string, MeasurementData>();
-            equipmentMeasurements.forEach((m: MeasurementData) => {
+            configuredMeasurements.forEach((m: MeasurementData) => {
               const existing = measurementMap.get(m.measurement_code);
               if (!existing || new Date(m.timestamp) > new Date(existing.timestamp)) {
                 measurementMap.set(m.measurement_code, m);
@@ -223,29 +274,13 @@ export const useFlowMonitor = (workspaceId: string) => {
             });
             
             const latestMeasurements = Array.from(measurementMap.values()).map((m) => {
-              // Trigger alarm if spec_status is 1 (out of spec)
-              if (m.spec_status === 1) {
-                const alarmEvent = new CustomEvent('specAlarm', {
-                  detail: {
-                    id: `${m.equipment_code}-${m.measurement_code}-${Date.now()}`,
-                    equipment_code: m.equipment_code,
-                    equipment_name: equipmentList.find(e => e.equipment_code === m.equipment_code)?.equipment_name || m.equipment_code,
-                    measurement_code: m.measurement_code,
-                    measurement_desc: m.measurement_desc,
-                    value: m.measurement_value,
-                    spec_type: m.usl !== undefined && m.measurement_value > m.usl ? 'ABOVE_SPEC' : 'BELOW_SPEC',
-                    spec_limit: m.usl !== undefined && m.measurement_value > m.usl ? m.usl : m.lsl || 0,
-                    timestamp: new Date()
-                  }
-                });
-                window.dispatchEvent(alarmEvent);
-              }
-              
               return {
                 code: m.measurement_code,
                 desc: m.measurement_desc,
                 value: m.measurement_value,
-                spec_status: m.spec_status,
+                spec_status: m.spec_status === 1 ? 'BELOW_SPEC' : 
+                           m.spec_status === 2 ? 'ABOVE_SPEC' : 
+                           m.spec_status === 9 ? 'NO_SPEC' : 'IN_SPEC',
                 usl: m.usl,
                 lsl: m.lsl
               };
@@ -356,8 +391,9 @@ export const useFlowMonitor = (workspaceId: string) => {
       console.error('Failed to load data:', err);
     } finally {
       setIsLoading(false);
+      isDataLoadingRef.current = false;
     }
-  }, [workspaceId, visibleEquipmentCodes]);
+  }, [workspaceId, workspaceUuid, alarmCheck]);
 
   // Update visible equipment codes when nodes change
   useEffect(() => {
@@ -368,6 +404,7 @@ export const useFlowMonitor = (workspaceId: string) => {
       }
     });
     setVisibleEquipmentCodes(codes);
+    visibleEquipmentCodesRef.current = codes;
   }, [nodes]);
 
   // Load data when visible equipment codes change or on initial flow selection
@@ -375,16 +412,20 @@ export const useFlowMonitor = (workspaceId: string) => {
     if (selectedFlow) {
       const timer = setTimeout(() => {
         loadData();
-      }, 300);
+      }, 2000); // Increased debounce time to 2 seconds
       return () => clearTimeout(timer);
     }
-  }, [visibleEquipmentCodes, selectedFlow, loadData]);
+  }, [selectedFlow, loadData]);
 
-  // Auto-refresh
+  // Auto-refresh with minimum 10 second interval
   useEffect(() => {
     if (autoRefresh && selectedFlow) {
-      loadData();
-      const interval = setInterval(loadData, refreshInterval);
+      const actualInterval = Math.max(refreshInterval, 10000); // Minimum 10 seconds
+      const interval = setInterval(() => {
+        if (!isDataLoadingRef.current) {
+          loadData();
+        }
+      }, actualInterval);
       return () => clearInterval(interval);
     }
   }, [autoRefresh, refreshInterval, selectedFlow, loadData]);
@@ -459,6 +500,7 @@ export const useFlowMonitor = (workspaceId: string) => {
     autoRefresh,
     refreshInterval,
     autoScroll,
+    alarmCheck,
     isSidebarOpen,
     isFullscreen,
     statusCounts: getStatusCounts(),
@@ -466,8 +508,10 @@ export const useFlowMonitor = (workspaceId: string) => {
     setAutoRefresh,
     setRefreshInterval,
     setAutoScroll,
+    setAlarmCheck,
     setIsSidebarOpen,
     loadData,
+    forceRefresh: loadData,
     toggleFullscreen,
   };
 };

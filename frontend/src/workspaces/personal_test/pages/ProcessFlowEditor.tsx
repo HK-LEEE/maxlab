@@ -9,7 +9,7 @@ import ReactFlow, {
 } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Save, FileText, Square, Trash2, Globe, FolderOpen, Download, Database, Ruler } from 'lucide-react';
+import { Save, FileText, Square, Trash2, FolderOpen, Download, Database, Ruler, Server } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
@@ -22,11 +22,11 @@ import { FloatingActionButton } from '../components/common/FloatingActionButton'
 import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
 import { AlignmentMenu } from '../components/editor/AlignmentMenu';
-import { PublishDialog } from '../components/editor/PublishDialog';
 import { MeasurementSpecDialog } from '../components/editor/MeasurementSpecDialog';
 import { DataSourceDialog } from '../components/editor/DataSourceDialog';
 
 import { useFlowEditor } from '../hooks/useFlowEditor';
+import { useDataSources } from '../hooks/useDataSources';
 import { Layout } from '../../../components/common/Layout';
 import { apiClient } from '../../../api/client';
 import { toast } from 'react-hot-toast';
@@ -46,6 +46,17 @@ const equipmentTypes = [
   { code: 'H1', name: '냉각기', icon: 'snowflake' },
 ];
 
+// Define nodeTypes and edgeTypes outside component to avoid re-creation
+const nodeTypes = Object.freeze({
+  equipment: EquipmentNode,
+  group: GroupNode,
+  text: TextNode,
+});
+
+const edgeTypes = Object.freeze({
+  custom: CustomEdgeWithLabel,
+});
+
 // Node color function for minimap
 const nodeColor = (node: Node) => {
   switch (node.type) {
@@ -64,17 +75,6 @@ const ProcessFlowEditorContent: React.FC = () => {
   const workspaceId = 'personal_test';
   const { screenToFlowPosition } = useReactFlow();
   
-  // Memoize nodeTypes and edgeTypes to avoid React Flow warnings
-  const nodeTypes = useMemo(() => ({
-    equipment: EquipmentNode,
-    group: GroupNode,
-    text: TextNode,
-  }), []);
-
-  const edgeTypes = useMemo(() => ({
-    custom: CustomEdgeWithLabel,
-  }), []);
-  
   const {
     nodes,
     edges,
@@ -91,6 +91,7 @@ const ProcessFlowEditorContent: React.FC = () => {
     nodeSize,
     autoScroll,
     selectedElements,
+    selectedDataSourceId,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -102,6 +103,7 @@ const ProcessFlowEditorContent: React.FC = () => {
     setEdges,
     setFlows,
     setCurrentFlow,
+    setSelectedDataSourceId,
     saveFlow,
     loadFlow,
     loadMoreEquipment,
@@ -109,17 +111,33 @@ const ProcessFlowEditorContent: React.FC = () => {
     addGroupNode,
     alignNodes,
     getNodeHeight,
-    publishFlow,
-    unpublishFlow,
     deleteFlow,
     lastAutoSaveTime,
   } = useFlowEditor(workspaceId);
+
+  // Data sources hook
+  const { dataSources, isLoading: isLoadingDataSources } = useDataSources(workspaceId);
+  
+  // Debug: Log data sources and selected data source ID
+  console.log('Data sources:', dataSources);
+  console.log('Selected data source ID:', selectedDataSourceId);
+  console.log('Is loading data sources:', isLoadingDataSources);
+  
+  // Ensure selected data source is valid when data sources are loaded
+  React.useEffect(() => {
+    if (!isLoadingDataSources && selectedDataSourceId && dataSources.length > 0) {
+      const isValidDataSource = dataSources.some(ds => ds.id === selectedDataSourceId);
+      if (!isValidDataSource) {
+        console.warn('Selected data source ID is not valid:', selectedDataSourceId);
+        console.warn('Available data sources:', dataSources.map(ds => ds.id));
+      }
+    }
+  }, [isLoadingDataSources, selectedDataSourceId, dataSources]);
 
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
   const [configNode, setConfigNode] = useState<Node | null>(null);
   const [textConfigNode, setTextConfigNode] = useState<Node | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const [versionManagementAvailable, setVersionManagementAvailable] = useState(true);
   const [isDataSourceDialogOpen, setIsDataSourceDialogOpen] = useState(false);
   const [isMeasurementSpecDialogOpen, setIsMeasurementSpecDialogOpen] = useState(false);
@@ -371,29 +389,32 @@ const ProcessFlowEditorContent: React.FC = () => {
               <Download size={16} />
               <span>Export</span>
             </button>
-            {currentFlow && (
-              <button
-                onClick={() => setIsPublishDialogOpen(true)}
-                className={`flex items-center space-x-1 px-3 py-1.5 rounded text-sm ${
-                  currentFlow.is_published
-                    ? 'bg-green-600 text-white hover:bg-green-700'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {currentFlow.is_published ? (
-                  <>
-                    <Globe size={16} />
-                    <span>Published</span>
-                  </>
-                ) : (
-                  <>
-                    <Globe size={16} />
-                    <span>Publish</span>
-                  </>
-                )}
-              </button>
-            )}
             <div className="w-px h-6 bg-gray-300" />
+            
+            {/* Data Source Selection */}
+            <div className="flex items-center space-x-2">
+              <Server size={16} className="text-gray-500" />
+              <select
+                value={selectedDataSourceId || ''}
+                onChange={(e) => setSelectedDataSourceId(e.target.value || null)}
+                className="text-sm border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                disabled={isLoadingDataSources}
+              >
+                <option value="">Default Data Source</option>
+                {dataSources.map((ds) => (
+                  <option key={ds.id} value={ds.id}>
+                    {ds.source_type.toUpperCase()} - {ds.id.slice(0, 8)}...
+                  </option>
+                ))}
+              </select>
+              {/* Debug info */}
+              {selectedDataSourceId && (
+                <span className="text-xs text-gray-500">
+                  Selected: {selectedDataSourceId.slice(0, 8)}...
+                </span>
+              )}
+            </div>
+            
             <button
               onClick={() => setIsDataSourceDialogOpen(true)}
               className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
@@ -487,7 +508,6 @@ const ProcessFlowEditorContent: React.FC = () => {
           currentFlowId={currentFlow?.id}
           onClose={() => setIsLoadDialogOpen(false)}
           onLoad={handleLoadFlow}
-          onPublish={publishFlow}
           onDelete={deleteFlow}
         />
 
@@ -512,16 +532,6 @@ const ProcessFlowEditorContent: React.FC = () => {
           />
         )}
 
-        {currentFlow && (
-          <PublishDialog
-            isOpen={isPublishDialogOpen}
-            flow={currentFlow}
-            onClose={() => setIsPublishDialogOpen(false)}
-            onPublish={publishFlow}
-            onUnpublish={unpublishFlow}
-            onDelete={deleteFlow}
-          />
-        )}
 
         <DataSourceDialog
           isOpen={isDataSourceDialogOpen}

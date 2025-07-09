@@ -15,7 +15,7 @@ sys.path.insert(0, str(project_root))
 
 from app.services.data_providers.mssql import MSSQLProvider
 from app.services.data_providers.dynamic import DynamicProvider
-from app.database import get_db
+from app.core.database import get_db
 
 async def test_direct_mssql_provider():
     """Test MSSQL provider directly."""

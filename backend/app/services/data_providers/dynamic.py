@@ -23,16 +23,18 @@ class DynamicProvider(IDataProvider):
     and delegates to appropriate provider based on source type.
     """
     
-    def __init__(self, db_session: AsyncSession, workspace_id: str):
+    def __init__(self, db_session: AsyncSession, workspace_id: str, data_source_id: Optional[str] = None):
         """
         Initialize dynamic provider with database session and workspace ID.
         
         Args:
             db_session: SQLAlchemy async session for config lookup
             workspace_id: Workspace ID to determine data source
+            data_source_id: Optional data source ID to override workspace default
         """
         self.db_session = db_session
         self.workspace_id = workspace_id
+        self.data_source_id = data_source_id
         self._provider: Optional[IDataProvider] = None
         self._config: Optional[Dict[str, Any]] = None
     
@@ -84,23 +86,41 @@ class DynamicProvider(IDataProvider):
                     workspace_uuid = self.workspace_id  # Fallback to original
             
             # Query data source configuration
-            query = text("""
-                SELECT 
-                    id as data_source_id,
-                    source_type,
-                    api_url,
-                    mssql_connection_string,
-                    api_key,
-                    api_headers,
-                    is_active,
-                    custom_queries
-                FROM data_source_configs
-                WHERE workspace_id = :workspace_id AND is_active = true
-                ORDER BY created_at DESC
-                LIMIT 1
-            """)
-            
-            result = await self.db_session.execute(query, {"workspace_id": workspace_uuid})
+            if self.data_source_id:
+                # If data_source_id is specified, load that specific data source
+                query = text("""
+                    SELECT 
+                        id as data_source_id,
+                        source_type,
+                        api_url,
+                        mssql_connection_string,
+                        api_key,
+                        api_headers,
+                        is_active,
+                        custom_queries
+                    FROM data_source_configs
+                    WHERE id = :data_source_id
+                    LIMIT 1
+                """)
+                result = await self.db_session.execute(query, {"data_source_id": self.data_source_id})
+            else:
+                # Default behavior: load workspace default data source
+                query = text("""
+                    SELECT 
+                        id as data_source_id,
+                        source_type,
+                        api_url,
+                        mssql_connection_string,
+                        api_key,
+                        api_headers,
+                        is_active,
+                        custom_queries
+                    FROM data_source_configs
+                    WHERE workspace_id = :workspace_id AND is_active = true
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                """)
+                result = await self.db_session.execute(query, {"workspace_id": workspace_uuid})
             config = result.fetchone()
             
             if not config:
@@ -259,18 +279,74 @@ class DynamicProvider(IDataProvider):
     async def get_measurement_data(
         self,
         equipment_code: Optional[str] = None,
+        equipment_codes: Optional[str] = None,
         equipment_type: Optional[str] = None,
+        measurement_code: Optional[str] = None,
         limit: int = 1000
     ) -> List[Dict[str, Any]]:
         """Get measurement data using configured provider."""
         provider = await self._get_provider()
-        measurements = await provider.get_measurement_data(
-            equipment_code=equipment_code,
-            equipment_type=equipment_type,
-            limit=limit
-        )
-        # Convert to list of dicts for backward compatibility
-        return [item.dict() for item in measurements]
+        
+        # Handle multiple equipment codes if provided
+        if equipment_codes:
+            # Parse comma-separated equipment codes
+            code_list = [code.strip() for code in equipment_codes.split(',')]
+            all_measurements = []
+            
+            for code in code_list:
+                measurements = await provider.get_measurement_data(
+                    equipment_code=code,
+                    equipment_type=equipment_type,
+                    limit=limit
+                )
+                all_measurements.extend(measurements)
+            
+            # Filter by measurement_code if provided
+            if measurement_code:
+                all_measurements = [m for m in all_measurements if m.measurement_code == measurement_code]
+            
+            # Convert to list of dicts for backward compatibility
+            result = []
+            for item in all_measurements:
+                item_dict = item.dict()
+                # Ensure spec_status is an integer
+                if 'spec_status' in item_dict and isinstance(item_dict['spec_status'], str):
+                    spec_status_mapping = {
+                        'IN_SPEC': 0,
+                        'BELOW_SPEC': 1,
+                        'ABOVE_SPEC': 2,
+                        'NO_SPEC': 9
+                    }
+                    item_dict['spec_status'] = spec_status_mapping.get(item_dict['spec_status'], 0)
+                result.append(item_dict)
+            return result
+        else:
+            # Single equipment code or no equipment code filter
+            measurements = await provider.get_measurement_data(
+                equipment_code=equipment_code,
+                equipment_type=equipment_type,
+                limit=limit
+            )
+            
+            # Filter by measurement_code if provided
+            if measurement_code:
+                measurements = [m for m in measurements if m.measurement_code == measurement_code]
+            
+            # Convert to list of dicts for backward compatibility
+            result = []
+            for item in measurements:
+                item_dict = item.dict()
+                # Ensure spec_status is an integer
+                if 'spec_status' in item_dict and isinstance(item_dict['spec_status'], str):
+                    spec_status_mapping = {
+                        'IN_SPEC': 0,
+                        'BELOW_SPEC': 1,
+                        'ABOVE_SPEC': 2,
+                        'NO_SPEC': 9
+                    }
+                    item_dict['spec_status'] = spec_status_mapping.get(item_dict['spec_status'], 0)
+                result.append(item_dict)
+            return result
     
     async def get_measurement_specs(
         self,
