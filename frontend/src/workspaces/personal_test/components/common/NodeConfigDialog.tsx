@@ -36,6 +36,9 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   const [measurementDetails, setMeasurementDetails] = useState<Record<string, any>>({});
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [expandedMeasurements, setExpandedMeasurements] = useState<Set<string>>(new Set());
+  const [equipmentTypeMeasurements, setEquipmentTypeMeasurements] = useState<any[]>([]);
+  const [measurementSearchTerm, setMeasurementSearchTerm] = useState('');
+  const [availableMeasurementsSearchTerm, setAvailableMeasurementsSearchTerm] = useState('');
 
   // Check if this is a common equipment node
   const isCommonEquipment = node.id === 'common-equipment';
@@ -50,37 +53,46 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
       .catch((err) => console.error('Failed to load equipment:', err));
   }, []);
 
-  // Load available measurements and their latest values
+  // Load all available measurements (equipment code independent)
   useEffect(() => {
-    if (formData.equipmentCode) {
-      // Load measurements for the selected equipment
-      apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=personal_test&equipment_code=${formData.equipmentCode}&limit=100`)
+    // Load all measurements from the workspace
+    apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=personal_test&limit=1000`)
+      .then((response) => {
+        const measurements = response.data || [];
+        setAvailableMeasurements(measurements);
+        
+        // Create a map of measurement details for preview
+        const details: Record<string, any> = {};
+        measurements.forEach((m: any) => {
+          details[m.measurement_code] = {
+            desc: m.measurement_desc,
+            value: m.measurement_value,
+            unit: m.unit,
+            timestamp: m.timestamp,
+            spec_status: m.spec_status,
+            usl: m.upper_spec_limit,
+            lsl: m.lower_spec_limit,
+            target: m.target_value,
+          };
+        });
+        setMeasurementDetails(details);
+      })
+      .catch((err) => console.error('Failed to load measurements:', err));
+  }, []); // No dependencies - load all measurements once
+
+  // Load measurements for equipment type (for common equipment or measurement search)
+  useEffect(() => {
+    if (formData.equipmentType) {
+      apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=personal_test&equipment_type=${formData.equipmentType}&limit=100`)
         .then((response) => {
           const measurements = response.data || [];
-          setAvailableMeasurements(measurements);
-          
-          // Create a map of measurement details for preview
-          const details: Record<string, any> = {};
-          measurements.forEach((m: any) => {
-            details[m.measurement_code] = {
-              desc: m.measurement_desc,
-              value: m.measurement_value,
-              unit: m.unit,
-              timestamp: m.timestamp,
-              spec_status: m.spec_status,
-              usl: m.upper_spec_limit,
-              lsl: m.lower_spec_limit,
-              target: m.target_value,
-            };
-          });
-          setMeasurementDetails(details);
+          setEquipmentTypeMeasurements(measurements);
         })
-        .catch((err) => console.error('Failed to load measurements:', err));
+        .catch((err) => console.error('Failed to load equipment type measurements:', err));
     } else {
-      setAvailableMeasurements([]);
-      setMeasurementDetails({});
+      setEquipmentTypeMeasurements([]);
     }
-  }, [formData.equipmentCode]);
+  }, [formData.equipmentType]);
 
   const filteredEquipment = availableEquipment.filter(
     (eq) => eq.equipment_type === formData.equipmentType
@@ -91,6 +103,20 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
     new Map(
       availableMeasurements.map((m) => [m.measurement_code, m])
     ).values()
+  );
+
+  // Get unique measurements for equipment type (for search functionality)
+  const availableMeasurementsForType = Array.from(
+    new Map(
+      equipmentTypeMeasurements.map((m) => [m.measurement_code, m])
+    ).values()
+  );
+
+  // Filter measurements based on search term
+  const filteredMeasurements = availableMeasurementsForType.filter(
+    (m) =>
+      m.measurement_code?.toLowerCase().includes(measurementSearchTerm.toLowerCase()) ||
+      m.measurement_desc?.toLowerCase().includes(measurementSearchTerm.toLowerCase())
   );
 
   // Generate dynamic equipment types from available equipment
@@ -316,149 +342,264 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                 />
               </div>
 
-              {/* Measurements to Display - Enhanced with preview and drag-drop */}
-              {formData.equipmentCode && availableMeasurementsForEquipment.length > 0 && (
+              {/* Measurements Search for Equipment Type (without specific code) */}
+              {formData.equipmentType && !formData.equipmentCode && availableMeasurementsForType.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Display Measurements
+                    Search Measurements by Type
                   </label>
+                  <p className="text-xs text-gray-600 mb-2">
+                    Search measurements available for {formData.equipmentType} equipment type
+                  </p>
                   
-                  {/* Selected measurements with drag and drop */}
-                  {formData.displayMeasurements.length > 0 && (
-                    <div className="mb-4">
-                      <p className="text-xs text-gray-600 mb-2">Selected measurements (drag to reorder):</p>
-                      <div className="space-y-2 border rounded p-2 bg-gray-50">
-                        {formData.displayMeasurements.map((code, index) => {
-                          const measurement = measurementDetails[code];
-                          if (!measurement) return null;
-                          
-                          return (
-                            <div
-                              key={code}
-                              draggable
-                              onDragStart={(e) => handleDragStart(e, index)}
-                              onDragOver={handleDragOver}
-                              onDrop={(e) => handleDrop(e, index)}
-                              className="bg-white rounded border p-2 cursor-move hover:shadow-md transition-shadow"
-                            >
-                              <div className="flex items-start justify-between">
-                                <div className="flex items-center space-x-2">
-                                  <GripVertical size={16} className="text-gray-400" />
-                                  <div className="flex-1">
-                                    <div className="font-medium text-sm">{measurement.desc}</div>
-                                    <div className="text-xs text-gray-500">Code: {code}</div>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleMeasurementExpanded(code)}
-                                  className="text-gray-400 hover:text-gray-600"
-                                >
-                                  {expandedMeasurements.has(code) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                </button>
-                              </div>
-                              
-                              {expandedMeasurements.has(code) && (
-                                <div className="mt-2 pt-2 border-t text-xs space-y-1">
-                                  <div className="flex justify-between">
-                                    <span className="text-gray-500">Latest Value:</span>
-                                    <span className={`font-medium ${getSpecStatusColor(measurement.spec_status || 'IN_SPEC')}`}>
-                                      {measurement.value?.toLocaleString()} {measurement.unit || ''}
-                                    </span>
-                                  </div>
-                                  {measurement.usl !== undefined && (
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-500">Upper Spec Limit:</span>
-                                      <span>{measurement.usl}</span>
-                                    </div>
-                                  )}
-                                  {measurement.lsl !== undefined && (
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-500">Lower Spec Limit:</span>
-                                      <span>{measurement.lsl}</span>
-                                    </div>
-                                  )}
-                                  {measurement.target !== undefined && (
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-500">Target:</span>
-                                      <span>{measurement.target}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                  {/* Search input */}
+                  <input
+                    type="text"
+                    value={measurementSearchTerm}
+                    onChange={(e) => setMeasurementSearchTerm(e.target.value)}
+                    placeholder="Search by measurement code or name..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black mb-3"
+                  />
                   
-                  {/* Available measurements to select */}
-                  <p className="text-xs text-gray-600 mb-2">Available measurements:</p>
-                  <div className="space-y-2 max-h-60 overflow-y-auto border rounded p-2">
-                    {availableMeasurementsForEquipment.map((measurement) => {
-                      const isSelected = formData.displayMeasurements.includes(measurement.measurement_code);
-                      const details = measurementDetails[measurement.measurement_code];
-                      
-                      return (
-                        <label
+                  {/* Filtered measurements list */}
+                  {filteredMeasurements.length > 0 && (
+                    <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-50">
+                      {filteredMeasurements.map((measurement) => (
+                        <div
                           key={measurement.measurement_code}
-                          className={`block p-2 rounded border cursor-pointer transition-colors ${
-                            isSelected ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'
-                          }`}
+                          className="p-2 bg-white rounded border hover:bg-gray-50 cursor-pointer"
+                          onClick={() => {
+                            // Add to display measurements if not already selected
+                            if (!formData.displayMeasurements.includes(measurement.measurement_code)) {
+                              setFormData({
+                                ...formData,
+                                displayMeasurements: [
+                                  ...formData.displayMeasurements,
+                                  measurement.measurement_code,
+                                ],
+                              });
+                            }
+                          }}
                         >
-                          <div className="flex items-start space-x-2">
-                            <input
-                              type="checkbox"
-                              value={measurement.measurement_code}
-                              checked={isSelected}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setFormData({
-                                    ...formData,
-                                    displayMeasurements: [
-                                      ...formData.displayMeasurements,
-                                      measurement.measurement_code,
-                                    ],
-                                  });
-                                } else {
-                                  setFormData({
-                                    ...formData,
-                                    displayMeasurements: formData.displayMeasurements.filter(
-                                      (code) => code !== measurement.measurement_code
-                                    ),
-                                  });
-                                }
-                              }}
-                              className="mt-1 rounded"
-                            />
-                            <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <div>
                               <div className="text-sm font-medium">
                                 {measurement.measurement_desc}
                               </div>
                               <div className="text-xs text-gray-500">
                                 Code: {measurement.measurement_code}
-                                {details && (
-                                  <span className="ml-2">
-                                    Latest: <span className={getSpecStatusColor(details.spec_status || 'IN_SPEC')}>
-                                      {details.value?.toLocaleString()} {details.unit || ''}
-                                    </span>
-                                  </span>
-                                )}
                               </div>
                             </div>
-                            {details && (details.usl !== undefined || details.lsl !== undefined) && (
-                              <div className="text-gray-400" title="Has spec limits">
-                                <Info size={16} />
-                              </div>
+                            {formData.displayMeasurements.includes(measurement.measurement_code) && (
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                Selected
+                              </span>
                             )}
                           </div>
-                        </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {measurementSearchTerm && filteredMeasurements.length === 0 && (
+                    <div className="text-sm text-gray-500 text-center py-4">
+                      No measurements found matching "{measurementSearchTerm}"
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Selected Measurements Display Section */}
+              {formData.displayMeasurements.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Selected Measurements
+                  </label>
+                  <p className="text-xs text-gray-600 mb-2">Drag to reorder selected measurements:</p>
+                  <div className="space-y-2 border rounded p-2 bg-gray-50">
+                    {formData.displayMeasurements.map((code, index) => {
+                      const measurement = measurementDetails[code] || 
+                        availableMeasurementsForType.find(m => m.measurement_code === code);
+                      if (!measurement) return null;
+                      
+                      return (
+                        <div
+                          key={code}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, index)}
+                          className="bg-white rounded border p-2 cursor-move hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-2">
+                              <GripVertical size={16} className="text-gray-400" />
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">
+                                  {measurement.measurement_desc || measurement.desc}
+                                </div>
+                                <div className="text-xs text-gray-500">Code: {code}</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                type="button"
+                                onClick={() => toggleMeasurementExpanded(code)}
+                                className="text-gray-400 hover:text-gray-600"
+                              >
+                                {expandedMeasurements.has(code) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData({
+                                    ...formData,
+                                    displayMeasurements: formData.displayMeasurements.filter(m => m !== code)
+                                  });
+                                }}
+                                className="text-red-400 hover:text-red-600"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {expandedMeasurements.has(code) && measurement.value !== undefined && (
+                            <div className="mt-2 pt-2 border-t text-xs space-y-1">
+                              <div className="flex justify-between">
+                                <span className="text-gray-500">Latest Value:</span>
+                                <span className={`font-medium ${getSpecStatusColor(measurement.spec_status || 'IN_SPEC')}`}>
+                                  {measurement.value?.toLocaleString()} {measurement.unit || ''}
+                                </span>
+                              </div>
+                              {measurement.usl !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Upper Spec Limit:</span>
+                                  <span>{measurement.usl}</span>
+                                </div>
+                              )}
+                              {measurement.lsl !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Lower Spec Limit:</span>
+                                  <span>{measurement.lsl}</span>
+                                </div>
+                              )}
+                              {measurement.target !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Target:</span>
+                                  <span>{measurement.target}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
                 </div>
               )}
+
+              {/* Available Measurements Section with Search */}
+              {availableMeasurements.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Available Measurements (All Measurements)
+                  </label>
+                  <p className="text-xs text-gray-600 mb-2">
+                    All measurements from the workspace - equipment code independent
+                  </p>
+                  
+                  {/* Search input */}
+                  <input
+                    type="text"
+                    value={availableMeasurementsSearchTerm}
+                    onChange={(e) => setAvailableMeasurementsSearchTerm(e.target.value)}
+                    placeholder="Search measurements by code..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black mb-3"
+                  />
+                  
+                  {/* Available measurements list */}
+                  <div className="space-y-2 max-h-60 overflow-y-auto border rounded p-2">
+                    {Array.from(new Map(availableMeasurements.map(m => [m.measurement_code, m])).values())
+                      .filter(measurement => 
+                        measurement.measurement_code.toLowerCase().includes(availableMeasurementsSearchTerm.toLowerCase()) ||
+                        measurement.measurement_desc.toLowerCase().includes(availableMeasurementsSearchTerm.toLowerCase())
+                      )
+                      .map((measurement, index) => {
+                        const isSelected = formData.displayMeasurements.includes(measurement.measurement_code);
+                        const details = measurementDetails[measurement.measurement_code];
+                        
+                        return (
+                          <label
+                            key={`${measurement.measurement_code}-${index}`}
+                            className={`block p-2 rounded border cursor-pointer transition-colors ${
+                              isSelected ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-start space-x-2">
+                              <input
+                                type="checkbox"
+                                value={measurement.measurement_code}
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFormData({
+                                      ...formData,
+                                      displayMeasurements: [
+                                        ...formData.displayMeasurements,
+                                        measurement.measurement_code,
+                                      ],
+                                    });
+                                  } else {
+                                    setFormData({
+                                      ...formData,
+                                      displayMeasurements: formData.displayMeasurements.filter(
+                                        (code) => code !== measurement.measurement_code
+                                      ),
+                                    });
+                                  }
+                                }}
+                                className="mt-1 rounded"
+                              />
+                              <div className="flex-1">
+                                <div className="text-sm font-medium">
+                                  {measurement.measurement_desc}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Code: {measurement.measurement_code}
+                                  {details && (
+                                    <span className="ml-2">
+                                      Latest: <span className={getSpecStatusColor(details.spec_status || 'IN_SPEC')}>
+                                        {details.value?.toLocaleString()} {details.unit || ''}
+                                      </span>
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {details && (details.usl !== undefined || details.lsl !== undefined) && (
+                                <div className="text-gray-400" title="Has spec limits">
+                                  <Info size={16} />
+                                </div>
+                              )}
+                            </div>
+                          </label>
+                        );
+                      })}
+                  </div>
+                  
+                  {availableMeasurementsSearchTerm && 
+                   Array.from(new Map(availableMeasurements.map(m => [m.measurement_code, m])).values())
+                   .filter(m => 
+                     m.measurement_code.toLowerCase().includes(availableMeasurementsSearchTerm.toLowerCase()) ||
+                     m.measurement_desc.toLowerCase().includes(availableMeasurementsSearchTerm.toLowerCase())
+                   ).length === 0 && (
+                    <div className="text-sm text-gray-500 text-center py-4">
+                      No measurements found matching "{availableMeasurementsSearchTerm}"
+                    </div>
+                  )}
+                </div>
+              )}
+
             </>
           )}
         </form>
