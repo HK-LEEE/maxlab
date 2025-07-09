@@ -21,15 +21,15 @@ import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { usePublicFlowMonitor } from '../hooks/usePublicFlowMonitor';
 
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
-const nodeTypes = {
+const nodeTypes = Object.freeze({
   equipment: EquipmentNode,
   group: GroupNode,
   text: TextNode,
-};
+});
 
-const edgeTypes = {
+const edgeTypes = Object.freeze({
   custom: CustomEdgeWithLabel,
-};
+});
 
 // Node color function for minimap
 const nodeColor = (node: Node) => {
@@ -54,24 +54,9 @@ const FlowCanvas: React.FC<{
   onNodeClick: (event: React.MouseEvent, node: Node) => void;
   equipmentStatusCount: number;
   activeCount: number;
-  onViewportChange?: (viewport: Viewport) => void;
   defaultViewport?: Viewport;
-}> = ({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, onViewportChange, defaultViewport }) => {
-  const { fitView, setViewport, getViewport } = useReactFlow();
-  const viewportRef = useRef<Viewport>();
-
-  // Store viewport changes
-  useEffect(() => {
-    const handleViewportChange = () => {
-      const currentViewport = getViewport();
-      viewportRef.current = currentViewport;
-      onViewportChange?.(currentViewport);
-    };
-
-    // Listen for viewport changes
-    const timer = setInterval(handleViewportChange, 500);
-    return () => clearInterval(timer);
-  }, [getViewport, onViewportChange]);
+}> = ({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, defaultViewport }) => {
+  const { fitView, setViewport } = useReactFlow();
 
   // Restore viewport after nodes update
   useEffect(() => {
@@ -139,18 +124,11 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
     error,
   } = usePublicFlowMonitor(publishToken || '');
 
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+  const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {
-      // console.log('Node clicked:', {
-      //   nodeId: node.id,
-      //   nodeType: node.type,
-      //   nodeData: node.data,
-      //   equipmentCode: node.data.equipmentCode,
-      //   availableStatuses: equipmentStatuses.map(s => s.equipment_code)
-      // });
       setSelectedNode(node);
     }
-  }, [equipmentStatuses]);
+  }, []);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -296,7 +274,6 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
             onNodeClick={handleNodeClick}
             equipmentStatusCount={equipmentStatusCount}
             activeCount={activeCount}
-            onViewportChange={setViewport}
             defaultViewport={viewport}
           />
         </ReactFlowProvider>
@@ -308,7 +285,15 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
             isOpen={true}
             onClose={() => setSelectedNode(null)}
             equipmentStatus={equipmentStatuses.find(s => s.equipment_code === selectedNode.data.equipmentCode)}
-            measurements={measurements.filter(m => m.equipment_code === selectedNode.data.equipmentCode)}
+            measurements={measurements.filter(m => {
+              // If displayMeasurements is configured, only show those measurements
+              if (selectedNode.data.displayMeasurements && selectedNode.data.displayMeasurements.length > 0) {
+                return selectedNode.data.displayMeasurements.includes(m.measurement_code);
+              }
+              
+              // Otherwise show no measurements (empty array)
+              return false;
+            })}
           />
         )}
       </div>

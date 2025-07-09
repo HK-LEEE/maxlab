@@ -24,7 +24,7 @@ interface EquipmentStatus {
   last_run_time?: string;
 }
 
-interface Measurement {
+interface MeasurementData {
   id: number;
   equipment_type: string;
   equipment_code: string;
@@ -32,6 +32,12 @@ interface Measurement {
   measurement_desc: string;
   measurement_value: number;
   timestamp: string;
+  spec_status?: number; // 0: In spec, 1: Below spec, 2: Above spec, 9: No spec
+  upper_spec_limit?: number;
+  lower_spec_limit?: number;
+  target_value?: number;
+  usl?: number; // Alternative field name for upper_spec_limit
+  lsl?: number; // Alternative field name for lower_spec_limit
 }
 
 export const usePublicFlowMonitor = (publishToken: string) => {
@@ -39,7 +45,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [equipmentStatuses, setEquipmentStatuses] = useState<EquipmentStatus[]>([]);
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [measurements, setMeasurements] = useState<MeasurementData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -97,25 +103,48 @@ export const usePublicFlowMonitor = (publishToken: string) => {
           const status = statuses.find(
             (s: EquipmentStatus) => s.equipment_code === node.data.equipmentCode
           );
-          const nodeMeasurements = measurementResponse.data.filter(
-            (m: Measurement) => m.equipment_code === node.data.equipmentCode
-          );
-
-          if (status) {
+          
+          // Filter measurements based on displayMeasurements configuration only
+          const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+            // If displayMeasurements is not set or empty, show no measurements
+            if (!node.data.displayMeasurements || node.data.displayMeasurements.length === 0) {
+              return false;
+            }
+            // Only show measurements that are in displayMeasurements (equipment code independent)
+            return node.data.displayMeasurements.includes(m.measurement_code);
+          });
+          
+          // Group measurements by code and take the latest
+          const measurementMap = new Map<string, MeasurementData>();
+          configuredMeasurements.forEach((m: MeasurementData) => {
+            const existing = measurementMap.get(m.measurement_code);
+            if (!existing || new Date(m.timestamp) > new Date(existing.timestamp)) {
+              measurementMap.set(m.measurement_code, m);
+            }
+          });
+          
+          const latestMeasurements = Array.from(measurementMap.values()).map((m) => {
             return {
-              ...node,
-              data: {
-                ...node.data,
-                status: status.status,
-                measurements: nodeMeasurements.map((m: Measurement) => ({
-                  code: m.measurement_code,
-                  desc: m.measurement_desc,
-                  value: m.measurement_value,
-                  unit: 'units',
-                })),
-              },
+              code: m.measurement_code,
+              desc: m.measurement_desc,
+              value: m.measurement_value,
+              spec_status: m.spec_status === 1 ? 'BELOW_SPEC' : 
+                         m.spec_status === 2 ? 'ABOVE_SPEC' : 
+                         m.spec_status === 9 ? 'NO_SPEC' : 'IN_SPEC',
+              usl: m.upper_spec_limit || m.usl,
+              lsl: m.lower_spec_limit || m.lsl,
+              target_value: m.target_value
             };
-          }
+          });
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              status: status?.status || 'STOP',
+              measurements: latestMeasurements,
+            },
+          };
         }
         return node;
       });
@@ -124,13 +153,13 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       // Update edges based on node statuses
       const edgesToUpdate = isInitialLoad ? flowData.flow_data?.edges || [] : edges;
       const nodeStatusMap = new Map<string, string>();
-      finalNodes.forEach(node => {
+      finalNodes.forEach((node: Node) => {
         if (node.type === 'equipment' && node.data.status) {
           nodeStatusMap.set(node.id, node.data.status);
         }
       });
       
-      const updatedEdges = edgesToUpdate.map(edge => {
+      const updatedEdges = edgesToUpdate.map((edge: Edge) => {
         const sourceStatus = nodeStatusMap.get(edge.source) || 'STOP';
         const targetStatus = nodeStatusMap.get(edge.target) || 'STOP';
         
@@ -219,7 +248,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [publishToken, isInitialLoad]);
+  }, [publishToken, isInitialLoad, nodes, edges]);
 
   // Initial load
   useEffect(() => {
