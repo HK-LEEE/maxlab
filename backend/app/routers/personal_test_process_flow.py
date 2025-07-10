@@ -882,44 +882,75 @@ async def get_public_measurements(
     db: AsyncSession = Depends(get_db)
 ):
     """게시된 공정도의 측정 데이터 조회 (공개 접근)"""
-    # First get workspace_id and data_source_id from the published flow
-    # For versions table, we need to join with flows table to get workspace_id and data_source_id
-    flow_info_query = """
-        SELECT f.workspace_id, f.data_source_id 
-        FROM personal_test_process_flow_versions v
-        JOIN personal_test_process_flows f ON v.flow_id = f.id
-        WHERE v.publish_token = :publish_token AND v.is_published = true
-        UNION
-        SELECT workspace_id, data_source_id 
-        FROM personal_test_process_flows
-        WHERE publish_token = :publish_token AND is_published = true
-        LIMIT 1
-    """
-    result = await db.execute(text(flow_info_query), {"publish_token": publish_token})
-    row = result.fetchone()
-    
-    if not row:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Published flow not found"
-        )
-    
-    workspace_id = row.workspace_id
-    data_source_id = row.data_source_id
-    
-    logger.info(f"🔍 Public measurements - workspace: {workspace_id}, data_source: {data_source_id}")
-    
-    # Always use DynamicProvider - it will handle fallback logic internally
-    from app.services.data_providers.dynamic import DynamicProvider
-    
-    # Create dynamic provider with optional data_source_id
-    provider = DynamicProvider(db, workspace_id, data_source_id)
+    provider = None
     
     try:
+        # Validate publish_token format
+        if not publish_token or len(publish_token) < 10:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid publish token format"
+            )
+        
+        # First get workspace_id and data_source_id from the published flow
+        # For versions table, we need to join with flows table to get workspace_id and data_source_id
+        flow_info_query = """
+            SELECT f.workspace_id, f.data_source_id 
+            FROM personal_test_process_flow_versions v
+            JOIN personal_test_process_flows f ON v.flow_id = f.id
+            WHERE v.publish_token = :publish_token AND v.is_published = true
+            UNION
+            SELECT workspace_id, data_source_id 
+            FROM personal_test_process_flows
+            WHERE publish_token = :publish_token AND is_published = true
+            LIMIT 1
+        """
+        
+        try:
+            result = await db.execute(text(flow_info_query), {"publish_token": publish_token})
+            row = result.fetchone()
+        except Exception as db_error:
+            logger.error(f"❌ Database query error in public measurements: {db_error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database error while looking up published flow"
+            )
+        
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Published flow not found"
+            )
+        
+        workspace_id = row.workspace_id
+        data_source_id = row.data_source_id
+        
+        logger.info(f"🔍 Public measurements - workspace: {workspace_id}, data_source: {data_source_id}")
+        
+        # Validate workspace_id and data_source_id
+        if not workspace_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Published flow has no workspace configuration"
+            )
+        
+        # Always use DynamicProvider - without fallback logic
+        from app.services.data_providers.dynamic import DynamicProvider
+        
+        # Create dynamic provider with required data_source_id
+        provider = DynamicProvider(db, workspace_id, data_source_id)
+        
         logger.info(f"🔍 Starting measurement data query for workspace: {workspace_id}, data_source: {data_source_id}")
         
         # Connect to data source
-        await provider.connect()
+        try:
+            await provider.connect()
+        except Exception as connect_error:
+            logger.error(f"❌ Failed to connect to data source: {connect_error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Cannot connect to data source for this flow: {str(connect_error)}"
+            )
         
         # Get measurement data
         try:
@@ -1014,15 +1045,18 @@ async def get_public_measurements(
         return result
     except Exception as e:
         logger.error(f"Error getting measurement data for public flow: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get measurement data: {str(e)}"
         )
     finally:
-        try:
-            await provider.disconnect()
-        except Exception as e:
-            logger.warning(f"Error disconnecting provider: {e}")
+        if provider:
+            try:
+                await provider.disconnect()
+            except Exception as e:
+                logger.warning(f"Error disconnecting provider: {e}")
 
 
 

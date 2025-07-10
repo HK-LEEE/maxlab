@@ -123,6 +123,10 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
     setAutoRefresh,
     refreshInterval,
     setRefreshInterval,
+    autoScroll,
+    setAutoScroll,
+    alarmCheck,
+    setAlarmCheck,
     forceRefresh,
     error,
   } = usePublicFlowMonitor(publishToken || '');
@@ -223,36 +227,61 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
               </div>
             </div>
 
-            {/* Refresh Controls */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={forceRefresh}
-                disabled={isLoading}
-                className="p-2 hover:bg-gray-100 rounded disabled:opacity-50"
-                title="Force refresh data"
-              >
-                <RefreshCw size={16} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
-              </button>
-              <select
-                value={refreshInterval}
-                onChange={(e) => setRefreshInterval(Number(e.target.value))}
-                className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-              >
-                {refreshIntervalOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={autoRefresh}
-                  onChange={(e) => setAutoRefresh(e.target.checked)}
-                  className="rounded border-gray-300 text-black focus:ring-black"
-                />
-                <span className="text-sm text-gray-600">Auto</span>
-              </label>
+            {/* Monitoring Controls */}
+            <div className="flex items-center space-x-4">
+              {/* Refresh Controls */}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={forceRefresh}
+                  disabled={isLoading}
+                  className="p-2 hover:bg-gray-100 rounded disabled:opacity-50"
+                  title="Force refresh data"
+                >
+                  <RefreshCw size={16} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
+                </button>
+                <select
+                  value={refreshInterval}
+                  onChange={(e) => setRefreshInterval(Number(e.target.value))}
+                  className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                >
+                  {refreshIntervalOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoRefresh}
+                    onChange={(e) => setAutoRefresh(e.target.checked)}
+                    className="rounded border-gray-300 text-black focus:ring-black"
+                  />
+                  <span className="text-sm text-gray-600">Auto</span>
+                </label>
+              </div>
+
+              {/* Monitoring Options */}
+              <div className="flex items-center space-x-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoScroll}
+                    onChange={(e) => setAutoScroll(e.target.checked)}
+                    className="rounded border-gray-300 text-black focus:ring-black"
+                  />
+                  <span className="text-sm text-gray-600">Auto-Scroll</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={alarmCheck}
+                    onChange={(e) => setAlarmCheck(e.target.checked)}
+                    className="rounded border-gray-300 text-black focus:ring-black"
+                  />
+                  <span className="text-sm text-gray-600">Alarm Check</span>
+                </label>
+              </div>
             </div>
 
             {/* Last Update */}
@@ -309,7 +338,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
         )}
 
         {/* Alarm Notification */}
-        {showAlarms && (
+        {showAlarms && alarmCheck && (
           <AlarmNotification onClose={() => setShowAlarms(false)} />
         )}
       </div>

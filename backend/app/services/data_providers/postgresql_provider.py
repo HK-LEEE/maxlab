@@ -94,111 +94,63 @@ class PostgreSQLProvider(IDataProvider):
     ) -> EquipmentStatusResponse:
         """설비 상태 조회"""
         try:
-            # Check if custom query exists
+            # Always require custom query configuration - no default query
             custom_query_info = self.custom_queries.get('equipment_status', {})
             custom_query = custom_query_info.get('query') if isinstance(custom_query_info, dict) else None
             
-            if custom_query:
-                # Use custom query
-                params = {"limit": limit, "offset": offset}
-                
-                # Add filters to custom query if provided
-                query_conditions = []
-                if equipment_type:
-                    query_conditions.append("equipment_type = :equipment_type")
-                    params["equipment_type"] = equipment_type
-                if status:
-                    query_conditions.append("status = :status")
-                    params["status"] = status
-                
-                # Parse custom query to add WHERE conditions if needed
-                if query_conditions and "WHERE" in custom_query.upper():
-                    # Add conditions after existing WHERE
-                    custom_query += f" AND {' AND '.join(query_conditions)}"
-                elif query_conditions:
-                    # Add WHERE clause
-                    custom_query += f" WHERE {' AND '.join(query_conditions)}"
-                
-                # Add pagination
-                custom_query += " LIMIT :limit OFFSET :offset"
-                
-                # Execute query
-                result = await self.db.execute(text(custom_query), params)
-                equipment_list = []
-                for row in result:
-                    # Map row to EquipmentData based on column names
-                    equipment_list.append(EquipmentData(
-                        equipment_type=getattr(row, 'equipment_type', ''),
-                        equipment_code=getattr(row, 'equipment_code', ''),
-                        equipment_name=getattr(row, 'equipment_name', ''),
-                        status=getattr(row, 'status', 'STOP'),
-                        last_run_time=getattr(row, 'last_run_time', None)
-                    ))
-                
-                # For total count, we need to modify the query
-                count_query = custom_query.replace("SELECT", "SELECT COUNT(*) as total FROM (SELECT", 1) + ") as subquery"
-                count_query = count_query.replace("LIMIT :limit OFFSET :offset", "")
-                count_params = {k: v for k, v in params.items() if k not in ['limit', 'offset']}
-                count_result = await self.db.execute(text(count_query), count_params)
-                total_count = count_result.scalar() or len(equipment_list)
-                
-                return EquipmentStatusResponse(
-                    items=equipment_list,
-                    total=total_count,
-                    limit=limit,
-                    offset=offset,
-                    has_more=(offset + limit) < total_count
-                )
+            if not custom_query:
+                raise ValueError("PostgreSQL provider requires custom equipment_status query configuration")
             
-            # Default query logic if no custom query
-            # 전체 개수 조회
-            count_query = """
-                SELECT COUNT(*) as total
-                FROM personal_test_equipment_status
-                WHERE 1=1
-            """
+            # Process custom query with parameter substitution (PostgreSQL style)
             params = {}
+            final_query = custom_query
             
-            if equipment_type:
-                count_query += " AND equipment_type = :equipment_type"
+            # Replace placeholders with PostgreSQL parameter format
+            if equipment_type and "{{equipment_type}}" in final_query:
+                final_query = final_query.replace("{{equipment_type}}", ":equipment_type")
                 params["equipment_type"] = equipment_type
             
-            if status:
-                count_query += " AND status = :status"
+            if status and "{{status}}" in final_query:
+                final_query = final_query.replace("{{status}}", ":status")
                 params["status"] = status
             
-            count_result = await self.db.execute(text(count_query), params)
-            total_count = count_result.scalar()
+            if "{{limit}}" in final_query:
+                final_query = final_query.replace("{{limit}}", ":limit")
+                params["limit"] = limit
+                
+            if "{{offset}}" in final_query:
+                final_query = final_query.replace("{{offset}}", ":offset")
+                params["offset"] = offset
             
-            # 데이터 조회
-            data_query = """
-                SELECT equipment_type, equipment_code, equipment_name, status, last_run_time
-                FROM personal_test_equipment_status
-                WHERE 1=1
-            """
+            logger.debug(f"Executing PostgreSQL equipment status query: {final_query}")
+            logger.debug(f"Parameters: {params}")
             
-            if equipment_type:
-                data_query += " AND equipment_type = :equipment_type"
-            
-            if status:
-                data_query += " AND status = :status"
-            
-            data_query += " ORDER BY equipment_type, equipment_code LIMIT :limit OFFSET :offset"
-            
-            params["limit"] = limit
-            params["offset"] = offset
-            
-            result = await self.db.execute(text(data_query), params)
+            # Execute the query
+            result = await self.db.execute(text(final_query), params)
             
             equipment_list = []
+            total_count = 0
+            
             for row in result:
-                equipment_list.append(EquipmentData(
-                    equipment_type=row.equipment_type,
-                    equipment_code=row.equipment_code,
-                    equipment_name=row.equipment_name,
-                    status=row.status,
-                    last_run_time=row.last_run_time
-                ))
+                # Convert row to dict for easier handling
+                row_dict = dict(row._mapping)
+                
+                # If the query includes a total count, extract it
+                if 'total' in row_dict:
+                    total_count = int(row_dict['total'])
+                
+                equipment_item = EquipmentData(
+                    equipment_type=str(row_dict.get('equipment_type', '')),
+                    equipment_code=str(row_dict.get('equipment_code', '')),
+                    equipment_name=str(row_dict.get('equipment_name', '')),
+                    status=str(row_dict.get('status', '')),
+                    last_run_time=row_dict.get('last_run_time')
+                )
+                equipment_list.append(equipment_item)
+            
+            # If no total count was provided, use the length of results
+            if total_count == 0:
+                total_count = len(equipment_list)
             
             return EquipmentStatusResponse(
                 items=equipment_list,
@@ -215,112 +167,76 @@ class PostgreSQLProvider(IDataProvider):
     async def get_measurement_data(
         self,
         equipment_code: Optional[str] = None,
+        equipment_codes: Optional[str] = None,
         equipment_type: Optional[str] = None,
+        measurement_code: Optional[str] = None,
         limit: int = 100
     ) -> List[MeasurementData]:
-        """측정 데이터 조회 (Spec 정보 포함)"""
+        """측정 데이터 조회 (Spec 정보 포함) - Requires custom query configuration"""
         try:
-            # Check if custom query exists
+            # Always require custom query configuration - no default query
             custom_query_info = self.custom_queries.get('measurement_data', {})
             custom_query = custom_query_info.get('query') if isinstance(custom_query_info, dict) else None
             
-            if custom_query:
-                # Use custom query
-                params = {"limit": limit}
-                
-                # Add filters to custom query if provided
-                query_conditions = []
-                if equipment_code:
-                    query_conditions.append("equipment_code = :equipment_code")
-                    params["equipment_code"] = equipment_code
-                if equipment_type:
-                    query_conditions.append("equipment_type = :equipment_type")
-                    params["equipment_type"] = equipment_type
-                
-                # Parse custom query to add WHERE conditions if needed
-                if query_conditions and "WHERE" in custom_query.upper():
-                    # Add conditions after existing WHERE
-                    custom_query += f" AND {' AND '.join(query_conditions)}"
-                elif query_conditions:
-                    # Add WHERE clause
-                    custom_query += f" WHERE {' AND '.join(query_conditions)}"
-                
-                # Add ORDER BY and LIMIT if not present
-                if "ORDER BY" not in custom_query.upper():
-                    custom_query += " ORDER BY timestamp DESC"
-                if "LIMIT" not in custom_query.upper():
-                    custom_query += " LIMIT :limit"
-                
-                # Execute query
-                result = await self.db.execute(text(custom_query), params)
-                measurements = []
-                for row in result:
-                    # Map row to MeasurementData based on column names
-                    measurements.append(MeasurementData(
-                        id=getattr(row, 'id', 0),
-                        equipment_type=getattr(row, 'equipment_type', ''),
-                        equipment_code=getattr(row, 'equipment_code', ''),
-                        measurement_code=getattr(row, 'measurement_code', ''),
-                        measurement_desc=getattr(row, 'measurement_desc', ''),
-                        measurement_value=float(getattr(row, 'measurement_value', 0)),
-                        timestamp=getattr(row, 'timestamp', datetime.now()),
-                        usl=getattr(row, 'usl', None),
-                        lsl=getattr(row, 'lsl', None),
-                        target=getattr(row, 'target', None),
-                        spec_status=getattr(row, 'spec_status', None)
-                    ))
-                
-                return measurements
+            if not custom_query:
+                raise ValueError("PostgreSQL provider requires custom measurement_data query configuration")
             
-            # Default query logic if no custom query
-            # v_measurement_data_with_spec 뷰 사용
-            query = """
-                SELECT 
-                    id,
-                    equipment_type,
-                    equipment_code,
-                    measurement_code,
-                    measurement_desc,
-                    measurement_value,
-                    timestamp,
-                    usl,
-                    lsl,
-                    target,
-                    spec_status
-                FROM v_measurement_data_with_spec
-                WHERE 1=1
-            """
-            params = {"limit": limit}
+            # Process custom query with parameter substitution (PostgreSQL style)
+            params = {}
+            final_query = custom_query
             
-            if equipment_code:
-                query += " AND equipment_code = :equipment_code"
+            # Replace placeholders with PostgreSQL parameter format
+            if equipment_code and "{{equipment_code}}" in final_query:
+                final_query = final_query.replace("{{equipment_code}}", ":equipment_code")
                 params["equipment_code"] = equipment_code
+            elif equipment_codes and "{{equipment_codes}}" in final_query:
+                # Handle multiple equipment codes
+                code_list = [code.strip() for code in equipment_codes.split(',')]
+                placeholders = ','.join([f':equipment_code_{i}' for i in range(len(code_list))])
+                final_query = final_query.replace("{{equipment_codes}}", placeholders)
+                for i, code in enumerate(code_list):
+                    params[f"equipment_code_{i}"] = code
             
-            if equipment_type:
-                query += " AND equipment_type = :equipment_type"
+            if equipment_type and "{{equipment_type}}" in final_query:
+                final_query = final_query.replace("{{equipment_type}}", ":equipment_type")
                 params["equipment_type"] = equipment_type
+                
+            if measurement_code and "{{measurement_code}}" in final_query:
+                final_query = final_query.replace("{{measurement_code}}", ":measurement_code")
+                params["measurement_code"] = measurement_code
             
-            query += " ORDER BY timestamp DESC LIMIT :limit"
+            if "{{limit}}" in final_query:
+                final_query = final_query.replace("{{limit}}", ":limit")
+                params["limit"] = limit
             
-            result = await self.db.execute(text(query), params)
+            logger.debug(f"Executing PostgreSQL measurement query: {final_query}")
+            logger.debug(f"Parameters: {params}")
             
-            measurements = []
+            # Execute the query
+            result = await self.db.execute(text(final_query), params)
+            
+            measurement_list = []
             for row in result:
-                measurements.append(MeasurementData(
-                    id=row.id,
-                    equipment_type=row.equipment_type,
-                    equipment_code=row.equipment_code,
-                    measurement_code=row.measurement_code,
-                    measurement_desc=row.measurement_desc,
-                    measurement_value=row.measurement_value,
-                    timestamp=row.timestamp,
-                    usl=row.usl,
-                    lsl=row.lsl,
-                    target=row.target,
-                    spec_status=row.spec_status
-                ))
+                # Convert row to dict for easier handling
+                row_dict = dict(row._mapping)
+                
+                # Convert to MeasurementData object
+                measurement_obj = MeasurementData(
+                    id=int(row_dict.get('id', 0)),
+                    equipment_type=str(row_dict.get('equipment_type', '')),
+                    equipment_code=str(row_dict.get('equipment_code', '')),
+                    measurement_code=str(row_dict.get('measurement_code', '')),
+                    measurement_desc=str(row_dict.get('measurement_desc', '')),
+                    measurement_value=float(row_dict.get('measurement_value', 0.0)),
+                    timestamp=row_dict.get('timestamp'),
+                    spec_status=int(row_dict.get('spec_status', 0)),
+                    upper_spec_limit=row_dict.get('upper_spec_limit') or row_dict.get('usl'),
+                    lower_spec_limit=row_dict.get('lower_spec_limit') or row_dict.get('lsl'),
+                    target_value=row_dict.get('target_value') or row_dict.get('target')
+                )
+                measurement_list.append(measurement_obj)
             
-            return measurements
+            return measurement_list
             
         except Exception as e:
             logger.error(f"Error getting measurement data: {e}")

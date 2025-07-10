@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
 import { authService } from './services/authService';
+import { useAuthRefresh } from './hooks/useAuthRefresh';
 import { Login } from './pages/Login';
 import { OAuthCallback } from './pages/OAuthCallback';
 import { Dashboard } from './pages/Dashboard';
@@ -55,6 +56,9 @@ function App() {
   const [isInitializing, setIsInitializing] = useState(true);
   const setAuth = useAuthStore((state) => state.setAuth);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  
+  // 자동 토큰 갱신 시작
+  useAuthRefresh();
   
   // App 시작 시 자동 Silent 로그인 시도
   useEffect(() => {

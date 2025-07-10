@@ -54,6 +54,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   const [refreshInterval, setRefreshInterval] = useState(10000); // Default 10 seconds for better real-time updates
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [alarmCheck, setAlarmCheck] = useState(true);
+  const [autoScroll, setAutoScroll] = useState(false);
   const [previousData, setPreviousData] = useState<{
     statuses: Map<string, any>,
     measurements: Map<string, any>
@@ -119,17 +120,21 @@ export const usePublicFlowMonitor = (publishToken: string) => {
 
       // Get equipment statuses with cache-busting
       const statusResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}/status?limit=100&_t=${Date.now()}`
+        `/api/v1/personal-test/process-flow/public/${publishToken}/equipment/status?limit=100&_t=${Date.now()}`
       );
       const statuses = statusResponse.data.items || statusResponse.data;
       // console.log('Public Equipment Status Response:', statuses);
-      setEquipmentStatuses(statuses);
+      // Ensure statuses is always an array
+      const validStatuses = Array.isArray(statuses) ? statuses : [];
+      setEquipmentStatuses(validStatuses);
 
       // Get measurements using the public endpoint with cache-busting
       const measurementResponse = await publicClient.get(
         `/api/v1/personal-test/process-flow/public/${publishToken}/measurements?limit=100&_t=${Date.now()}`
       );
-      setMeasurements(measurementResponse.data);
+      // Ensure measurements is always an array
+      const validMeasurements = Array.isArray(measurementResponse.data) ? measurementResponse.data : [];
+      setMeasurements(validMeasurements);
 
       // Check for spec violations and trigger alarms (only if alarm check is enabled)
       if (alarmCheck) {
@@ -144,7 +149,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
           }
         });
         
-        measurementResponse.data.forEach((measurement: MeasurementData) => {
+        validMeasurements.forEach((measurement: MeasurementData) => {
           // Only trigger alarms for measurements that are visible on current screen
           if (!visibleMeasurementCodes.has(measurement.measurement_code)) {
             return;
@@ -159,7 +164,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
             
             if (!prevMeasurement || prevMeasurement.spec_status !== measurement.spec_status) {
               // Find equipment info
-              const equipment = statuses.find((e: EquipmentStatus) => 
+              const equipment = validStatuses.find((e: EquipmentStatus) => 
                 e.equipment_code === measurement.equipment_code
               );
               
@@ -197,12 +202,12 @@ export const usePublicFlowMonitor = (publishToken: string) => {
 
       // Update previous data for alarm checking
       const newStatusMap = new Map();
-      statuses.forEach((status: EquipmentStatus) => {
+      validStatuses.forEach((status: EquipmentStatus) => {
         newStatusMap.set(status.equipment_code, status);
       });
       
       const newMeasurementMap = new Map();
-      measurementResponse.data.forEach((measurement: MeasurementData) => {
+      validMeasurements.forEach((measurement: MeasurementData) => {
         const key = `${measurement.equipment_code}_${measurement.measurement_code}`;
         newMeasurementMap.set(key, measurement);
       });
@@ -216,12 +221,12 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       const updatedNodes = isInitialLoad ? flowData.flow_data?.nodes || [] : nodes;
       const finalNodes = updatedNodes.map((node: Node) => {
         if (node.type === 'equipment' && node.data.equipmentCode) {
-          const status = statuses.find(
+          const status = validStatuses.find(
             (s: EquipmentStatus) => s.equipment_code === node.data.equipmentCode
           );
           
           // Filter measurements based on displayMeasurements configuration
-          const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+          const configuredMeasurements = validMeasurements.filter((m: MeasurementData) => {
             // If displayMeasurements is configured and not empty, filter by it
             if (node.data.displayMeasurements && node.data.displayMeasurements.length > 0) {
               return node.data.displayMeasurements.includes(m.measurement_code);
@@ -365,7 +370,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [publishToken, isInitialLoad, nodes, edges]);
+  }, [publishToken, isInitialLoad]);
 
   // Initial load
   useEffect(() => {
@@ -383,13 +388,10 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     return () => clearInterval(interval);
   }, [autoRefresh, flow, loadFlow, refreshInterval]);
 
-  // Enable auto scroll for monitor
+  // Set global auto-scroll state
   useEffect(() => {
-    (window as any).autoScrollMeasurements = true;
-    return () => {
-      (window as any).autoScrollMeasurements = false;
-    };
-  }, []);
+    (window as any).autoScrollMeasurements = autoScroll;
+  }, [autoScroll]);
 
   return {
     flow,
@@ -404,6 +406,10 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     setAutoRefresh,
     refreshInterval,
     setRefreshInterval,
+    autoScroll,
+    setAutoScroll,
+    alarmCheck,
+    setAlarmCheck,
     forceRefresh: loadFlow,
   };
 };

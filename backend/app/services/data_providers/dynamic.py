@@ -52,12 +52,13 @@ class DynamicProvider(IDataProvider):
             return self._config
             
         try:
-            # First, check if workspace_id is a valid UUID
-            workspace_uuid = self.workspace_id
+            # Convert workspace_id to string for consistent handling
+            workspace_id_str = str(self.workspace_id)
+            workspace_uuid = workspace_id_str
             
             # If not a valid UUID format, try to find by slug or name
-            if not self._is_valid_uuid(self.workspace_id):
-                logger.info(f"Workspace ID '{self.workspace_id}' is not a UUID, looking up workspace...")
+            if not self._is_valid_uuid(workspace_id_str):
+                logger.info(f"Workspace ID '{workspace_id_str}' is not a UUID, looking up workspace...")
                 
                 # Try to find workspace by slug or name
                 workspace_query = text("""
@@ -70,24 +71,25 @@ class DynamicProvider(IDataProvider):
                 """)
                 
                 # Handle cases like 'personal_test' vs 'personaltest'
-                workspace_id_no_underscore = self.workspace_id.replace('_', '')
+                workspace_id_no_underscore = workspace_id_str.replace('_', '')
                 
                 ws_result = await self.db_session.execute(workspace_query, {
-                    "workspace_id": self.workspace_id,
+                    "workspace_id": workspace_id_str,
                     "workspace_id_no_underscore": workspace_id_no_underscore
                 })
                 ws_row = ws_result.fetchone()
                 
                 if ws_row:
                     workspace_uuid = str(ws_row.id)
-                    logger.info(f"Found workspace UUID: {workspace_uuid} for '{self.workspace_id}'")
+                    logger.info(f"Found workspace UUID: {workspace_uuid} for '{workspace_id_str}'")
                 else:
-                    logger.warning(f"No workspace found for '{self.workspace_id}'")
-                    workspace_uuid = self.workspace_id  # Fallback to original
+                    logger.warning(f"No workspace found for '{workspace_id_str}'")
+                    workspace_uuid = workspace_id_str  # Fallback to original
             
             # Query data source configuration
             if self.data_source_id:
                 # If data_source_id is specified, load that specific data source
+                logger.info(f"Loading specific data source: {self.data_source_id}")
                 query = text("""
                     SELECT 
                         id as data_source_id,
@@ -99,7 +101,7 @@ class DynamicProvider(IDataProvider):
                         is_active,
                         custom_queries
                     FROM data_source_configs
-                    WHERE id = :data_source_id
+                    WHERE id = :data_source_id AND is_active = true
                     LIMIT 1
                 """)
                 result = await self.db_session.execute(query, {"data_source_id": self.data_source_id})
@@ -124,13 +126,12 @@ class DynamicProvider(IDataProvider):
             config = result.fetchone()
             
             if not config:
-                logger.info(f"No data source config found for workspace {self.workspace_id}, using default PostgreSQL")
-                # Default to PostgreSQL if no config found
-                self._config = {
-                    "source_type": "postgresql",
-                    "connection_string": None,
-                    "is_active": True
-                }
+                if self.data_source_id:
+                    logger.error(f"Specific data source {self.data_source_id} not found or inactive")
+                    raise ValueError(f"Data source {self.data_source_id} not found or inactive")
+                else:
+                    logger.error(f"No active data source config found for workspace {self.workspace_id}")
+                    raise ValueError(f"No active data source configuration found for workspace {self.workspace_id}")
             else:
                 self._config = dict(config._mapping)
                 # Convert source_type to lowercase for internal use
@@ -173,12 +174,8 @@ class DynamicProvider(IDataProvider):
                 
         except Exception as e:
             logger.error(f"Error loading data source config: {e}")
-            # Default to PostgreSQL on error
-            self._config = {
-                "source_type": "postgresql",
-                "connection_string": None,
-                "is_active": True
-            }
+            # Don't fallback - raise the error to indicate configuration issue
+            raise RuntimeError(f"Failed to load data source configuration for workspace {self.workspace_id}: {e}")
             
         return self._config
     

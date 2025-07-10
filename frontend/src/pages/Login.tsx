@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { LogIn, Shield } from 'lucide-react';
@@ -14,48 +14,113 @@ const MLLogo: React.FC = () => (
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [oauthLoading, setOauthLoading] = useState(false);
   const [silentLoginAttempting, setSilentLoginAttempting] = useState(true);
+  const authAttemptRef = useRef(false);
+  const mountedRef = useRef(true);
 
-  // 페이지 로드 시 자동 Silent 로그인 시도
+  // 컴포넌트 언마운트 감지
   useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // 이미 인증된 사용자 리다이렉트 (OAuth 진행 중이 아닐 때만)
+  useEffect(() => {
+    if (isAuthenticated && !oauthLoading) {
+      navigate('/', { replace: true });
+      return;
+    }
+  }, [isAuthenticated, navigate, oauthLoading]);
+
+  // 페이지 로드 시 자동 Silent 로그인 시도 (중복 방지)
+  useEffect(() => {
+    // 이미 시도했거나 이미 인증된 경우 스킵
+    if (authAttemptRef.current || isAuthenticated) {
+      setSilentLoginAttempting(false);
+      return;
+    }
+
+    authAttemptRef.current = true;
+
     const attemptSilentLogin = async () => {
       try {
+        // 기존 토큰 확인
+        const existingToken = localStorage.getItem('accessToken');
+        if (existingToken && authService.isAuthenticated()) {
+          const storedUser = authService.getStoredUser();
+          if (storedUser) {
+            setAuth(existingToken, storedUser);
+            toast.success(`환영합니다, ${storedUser.full_name || storedUser.username}!`);
+            if (mountedRef.current) {
+              navigate('/', { replace: true });
+            }
+            return;
+          }
+        }
+
+        // Silent 로그인 시도
         const result = await authService.attemptSilentLogin();
         
-        if (result.success && result.user) {
+        if (result.success && result.user && mountedRef.current) {
           const token = localStorage.getItem('accessToken') || '';
           setAuth(token, result.user);
           toast.success(`자동 로그인되었습니다. 환영합니다, ${result.user.full_name || result.user.username}!`);
-          navigate('/');
+          navigate('/', { replace: true });
         } else {
           console.log('Silent login failed, showing manual login options');
         }
       } catch (error) {
         console.log('Silent login error:', error);
       } finally {
-        setSilentLoginAttempting(false);
+        if (mountedRef.current) {
+          setSilentLoginAttempting(false);
+        }
       }
     };
 
-    attemptSilentLogin();
-  }, [navigate, setAuth]);
+    // 약간의 지연을 두어 중복 호출 방지
+    const timeoutId = setTimeout(attemptSilentLogin, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [navigate, setAuth, isAuthenticated]);
 
   const handleOAuthLogin = async () => {
+    // 중복 OAuth 시도 방지
+    if (oauthLoading || isAuthenticated) {
+      return;
+    }
+
     setOauthLoading(true);
     
     try {
+      console.log('🚀 Login.tsx: Starting OAuth login...');
       const user = await authService.loginWithPopupOAuth();
+      console.log('✅ Login.tsx: OAuth login successful, user:', user);
+      
+      console.log('🔍 Login.tsx: mountedRef.current =', mountedRef.current);
+      if (!mountedRef.current) {
+        console.log('⚠️ Login.tsx: Component unmounted, but continuing anyway for OAuth completion');
+        // OAuth 완료를 위해 계속 진행
+      }
       
       // Create token for compatibility with existing auth store
       const token = localStorage.getItem('accessToken') || '';
+      console.log('🔑 Login.tsx: Setting auth with token:', token.substring(0, 20) + '...');
       setAuth(token, user);
+      console.log('🎉 Login.tsx: Auth set successfully, navigating to home');
       
       toast.success(`Welcome back, ${user.full_name || user.username}!`);
-      navigate('/');
+      navigate('/', { replace: true });
       
     } catch (error: any) {
       console.error('OAuth login error:', error);
+      
+      if (!mountedRef.current) {
+        return;
+      }
       
       if (error.message?.includes('blocked')) {
         toast.error('Popup was blocked. Please allow popups for this site and try again.', {
@@ -73,7 +138,9 @@ export const Login: React.FC = () => {
         });
       }
     } finally {
-      setOauthLoading(false);
+      if (mountedRef.current) {
+        setOauthLoading(false);
+      }
     }
   };
 
@@ -134,8 +201,12 @@ export const Login: React.FC = () => {
             {/* OAuth Login Button */}
             <button
               onClick={handleOAuthLogin}
-              disabled={oauthLoading}
-              className="w-full py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors flex items-center justify-center space-x-3 shadow-md"
+              disabled={oauthLoading || isAuthenticated}
+              className={`w-full py-4 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors flex items-center justify-center space-x-3 shadow-md ${
+                oauthLoading || isAuthenticated 
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
             >
               <LogIn size={24} />
               <span className="text-lg">

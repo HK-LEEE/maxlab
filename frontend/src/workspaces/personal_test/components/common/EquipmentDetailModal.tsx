@@ -156,7 +156,19 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
             <div>
               <h3 className="text-lg font-semibold mb-3">측정값 목록</h3>
               <div className="space-y-2">
-                {measurements.map((measurement, index) => {
+                {(() => {
+                  // Remove duplicates by grouping by measurement_code and taking the latest one
+                  const measurementMap = new Map();
+                  measurements.forEach((measurement) => {
+                    const key = measurement.measurement_code;
+                    const existing = measurementMap.get(key);
+                    if (!existing || new Date(measurement.timestamp) > new Date(existing.timestamp)) {
+                      measurementMap.set(key, measurement);
+                    }
+                  });
+                  const uniqueMeasurements = Array.from(measurementMap.values());
+                  
+                  return uniqueMeasurements.map((measurement, index) => {
                   const specStatus = getSpecStatusDisplay(measurement.spec_status ?? 9);
                   const IconComponent = specStatus.icon;
                   
@@ -245,7 +257,8 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
                       </div>
                     </div>
                   );
-                })}
+                  });
+                })()}
               </div>
             </div>
           ) : (

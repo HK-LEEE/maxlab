@@ -28,25 +28,43 @@ export const authService = {
       
       const userInfo = await getUserInfo(tokenResponse.access_token);
       
-      // 토큰 저장
-      localStorage.setItem('accessToken', tokenResponse.access_token);
-      localStorage.setItem('tokenType', tokenResponse.token_type);
-      localStorage.setItem('expiresIn', tokenResponse.expires_in.toString());
-      localStorage.setItem('scope', tokenResponse.scope);
+      // 토큰 저장 (만료 시간 정확히 계산)
+      const currentTime = Date.now();
+      const expiryTime = currentTime + (tokenResponse.expires_in * 1000);
       
-      // 사용자 정보 매핑
+      localStorage.setItem('accessToken', tokenResponse.access_token);
+      localStorage.setItem('tokenType', tokenResponse.token_type || 'Bearer');
+      localStorage.setItem('expiresIn', tokenResponse.expires_in.toString());
+      localStorage.setItem('tokenExpiryTime', expiryTime.toString());
+      localStorage.setItem('scope', tokenResponse.scope);
+      localStorage.setItem('tokenCreatedAt', currentTime.toString());
+      
+      console.log('📋 User info received:', userInfo);
+      
+      // 사용자 정보 매핑 (안전한 기본값 처리)
       const user: User = {
-        id: userInfo.sub || userInfo.id || userInfo.user_id,
-        email: userInfo.email,
-        username: userInfo.display_name || userInfo.username,
-        full_name: userInfo.real_name || userInfo.full_name,
-        is_active: true,
-        is_admin: userInfo.is_admin || false,
-        role: userInfo.is_admin ? 'admin' : 'user',
-        groups: userInfo.groups?.map((g: any) => g.name || g.display_name) || []
+        id: userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
+        email: userInfo.email || '',
+        username: userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+        full_name: userInfo.real_name || userInfo.full_name || userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+        is_active: userInfo.is_active !== undefined ? userInfo.is_active : true,
+        is_admin: Boolean(userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
+        role: (userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
+        groups: Array.isArray(userInfo.groups) 
+          ? userInfo.groups.map((g: any) => typeof g === 'string' ? g : (g.name || g.display_name || g)).filter(Boolean)
+          : []
       };
       
-      localStorage.setItem('user', JSON.stringify(user));
+      console.log('👤 Mapped user:', user);
+      
+      // 사용자 정보와 함께 생성 시간 저장
+      const userWithMetadata = {
+        ...user,
+        created_at: currentTime,
+        updated_at: currentTime
+      };
+      
+      localStorage.setItem('user', JSON.stringify(userWithMetadata));
       return user;
       
     } catch (error: any) {
@@ -81,27 +99,42 @@ export const authService = {
         
         const userInfo = await getUserInfo(result.token);
         
-        // 토큰 저장
+        // 토큰 저장 (만료 시간 정확히 계산)
+        const currentTime = Date.now();
+        const expiresInSeconds = result.tokenData?.expires_in || 3600;
+        const expiryTime = currentTime + (expiresInSeconds * 1000);
+        
         localStorage.setItem('accessToken', result.token);
         if (result.tokenData) {
           localStorage.setItem('tokenType', result.tokenData.token_type || 'Bearer');
-          localStorage.setItem('expiresIn', (result.tokenData.expires_in || 3600).toString());
+          localStorage.setItem('expiresIn', expiresInSeconds.toString());
+          localStorage.setItem('tokenExpiryTime', expiryTime.toString());
           localStorage.setItem('scope', result.tokenData.scope || 'read:profile read:groups manage:workflows');
+          localStorage.setItem('tokenCreatedAt', currentTime.toString());
         }
         
-        // 사용자 정보 매핑
+        // 사용자 정보 매핑 (안전한 기본값 처리)
         const user: User = {
-          id: userInfo.sub || userInfo.id || userInfo.user_id,
-          email: userInfo.email,
-          username: userInfo.display_name || userInfo.username,
-          full_name: userInfo.real_name || userInfo.full_name,
-          is_active: true,
-          is_admin: userInfo.is_admin || false,
-          role: userInfo.is_admin ? 'admin' : 'user',
-          groups: userInfo.groups?.map((g: any) => g.name || g.display_name) || []
+          id: userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
+          email: userInfo.email || '',
+          username: userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+          full_name: userInfo.real_name || userInfo.full_name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+          is_active: userInfo.is_active !== undefined ? userInfo.is_active : true,
+          is_admin: Boolean(userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
+          role: (userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
+          groups: Array.isArray(userInfo.groups) 
+            ? userInfo.groups.map((g: any) => g.name || g.display_name || g).filter(Boolean)
+            : []
         };
         
-        localStorage.setItem('user', JSON.stringify(user));
+        // 사용자 정보와 함께 생성 시간 저장
+        const userWithMetadata = {
+          ...user,
+          created_at: currentTime,
+          updated_at: currentTime
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userWithMetadata));
         
         return { success: true, user };
       } else {
@@ -129,18 +162,38 @@ export const authService = {
       throw new Error('No access token available');
     }
 
+    // 토큰 유효성 먼저 확인
+    if (!authService.isAuthenticated()) {
+      throw new Error('Token expired');
+    }
+
     const userInfo = await getUserInfo(accessToken);
+    const currentTime = Date.now();
     
-    return {
-      id: userInfo.sub || userInfo.id || userInfo.user_id,
-      email: userInfo.email,
-      username: userInfo.display_name || userInfo.username,
-      full_name: userInfo.real_name || userInfo.full_name,
-      is_active: true,
-      is_admin: userInfo.is_admin || false,
-      role: userInfo.is_admin ? 'admin' : 'user',
-      groups: userInfo.groups?.map((g: any) => g.name || g.display_name) || []
+    // 사용자 정보 매핑 (안전한 기본값 처리)
+    const user: User = {
+      id: userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
+      email: userInfo.email || '',
+      username: userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+      full_name: userInfo.real_name || userInfo.full_name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+      is_active: userInfo.is_active !== undefined ? userInfo.is_active : true,
+      is_admin: Boolean(userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
+      role: (userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
+      groups: Array.isArray(userInfo.groups) 
+        ? userInfo.groups.map((g: any) => g.name || g.display_name || g).filter(Boolean)
+        : []
     };
+
+    // 업데이트된 사용자 정보 저장
+    const userWithMetadata = {
+      ...user,
+      created_at: JSON.parse(localStorage.getItem('user') || '{}').created_at || currentTime,
+      updated_at: currentTime
+    };
+    
+    localStorage.setItem('user', JSON.stringify(userWithMetadata));
+    
+    return user;
   },
 
   /**
@@ -188,6 +241,8 @@ export const authService = {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('tokenType');
       localStorage.removeItem('expiresIn');
+      localStorage.removeItem('tokenExpiryTime');
+      localStorage.removeItem('tokenCreatedAt');
       localStorage.removeItem('scope');
       localStorage.removeItem('user');
       
@@ -205,23 +260,36 @@ export const authService = {
    */
   isAuthenticated: (): boolean => {
     const accessToken = localStorage.getItem('accessToken');
-    const expiresIn = localStorage.getItem('expiresIn');
+    const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
     
     if (!accessToken) {
       return false;
     }
     
-    // 토큰 만료 확인 (간단한 체크)
-    if (expiresIn) {
-      const expiryTime = parseInt(expiresIn, 10) * 1000; // Convert to milliseconds
+    // 토큰 만료 확인 (정확한 만료 시간 사용)
+    if (tokenExpiryTime) {
+      const expiryTime = parseInt(tokenExpiryTime, 10);
       const now = Date.now();
-      const tokenAge = now - (JSON.parse(localStorage.getItem('user') || '{}').created_at || now);
       
-      if (tokenAge > expiryTime) {
+      // 만료 5분 전부터 토큰 갱신 필요로 표시
+      const bufferTime = 5 * 60 * 1000; // 5 minutes
+      
+      if (now >= expiryTime) {
         console.log('Token expired, clearing storage');
         authService.logout();
         return false;
+      } else if (now >= (expiryTime - bufferTime)) {
+        console.log('Token expires soon, consider refreshing');
+        // 토큰이 곧 만료되지만 아직 유효
+        return true;
       }
+    }
+    
+    // 저장된 사용자 정보 확인
+    const storedUser = authService.getStoredUser();
+    if (!storedUser || !storedUser.id) {
+      console.log('No valid user data found');
+      return false;
     }
     
     return true;
@@ -248,10 +316,79 @@ export const authService = {
    * 인증 토큰 갱신
    */
   refreshToken: async (): Promise<boolean> => {
-    // OAuth에서는 일반적으로 refresh token을 사용하지만
-    // 현재 구현에서는 silent authentication으로 대체
-    const result = await authService.attemptSilentLogin();
-    return result.success;
+    try {
+      console.log('🔄 Attempting token refresh...');
+      
+      // 현재 토큰이 있는지 확인
+      const currentToken = localStorage.getItem('accessToken');
+      if (!currentToken) {
+        console.log('❌ No current token to refresh');
+        return false;
+      }
+
+      // Silent authentication으로 토큰 갱신 시도
+      const result = await authService.attemptSilentLogin();
+      
+      if (result.success) {
+        console.log('✅ Token refresh successful');
+        return true;
+      } else {
+        console.log('❌ Token refresh failed:', result.error);
+        
+        // 갱신 실패 시 기존 토큰이 여전히 유효한지 확인
+        if (authService.isAuthenticated()) {
+          console.log('ℹ️ Current token still valid, keeping it');
+          return true;
+        } else {
+          console.log('🔓 Token refresh failed and current token expired, clearing auth');
+          await authService.logout();
+          return false;
+        }
+      }
+    } catch (error: any) {
+      console.error('Token refresh error:', error);
+      return false;
+    }
+  },
+
+  /**
+   * 자동 토큰 갱신 시작
+   */
+  startAutoTokenRefresh: (): (() => void) => {
+    let refreshInterval: NodeJS.Timeout;
+    
+    const checkAndRefresh = async () => {
+      try {
+        if (!authService.isAuthenticated()) {
+          console.log('🔓 User not authenticated, stopping auto refresh');
+          clearInterval(refreshInterval);
+          return;
+        }
+
+        if (authService.needsTokenRefresh()) {
+          console.log('🔄 Token needs refresh, attempting automatic refresh...');
+          const success = await authService.refreshToken();
+          
+          if (!success) {
+            console.log('❌ Auto token refresh failed');
+            clearInterval(refreshInterval);
+          }
+        }
+      } catch (error) {
+        console.error('Auto token refresh check error:', error);
+      }
+    };
+
+    // 매 1분마다 토큰 상태 확인
+    refreshInterval = setInterval(checkAndRefresh, 60 * 1000);
+    
+    // 즉시 한 번 확인
+    checkAndRefresh();
+
+    // 정리 함수 반환
+    return () => {
+      clearInterval(refreshInterval);
+    };
   },
 
   /**
@@ -269,14 +406,55 @@ export const authService = {
   },
 
   /**
+   * 토큰 갱신 필요 여부 확인
+   */
+  needsTokenRefresh: (): boolean => {
+    const accessToken = localStorage.getItem('accessToken');
+    const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
+    
+    if (!accessToken || !tokenExpiryTime) {
+      return false;
+    }
+    
+    const expiryTime = parseInt(tokenExpiryTime, 10);
+    const now = Date.now();
+    const bufferTime = 5 * 60 * 1000; // 5 minutes
+    
+    return now >= (expiryTime - bufferTime);
+  },
+
+  /**
+   * 토큰 만료까지 남은 시간 (초)
+   */
+  getTokenTimeToExpiry: (): number => {
+    const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
+    
+    if (!tokenExpiryTime) {
+      return 0;
+    }
+    
+    const expiryTime = parseInt(tokenExpiryTime, 10);
+    const now = Date.now();
+    
+    return Math.max(0, Math.floor((expiryTime - now) / 1000));
+  },
+
+  /**
    * 디버깅 정보
    */
   getAuthDebugInfo: () => {
+    const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
+    const tokenCreatedAt = localStorage.getItem('tokenCreatedAt');
+    
     return {
       isAuthenticated: authService.isAuthenticated(),
+      needsRefresh: authService.needsTokenRefresh(),
+      timeToExpiry: authService.getTokenTimeToExpiry(),
       hasToken: !!localStorage.getItem('accessToken'),
       tokenType: localStorage.getItem('tokenType'),
       expiresIn: localStorage.getItem('expiresIn'),
+      tokenExpiryTime: tokenExpiryTime ? new Date(parseInt(tokenExpiryTime)).toISOString() : null,
+      tokenCreatedAt: tokenCreatedAt ? new Date(parseInt(tokenCreatedAt)).toISOString() : null,
       scope: localStorage.getItem('scope'),
       user: authService.getStoredUser(),
       sessionData: {

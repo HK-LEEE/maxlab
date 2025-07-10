@@ -66,18 +66,63 @@ export const authApi = {
 
   // Search endpoints for autocomplete
   searchUsers: async (query: string): Promise<User[]> => {
-    const response = await authClient.get<User[]>(`/api/v1/external/users/search?q=${query}`);
-    return response.data;
+    try {
+      console.log(`🔍 Frontend: Searching users with query: "${query}"`);
+      
+      if (!query || query.trim().length < 1) {
+        console.log('❌ Frontend: Search query is empty or too short');
+        return [];
+      }
+      
+      const response = await authClient.get<User[]>(`/api/v1/external/users/search?q=${encodeURIComponent(query.trim())}`);
+      console.log(`✅ Frontend: Found ${response.data?.length || 0} users`);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error('❌ Frontend: Error searching users:', error);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      return [];
+    }
   },
 
   searchGroups: async (query: string): Promise<Group[]> => {
-    const response = await authClient.get<Group[]>(`/api/v1/admin/groups/search?q=${query}`);
-    return response.data;
+    try {
+      console.log(`🔍 Frontend: Searching groups with query: "${query}"`);
+      
+      if (!query || query.trim().length < 1) {
+        console.log('❌ Frontend: Search query is empty or too short');
+        return [];
+      }
+      
+      const response = await authClient.get<Group[]>(`/api/v1/external/groups/search?q=${encodeURIComponent(query.trim())}`);
+      console.log(`✅ Frontend: Found ${response.data?.length || 0} groups`);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error('❌ Frontend: Error searching groups:', error);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      return [];
+    }
   },
 
   // External API endpoints
   getGroups: async (): Promise<Group[]> => {
-    const response = await authClient.get<Group[]>(`/api/v1/external/groups`);
-    return response.data;
+    try {
+      console.log('🔍 Frontend: Getting all groups');
+      const response = await authClient.get<Group[]>(`/api/v1/external/groups`);
+      console.log(`✅ Frontend: Found ${response.data?.length || 0} groups`);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error('❌ Frontend: Error getting groups:', error);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      return [];
+    }
   },
 };
