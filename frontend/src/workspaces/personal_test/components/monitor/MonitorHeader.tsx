@@ -71,7 +71,6 @@ export const MonitorHeader: React.FC<MonitorHeaderProps> = ({
             onChange={(e) => onRefreshIntervalChange(Number(e.target.value))}
             className="px-2 py-1 border rounded text-sm"
           >
-            <option value={10000}>10초</option>
             <option value={30000}>30초</option>
             <option value={60000}>1분</option>
             <option value={180000}>3분</option>
