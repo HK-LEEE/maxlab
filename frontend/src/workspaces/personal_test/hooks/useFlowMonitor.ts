@@ -46,9 +46,9 @@ export const useFlowMonitor = (workspaceId: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(10000); // 10 seconds for better real-time updates
-  const [autoScroll, setAutoScroll] = useState(false);
-  const [alarmCheck, setAlarmCheck] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds default
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [alarmCheck, setAlarmCheck] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isDataLoadingRef = useRef(false);

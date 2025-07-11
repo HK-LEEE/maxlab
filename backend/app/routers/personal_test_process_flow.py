@@ -1139,86 +1139,36 @@ async def get_equipment_status(
         import traceback
         logger.error(f"❌ Full traceback: {traceback.format_exc()}")
         
-        # Check if we have a configured data source - if MSSQL is configured but failing, don't fallback
+        # No fallback logic - if data source connection fails, return clear error
+        logger.error(f"❌ Data source connection failed for workspace {workspace_id}")
+        
+        # Get the configured data source type for better error message
         try:
-            # Get active data source configuration
             from app.services.data_providers.dynamic import DynamicProvider
             dynamic_provider = DynamicProvider(db, workspace_id)
             config = await dynamic_provider._load_config()
+            source_type = config.get('source_type', 'Unknown') if config else 'Unknown'
             
-            logger.info(f"🔍 Checking fallback conditions - Source type: {config.get('source_type')}")
+            error_details = {
+                'mssql': 'Please check your MSSQL server connection, credentials, and network connectivity.',
+                'postgresql': 'Please check your PostgreSQL server connection and database configuration.',
+                'api': 'Please check your API endpoint URL, authentication, and network connectivity.'
+            }
             
-            if config and config.get('source_type') == 'mssql':
-                # MSSQL is configured but failing - don't fallback, return proper error
-                logger.error(f"🚫 MSSQL configured but failing - NO FALLBACK")
-                raise HTTPException(
-                    status_code=503,
-                    detail=f"MSSQL data source connection failed: {str(e)}. Please check your MSSQL server configuration."
-                )
-            elif config and config.get('source_type') != 'postgresql':
-                # Any other configured data source failing - don't fallback
-                logger.error(f"🚫 {config.get('source_type')} configured but failing - NO FALLBACK")
-                raise HTTPException(
-                    status_code=503,
-                    detail=f"{config.get('source_type')} data source connection failed: {str(e)}. Please check your configuration."
-                )
+            detail_message = error_details.get(source_type.lower(), 'Please check your data source configuration.')
+            
+            raise HTTPException(
+                status_code=503,
+                detail=f"Cannot connect to {source_type} data source: {str(e)}. {detail_message}"
+            )
         except HTTPException:
             raise
         except Exception as config_error:
-            logger.warning(f"⚠️ Could not check data source configuration: {config_error}")
-        
-        # Only fallback to PostgreSQL if no specific data source is configured or if PostgreSQL is configured
-        logger.warning("🔄 Falling back to PostgreSQL for equipment status")
-        
-        # Fallback to direct database query
-        # First, get the total count
-        count_query = """
-            SELECT COUNT(*) as total
-            FROM personal_test_equipment_status
-            WHERE 1=1
-        """
-        params = {}
-        
-        if equipment_type:
-            count_query += " AND equipment_type = :equipment_type"
-            params["equipment_type"] = equipment_type
-        
-        if status:
-            count_query += " AND status = :status"
-            params["status"] = status
-        
-        count_result = await db.execute(text(count_query), params) if params else await db.execute(text(count_query))
-        total_count = count_result.scalar()
-        
-        # Now get the paginated data
-        base_query = """
-            SELECT equipment_type, equipment_code, equipment_name, status, last_run_time
-            FROM personal_test_equipment_status
-            WHERE 1=1
-        """
-        
-        if equipment_type:
-            base_query += " AND equipment_type = :equipment_type"
-        
-        if status:
-            base_query += " AND status = :status"
-        
-        base_query += " ORDER BY equipment_type, equipment_code LIMIT :limit OFFSET :offset"
-        
-        params["limit"] = limit
-        params["offset"] = offset
-        
-        result = await db.execute(text(base_query), params)
-        
-        equipment_list = []
-        for row in result:
-            equipment_list.append(EquipmentStatus(
-                equipment_type=row.equipment_type,
-                equipment_code=row.equipment_code,
-                equipment_name=row.equipment_name,
-                status=row.status,
-                last_run_time=row.last_run_time
-            ))
+            logger.error(f"❌ Could not determine data source configuration: {config_error}")
+            raise HTTPException(
+                status_code=503,
+                detail=f"Data source connection failed: {str(e)}. Please check your data source configuration in the workspace settings."
+            )
         
         return EquipmentStatusResponse(
             items=equipment_list,
@@ -1316,86 +1266,36 @@ async def get_measurement_data(
     except Exception as e:
         logger.error(f"Error getting measurements from provider: {e}")
         
-        # Check if we have a configured data source - if MSSQL is configured but failing, don't fallback
+        # No fallback logic - if data source connection fails, return clear error
+        logger.error(f"❌ Data source connection failed for workspace {workspace_id}")
+        
+        # Get the configured data source type for better error message
         try:
-            # Get active data source configuration
             from app.services.data_providers.dynamic import DynamicProvider
             dynamic_provider = DynamicProvider(db, workspace_id)
             config = await dynamic_provider._load_config()
+            source_type = config.get('source_type', 'Unknown') if config else 'Unknown'
             
-            logger.info(f"🔍 Checking fallback conditions - Source type: {config.get('source_type')}")
+            error_details = {
+                'mssql': 'Please check your MSSQL server connection, credentials, and network connectivity.',
+                'postgresql': 'Please check your PostgreSQL server connection and database configuration.',
+                'api': 'Please check your API endpoint URL, authentication, and network connectivity.'
+            }
             
-            if config and config.get('source_type') == 'mssql':
-                # MSSQL is configured but failing - don't fallback, return proper error
-                logger.error(f"🚫 MSSQL configured but failing - NO FALLBACK")
-                raise HTTPException(
-                    status_code=503,
-                    detail=f"MSSQL data source connection failed: {str(e)}. Please check your MSSQL server configuration."
-                )
-            elif config and config.get('source_type') != 'postgresql':
-                # Any other configured data source failing - don't fallback
-                logger.error(f"🚫 {config.get('source_type')} configured but failing - NO FALLBACK")
-                raise HTTPException(
-                    status_code=503,
-                    detail=f"{config.get('source_type')} data source connection failed: {str(e)}. Please check your configuration."
-                )
+            detail_message = error_details.get(source_type.lower(), 'Please check your data source configuration.')
+            
+            raise HTTPException(
+                status_code=503,
+                detail=f"Cannot connect to {source_type} data source: {str(e)}. {detail_message}"
+            )
         except HTTPException:
             raise
         except Exception as config_error:
-            logger.warning(f"⚠️ Could not check data source configuration: {config_error}")
-        
-        # Only fallback to PostgreSQL if no specific data source is configured or if PostgreSQL is configured
-        logger.warning("🔄 Falling back to PostgreSQL for measurement data")
-        
-        # Fallback to direct database query
-        base_query = """
-            SELECT id, equipment_type, equipment_code, measurement_code, 
-                   measurement_desc, measurement_value, timestamp,
-                   usl, lsl, spec_status
-            FROM personal_test_measurement_data
-            WHERE 1=1
-        """
-        params = {"limit": limit}
-        
-        if equipment_codes:
-            # Handle comma-separated equipment codes
-            codes_list = equipment_codes.split(',')
-            placeholders = ','.join([f':code_{i}' for i in range(len(codes_list))])
-            base_query += f" AND equipment_code IN ({placeholders})"
-            for i, code in enumerate(codes_list):
-                params[f"code_{i}"] = code.strip()
-        elif equipment_code:
-            base_query += " AND equipment_code = :equipment_code"
-            params["equipment_code"] = equipment_code
-        
-        if equipment_type:
-            base_query += " AND equipment_type = :equipment_type"
-            params["equipment_type"] = equipment_type
-            
-        if measurement_code:
-            base_query += " AND measurement_code = :measurement_code"
-            params["measurement_code"] = measurement_code
-        
-        base_query += " ORDER BY timestamp DESC LIMIT :limit"
-        
-        result = await db.execute(text(base_query), params)
-        
-        measurements = []
-        for row in result:
-            measurements.append(MeasurementData(
-                id=row.id,
-                equipment_type=row.equipment_type,
-                equipment_code=row.equipment_code,
-                measurement_code=row.measurement_code,
-                measurement_desc=row.measurement_desc,
-                measurement_value=float(row.measurement_value),
-                timestamp=row.timestamp,
-                usl=float(row.usl) if row.usl is not None else None,
-                lsl=float(row.lsl) if row.lsl is not None else None,
-                spec_status=int(row.spec_status) if row.spec_status is not None else None
-            ))
-        
-        return measurements
+            logger.error(f"❌ Could not determine data source configuration: {config_error}")
+            raise HTTPException(
+                status_code=503,
+                detail=f"Data source connection failed: {str(e)}. Please check your data source configuration in the workspace settings."
+            )
     finally:
         await provider.disconnect()
 
@@ -1689,25 +1589,41 @@ async def update_data_source(
 ):
     """Update a data source configuration."""
     try:
+        # Only update connection_string if provided (not empty)
+        update_connection = config.connection_string and config.connection_string.strip()
+        
         # Map API fields to database columns
-        api_url = config.connection_string if config.source_type.lower() == 'api' else None
-        mssql_connection_string = config.connection_string if config.source_type.lower() == 'mssql' else None
+        api_url = config.connection_string if config.source_type.lower() == 'api' and update_connection else None
+        mssql_connection_string = config.connection_string if config.source_type.lower() == 'mssql' and update_connection else None
         # For PostgreSQL, we'll store it in mssql_connection_string field (since we're reusing the column)
-        if config.source_type.lower() == 'postgresql' and config.connection_string:
+        if config.source_type.lower() == 'postgresql' and update_connection:
             mssql_connection_string = config.connection_string
         
-        query = """
-            UPDATE data_source_configs SET
-                source_type = :source_type,
-                api_url = :api_url,
-                mssql_connection_string = :mssql_connection_string,
-                api_key = :api_key,
-                api_headers = :api_headers,
-                custom_queries = :custom_queries,
-                is_active = :is_active,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = :id AND workspace_id = :workspace_id
-        """
+        # Build dynamic query based on whether connection_string is provided
+        if update_connection:
+            query = """
+                UPDATE data_source_configs SET
+                    source_type = :source_type,
+                    api_url = :api_url,
+                    mssql_connection_string = :mssql_connection_string,
+                    api_key = :api_key,
+                    api_headers = :api_headers,
+                    custom_queries = :custom_queries,
+                    is_active = :is_active,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = :id AND workspace_id = :workspace_id
+            """
+        else:
+            # Don't update connection fields if connection_string is empty
+            query = """
+                UPDATE data_source_configs SET
+                    source_type = :source_type,
+                    api_headers = :api_headers,
+                    custom_queries = :custom_queries,
+                    is_active = :is_active,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = :id AND workspace_id = :workspace_id
+            """
         
         # Convert workspace_id if it's 'personal_test'
         workspace_id_str = str(config.workspace_id)
@@ -1723,22 +1639,29 @@ async def update_data_source(
                 # If it fails, use the predefined UUID for personal_test
                 workspace_uuid = '21ee03db-90c4-4592-b00f-c44801e0b164'
         
-        # Encrypt sensitive data before storing
-        encrypted_api_url = encrypt_connection_string(api_url) if api_url else None
-        encrypted_mssql_connection = encrypt_connection_string(mssql_connection_string) if mssql_connection_string else None
-        encrypted_api_key = encrypt_connection_string(config.api_key) if config.api_key else None
-        
-        result = await db.execute(text(query), {
+        # Prepare query parameters based on whether we're updating connection
+        params = {
             "id": str(source_id),
             "workspace_id": workspace_uuid,
             "source_type": config.source_type.upper(),
-            "api_url": encrypted_api_url,
-            "mssql_connection_string": encrypted_mssql_connection,
-            "api_key": encrypted_api_key,
             "api_headers": json.dumps(config.headers) if config.headers else None,
             "custom_queries": json.dumps(config.custom_queries) if config.custom_queries else None,
             "is_active": config.is_active
-        })
+        }
+        
+        if update_connection:
+            # Encrypt sensitive data before storing
+            encrypted_api_url = encrypt_connection_string(api_url) if api_url else None
+            encrypted_mssql_connection = encrypt_connection_string(mssql_connection_string) if mssql_connection_string else None
+            encrypted_api_key = encrypt_connection_string(config.api_key) if config.api_key else None
+            
+            params.update({
+                "api_url": encrypted_api_url,
+                "mssql_connection_string": encrypted_mssql_connection,
+                "api_key": encrypted_api_key
+            })
+        
+        result = await db.execute(text(query), params)
         
         if result.rowcount == 0:
             raise HTTPException(status_code=404, detail="Data source not found")
@@ -1803,6 +1726,84 @@ async def delete_data_source(
     await db.commit()
     
     return {"message": "Data source deleted successfully"}
+
+@router.get("/data-sources/{source_id}/status")
+async def get_data_source_status(
+    source_id: uuid.UUID,
+    current_user: dict = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get real-time connection status for a data source."""
+    # Get the data source configuration
+    result = await db.execute(
+        text("SELECT * FROM data_source_configs WHERE id = :id"),
+        {"id": str(source_id)}
+    )
+    config = result.fetchone()
+    
+    if not config:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    
+    from app.core.security import decrypt_connection_string
+    
+    try:
+        source_type_lower = config.source_type.lower() if config.source_type else "postgresql"
+        
+        if source_type_lower == "postgresql":
+            # For PostgreSQL, test the current database connection
+            test_result = await db.execute(text("SELECT 1"))
+            success = test_result.scalar() == 1
+            connection_info = "Current PostgreSQL database"
+            
+        elif source_type_lower == "mssql":
+            if config.mssql_connection_string:
+                connection_string = decrypt_connection_string(config.mssql_connection_string)
+                from app.services.data_providers.mssql import MSSQLProvider
+                provider = MSSQLProvider(connection_string)
+                await provider.connect()
+                await provider.disconnect()
+                success = True
+                # Extract server info from connection string
+                import re
+                server_match = re.search(r'server=([^;]+)', connection_string, re.IGNORECASE)
+                database_match = re.search(r'database=([^;]+)', connection_string, re.IGNORECASE)
+                server = server_match.group(1) if server_match else "Unknown"
+                database = database_match.group(1) if database_match else "Unknown"
+                connection_info = f"MSSQL Server: {server}, Database: {database}"
+            else:
+                raise Exception("No connection string configured")
+                
+        elif source_type_lower == "api":
+            if config.api_url:
+                api_url = decrypt_connection_string(config.api_url)
+                import httpx
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    response = await client.get(api_url)
+                    success = response.status_code < 400
+                connection_info = f"API Endpoint: {api_url}"
+            else:
+                raise Exception("No API URL configured")
+        else:
+            raise Exception(f"Unsupported source type: {source_type_lower}")
+            
+        return {
+            "id": str(source_id),
+            "source_type": source_type_lower,
+            "status": "connected" if success else "disconnected",
+            "connection_info": connection_info,
+            "last_checked": datetime.now().isoformat(),
+            "error": None
+        }
+        
+    except Exception as e:
+        return {
+            "id": str(source_id),
+            "source_type": config.source_type.lower() if config.source_type else "unknown",
+            "status": "error",
+            "connection_info": "Connection failed",
+            "last_checked": datetime.now().isoformat(),
+            "error": str(e)
+        }
 
 @router.post("/data-sources/{source_id}/test")
 async def test_data_source(

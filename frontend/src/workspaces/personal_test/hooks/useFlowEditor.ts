@@ -3,6 +3,7 @@ import type { Node, Edge, Connection } from 'reactflow';
 import { addEdge, useNodesState, useEdgesState } from 'reactflow';
 import { apiClient } from '../../../api/client';
 import { toast } from 'react-hot-toast';
+import { deleteFlowBackup } from '../utils/flowBackup';
 
 interface ProcessFlow {
   id: string;
@@ -137,6 +138,12 @@ export const useFlowEditor = (workspaceId: string) => {
       if (isAutoSave) {
         setLastAutoSaveTime(new Date());
       }
+      
+      // 저장 성공 시 백업 삭제 (수동 저장일 때만, 자동 저장은 백업을 유지)
+      if (!isAutoSave) {
+        deleteFlowBackup(workspaceId, currentFlow?.id || null);
+        console.log('🗑️ Backup deleted after successful save');
+      }
     } catch (err) {
       setError('Failed to save process flow');
       if (!isAutoSave) {
@@ -154,6 +161,10 @@ export const useFlowEditor = (workspaceId: string) => {
     console.log('Loading flow:', flow);
     console.log('Flow nodes:', flow.flow_data?.nodes);
     console.log('Flow data_source_id:', flow.data_source_id);
+    
+    // 로드하는 플로우의 백업 데이터 삭제 (새로운 플로우 로드 시 백업 불필요)
+    deleteFlowBackup(workspaceId, flow.id);
+    console.log('🗑️ Backup deleted for loaded flow:', flow.id);
     
     setCurrentFlow(flow);
     setFlowName(flow.name);

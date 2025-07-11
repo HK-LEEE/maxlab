@@ -40,8 +40,19 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      // ProcessFlowEditor에서는 즉시 리다이렉트하지 않고 이벤트 발송
+      const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
+      
+      if (isProcessFlowEditor) {
+        // 토큰 만료 이벤트 발송 (TokenStatusMonitor에서 처리)
+        window.dispatchEvent(new CustomEvent('auth:token-expired', { 
+          detail: { error, source: 'api' } 
+        }));
+      } else {
+        // 다른 페이지에서는 기존대로 즉시 리다이렉트
+        useAuthStore.getState().logout();
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

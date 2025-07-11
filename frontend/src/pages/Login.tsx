@@ -20,6 +20,13 @@ export const Login: React.FC = () => {
   const authAttemptRef = useRef(false);
   const mountedRef = useRef(true);
 
+  // URL 매개변수에서 return URL 가져오기
+  const getReturnUrl = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnUrl = urlParams.get('return');
+    return returnUrl ? decodeURIComponent(returnUrl) : '/';
+  };
+
   // 컴포넌트 언마운트 감지
   useEffect(() => {
     return () => {
@@ -30,7 +37,8 @@ export const Login: React.FC = () => {
   // 이미 인증된 사용자 리다이렉트 (OAuth 진행 중이 아닐 때만)
   useEffect(() => {
     if (isAuthenticated && !oauthLoading) {
-      navigate('/', { replace: true });
+      const returnUrl = getReturnUrl();
+      navigate(returnUrl, { replace: true });
       return;
     }
   }, [isAuthenticated, navigate, oauthLoading]);
@@ -55,7 +63,8 @@ export const Login: React.FC = () => {
             setAuth(existingToken, storedUser);
             toast.success(`환영합니다, ${storedUser.full_name || storedUser.username}!`);
             if (mountedRef.current) {
-              navigate('/', { replace: true });
+              const returnUrl = getReturnUrl();
+              navigate(returnUrl, { replace: true });
             }
             return;
           }
@@ -68,7 +77,8 @@ export const Login: React.FC = () => {
           const token = localStorage.getItem('accessToken') || '';
           setAuth(token, result.user);
           toast.success(`자동 로그인되었습니다. 환영합니다, ${result.user.full_name || result.user.username}!`);
-          navigate('/', { replace: true });
+          const returnUrl = getReturnUrl();
+          navigate(returnUrl, { replace: true });
         } else {
           console.log('Silent login failed, showing manual login options');
         }
@@ -110,10 +120,11 @@ export const Login: React.FC = () => {
       const token = localStorage.getItem('accessToken') || '';
       console.log('🔑 Login.tsx: Setting auth with token:', token.substring(0, 20) + '...');
       setAuth(token, user);
-      console.log('🎉 Login.tsx: Auth set successfully, navigating to home');
+      console.log('🎉 Login.tsx: Auth set successfully, navigating to return URL');
       
       toast.success(`Welcome back, ${user.full_name || user.username}!`);
-      navigate('/', { replace: true });
+      const returnUrl = getReturnUrl();
+      navigate(returnUrl, { replace: true });
       
     } catch (error: any) {
       console.error('OAuth login error:', error);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
@@ -55,10 +55,40 @@ function App() {
   console.log('App component rendering');
   const [isInitializing, setIsInitializing] = useState(true);
   const setAuth = useAuthStore((state) => state.setAuth);
+  const logout = useAuthStore((state) => state.logout);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   
   // 자동 토큰 갱신 시작
   useAuthRefresh();
+  
+  // 자동 로그아웃 이벤트 리스너
+  useEffect(() => {
+    const handleAutoLogout = (event: CustomEvent) => {
+      console.log('🔓 Auto logout triggered:', event.detail);
+      
+      // Public 페이지인지 확인 (로그인 불필요)
+      const currentPath = window.location.pathname;
+      const isPublicPage = currentPath.startsWith('/public/flow/');
+      
+      logout();
+      
+      // Public 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
+      if (!isPublicPage && event.detail?.reason === 'token_refresh_failed') {
+        console.log('Session expired, redirecting to login...');
+        // 현재 페이지를 기억해서 로그인 후 돌아올 수 있도록
+        const returnUrl = encodeURIComponent(currentPath + window.location.search);
+        window.location.href = `/login?return=${returnUrl}`;
+      } else if (isPublicPage) {
+        console.log('Session expired on public page, staying on current page...');
+      }
+    };
+
+    window.addEventListener('auth:logout', handleAutoLogout as EventListener);
+    
+    return () => {
+      window.removeEventListener('auth:logout', handleAutoLogout as EventListener);
+    };
+  }, [logout]);
   
   // App 시작 시 자동 Silent 로그인 시도
   useEffect(() => {

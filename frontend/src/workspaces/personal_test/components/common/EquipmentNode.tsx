@@ -162,14 +162,20 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
       <Handle
         type="target"
         position={Position.Top}
-        className="w-3 h-3 bg-gray-400"
+        style={{
+          top: -16,
+          backgroundColor: '#6b7280',
+          width: 12,
+          height: 12,
+          border: 'none'
+        }}
       />
       
       {/* Tier 1: Equipment Name (Center aligned) */}
-      <div className={`px-3 py-2 border-b ${window.location.pathname.includes('monitor') ? status.headerBg : data.equipmentType ? 'bg-gray-50' : 'bg-gray-100'} relative`}>
+      <div className={`px-3 py-2 border-b ${(window.location.pathname.includes('monitor') || window.location.pathname.includes('public')) ? status.headerBg : data.equipmentType ? 'bg-gray-50' : 'bg-gray-100'} relative`}>
         <div className="flex items-center justify-center space-x-1">
-          <div className={window.location.pathname.includes('monitor') ? status.headerText : "text-gray-600"}>{icon}</div>
-          <div className={`font-semibold text-sm text-center ${window.location.pathname.includes('monitor') ? status.headerText : ''}`}>
+          <div className={(window.location.pathname.includes('monitor') || window.location.pathname.includes('public')) ? status.headerText : "text-gray-600"}>{icon}</div>
+          <div className={`font-semibold text-sm text-center ${(window.location.pathname.includes('monitor') || window.location.pathname.includes('public')) ? status.headerText : ''}`}>
             {data.equipmentType ? data.label : '공통설비 (미지정)'}
           </div>
           {hasSpecOut && (
@@ -252,7 +258,13 @@ export const EquipmentNode = memo(({ data, selected }: NodeProps<EquipmentNodeDa
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-3 h-3 bg-gray-400"
+        style={{
+          bottom: -16,
+          backgroundColor: '#6b7280',
+          width: 12,
+          height: 12,
+          border: 'none'
+        }}
       />
       </div>
     </>

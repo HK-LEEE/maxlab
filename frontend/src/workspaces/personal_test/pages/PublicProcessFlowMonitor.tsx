@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactFlow, {
   Background,
@@ -56,7 +56,7 @@ const FlowCanvas: React.FC<{
   equipmentStatusCount: number;
   activeCount: number;
   defaultViewport?: Viewport;
-}> = ({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, defaultViewport }) => {
+}> = React.memo(({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, defaultViewport }) => {
   const { fitView, setViewport } = useReactFlow();
 
   // Restore viewport after nodes update
@@ -82,6 +82,12 @@ const FlowCanvas: React.FC<{
       minZoom={0.1}
       maxZoom={4}
       connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+      connectionMode="loose"
+      defaultEdgeOptions={{
+        type: 'custom',
+        style: { strokeWidth: 2, stroke: '#374151' },
+        animated: false
+      }}
       proOptions={{ hideAttribution: true }}
     >
       <Background color="#aaa" gap={16} />
@@ -101,7 +107,18 @@ const FlowCanvas: React.FC<{
       </Panel>
     </ReactFlow>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function to prevent unnecessary re-renders
+  return (
+    prevProps.nodes === nextProps.nodes &&
+    prevProps.edges === nextProps.edges &&
+    prevProps.nodeTypes === nextProps.nodeTypes &&
+    prevProps.edgeTypes === nextProps.edgeTypes &&
+    prevProps.equipmentStatusCount === nextProps.equipmentStatusCount &&
+    prevProps.activeCount === nextProps.activeCount &&
+    prevProps.defaultViewport === nextProps.defaultViewport
+  );
+});
 
 const PublicProcessFlowMonitorContent: React.FC = () => {
   const { publishToken } = useParams<{ publishToken: string }>();
@@ -129,6 +146,8 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
     setAlarmCheck,
     forceRefresh,
     error,
+    retryCount,
+    maxRetries,
   } = usePublicFlowMonitor(publishToken || '');
 
   const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
@@ -165,10 +184,31 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <Globe className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Flow Not Found</h2>
-          <p className="text-gray-600">This flow is not publicly available or the link is invalid.</p>
+          <h2 className="text-xl font-semibold mb-2">
+            {error.includes('Service temporarily unavailable') ? 'Service Unavailable' : 
+             error.includes('Server error') ? 'Server Error' :
+             error.includes('Network connection error') ? 'Connection Error' :
+             'Flow Not Found'}
+          </h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          {retryCount > 0 && retryCount < maxRetries && (
+            <div className="mb-4">
+              <div className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 rounded-lg">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                Retrying... ({retryCount}/{maxRetries})
+              </div>
+            </div>
+          )}
+          {!error.includes('Service temporarily unavailable') && !error.includes('Server error') && (
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+            >
+              Refresh Page
+            </button>
+          )}
         </div>
       </div>
     );
@@ -186,11 +226,11 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   }
 
   const refreshIntervalOptions = [
-    { value: 10000, label: '10 seconds' },
-    { value: 30000, label: '30 seconds' },
-    { value: 60000, label: '1 minute' },
-    { value: 180000, label: '3 minutes' },
-    { value: 300000, label: '5 minutes' },
+    { value: 30000, label: '30초' },
+    { value: 60000, label: '1분' },
+    { value: 180000, label: '3분' },
+    { value: 300000, label: '5분' },
+    { value: 600000, label: '10분' },
   ];
 
   return (

@@ -45,7 +45,7 @@ const FlowCanvas: React.FC<{
   onNodeClick: (event: React.MouseEvent, node: Node) => void;
   equipmentStatusCount: number;
   activeCount: number;
-}> = ({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount }) => {
+}> = React.memo(({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount }) => {
   const { fitView } = useReactFlow();
 
   return (
@@ -64,6 +64,12 @@ const FlowCanvas: React.FC<{
       minZoom={0.1}
       maxZoom={4}
       connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+      connectionMode="loose"
+      defaultEdgeOptions={{
+        type: 'custom',
+        style: { strokeWidth: 2, stroke: '#374151' },
+        animated: false
+      }}
       proOptions={{ hideAttribution: true }}
     >
       <Background />
@@ -83,7 +89,17 @@ const FlowCanvas: React.FC<{
       </Panel>
     </ReactFlow>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function to prevent unnecessary re-renders
+  return (
+    prevProps.nodes === nextProps.nodes &&
+    prevProps.edges === nextProps.edges &&
+    prevProps.nodeTypes === nextProps.nodeTypes &&
+    prevProps.edgeTypes === nextProps.edgeTypes &&
+    prevProps.equipmentStatusCount === nextProps.equipmentStatusCount &&
+    prevProps.activeCount === nextProps.activeCount
+  );
+});
 
 const ProcessFlowMonitorContent: React.FC = () => {
   const workspaceId = 'personal_test';

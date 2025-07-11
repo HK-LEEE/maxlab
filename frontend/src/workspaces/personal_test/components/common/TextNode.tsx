@@ -70,16 +70,6 @@ export const TextNode: React.FC<NodeProps<TextNodeData>> = ({ data, selected }) 
         position={Position.Bottom}
         style={{ opacity: 0 }}
       />
-      <Handle
-        type="target"
-        position={Position.Left}
-        style={{ opacity: 0 }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        style={{ opacity: 0 }}
-      />
     </div>
   );
 };

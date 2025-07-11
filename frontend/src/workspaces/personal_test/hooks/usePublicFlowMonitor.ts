@@ -51,10 +51,12 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(10000); // Default 10 seconds for better real-time updates
+  const [refreshInterval, setRefreshInterval] = useState(30000); // Default 30 seconds
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [alarmCheck, setAlarmCheck] = useState(true);
-  const [autoScroll, setAutoScroll] = useState(false);
+  const [alarmCheck, setAlarmCheck] = useState(false);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
+  const [maxRetries] = useState(3);
   const [previousData, setPreviousData] = useState<{
     statuses: Map<string, any>,
     measurements: Map<string, any>
@@ -360,12 +362,44 @@ export const usePublicFlowMonitor = (publishToken: string) => {
 
       setLastUpdate(new Date());
       setIsInitialLoad(false);
+      
+      // Reset retry count on successful load
+      if (retryCount > 0) {
+        setRetryCount(0);
+      }
     } catch (err: any) {
       console.error('Failed to load public flow:', err);
+      
+      // Check if this is a retryable error
+      const isRetryableError = err.response?.status === 503 || 
+                              err.response?.status >= 500 || 
+                              err.code === 'NETWORK_ERROR' || 
+                              !err.response;
+      
+      if (isRetryableError && retryCount < maxRetries) {
+        const nextRetry = retryCount + 1;
+        setRetryCount(nextRetry);
+        console.log(`Retrying... (${nextRetry}/${maxRetries})`);
+        
+        // Exponential backoff: 2s, 4s, 8s
+        const delay = Math.pow(2, nextRetry) * 1000;
+        setTimeout(() => {
+          loadFlow();
+        }, delay);
+        return;
+      }
+      
+      // Set appropriate error message
       if (err.response?.status === 404) {
         setError('Flow not found or not published');
+      } else if (err.response?.status === 503) {
+        setError('Service temporarily unavailable. The monitoring system may be starting up or under maintenance. Please try again in a few moments.');
+      } else if (err.response?.status >= 500) {
+        setError('Server error. Please try again later or contact support if the problem persists.');
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        setError('Network connection error. Please check your internet connection and try again.');
       } else {
-        setError('Failed to load flow data');
+        setError('Failed to load flow data. Please try refreshing the page.');
       }
     } finally {
       setIsLoading(false);
@@ -411,5 +445,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     alarmCheck,
     setAlarmCheck,
     forceRefresh: loadFlow,
+    retryCount,
+    maxRetries,
   };
 };

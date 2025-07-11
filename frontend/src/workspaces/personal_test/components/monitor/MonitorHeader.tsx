@@ -75,6 +75,7 @@ export const MonitorHeader: React.FC<MonitorHeaderProps> = ({
             <option value={60000}>1분</option>
             <option value={180000}>3분</option>
             <option value={300000}>5분</option>
+            <option value={600000}>10분</option>
           </select>
           <label className="flex items-center space-x-2">
             <input

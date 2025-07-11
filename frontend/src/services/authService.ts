@@ -370,8 +370,16 @@ export const authService = {
           const success = await authService.refreshToken();
           
           if (!success) {
-            console.log('❌ Auto token refresh failed');
+            console.log('❌ Auto token refresh failed, logging out user');
             clearInterval(refreshInterval);
+            
+            // 자동 로그아웃 수행
+            await authService.logout();
+            
+            // 로그인 페이지로 리다이렉트 (앱 수준에서 처리되도록 이벤트 발송)
+            window.dispatchEvent(new CustomEvent('auth:logout', { 
+              detail: { reason: 'token_refresh_failed' } 
+            }));
           }
         }
       } catch (error) {

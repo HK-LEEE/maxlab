@@ -1,15 +1,14 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
-  Panel,
   ReactFlowProvider,
   useReactFlow,
 } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Save, FileText, Square, Trash2, FolderOpen, Download, Database, Ruler, Server } from 'lucide-react';
+import { Save, FolderOpen, Download, Database, Ruler, Server, ChevronDown } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
@@ -18,6 +17,8 @@ import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { NodeConfigDialog } from '../components/common/NodeConfigDialog';
 import { TextConfigDialog } from '../components/common/TextConfigDialog';
 import { FloatingActionButton } from '../components/common/FloatingActionButton';
+import { TokenStatusMonitor } from '../components/common/TokenStatusMonitor';
+import { BackupRecoveryModal } from '../components/common/BackupRecoveryModal';
 
 import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
@@ -28,8 +29,9 @@ import { DataSourceDialog } from '../components/editor/DataSourceDialog';
 import { useFlowEditor } from '../hooks/useFlowEditor';
 import { useDataSources } from '../hooks/useDataSources';
 import { Layout } from '../../../components/common/Layout';
-import { apiClient } from '../../../api/client';
+import { saveFlowBackup, loadFlowBackup, deleteFlowBackup, cleanupExpiredBackups, hasSignificantChanges, type FlowBackupData } from '../utils/flowBackup';
 import { toast } from 'react-hot-toast';
+import { apiClient } from '../../../api/client';
 
 
 const equipmentTypes = [
@@ -107,7 +109,6 @@ const ProcessFlowEditorContent: React.FC = () => {
     saveFlow,
     loadFlow,
     loadMoreEquipment,
-    deleteSelectedNodes,
     addGroupNode,
     alignNodes,
     getNodeHeight,
@@ -138,8 +139,181 @@ const ProcessFlowEditorContent: React.FC = () => {
   const [configNode, setConfigNode] = useState<Node | null>(null);
   const [textConfigNode, setTextConfigNode] = useState<Node | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [versionManagementAvailable, setVersionManagementAvailable] = useState(true);
   const [isDataSourceDialogOpen, setIsDataSourceDialogOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Backup/Recovery state
+  const [showBackupRecovery, setShowBackupRecovery] = useState(false);
+  const [backupData, setBackupData] = useState<FlowBackupData | null>(null);
+  const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
+
+  // 컴포넌트 마운트 시 백업 확인 및 정리
+  useEffect(() => {
+    cleanupExpiredBackups();
+    
+    // 기존 백업 데이터가 있는지 확인
+    const existingBackup = loadFlowBackup(workspaceId, currentFlow?.id || null);
+    if (existingBackup) {
+      // 정확한 비교를 통해 실질적인 변경사항이 있는지 확인
+      const hasChanges = hasSignificantChanges(
+        {
+          nodes,
+          edges,
+          flowName,
+          dataSourceId: selectedDataSourceId,
+        },
+        existingBackup
+      );
+      
+      if (hasChanges) {
+        console.log('📋 Significant changes detected, showing backup recovery modal');
+        setBackupData(existingBackup);
+        setShowBackupRecovery(true);
+      } else {
+        // 실질적인 차이가 없으면 백업 삭제
+        console.log('🗑️ No significant changes, deleting backup');
+        deleteFlowBackup(workspaceId, currentFlow?.id || null);
+      }
+    }
+  }, []);
+
+  // 자동 백업 (디바운스 적용 + 저장 후 일정 시간 대기)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // 최근 저장 후 30초 이내에는 백업하지 않음 (불필요한 백업 방지)
+      const now = new Date();
+      if (lastSaveTime && (now.getTime() - lastSaveTime.getTime()) < 30000) {
+        console.log('⏳ Skipping backup - recent save detected');
+        return;
+      }
+
+      // 의미있는 내용이 있을 때만 백업
+      const hasContent = nodes.length > 0 || edges.length > 0 || flowName !== 'New Process Flow';
+      if (hasContent) {
+        console.log('💾 Auto-saving backup');
+        saveFlowBackup(workspaceId, currentFlow?.id || null, {
+          nodes,
+          edges,
+          flowName,
+          dataSourceId: selectedDataSourceId || undefined,
+        });
+      }
+    }, 2000); // 2초 디바운스
+
+    return () => clearTimeout(timer);
+  }, [nodes, edges, flowName, selectedDataSourceId, workspaceId, currentFlow?.id, lastSaveTime]);
+
+  // 백업 복구 핸들러
+  const handleBackupRecover = useCallback((backup: FlowBackupData) => {
+    // 백업 데이터로 상태 복원
+    setNodes(backup.nodes);
+    setEdges(backup.edges);
+    setFlowName(backup.flowName);
+    if (backup.dataSourceId) {
+      setSelectedDataSourceId(backup.dataSourceId);
+    }
+    
+    toast.success('백업 데이터가 복구되었습니다', {
+      icon: '🔄',
+    });
+    
+    // 백업 데이터 삭제
+    deleteFlowBackup(workspaceId, currentFlow?.id || null);
+  }, [setNodes, setEdges, setFlowName, setSelectedDataSourceId, workspaceId, currentFlow?.id]);
+
+  // 백업 삭제 핸들러
+  const handleBackupDiscard = useCallback(() => {
+    deleteFlowBackup(workspaceId, currentFlow?.id || null);
+    toast.success('백업 데이터가 삭제되었습니다', {
+      icon: '🗑️',
+    });
+  }, [workspaceId, currentFlow?.id]);
+
+  // 저장 완료 감지를 위한 이펙트
+  useEffect(() => {
+    if (lastAutoSaveTime) {
+      setLastSaveTime(lastAutoSaveTime);
+    }
+  }, [lastAutoSaveTime]);
+
+  // 토큰 만료 전 저장 핸들러
+  const handleSaveBeforeExpiry = useCallback(async () => {
+    await saveFlow(false);
+    setLastSaveTime(new Date());
+    // 저장 성공 시 백업 삭제
+    deleteFlowBackup(workspaceId, currentFlow?.id || null);
+  }, [saveFlow, workspaceId, currentFlow?.id]);
+
+  // 수동 저장 래퍼 (저장 시간 추적)
+  const handleManualSave = useCallback(async () => {
+    await saveFlow(false);
+    setLastSaveTime(new Date());
+  }, [saveFlow]);
+
+  // 새 버전으로 저장
+  const handleSaveAsNewVersion = useCallback(async () => {
+    if (!currentFlow) {
+      // If no current flow, create new one first
+      await saveFlow(false);
+      setLastSaveTime(new Date());
+      return;
+    }
+
+    const versionName = `${flowName} - Version ${new Date().toLocaleString()}`;
+    const description = `Saved from editor at ${new Date().toLocaleString()}`;
+    
+    try {
+      const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/versions`, {
+        name: versionName,
+        description,
+        flow_data: { nodes, edges }
+      });
+      
+      // Update the current version number in currentFlow
+      if (response.data && currentFlow) {
+        const updatedFlow = {
+          ...currentFlow,
+          current_version: response.data.version_number,
+          flow_data: { nodes, edges }  // Include current editor state
+        };
+        // Update flows list to reflect new version
+        setFlows(prevFlows => 
+          prevFlows.map(f => f.id === currentFlow.id ? updatedFlow : f)
+        );
+        // Also update currentFlow in the editor
+        setCurrentFlow(updatedFlow);
+      }
+      
+      setLastSaveTime(new Date());
+      toast.success('Saved as new version successfully');
+    } catch (error: any) {
+      console.error('Failed to save as new version:', error);
+      if (error.response?.status === 503 || error.response?.status === 500) {
+        toast.error('Version management is not available. The flow has been saved normally.', {
+          duration: 5000,
+          icon: '⚠️'
+        });
+      } else {
+        toast.error('Failed to save as new version');
+      }
+    }
+  }, [currentFlow, flowName, nodes, edges, saveFlow, setFlows, setCurrentFlow]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as HTMLElement)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isDropdownOpen]);
+
   const [isMeasurementSpecDialogOpen, setIsMeasurementSpecDialogOpen] = useState(false);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -288,46 +462,10 @@ const ProcessFlowEditorContent: React.FC = () => {
     toast.success('Flow exported successfully');
   };
 
-  const handleSaveAsNewVersion = async () => {
-    const versionName = `${flowName} - Version ${new Date().toLocaleString()}`;
-    const description = `Saved from editor at ${new Date().toLocaleString()}`;
-    
-    try {
-      const versionResponse = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${currentFlow?.id}/versions`, {
-        name: versionName,
-        description,
-        flow_data: { nodes, edges }
-      });
-      
-      // Update the current version number in currentFlow
-      if (versionResponse.data && currentFlow) {
-        const updatedFlow = {
-          ...currentFlow,
-          current_version: versionResponse.data.version_number,
-          flow_data: { nodes, edges }  // Include current editor state
-        };
-        // Update flows list to reflect new version
-        setFlows(prevFlows => 
-          prevFlows.map(f => f.id === currentFlow.id ? updatedFlow : f)
-        );
-        // Also update currentFlow in the editor
-        setCurrentFlow(updatedFlow);
-      }
-      
-      toast.success('Saved as new version successfully');
-    } catch (error: any) {
-      console.error('Failed to save as new version:', error);
-      if (error.response?.status === 503 || error.response?.status === 500) {
-        setVersionManagementAvailable(false);
-        toast.error('Version management is not available. The flow has been saved normally.', {
-          duration: 5000,
-          icon: '⚠️'
-        });
-      } else {
-        toast.error('Failed to save as new version');
-      }
-    }
-  };
+
+  // Memoize node and edge types to prevent ReactFlow warnings
+  const memoizedNodeTypes = useMemo(() => nodeTypes, []);
+  const memoizedEdgeTypes = useMemo(() => edgeTypes, []);
 
   // Memoize default edge options
   const defaultEdgeOptions = useMemo(() => ({
@@ -357,14 +495,52 @@ const ProcessFlowEditorContent: React.FC = () => {
                 </span>
               )}
             </div>
-            <button
-              onClick={saveFlow}
-              disabled={isSaving}
-              className="flex items-center space-x-1 px-3 py-1.5 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 text-sm"
-            >
-              <Save size={16} />
-              <span>{isSaving ? 'Saving...' : 'Save'}</span>
-            </button>
+            {/* Save Dropdown */}
+            <div ref={dropdownRef} className="relative">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                disabled={isSaving}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 text-sm"
+              >
+                <Save size={16} />
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg z-50 min-w-[180px]">
+                  <button
+                    onClick={() => {
+                      handleSaveAsNewVersion();
+                      setIsDropdownOpen(false);
+                    }}
+                    disabled={isSaving}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50 border-b border-gray-100"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Save size={14} />
+                      <span>Save as New Version</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">Creates a new version</div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleManualSave();
+                      setIsDropdownOpen(false);
+                    }}
+                    disabled={isSaving}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Save size={14} />
+                      <span>Update Current Version</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">Overwrites existing flow</div>
+                  </button>
+                </div>
+              )}
+            </div>
             <button
               onClick={() => setIsLoadDialogOpen(true)}
               className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
@@ -372,16 +548,6 @@ const ProcessFlowEditorContent: React.FC = () => {
               <FolderOpen size={16} />
               <span>Load</span>
             </button>
-            {currentFlow && versionManagementAvailable && (
-              <button
-                onClick={handleSaveAsNewVersion}
-                className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-                title={!versionManagementAvailable ? "Version management not available" : ""}
-              >
-                <Save size={16} />
-                <span>Save as Version</span>
-              </button>
-            )}
             <button
               onClick={handleExportFlow}
               className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
@@ -454,10 +620,11 @@ const ProcessFlowEditorContent: React.FC = () => {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onNodeDoubleClick={onNodeDoubleClick}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
+          nodeTypes={memoizedNodeTypes}
+          edgeTypes={memoizedEdgeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+          connectionMode="loose"
           snapToGrid={true}
           snapGrid={[15, 15]}
           fitView
@@ -542,6 +709,20 @@ const ProcessFlowEditorContent: React.FC = () => {
         <MeasurementSpecDialog
           isOpen={isMeasurementSpecDialogOpen}
           onClose={() => setIsMeasurementSpecDialogOpen(false)}
+        />
+
+        {/* Token Status Monitor */}
+        <TokenStatusMonitor
+          onSaveBeforeExpiry={handleSaveBeforeExpiry}
+        />
+
+        {/* Backup Recovery Modal */}
+        <BackupRecoveryModal
+          isOpen={showBackupRecovery}
+          onClose={() => setShowBackupRecovery(false)}
+          onRecover={handleBackupRecover}
+          onDiscard={handleBackupDiscard}
+          backupData={backupData}
         />
       </div>
     </div>
