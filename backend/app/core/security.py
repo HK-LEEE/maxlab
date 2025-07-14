@@ -262,6 +262,23 @@ async def get_current_user(
         AuthenticationError: 인증 실패시
     """
     token = credentials.credentials
+    
+    # Check token blacklist first
+    try:
+        from ..services.token_blacklist import get_token_blacklist
+        blacklist_service = get_token_blacklist()
+        
+        if blacklist_service and blacklist_service.is_token_blacklisted(token):
+            logger.warning("Access attempted with blacklisted token")
+            raise AuthenticationError("Token has been revoked")
+    except ImportError:
+        # Token blacklist service not available, continue
+        pass
+    except Exception as e:
+        logger.error(f"Error checking token blacklist: {e}")
+        # Continue with normal verification if blacklist check fails
+        pass
+    
     user_data = await verify_token_with_auth_server(token)
     
     # 사용자 그룹 정보 추가 조회

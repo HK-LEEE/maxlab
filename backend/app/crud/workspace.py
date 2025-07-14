@@ -4,8 +4,8 @@ MAX Lab MVP 플랫폼 워크스페이스 관련 CRUD 로직
 """
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, or_, update, delete
-from sqlalchemy.orm import selectinload
+from sqlalchemy import select, func, and_, or_, update, delete, exists
+from sqlalchemy.orm import selectinload, joinedload
 import logging
 import re
 import uuid
@@ -130,14 +130,15 @@ class WorkspaceCRUD:
         return result.scalar_one_or_none()
     
     async def get_with_details(self, db: AsyncSession, workspace_id: uuid.UUID) -> Optional[Workspace]:
-        """워크스페이스 상세 정보 조회 (그룹, 모듈 포함)"""
+        """워크스페이스 상세 정보 조회 (그룹, 모듈 포함) - 성능 최적화"""
+        # joinedload 사용으로 N+1 쿼리 문제 해결 (소규모 관련 데이터의 경우)
         stmt = select(Workspace).options(
-            selectinload(Workspace.workspace_groups),
-            selectinload(Workspace.mvp_modules)
+            joinedload(Workspace.workspace_groups),
+            joinedload(Workspace.mvp_modules)
         ).where(Workspace.id == workspace_id)
         
         result = await db.execute(stmt)
-        return result.scalar_one_or_none()
+        return result.unique().scalar_one_or_none()
     
     async def get_multi(
         self, 
@@ -156,30 +157,40 @@ class WorkspaceCRUD:
         if active_only:
             stmt = stmt.where(Workspace.is_active == True)
         
-        # 관리자가 아닌 경우 접근 권한이 있는 워크스페이스만 조회
+        # 관리자가 아닌 경우 접근 권한이 있는 워크스페이스만 조회 - EXISTS 최적화
         if not is_admin:
-            # Build permission conditions
+            # EXISTS를 사용하여 IN 서브쿼리보다 성능 향상
             permission_conditions = []
             
-            # Check user-based permissions
+            # 소유자 권한 확인
             if user_id:
-                user_subquery = select(WorkspaceUser.workspace_id).where(
-                    WorkspaceUser.user_id == user_id
-                )
-                permission_conditions.append(Workspace.id.in_(user_subquery))
+                permission_conditions.append(Workspace.owner_id == user_id)
             
-            # Check group-based permissions
+            # 사용자 기반 권한 확인 (EXISTS 사용)
+            if user_id:
+                user_exists = exists().where(
+                    and_(
+                        WorkspaceUser.workspace_id == Workspace.id,
+                        WorkspaceUser.user_id == user_id
+                    )
+                )
+                permission_conditions.append(user_exists)
+            
+            # 그룹 기반 권한 확인 (EXISTS 사용)
             if user_groups:
-                group_subquery = select(WorkspaceGroup.workspace_id).where(
-                    WorkspaceGroup.group_name.in_(user_groups)
+                group_exists = exists().where(
+                    and_(
+                        WorkspaceGroup.workspace_id == Workspace.id,
+                        WorkspaceGroup.group_name.in_(user_groups)
+                    )
                 )
-                permission_conditions.append(Workspace.id.in_(group_subquery))
+                permission_conditions.append(group_exists)
             
-            # Apply OR condition if we have any permission conditions
+            # OR 조건 적용
             if permission_conditions:
                 stmt = stmt.where(or_(*permission_conditions))
             else:
-                # No permissions - return empty result
+                # 권한 없음 - 빈 결과 반환
                 stmt = stmt.where(False)
         
         stmt = stmt.offset(skip).limit(limit).order_by(Workspace.created_at.desc())

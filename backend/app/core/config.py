@@ -18,11 +18,62 @@ class Settings(BaseSettings):
     # 데이터베이스 (PostgreSQL 17)
     DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/max_lab"
     
+    # 데이터베이스 SSL/TLS 보안 설정 (환경별 기본값)
+    DB_SSL_MODE: str = "disable"  # 개발: disable, 프로덕션: require
+    DB_SSL_CERT_PATH: Optional[str] = None  # 클라이언트 인증서 경로
+    DB_SSL_KEY_PATH: Optional[str] = None   # 클라이언트 키 경로
+    DB_SSL_CA_PATH: Optional[str] = None    # CA 인증서 경로
+    
+    @field_validator('DB_SSL_MODE')
+    @classmethod
+    def validate_ssl_mode(cls, v: str, info) -> str:
+        """환경에 따른 SSL 모드 자동 조정"""
+        # 환경 변수에서 직접 설정된 경우 그대로 사용
+        if hasattr(info.data, 'get') and 'ENVIRONMENT' in info.data:
+            env = info.data.get('ENVIRONMENT', 'development')
+        else:
+            env = 'development'
+        
+        # 프로덕션 환경에서는 SSL 보안 강화 권장
+        if env == 'production' and v == 'disable':
+            return 'require'  # 프로덕션에서는 최소 require 모드
+        
+        valid_modes = ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full']
+        if v not in valid_modes:
+            raise ValueError(f"DB_SSL_MODE must be one of {valid_modes}")
+        
+        return v
+    
     # 보안
     SECRET_KEY: str = "max-lab-secret-key-change-this-in-production"
     JWT_SECRET_KEY: str = "max-lab-jwt-secret-key-change-this"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    
+    # CSRF 보안 설정
+    CSRF_SECRET_KEY: str = "csrf-secret-key-change-this-in-production"
+    CSRF_TOKEN_LENGTH: int = 32
+    CSRF_COOKIE_NAME: str = "csrf_token"
+    CSRF_HEADER_NAME: str = "X-CSRF-Token"
+    CSRF_COOKIE_SAMESITE: str = "strict"
+    CSRF_COOKIE_SECURE: bool = False  # Set to True in production with HTTPS
+    
+    # 세션 보안 설정
+    SESSION_SECRET_KEY: str = "session-secret-key-change-this-in-production"
+    SESSION_COOKIE_NAME: str = "maxlab_session"
+    SESSION_LIFETIME_SECONDS: int = 3600  # 1 hour
+    SESSION_REMEMBER_ME_LIFETIME_SECONDS: int = 86400 * 30  # 30 days
+    SESSION_MAX_PER_USER: int = 5
+    SESSION_RENEWAL_THRESHOLD_SECONDS: int = 300  # 5 minutes
+    SESSION_COOKIE_SECURE: bool = False  # Set to True in production with HTTPS
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SAMESITE: str = "strict"
+    
+    # 레이트 리미팅 설정
+    REDIS_URL: str = "redis://localhost:6379/0"
+    RATE_LIMITING_ENABLED: bool = True
+    RATE_LIMITING_FAIL_OPEN: bool = True  # Allow requests if Redis is down
+    RATE_LIMITING_HEADERS_ENABLED: bool = True  # Include rate limit headers in responses
     
     # 외부 인증 서버 (localhost:8000의 MAXDP 인증 서버)
     AUTH_SERVER_URL: str = "http://localhost:8000"

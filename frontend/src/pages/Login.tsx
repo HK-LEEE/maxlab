@@ -19,6 +19,13 @@ export const Login: React.FC = () => {
   const [silentLoginAttempting, setSilentLoginAttempting] = useState(true);
   const authAttemptRef = useRef(false);
   const mountedRef = useRef(true);
+  
+  // Traditional login state
+  const [showTraditionalLogin, setShowTraditionalLogin] = useState(false);
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [traditionalLoading, setTraditionalLoading] = useState(false);
+  const [authMethods] = useState({ oauth: true, traditional: false, methods: ['oauth'] });
 
   // URL 매개변수에서 return URL 가져오기
   const getReturnUrl = () => {
@@ -43,8 +50,9 @@ export const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate, oauthLoading]);
 
-  // 페이지 로드 시 자동 Silent 로그인 시도 (중복 방지)
+  // 페이지 로드 시 인증 방법 체크 및 Silent 로그인 시도
   useEffect(() => {
+    
     // 이미 시도했거나 이미 인증된 경우 스킵
     if (authAttemptRef.current || isAuthenticated) {
       setSilentLoginAttempting(false);
@@ -155,6 +163,8 @@ export const Login: React.FC = () => {
     }
   };
 
+
+
   const handleSignupRedirect = () => {
     authService.redirectToSignup();
   };
@@ -210,20 +220,23 @@ export const Login: React.FC = () => {
             </p>
 
             {/* OAuth Login Button */}
-            <button
-              onClick={handleOAuthLogin}
-              disabled={oauthLoading || isAuthenticated}
-              className={`w-full py-4 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors flex items-center justify-center space-x-3 shadow-md ${
-                oauthLoading || isAuthenticated 
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              <LogIn size={24} />
-              <span className="text-lg">
-                {oauthLoading ? 'MAX Platform 연결 중...' : 'MAX Platform으로 로그인'}
-              </span>
-            </button>
+            {authMethods.oauth && (
+              <button
+                onClick={handleOAuthLogin}
+                disabled={oauthLoading || isAuthenticated}
+                className={`w-full py-4 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors flex items-center justify-center space-x-3 shadow-md ${
+                  oauthLoading || isAuthenticated 
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                <LogIn size={24} />
+                <span className="text-lg">
+                  {oauthLoading ? 'MAX Platform 연결 중...' : 'MAX Platform으로 로그인'}
+                </span>
+              </button>
+            )}
+
           </div>
 
           {/* Benefits Section */}

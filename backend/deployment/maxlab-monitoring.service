@@ -1,0 +1,40 @@
+[Unit]
+Description=MaxLab Database Monitoring Daemon
+Documentation=https://github.com/maxlab/maxlab
+After=network.target postgresql.service maxlab-backup.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=lee
+Group=lee
+WorkingDirectory=/home/lee/proejct/maxlab/backend
+Environment=PATH=/home/lee/proejct/maxlab/backend/.venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/home/lee/proejct/maxlab/backend
+ExecStart=/home/lee/proejct/maxlab/backend/.venv/bin/python /home/lee/proejct/maxlab/backend/scripts/monitoring_daemon.py --daemon --interval=300
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+# 로그 설정
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=maxlab-monitoring
+
+# 보안 설정
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/lee/proejct/maxlab/backend/monitoring_reports
+ReadWritePaths=/home/lee/proejct/maxlab/backend/logs
+ReadWritePaths=/tmp
+
+# 리소스 제한
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target

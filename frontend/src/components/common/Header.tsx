@@ -3,6 +3,8 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, LogOut, User, Bell, Sparkles, Settings } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { getAvatarColor, getInitials } from '../../utils/avatar';
+import { useSecureLogout } from '../../hooks/useSecureLogout';
+import LogoutConfirmationDialog from './LogoutConfirmationDialog';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -94,9 +96,20 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onClose, onLogo
 export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const isMainPage = location.pathname === '/';
   const [showDropdown, setShowDropdown] = useState(false);
+  
+  // Secure logout functionality
+  const {
+    showConfirmation,
+    isLoading,
+    error,
+    showLogoutConfirmation,
+    hideLogoutConfirmation,
+    handleLogoutConfirm,
+    clearError
+  } = useSecureLogout();
 
   // 현재 페이지 제목 가져오기
   const getCurrentPageTitle = () => {
@@ -115,7 +128,12 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
   };
 
   const handleLogout = () => {
-    logout();
+    setShowDropdown(false);
+    showLogoutConfirmation();
+  };
+
+  const handleLogoutComplete = async (logoutAll?: boolean) => {
+    await handleLogoutConfirm(logoutAll);
     navigate('/login');
   };
 
@@ -183,6 +201,29 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
           )}
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmationDialog
+        isOpen={showConfirmation}
+        onClose={hideLogoutConfirmation}
+        onConfirm={handleLogoutComplete}
+        userEmail={user?.email}
+      />
+
+      {/* Error Display */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg z-50">
+          <div className="flex items-center justify-between">
+            <span>{error}</span>
+            <button
+              onClick={clearError}
+              className="ml-4 text-red-500 hover:text-red-700"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

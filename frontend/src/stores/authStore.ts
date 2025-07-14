@@ -41,14 +41,24 @@ export const useAuthStore = create<AuthState>()(
         set({ user: normalizedUser, isAuthenticated: true });
       },
       
-      logout: () => {
-        // OAuth 토큰 및 관련 데이터 정리
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('tokenType');
-        localStorage.removeItem('expiresIn');
-        localStorage.removeItem('scope');
-        sessionStorage.clear(); // OAuth 세션 데이터 정리
+      logout: async () => {
+        // Enhanced logout with token revocation
+        try {
+          // Import authService dynamically to avoid circular dependencies
+          const { authService } = await import('../services/authService');
+          await authService.logout();
+        } catch (error) {
+          console.error('Enhanced logout failed, performing basic cleanup:', error);
+          
+          // Fallback: basic cleanup
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('tokenType');
+          localStorage.removeItem('expiresIn');
+          localStorage.removeItem('scope');
+          sessionStorage.clear();
+        }
         
+        // Always clear auth store state
         set({ user: null, isAuthenticated: false });
       },
       

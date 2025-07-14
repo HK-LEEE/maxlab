@@ -17,6 +17,15 @@ import { ProcessFlowMonitor } from './workspaces/personal_test/pages/ProcessFlow
 import { ProcessFlowPublish } from './workspaces/personal_test/pages/ProcessFlowPublish';
 import { PublicProcessFlowMonitor } from './workspaces/personal_test/pages/PublicProcessFlowMonitor';
 import { Profile } from './pages/Profile';
+import { TokenExpiryNotification, TokenStatusDebug } from './components/TokenExpiryNotification';
+import TokenRefreshTester from './components/TokenRefreshTester';
+import { registerGlobalTokenTestHelpers } from './utils/tokenTestUtils';
+import { registerOAuthTestHelpers } from './utils/oauthServerTest';
+import { registerSessionTestHelpers } from './utils/sessionPersistenceTest';
+import { registerTokenRotationTestHelpers } from './utils/tokenRotationTest';
+import { registerEncryptionTestHelpers } from './utils/encryptionTestUtils';
+import { registerSecurityEventTestHelpers } from './utils/securityEventTestUtils';
+import { registerTokenFlowTestHelpers } from './utils/tokenFlowAutomatedTest';
 import './styles/index.css';
 
 console.log('App.tsx loaded');
@@ -51,15 +60,17 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
+const AuthRefreshProvider: React.FC = () => {
+  useAuthRefresh();
+  return null;
+};
+
 function App() {
   console.log('App component rendering');
   const [isInitializing, setIsInitializing] = useState(true);
   const setAuth = useAuthStore((state) => state.setAuth);
   const logout = useAuthStore((state) => state.logout);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
-  // 자동 토큰 갱신 시작
-  useAuthRefresh();
   
   // 자동 로그아웃 이벤트 리스너
   useEffect(() => {
@@ -89,6 +100,17 @@ function App() {
       window.removeEventListener('auth:logout', handleAutoLogout as EventListener);
     };
   }, [logout]);
+  
+  // 개발 환경에서 토큰 테스트 헬퍼 등록
+  useEffect(() => {
+    registerGlobalTokenTestHelpers();
+    registerOAuthTestHelpers();
+    registerSessionTestHelpers();
+    registerTokenRotationTestHelpers();
+    registerEncryptionTestHelpers();
+    registerSecurityEventTestHelpers();
+    registerTokenFlowTestHelpers();
+  }, []);
   
   // App 시작 시 자동 Silent 로그인 시도
   useEffect(() => {
@@ -153,6 +175,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <AuthRefreshProvider />
+        <TokenExpiryNotification />
+        <TokenStatusDebug />
+        <TokenRefreshTester />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />

@@ -21,6 +21,14 @@ from .routers.files import router as files_router
 from .routers.mvp_modules import router as mvp_modules_router
 from .routers.personal_test_process_flow import router as personal_test_process_flow_router
 from .routers.external import router as external_router
+from .api.v1.endpoints.csrf import router as csrf_router
+from .api.v1.endpoints.session import router as session_router
+from .api.v1.endpoints.rate_limit import router as rate_limit_router
+from .api.v1.endpoints.token_blacklist import router as token_blacklist_router
+from .middleware.csrf_protection import CSRFConfig
+from .middleware.session_middleware import SecureSessionMiddleware
+from .middleware.rate_limiting import RateLimitingConfig
+from .services.session_manager import SessionConfig
 
 # 동적 MVP 로더 임포트
 import sys
@@ -53,6 +61,18 @@ async def lifespan(app: FastAPI):
         async for db in get_db():
             await ensure_tables_exist(db)
             break
+        
+        # Initialize token blacklist service
+        try:
+            import redis
+            from .services.token_blacklist import initialize_token_blacklist
+            
+            redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+            initialize_token_blacklist(redis_client)
+            logger.info("✅ Token blacklist service initialized")
+        except Exception as e:
+            logger.warning(f"⚠️ Token blacklist service initialization failed: {e}")
+            # Continue without blacklist service
         
         # MVP 모듈 동적 로딩
         if settings.AUTO_LOAD_MODULES:
@@ -98,7 +118,48 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS 미들웨어 설정
+# 세션 관리 미들웨어 설정
+session_config = SessionConfig(
+    session_lifetime=settings.SESSION_LIFETIME_SECONDS,
+    max_sessions_per_user=settings.SESSION_MAX_PER_USER,
+    session_renewal_threshold=settings.SESSION_RENEWAL_THRESHOLD_SECONDS,
+    secure_cookies=settings.SESSION_COOKIE_SECURE,
+    httponly_cookies=settings.SESSION_COOKIE_HTTPONLY,
+    samesite_policy=settings.SESSION_COOKIE_SAMESITE,
+    encryption_key=settings.SESSION_SECRET_KEY,
+    cookie_name=settings.SESSION_COOKIE_NAME,
+    remember_me_lifetime=settings.SESSION_REMEMBER_ME_LIFETIME_SECONDS
+)
+app.add_middleware(
+    SecureSessionMiddleware,
+    config=session_config,
+    exempt_paths={
+        "/docs", "/redoc", "/openapi.json", "/favicon.ico",
+        "/api/v1/health", "/api/v1/csrf/", "/static/",
+        "/api/v1/auth/", "/api/oauth/"
+    }
+)
+
+# CSRF 보호 미들웨어 설정 (세션 이후에 추가) - 임시 비활성화
+# csrf_config = CSRFConfig(
+#     secret_key=settings.CSRF_SECRET_KEY,
+#     token_length=settings.CSRF_TOKEN_LENGTH,
+#     cookie_name=settings.CSRF_COOKIE_NAME,
+#     header_name=settings.CSRF_HEADER_NAME,
+#     cookie_samesite=settings.CSRF_COOKIE_SAMESITE,
+#     cookie_secure=settings.CSRF_COOKIE_SECURE,
+#     exempt_paths={
+#         "/docs", "/redoc", "/openapi.json", "/favicon.ico",
+#         "/api/v1/health", "/api/v1/csrf/token", "/api/v1/csrf/status",
+#         "/api/v1/auth/", "/api/oauth/", "/"
+#     }
+# )
+# app.add_middleware(csrf_config.create_middleware(app))
+
+# 레이트 리미팅 미들웨어 설정 (CSRF 이후, CORS 이전에 추가) - 완전히 제거
+# Rate limiting middleware is temporarily disabled due to configuration issues
+
+# CORS 미들웨어 설정 (마지막에 추가)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
@@ -109,6 +170,10 @@ app.add_middleware(
 
 # 기본 API 라우터 포함
 app.include_router(health_router, prefix="/api/v1", tags=["Health"])
+app.include_router(csrf_router, prefix="/api/v1/csrf", tags=["CSRF"])
+app.include_router(session_router, prefix="/api/v1/session", tags=["Session"])
+app.include_router(rate_limit_router, prefix="/api/v1/rate-limit", tags=["Rate Limiting"])
+app.include_router(token_blacklist_router, prefix="/api/v1/token-blacklist", tags=["Token Blacklist"])
 app.include_router(workspaces_router, prefix="/api/v1")
 app.include_router(auth_proxy_router, prefix="/api/v1")
 app.include_router(files_router, prefix="/api/v1")

@@ -8,6 +8,8 @@ export interface TokenResponse {
   token_type: string;
   expires_in: number;
   scope: string;
+  refresh_token?: string;
+  refresh_expires_in?: number;
 }
 
 export interface OAuthMessage {
@@ -108,7 +110,7 @@ export class PopupOAuthLogin {
           // Origin 검증
           const trustedOrigins = [
             window.location.origin,
-            'http://localhost:3000'  // MAX Platform
+            this.authUrl  // OAuth 서버 URL (환경 변수에서 가져옴)
           ];
           
           if (!trustedOrigins.includes(event.origin)) {

@@ -372,7 +372,25 @@ class FileCRUD:
             dir_count_result = await db.execute(dir_count_query)
             dir_count = dir_count_result.scalar()
             
-            # MIME 타입별 통계
+            # MIME 타입별 통계 - 단일 쿼리로 최적화
+            from sqlalchemy import case
+            
+            # 모든 통계를 하나의 쿼리로 계산
+            combined_stats_query = select(
+                func.sum(self.model.file_size).label("total_size"),
+                func.count(case((self.model.is_directory == False, 1))).label("file_count"),
+                func.count(case((self.model.is_directory == True, 1))).label("dir_count")
+            ).where(
+                and_(
+                    self.model.workspace_id == uuid.UUID(workspace_id),
+                    self.model.is_deleted == False
+                )
+            )
+            
+            combined_result = await db.execute(combined_stats_query)
+            combined_data = combined_result.first()
+            
+            # MIME 타입별 세부 통계
             type_stats_query = select(
                 self.model.mime_type,
                 func.count(self.model.id).label("count"),
@@ -394,9 +412,9 @@ class FileCRUD:
                 }
             
             return {
-                "total_size": total_data.total_size or 0,
-                "file_count": file_count or 0,
-                "directory_count": dir_count or 0,
+                "total_size": combined_data.total_size or 0,
+                "file_count": combined_data.file_count or 0,
+                "directory_count": combined_data.dir_count or 0,
                 "by_type": type_stats
             }
             

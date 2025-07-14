@@ -4,7 +4,10 @@
  */
 
 import { PopupOAuthLogin, getUserInfo } from '../utils/popupOAuth';
-import { attemptSilentLogin } from '../utils/silentAuth';
+import { attemptSilentLogin, isSafePageForTokenRefresh } from '../utils/silentAuth';
+import { tokenRefreshManager } from './tokenRefreshManager';
+import { tokenBlacklistService } from './tokenBlacklistService';
+import { refreshTokenService, type TokenResponse } from './refreshTokenService';
 import type { User } from '../types/auth';
 
 export interface AuthServiceResult {
@@ -28,16 +31,15 @@ export const authService = {
       
       const userInfo = await getUserInfo(tokenResponse.access_token);
       
-      // 토큰 저장 (만료 시간 정확히 계산)
-      const currentTime = Date.now();
-      const expiryTime = currentTime + (tokenResponse.expires_in * 1000);
-      
-      localStorage.setItem('accessToken', tokenResponse.access_token);
-      localStorage.setItem('tokenType', tokenResponse.token_type || 'Bearer');
-      localStorage.setItem('expiresIn', tokenResponse.expires_in.toString());
-      localStorage.setItem('tokenExpiryTime', expiryTime.toString());
-      localStorage.setItem('scope', tokenResponse.scope);
-      localStorage.setItem('tokenCreatedAt', currentTime.toString());
+      // 토큰 저장 (RefreshTokenService 사용)
+      await refreshTokenService.storeTokens({
+        access_token: tokenResponse.access_token,
+        token_type: tokenResponse.token_type || 'Bearer',
+        expires_in: tokenResponse.expires_in,
+        scope: tokenResponse.scope,
+        refresh_token: tokenResponse.refresh_token,
+        refresh_expires_in: tokenResponse.refresh_expires_in
+      });
       
       console.log('📋 User info received:', userInfo);
       
@@ -58,6 +60,7 @@ export const authService = {
       console.log('👤 Mapped user:', user);
       
       // 사용자 정보와 함께 생성 시간 저장
+      const currentTime = Date.now();
       const userWithMetadata = {
         ...user,
         created_at: currentTime,
@@ -99,18 +102,24 @@ export const authService = {
         
         const userInfo = await getUserInfo(result.token);
         
-        // 토큰 저장 (만료 시간 정확히 계산)
-        const currentTime = Date.now();
-        const expiresInSeconds = result.tokenData?.expires_in || 3600;
-        const expiryTime = currentTime + (expiresInSeconds * 1000);
-        
-        localStorage.setItem('accessToken', result.token);
+        // 토큰 저장 (RefreshTokenService 사용)
         if (result.tokenData) {
-          localStorage.setItem('tokenType', result.tokenData.token_type || 'Bearer');
-          localStorage.setItem('expiresIn', expiresInSeconds.toString());
-          localStorage.setItem('tokenExpiryTime', expiryTime.toString());
-          localStorage.setItem('scope', result.tokenData.scope || 'read:profile read:groups manage:workflows');
-          localStorage.setItem('tokenCreatedAt', currentTime.toString());
+          await refreshTokenService.storeTokens({
+            access_token: result.token,
+            token_type: result.tokenData.token_type || 'Bearer',
+            expires_in: result.tokenData.expires_in || 3600,
+            scope: result.tokenData.scope || 'read:profile read:groups manage:workflows',
+            refresh_token: result.tokenData.refresh_token,
+            refresh_expires_in: result.tokenData.refresh_expires_in
+          });
+        } else {
+          // Fallback for when tokenData is not available
+          await refreshTokenService.storeTokens({
+            access_token: result.token,
+            token_type: 'Bearer',
+            expires_in: 3600,
+            scope: 'read:profile read:groups manage:workflows'
+          });
         }
         
         // 사용자 정보 매핑 (안전한 기본값 처리)
@@ -128,6 +137,7 @@ export const authService = {
         };
         
         // 사용자 정보와 함께 생성 시간 저장
+        const currentTime = Date.now();
         const userWithMetadata = {
           ...user,
           created_at: currentTime,
@@ -215,54 +225,87 @@ export const authService = {
   },
 
   /**
-   * 로그아웃
+   * 로그아웃 - 보안 강화 (Refresh Token 포함)
    */
   logout: async (): Promise<void> => {
     try {
       const accessToken = localStorage.getItem('accessToken');
+      
+      // First, blacklist the token on our backend
       if (accessToken) {
-        // 토큰 취소 요청
-        const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
-        await fetch(`${authUrl}/api/oauth/revoke`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            token: accessToken,
-            client_id: import.meta.env.VITE_CLIENT_ID || 'maxlab'
-          })
-        });
+        try {
+          await tokenBlacklistService.blacklistCurrentToken('user_logout');
+          console.log('✅ Token blacklisted on backend');
+        } catch (error) {
+          console.warn('⚠️ Failed to blacklist token on backend:', error);
+          // Continue with logout even if blacklisting fails
+        }
       }
+      
+      // Enhanced logout with refresh token revocation
+      await refreshTokenService.secureLogout();
+      
     } catch (error) {
       console.error('Logout error:', error);
+      // 로그아웃 에러는 로그만 남기고 계속 진행
     } finally {
-      // 로컬 데이터 정리
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('tokenType');
-      localStorage.removeItem('expiresIn');
-      localStorage.removeItem('tokenExpiryTime');
-      localStorage.removeItem('tokenCreatedAt');
-      localStorage.removeItem('scope');
-      localStorage.removeItem('user');
-      
-      // 세션 스토리지 정리
-      sessionStorage.removeItem('oauth_state');
-      sessionStorage.removeItem('oauth_code_verifier');
-      sessionStorage.removeItem('oauth_popup_mode');
-      sessionStorage.removeItem('silent_oauth_state');
-      sessionStorage.removeItem('silent_oauth_code_verifier');
+      // 강화된 로컬 데이터 정리
+      await authService._secureCleanup();
     }
   },
 
   /**
-   * 인증 상태 확인
+   * 보안 강화된 데이터 정리 - Refresh Token 포함
+   */
+  _secureCleanup: async (): Promise<void> => {
+    // 현재 토큰을 블랙리스트에 추가
+    const currentToken = localStorage.getItem('accessToken');
+    if (currentToken) {
+      tokenRefreshManager.blacklistToken(currentToken, 'logout');
+    }
+
+    // RefreshTokenService를 통한 완전한 토큰 정리
+    await refreshTokenService.clearAllTokens();
+    
+    // 세션 스토리지 정리 (모든 OAuth 관련 데이터)
+    const sessionKeysToRemove = [
+      'oauth_state',
+      'oauth_code_verifier',
+      'oauth_popup_mode',
+      'silent_oauth_state',
+      'silent_oauth_code_verifier',
+      'oauth_nonce',
+      'csrf_token'
+    ];
+
+    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
+
+    // 쿠키 정리 (있다면)
+    document.cookie.split(';').forEach(cookie => {
+      const name = cookie.split('=')[0].trim();
+      if (name.includes('auth') || name.includes('token') || name.includes('session')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; secure; samesite=strict`;
+      }
+    });
+    
+    console.log('🧹 Complete secure cleanup finished');
+  },
+
+  /**
+   * 인증 상태 확인 - 보안 강화
    */
   isAuthenticated: (): boolean => {
     const accessToken = localStorage.getItem('accessToken');
     const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
     
     if (!accessToken) {
+      return false;
+    }
+
+    // 토큰 블랙리스트 확인
+    if (tokenRefreshManager.isTokenBlacklisted(accessToken)) {
+      console.log('🚫 Token is blacklisted, clearing storage');
+      authService._secureCleanup();
       return false;
     }
     
@@ -275,7 +318,17 @@ export const authService = {
       const bufferTime = 5 * 60 * 1000; // 5 minutes
       
       if (now >= expiryTime) {
-        console.log('Token expired, clearing storage');
+        console.log('Access token expired');
+        tokenRefreshManager.blacklistToken(accessToken, 'expired');
+        
+        // Access token이 만료되었지만 refresh token이 유효하면 갱신 가능
+        if (refreshTokenService.isRefreshTokenValid()) {
+          console.log('Access token expired but refresh token is valid, authentication can be renewed');
+          return true; // 갱신 가능하므로 인증된 상태로 간주
+        }
+        
+        // 둘 다 만료된 경우 로그아웃
+        console.log('Both access and refresh tokens expired, logging out');
         authService.logout();
         return false;
       } else if (now >= (expiryTime - bufferTime)) {
@@ -313,85 +366,33 @@ export const authService = {
   },
 
   /**
-   * 인증 토큰 갱신
+   * 인증 토큰 갱신 - Refresh Token 우선 처리
    */
   refreshToken: async (): Promise<boolean> => {
-    try {
-      console.log('🔄 Attempting token refresh...');
-      
-      // 현재 토큰이 있는지 확인
-      const currentToken = localStorage.getItem('accessToken');
-      if (!currentToken) {
-        console.log('❌ No current token to refresh');
-        return false;
+    return tokenRefreshManager.refreshToken(async () => {
+      try {
+        const result = await authService.attemptSilentLogin();
+        return {
+          success: result.success,
+          token: result.success ? localStorage.getItem('accessToken') || undefined : undefined,
+          error: result.error
+        };
+      } catch (error: any) {
+        return {
+          success: false,
+          error: error.message || 'Silent auth failed'
+        };
       }
-
-      // Silent authentication으로 토큰 갱신 시도
-      const result = await authService.attemptSilentLogin();
-      
-      if (result.success) {
-        console.log('✅ Token refresh successful');
-        return true;
-      } else {
-        console.log('❌ Token refresh failed:', result.error);
-        
-        // 특정 에러에 따른 처리
-        if (result.error === 'Cannot attempt silent auth on current page' || 
-            result.error === 'Silent authentication not supported' ||
-            result.error === 'Silent authentication already in progress') {
-          console.log('ℹ️ Silent auth not possible, checking current token validity');
-          
-          // 현재 토큰이 여전히 유효한지 확인
-          if (authService.isAuthenticated()) {
-            console.log('ℹ️ Current token still valid, keeping it');
-            return true;
-          }
-        }
-        
-        // 로그인이 필요한 경우 또는 토큰이 만료된 경우
-        if (result.error === 'login_required' || result.error === 'silent_auth_timeout') {
-          console.log('🔓 Authentication required, checking if token is still usable');
-          
-          // 마지막으로 현재 토큰 검증 시도
-          const isStillValid = await authService.validateToken();
-          if (isStillValid) {
-            console.log('ℹ️ Current token validated successfully, keeping it');
-            return true;
-          } else {
-            console.log('🔓 Token validation failed, clearing auth');
-            await authService.logout();
-            return false;
-          }
-        }
-        
-        // 기타 에러의 경우 기존 토큰 유효성 확인
-        if (authService.isAuthenticated()) {
-          console.log('ℹ️ Current token still valid despite refresh failure, keeping it');
-          return true;
-        } else {
-          console.log('🔓 Token refresh failed and current token expired, clearing auth');
-          await authService.logout();
-          return false;
-        }
-      }
-    } catch (error: any) {
-      console.error('Token refresh error:', error);
-      
-      // 에러 발생 시에도 현재 토큰 확인
-      if (authService.isAuthenticated()) {
-        console.log('ℹ️ Refresh error but current token still valid, keeping it');
-        return true;
-      }
-      
-      return false;
-    }
+    });
   },
 
   /**
-   * 자동 토큰 갱신 시작
+   * 자동 토큰 갱신 시작 - 최적화된 로직
    */
   startAutoTokenRefresh: (): (() => void) => {
     let refreshInterval: NodeJS.Timeout;
+    let lastRefreshAttempt = 0;
+    let consecutiveFailures = 0;
     
     const checkAndRefresh = async () => {
       try {
@@ -401,37 +402,125 @@ export const authService = {
           return;
         }
 
-        if (authService.needsTokenRefresh()) {
-          console.log('🔄 Token needs refresh, attempting automatic refresh...');
+        // 현재 페이지에서 토큰 갱신이 안전한지 확인
+        if (!isSafePageForTokenRefresh()) {
+          console.log('🔐 Current page not safe for token refresh, skipping...');
+          return;
+        }
+
+        // 토큰 갱신 필요 여부 확인
+        const needsRefresh = authService.needsTokenRefresh();
+        const hasValidRefreshToken = refreshTokenService.isRefreshTokenValid();
+        
+        if (needsRefresh) {
+          // 너무 빈번한 갱신 시도 방지 (30초 쿨다운)
+          const now = Date.now();
+          if (now - lastRefreshAttempt < 30000) {
+            console.log('🔄 Token refresh attempted too recently, skipping...');
+            return;
+          }
+
+          lastRefreshAttempt = now;
+          
+          console.log(`🔄 Token needs refresh, attempting automatic refresh... (Method: ${hasValidRefreshToken ? 'refresh_token' : 'silent_auth'})`);
+          
           const success = await authService.refreshToken();
           
-          if (!success) {
-            console.log('❌ Auto token refresh failed, logging out user');
-            clearInterval(refreshInterval);
+          if (success) {
+            console.log('✅ Auto token refresh successful');
+            consecutiveFailures = 0; // 성공 시 실패 카운터 리셋
+          } else {
+            consecutiveFailures++;
+            console.log(`❌ Auto token refresh failed (attempt ${consecutiveFailures})`);
             
-            // 자동 로그아웃 수행
-            await authService.logout();
-            
-            // 로그인 페이지로 리다이렉트 (앱 수준에서 처리되도록 이벤트 발송)
-            window.dispatchEvent(new CustomEvent('auth:logout', { 
-              detail: { reason: 'token_refresh_failed' } 
-            }));
+            // 3번 연속 실패 시 로그아웃
+            if (consecutiveFailures >= 3) {
+              console.log('❌ Multiple consecutive refresh failures, logging out user');
+              clearInterval(refreshInterval);
+              
+              // 자동 로그아웃 수행
+              await authService.logout();
+              
+              // 로그인 페이지로 리다이렉트 (앱 수준에서 처리되도록 이벤트 발송)
+              window.dispatchEvent(new CustomEvent('auth:logout', { 
+                detail: { reason: 'token_refresh_failed', attempts: consecutiveFailures } 
+              }));
+              return;
+            }
+          }
+        } else {
+          // 갱신이 필요하지 않으면 실패 카운터 리셋
+          if (consecutiveFailures > 0) {
+            console.log('🔄 Token refresh no longer needed, resetting failure counter');
+            consecutiveFailures = 0;
           }
         }
+
+        // Refresh Token 만료 임박 알림 (1일 전)
+        if (hasValidRefreshToken && refreshTokenService.needsRefreshTokenRenewal()) {
+          console.log('⚠️ Refresh token expires soon, user should re-authenticate');
+          window.dispatchEvent(new CustomEvent('auth:refresh_token_expiring', {
+            detail: { 
+              timeToExpiry: refreshTokenService.getRefreshTokenTimeToExpiry(),
+              message: 'Your session will expire soon. Please log in again to maintain access.'
+            }
+          }));
+        }
+
       } catch (error) {
         console.error('Auto token refresh check error:', error);
+        consecutiveFailures++;
+        
+        // 치명적 에러 시에도 3회 실패 규칙 적용
+        if (consecutiveFailures >= 3) {
+          console.log('❌ Critical errors in token refresh, forcing logout');
+          clearInterval(refreshInterval);
+          await authService.logout();
+          window.dispatchEvent(new CustomEvent('auth:logout', { 
+            detail: { reason: 'critical_error', error: error.message } 
+          }));
+        }
       }
     };
 
-    // 매 1분마다 토큰 상태 확인
-    refreshInterval = setInterval(checkAndRefresh, 60 * 1000);
-    
-    // 즉시 한 번 확인
+    // 동적 인터벌 설정
+    const getRefreshInterval = () => {
+      const accessTokenTimeToExpiry = authService.getTokenTimeToExpiry();
+      
+      // Access token 만료까지 5분 이하면 30초마다 체크
+      if (accessTokenTimeToExpiry <= 300) {
+        return 30 * 1000; // 30초
+      }
+      
+      // Access token 만료까지 30분 이하면 1분마다 체크
+      if (accessTokenTimeToExpiry <= 1800) {
+        return 60 * 1000; // 1분
+      }
+      
+      // 그 외의 경우 5분마다 체크
+      return 5 * 60 * 1000; // 5분
+    };
+
+    // 초기 체크
     checkAndRefresh();
+
+    // 동적 인터벌로 갱신 체크
+    const startDynamicInterval = () => {
+      const interval = getRefreshInterval();
+      refreshInterval = setTimeout(() => {
+        checkAndRefresh().then(() => {
+          startDynamicInterval(); // 재귀적으로 다음 인터벌 설정
+        });
+      }, interval);
+    };
+
+    startDynamicInterval();
 
     // 정리 함수 반환
     return () => {
-      clearInterval(refreshInterval);
+      if (refreshInterval) {
+        clearTimeout(refreshInterval);
+      }
     };
   },
 
@@ -450,7 +539,7 @@ export const authService = {
   },
 
   /**
-   * 토큰 갱신 필요 여부 확인
+   * 토큰 갱신 필요 여부 확인 - Refresh Token 고려
    */
   needsTokenRefresh: (): boolean => {
     const accessToken = localStorage.getItem('accessToken');
@@ -464,7 +553,15 @@ export const authService = {
     const now = Date.now();
     const bufferTime = 5 * 60 * 1000; // 5 minutes
     
-    return now >= (expiryTime - bufferTime);
+    // Access token이 갱신이 필요한 시점이고, refresh token이나 다른 갱신 방법이 있는 경우
+    const needsRefresh = now >= (expiryTime - bufferTime);
+    
+    if (needsRefresh) {
+      // Refresh token이 유효하거나 silent auth 가능한 경우 갱신 시도
+      return refreshTokenService.isRefreshTokenValid() || isSafePageForTokenRefresh();
+    }
+    
+    return false;
   },
 
   /**
@@ -484,11 +581,12 @@ export const authService = {
   },
 
   /**
-   * 디버깅 정보
+   * 디버깅 정보 - Refresh Token 정보 포함
    */
   getAuthDebugInfo: () => {
     const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
     const tokenCreatedAt = localStorage.getItem('tokenCreatedAt');
+    const refreshTokenDebug = refreshTokenService.getDebugInfo();
     
     return {
       isAuthenticated: authService.isAuthenticated(),
@@ -501,11 +599,13 @@ export const authService = {
       tokenCreatedAt: tokenCreatedAt ? new Date(parseInt(tokenCreatedAt)).toISOString() : null,
       scope: localStorage.getItem('scope'),
       user: authService.getStoredUser(),
+      refreshToken: refreshTokenDebug,
       sessionData: {
         oauth_state: sessionStorage.getItem('oauth_state'),
         silent_oauth_state: sessionStorage.getItem('silent_oauth_state'),
         oauth_popup_mode: sessionStorage.getItem('oauth_popup_mode')
-      }
+      },
+      tokenRefreshManager: tokenRefreshManager.getRefreshStatus()
     };
   }
 };

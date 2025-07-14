@@ -9,6 +9,7 @@ from typing import AsyncGenerator
 import logging
 
 from .config import settings
+import ssl
 
 logger = logging.getLogger(__name__)
 
@@ -16,13 +17,66 @@ class Base(DeclarativeBase):
     """모든 데이터베이스 모델의 기본 클래스"""
     pass
 
-# 비동기 엔진 생성
+def _get_database_connect_args() -> dict:
+    """데이터베이스 연결 인수 생성 (SSL 설정 포함)"""
+    if "postgresql" not in settings.DATABASE_URL:
+        return {}
+    
+    connect_args = {
+        "server_settings": {
+            "application_name": "maxlab_backend",
+            "jit": "off",  # JIT 비활성화로 안정성 향상
+        }
+    }
+    
+    # SSL 설정 적용
+    if settings.DB_SSL_MODE and settings.DB_SSL_MODE != "disable":
+        try:
+            ssl_context = ssl.create_default_context()
+            
+            # SSL 모드에 따른 설정
+            if settings.DB_SSL_MODE == "require":
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+            elif settings.DB_SSL_MODE == "verify-ca":
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+                if settings.DB_SSL_CA_PATH:
+                    ssl_context.load_verify_locations(settings.DB_SSL_CA_PATH)
+            elif settings.DB_SSL_MODE == "verify-full":
+                ssl_context.check_hostname = True
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+                if settings.DB_SSL_CA_PATH:
+                    ssl_context.load_verify_locations(settings.DB_SSL_CA_PATH)
+            
+            # 클라이언트 인증서 로드
+            if settings.DB_SSL_CERT_PATH and settings.DB_SSL_KEY_PATH:
+                ssl_context.load_cert_chain(
+                    settings.DB_SSL_CERT_PATH, 
+                    settings.DB_SSL_KEY_PATH
+                )
+            
+            connect_args["ssl"] = ssl_context
+            logger.info(f"SSL/TLS enabled for database connection (mode: {settings.DB_SSL_MODE})")
+            
+        except Exception as e:
+            logger.warning(f"SSL configuration failed, falling back to non-SSL connection: {e}")
+    else:
+        logger.info("SSL/TLS disabled for database connection")
+    
+    return connect_args
+
+# 비동기 엔진 생성 - 프로덕션 최적화 설정
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,  # SQL 쿼리 로깅
     future=True,
     pool_pre_ping=True,   # 연결 상태 확인
-    pool_recycle=3600,    # 1시간마다 연결 재생성
+    pool_recycle=1800,    # 30분마다 연결 재생성 (최적화)
+    pool_size=20,         # 기본 커넥션 풀 크기 증가
+    max_overflow=30,      # 최대 추가 연결 수
+    pool_timeout=30,      # 연결 대기 시간 (초)
+    connect_args=_get_database_connect_args()
 )
 
 # 비동기 세션 팩토리 생성

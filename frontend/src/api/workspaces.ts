@@ -10,10 +10,28 @@ export const workspaceApi = {
   },
 
   getWorkspaceTree: async (parentId?: string): Promise<WorkspaceTreeResponse> => {
-    const response = await apiClient.get<WorkspaceTreeResponse>('/api/v1/workspaces/tree', {
-      params: { parent_id: parentId },
-    });
-    return response.data;
+    console.log('📡 API: Getting workspace tree, parentId:', parentId);
+    
+    try {
+      const response = await apiClient.get<WorkspaceTreeResponse>('/api/v1/workspaces/tree', {
+        params: { parent_id: parentId },
+      });
+      console.log('📡 API: Workspace tree response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('📡 API: Workspace tree error:', {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+        message: error?.message,
+        config: {
+          url: error?.config?.url,
+          method: error?.config?.method,
+          headers: error?.config?.headers,
+        }
+      });
+      throw error;
+    }
   },
 
   getWorkspace: async (id: string): Promise<Workspace> => {

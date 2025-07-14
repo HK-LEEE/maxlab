@@ -15,10 +15,23 @@ export const Dashboard: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
-  const { data: workspaceTree, isLoading } = useQuery({
+  const { data: workspaceTree, isLoading, error } = useQuery({
     queryKey: ['workspaceTree'],
-    queryFn: () => workspaceApi.getWorkspaceTree(),
+    queryFn: async () => {
+      console.log('🔄 Fetching workspace tree...');
+      console.log('🔑 Access token:', localStorage.getItem('accessToken') ? 'Present' : 'Missing');
+      console.log('👤 Current user:', user);
+      
+      const result = await workspaceApi.getWorkspaceTree();
+      console.log('✅ Workspace tree loaded:', result);
+      return result;
+    },
   });
+
+  // Error 상태 로깅
+  if (error) {
+    console.error('🚨 Workspace query error:', error);
+  }
 
   const createWorkspaceMutation = useMutation({
     mutationFn: (data: WorkspaceCreate) => workspaceApi.createWorkspace(data),

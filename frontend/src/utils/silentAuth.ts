@@ -13,6 +13,8 @@ interface SilentAuthResult {
     token_type: string;
     expires_in: number;
     scope: string;
+    refresh_token?: string;
+    refresh_expires_in?: number;
   };
   error?: string;
 }
@@ -97,7 +99,7 @@ export class SilentAuth {
           // 보안: origin 검증
           const trustedOrigins = [
             window.location.origin,
-            'http://localhost:3000'  // MAX Platform
+            this.authUrl  // OAuth 서버 URL (환경 변수에서 가져옴)
           ];
           
           if (!trustedOrigins.includes(event.origin)) {
@@ -174,10 +176,8 @@ export class SilentAuth {
 // 편의 함수
 export async function attemptSilentLogin(): Promise<SilentAuthResult> {
   // 더 엄격한 페이지 검증
-  const currentPath = window.location.pathname;
-  const restrictedPaths = ['/login', '/oauth/callback', '/signup'];
-  
-  if (restrictedPaths.some(path => currentPath.startsWith(path))) {
+  if (!isSafePageForTokenRefresh()) {
+    const currentPath = window.location.pathname;
     console.log('🚫 Silent auth not allowed on current page:', currentPath);
     return { success: false, error: 'Cannot attempt silent auth on current page' };
   }
@@ -201,6 +201,53 @@ export async function attemptSilentLogin(): Promise<SilentAuthResult> {
   } finally {
     silentAuth.forceCleanup();
   }
+}
+
+// 토큰 갱신이 안전한 페이지인지 확인
+export function isSafePageForTokenRefresh(): boolean {
+  const currentPath = window.location.pathname;
+  const currentHash = window.location.hash;
+  
+  // OAuth 관련 페이지들은 토큰 갱신 불허
+  const unsafePaths = [
+    '/login',
+    '/logout', 
+    '/oauth/callback',
+    '/oauth/authorize',
+    '/signup',
+    '/register'
+  ];
+  
+  // OAuth 콜백 처리 중인지 확인 (URL 파라미터 기준)
+  const urlParams = new URLSearchParams(window.location.search);
+  const isOAuthCallback = urlParams.has('code') && urlParams.has('state');
+  
+  // 해시에 OAuth 정보가 있는지 확인 (implicit flow)
+  const isImplicitOAuth = currentHash.includes('access_token') || currentHash.includes('code');
+  
+  // OAuth 처리 진행 중인지 확인
+  const isOAuthInProgress = Boolean(
+    sessionStorage.getItem('oauth_state') || 
+    sessionStorage.getItem('silent_oauth_state') ||
+    sessionStorage.getItem('oauth_code_verifier')
+  );
+  
+  // 현재 페이지가 안전하지 않거나 OAuth 처리 중이면 false
+  if (unsafePaths.some(path => currentPath.startsWith(path))) {
+    return false;
+  }
+  
+  if (isOAuthCallback || isImplicitOAuth) {
+    console.log('🚫 OAuth callback in progress, token refresh not safe');
+    return false;
+  }
+  
+  if (isOAuthInProgress) {
+    console.log('🚫 OAuth flow in progress, token refresh not safe');
+    return false;
+  }
+  
+  return true;
 }
 
 // Silent auth 상태 체크
