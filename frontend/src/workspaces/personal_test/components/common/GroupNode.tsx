@@ -11,7 +11,7 @@ interface GroupNodeData {
   titleColor?: string;
   titlePosition?: 'top' | 'center';
   zIndex?: number;
-  borderStyle?: 'solid' | 'dashed';
+  borderStyle?: 'solid' | 'dashed' | 'dotted';
 }
 
 export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => {

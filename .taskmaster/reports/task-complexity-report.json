@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-07-13T23:39:03.304Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Task Master",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Database Security and Performance Optimization",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into database performance optimization (indexing, query optimization), connection pooling setup, SSL/TLS security implementation, backup strategy, PostgreSQL production configuration, and monitoring implementation",
+			"reasoning": "High complexity due to multiple technical domains (performance, security, configuration) requiring deep PostgreSQL expertise and production-ready implementation"
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Authentication System Security Hardening",
+			"complexityScore": 9,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Split into secure token refresh implementation, CSRF protection setup, session security enhancement, API rate limiting with Redis, JWT validation and blacklisting, logout with token revocation, and brute force protection",
+			"reasoning": "Very high complexity involving multiple security protocols, OAuth 2.0 intricacies, and critical security vulnerabilities that require expert-level implementation"
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Process Flow Editor Stability Enhancement",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into React Error Boundaries implementation, ReactFlow performance optimization with virtualization, auto-save functionality with debouncing, memory leak fixes using React hooks optimization, and performance monitoring setup",
+			"reasoning": "High complexity due to React performance optimization, memory management challenges, and ReactFlow-specific optimization requiring advanced React knowledge"
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "API Optimization and Error Handling",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break into structured error handling implementation, API response caching with Redis, database query optimization, request/response validation with Pydantic, comprehensive logging setup, and API versioning strategy",
+			"reasoning": "High complexity involving FastAPI optimization, caching strategies, database performance, and comprehensive error handling patterns"
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Mock Data Identification and Removal",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Split into codebase scanning for hardcoded data, mock API response removal and real endpoint replacement, development configuration cleanup, and automated testing data removal",
+			"reasoning": "Medium complexity requiring systematic code review and careful replacement without breaking functionality, but mostly manual work"
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Real Data Integration and Validation",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Divide into MAX Platform user profile integration, equipment data source connections, real-time WebSocket implementation, data validation schema creation, data transformation pipelines, and data quality monitoring setup",
+			"reasoning": "High complexity involving external API integrations, real-time data handling, and data pipeline architecture requiring robust error handling"
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Production Environment Configuration",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break into environment configuration setup, SSL/TLS certificate configuration, reverse proxy with Nginx setup, security headers implementation, and production database connection configuration",
+			"reasoning": "Medium-high complexity involving DevOps knowledge, security configuration, and production deployment expertise"
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Monitoring and Alerting System",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Split into Prometheus metrics setup, Grafana dashboard creation, structured logging implementation, health check endpoints creation, and alerting system configuration",
+			"reasoning": "High complexity requiring monitoring system expertise, observability patterns, and integration of multiple monitoring tools"
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Performance Optimization and Scaling",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into React code splitting and lazy loading, Vite build optimization, CDN integration, Redis caching implementation, and service worker setup for offline capabilities",
+			"reasoning": "Medium-high complexity involving frontend performance optimization, build tools configuration, and caching strategies"
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Documentation and User Guide Creation",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into user manual creation, OpenAPI/Swagger documentation generation, administrator guide writing, and troubleshooting documentation creation",
+			"reasoning": "Medium complexity primarily involving content creation and documentation tools, but requires understanding of all system components"
+		}
+	]
+}

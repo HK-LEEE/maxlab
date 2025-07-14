@@ -39,17 +39,22 @@ authClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    
+    if (status === 401 || status === 403) {
+      console.log(`🔒 Authentication error (${status}):`, error.config?.url);
+      
       // ProcessFlowEditor에서는 즉시 리다이렉트하지 않고 이벤트 발송
       const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
       
       if (isProcessFlowEditor) {
-        // 토큰 만료 이벤트 발송 (TokenStatusMonitor에서 처리)
+        // 토큰 만료/권한 없음 이벤트 발송 (TokenStatusMonitor에서 처리)
         window.dispatchEvent(new CustomEvent('auth:token-expired', { 
-          detail: { error, source: 'api' } 
+          detail: { error, source: 'api', status } 
         }));
       } else {
         // 다른 페이지에서는 기존대로 즉시 리다이렉트
+        console.log('🔓 Clearing auth and redirecting to login...');
         useAuthStore.getState().logout();
         window.location.href = '/login';
       }
@@ -61,7 +66,10 @@ apiClient.interceptors.response.use(
 authClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    
+    if (status === 401 || status === 403) {
+      console.log(`🔒 Auth API error (${status}):`, error.config?.url);
       useAuthStore.getState().logout();
       window.location.href = '/login';
     }

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../../../api/client';
 import { toast } from 'react-hot-toast';
+import { useAuthStore } from '../../../stores/authStore';
+import { authService } from '../../../services/authService';
 
 export interface ProcessFlow {
   id: string;
@@ -34,10 +36,19 @@ export const usePublishManager = (workspaceId: string) => {
   });
 
   const workspaceUuid = '21ee03db-90c4-4592-b00f-c44801e0b164';
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   // Load flows from API
   const loadFlows = useCallback(async () => {
     if (!workspaceId) return;
+    
+    // 인증 상태 확인
+    if (!isAuthenticated) {
+      console.log('🔒 User not authenticated, skipping flow load');
+      setError('로그인이 필요합니다.');
+      setIsLoading(false);
+      return;
+    }
     
     setIsLoading(true);
     setError(null);
@@ -64,15 +75,43 @@ export const usePublishManager = (workspaceId: string) => {
       
     } catch (err: any) {
       console.error('Failed to load flows:', err);
+      
+      const status = err.response?.status;
+      
+      if (status === 401 || status === 403) {
+        console.log('🔒 Authentication error, attempting token refresh...');
+        
+        // 토큰 갱신 시도
+        const refreshSuccess = await authService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('✅ Token refreshed, retrying flow load...');
+          // 재시도
+          setTimeout(() => loadFlows(), 1000);
+          return;
+        } else {
+          console.log('❌ Token refresh failed, redirecting to login...');
+          setError('인증이 만료되었습니다. 다시 로그인해주세요.');
+          toast.error('인증이 만료되었습니다. 다시 로그인해주세요.');
+          // authService.logout이 이미 호출됨
+          return;
+        }
+      }
+      
       setError('플로우 목록을 불러오는데 실패했습니다.');
       toast.error('플로우 목록을 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
-  }, [workspaceId]);
+  }, [workspaceId, isAuthenticated]);
 
   // Publish a flow
   const publishFlow = useCallback(async (flowId: string) => {
+    if (!isAuthenticated) {
+      toast.error('로그인이 필요합니다.');
+      throw new Error('로그인이 필요합니다.');
+    }
+
     try {
       const response = await apiClient.put(
         `/api/v1/personal-test/process-flow/flows/${flowId}/publish`,
@@ -103,14 +142,38 @@ export const usePublishManager = (workspaceId: string) => {
       
     } catch (err: any) {
       console.error('Failed to publish flow:', err);
+      
+      const status = err.response?.status;
+      
+      if (status === 401 || status === 403) {
+        console.log('🔒 Authentication error during publish, attempting token refresh...');
+        
+        const refreshSuccess = await authService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('✅ Token refreshed, retrying publish...');
+          // 재시도
+          return publishFlow(flowId);
+        } else {
+          const errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.';
+          toast.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+      }
+      
       const errorMessage = err.response?.data?.detail || '플로우 게시에 실패했습니다.';
       toast.error(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Unpublish a flow
   const unpublishFlow = useCallback(async (flowId: string) => {
+    if (!isAuthenticated) {
+      toast.error('로그인이 필요합니다.');
+      throw new Error('로그인이 필요합니다.');
+    }
+
     try {
       await apiClient.put(
         `/api/v1/personal-test/process-flow/flows/${flowId}/unpublish`,
@@ -140,11 +203,30 @@ export const usePublishManager = (workspaceId: string) => {
       
     } catch (err: any) {
       console.error('Failed to unpublish flow:', err);
+      
+      const status = err.response?.status;
+      
+      if (status === 401 || status === 403) {
+        console.log('🔒 Authentication error during unpublish, attempting token refresh...');
+        
+        const refreshSuccess = await authService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('✅ Token refreshed, retrying unpublish...');
+          // 재시도
+          return unpublishFlow(flowId);
+        } else {
+          const errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.';
+          toast.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+      }
+      
       const errorMessage = err.response?.data?.detail || '플로우 게시 취소에 실패했습니다.';
       toast.error(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Generate public URL for a published flow
   const getPublicUrl = useCallback((publishToken: string) => {

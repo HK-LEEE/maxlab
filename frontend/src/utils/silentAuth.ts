@@ -173,10 +173,28 @@ export class SilentAuth {
 
 // 편의 함수
 export async function attemptSilentLogin(): Promise<SilentAuthResult> {
-  if (window.location.pathname === '/login' || window.location.pathname === '/oauth/callback') {
+  // 더 엄격한 페이지 검증
+  const currentPath = window.location.pathname;
+  const restrictedPaths = ['/login', '/oauth/callback', '/signup'];
+  
+  if (restrictedPaths.some(path => currentPath.startsWith(path))) {
+    console.log('🚫 Silent auth not allowed on current page:', currentPath);
     return { success: false, error: 'Cannot attempt silent auth on current page' };
   }
 
+  // Silent auth 지원 여부 확인
+  if (!isSilentAuthSupported()) {
+    console.log('🚫 Silent auth not supported in current environment');
+    return { success: false, error: 'Silent authentication not supported' };
+  }
+
+  // 기존 silent auth 진행 중인지 확인
+  if (sessionStorage.getItem('silent_oauth_state')) {
+    console.log('🚫 Silent auth already in progress');
+    return { success: false, error: 'Silent authentication already in progress' };
+  }
+
+  console.log('✅ Silent auth conditions met, starting...');
   const silentAuth = new SilentAuth();
   try {
     return await silentAuth.attemptSilentAuth();

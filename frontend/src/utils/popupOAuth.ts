@@ -22,6 +22,7 @@ export class PopupOAuthLogin {
   private checkInterval: NodeJS.Timeout | null = null;
   private messageHandler: ((event: MessageEvent) => void) | null = null;
   private messageReceived: boolean = false;
+  private authInProgress: boolean = false;
 
   private readonly clientId: string;
   private readonly redirectUri: string;
@@ -57,6 +58,13 @@ export class PopupOAuthLogin {
 
   // OAuth 시작
   async startAuth(): Promise<TokenResponse> {
+    // 이미 진행 중인 인증이 있는지 확인
+    if (this.authInProgress) {
+      throw new Error('OAuth authentication already in progress');
+    }
+
+    this.authInProgress = true;
+
     return new Promise(async (resolve, reject) => {
       try {
         // PKCE 파라미터 생성
@@ -176,6 +184,7 @@ export class PopupOAuthLogin {
 
     this.popup = null;
     this.messageReceived = false;
+    this.authInProgress = false;
     
     sessionStorage.removeItem('oauth_popup_mode');
     sessionStorage.removeItem('oauth_state');
@@ -187,8 +196,17 @@ export class PopupOAuthLogin {
   }
 }
 
+// 중복 토큰 교환 요청 방지를 위한 전역 상태
+const tokenExchangeInProgress = new Map<string, Promise<TokenResponse>>();
+
 // 토큰 교환
 export async function exchangeCodeForToken(code: string): Promise<TokenResponse> {
+  // 동일한 코드로 이미 진행 중인 요청이 있는지 확인
+  if (tokenExchangeInProgress.has(code)) {
+    console.log('🔄 Token exchange already in progress for this code, waiting...');
+    return tokenExchangeInProgress.get(code)!;
+  }
+
   const codeVerifier = sessionStorage.getItem('oauth_code_verifier') || 
                       sessionStorage.getItem('silent_oauth_code_verifier');
   const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
@@ -197,26 +215,56 @@ export async function exchangeCodeForToken(code: string): Promise<TokenResponse>
     throw new Error('No code verifier found in session storage');
   }
 
-  const response = await fetch(`${authUrl}/api/oauth/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: import.meta.env.VITE_REDIRECT_URI || `${window.location.origin}/oauth/callback`,
-      client_id: import.meta.env.VITE_CLIENT_ID || 'maxlab',
-      code_verifier: codeVerifier
-    })
-  });
+  console.log('🔐 Starting token exchange with code:', code.substring(0, 8) + '...');
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error_description || `Token exchange failed: ${response.statusText}`);
-  }
+  // 토큰 교환 Promise 생성 및 저장
+  const tokenExchangePromise = (async (): Promise<TokenResponse> => {
+    try {
+      const response = await fetch(`${authUrl}/api/oauth/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: import.meta.env.VITE_REDIRECT_URI || `${window.location.origin}/oauth/callback`,
+          client_id: import.meta.env.VITE_CLIENT_ID || 'maxlab',
+          code_verifier: codeVerifier
+        })
+      });
 
-  return response.json() as TokenResponse;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error_description || `Token exchange failed: ${response.statusText}`;
+        console.error('❌ Token exchange failed:', errorMessage);
+        
+        // 특정 에러에 대한 추가 정보
+        if (response.status === 400 && errorData.error === 'invalid_grant') {
+          throw new Error('Invalid or expired authorization code');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      console.log('✅ Token exchange successful');
+      const tokenResponse = await response.json() as TokenResponse;
+      
+      // 성공 후 코드 verifier 즉시 정리
+      sessionStorage.removeItem('oauth_code_verifier');
+      sessionStorage.removeItem('silent_oauth_code_verifier');
+      
+      return tokenResponse;
+    } finally {
+      // 완료 후 진행 중인 요청에서 제거
+      tokenExchangeInProgress.delete(code);
+    }
+  })();
+
+  // 진행 중인 요청으로 등록
+  tokenExchangeInProgress.set(code, tokenExchangePromise);
+
+  return tokenExchangePromise;
 }
 
 // 팝업 모드 확인

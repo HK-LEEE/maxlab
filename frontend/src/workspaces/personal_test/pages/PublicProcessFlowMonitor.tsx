@@ -90,7 +90,7 @@ const FlowCanvas: React.FC<{
       }}
       proOptions={{ hideAttribution: true }}
     >
-      <Background color="#aaa" gap={16} />
+      <Background color="#ffffff" gap={16} />
       <Controls showInteractive={false} />
       <MiniMap nodeColor={nodeColor} />
       <Panel position="bottom-right" className="bg-white p-2 rounded shadow">
@@ -183,7 +183,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
 
   if (error) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="h-screen flex items-center justify-center bg-white">
         <div className="text-center max-w-md">
           <Globe className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">
@@ -216,7 +216,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
 
   if (isLoading || !flow) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
           <p className="text-gray-600">Loading flow...</p>
@@ -234,7 +234,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   ];
 
   return (
-    <div ref={containerRef} className="h-screen flex flex-col bg-gray-50">
+    <div ref={containerRef} className="h-screen flex flex-col bg-white">
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">

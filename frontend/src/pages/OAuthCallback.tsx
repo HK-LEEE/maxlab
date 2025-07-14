@@ -3,7 +3,7 @@
  * Handles OAuth authorization code callbacks for both popup and silent authentication
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { exchangeCodeForToken, isPopupMode } from '../utils/popupOAuth';
@@ -21,9 +21,21 @@ export const OAuthCallback: React.FC = () => {
     status: 'loading',
     message: 'Processing OAuth callback...'
   });
+  
+  // 중복 실행 방지를 위한 ref
+  const isProcessingRef = useRef(false);
+  const hasProcessedRef = useRef(false);
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
+      // 중복 실행 방지 체크
+      if (isProcessingRef.current || hasProcessedRef.current) {
+        console.log('🚫 OAuth callback already processing or completed, skipping...');
+        return;
+      }
+      
+      isProcessingRef.current = true;
+      
       try {
         const code = searchParams.get('code');
         const state = searchParams.get('state');
@@ -76,7 +88,10 @@ export const OAuthCallback: React.FC = () => {
             // 토큰 교환
             const tokenResponse = await exchangeCodeForToken(code);
             
-            // 세션 정리
+            // 성공 표시
+            hasProcessedRef.current = true;
+            
+            // 세션 정리 (완전 정리)
             sessionStorage.removeItem('oauth_state');
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_popup_mode');
@@ -94,9 +109,18 @@ export const OAuthCallback: React.FC = () => {
             
           } catch (error: any) {
             console.error('OAuth token exchange error:', error);
+            
+            // 특정 에러에 대한 처리
+            let errorMessage = error.message || 'Token exchange failed';
+            if (error.message?.includes('Invalid or expired authorization code')) {
+              errorMessage = 'Authorization code has already been used. Please try logging in again.';
+            } else if (error.message?.includes('Bad Request')) {
+              errorMessage = 'Authentication request failed. Please try again.';
+            }
+            
             window.opener?.postMessage({
               type: 'OAUTH_ERROR',
-              error: error.message || 'Token exchange failed'
+              error: errorMessage
             }, window.location.origin);
             if (inPopupMode) window.close();
           }
@@ -105,11 +129,24 @@ export const OAuthCallback: React.FC = () => {
           try {
             const tokenResponse = await exchangeCodeForToken(code);
             
-            // 토큰을 localStorage에 저장
+            // 성공 표시
+            hasProcessedRef.current = true;
+            
+            // 토큰을 localStorage에 저장 (완전한 토큰 정보 저장)
+            const currentTime = Date.now();
+            const expiryTime = currentTime + (tokenResponse.expires_in * 1000);
+            
             localStorage.setItem('accessToken', tokenResponse.access_token);
             localStorage.setItem('tokenType', tokenResponse.token_type);
             localStorage.setItem('expiresIn', tokenResponse.expires_in.toString());
+            localStorage.setItem('tokenExpiryTime', expiryTime.toString());
+            localStorage.setItem('tokenCreatedAt', currentTime.toString());
             localStorage.setItem('scope', tokenResponse.scope);
+            
+            // 세션 정리
+            sessionStorage.removeItem('oauth_state');
+            sessionStorage.removeItem('oauth_code_verifier');
+            sessionStorage.removeItem('oauth_popup_mode');
             
             setState({
               status: 'success',
@@ -132,25 +169,38 @@ export const OAuthCallback: React.FC = () => {
       } catch (error: any) {
         console.error('OAuth callback error:', error);
         
+        // 에러 처리 완료 표시
+        hasProcessedRef.current = true;
+        
+        // 특정 에러에 대한 메시지 개선
+        let errorMessage = error.message || 'Authentication failed';
+        if (error.message?.includes('Invalid or expired authorization code')) {
+          errorMessage = 'This login session has expired. Please try logging in again.';
+        } else if (error.message?.includes('Bad Request')) {
+          errorMessage = 'Authentication request failed. Please try again.';
+        }
+        
         if (isPopupMode()) {
           window.opener?.postMessage({
             type: 'OAUTH_ERROR',
-            error: error.message || 'Authentication failed'
+            error: errorMessage
           }, window.location.origin);
           window.close();
         } else {
           setState({
             status: 'error',
             message: 'Authentication failed',
-            error: error.message || 'An unexpected error occurred during authentication'
+            error: errorMessage
           });
 
-          toast.error(error.message || 'Authentication failed');
+          toast.error(errorMessage);
 
           setTimeout(() => {
             navigate('/login', { replace: true });
           }, 5000);
         }
+      } finally {
+        isProcessingRef.current = false;
       }
     };
 

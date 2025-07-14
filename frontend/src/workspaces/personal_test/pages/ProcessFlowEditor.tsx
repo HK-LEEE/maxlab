@@ -16,6 +16,7 @@ import { TextNode } from '../components/common/TextNode';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { NodeConfigDialog } from '../components/common/NodeConfigDialog';
 import { TextConfigDialog } from '../components/common/TextConfigDialog';
+import { GroupConfigDialog } from '../components/common/GroupConfigDialog';
 import { FloatingActionButton } from '../components/common/FloatingActionButton';
 import { TokenStatusMonitor } from '../components/common/TokenStatusMonitor';
 import { BackupRecoveryModal } from '../components/common/BackupRecoveryModal';
@@ -138,6 +139,7 @@ const ProcessFlowEditorContent: React.FC = () => {
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
   const [configNode, setConfigNode] = useState<Node | null>(null);
   const [textConfigNode, setTextConfigNode] = useState<Node | null>(null);
+  const [groupConfigNode, setGroupConfigNode] = useState<Node | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDataSourceDialogOpen, setIsDataSourceDialogOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -426,8 +428,10 @@ const ProcessFlowEditorContent: React.FC = () => {
   };
 
   const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-    if (node.type === 'equipment' || node.type === 'group') {
+    if (node.type === 'equipment') {
       setConfigNode(node);
+    } else if (node.type === 'group') {
+      setGroupConfigNode(node);
     } else if (node.type === 'text') {
       setTextConfigNode(node);
     }
@@ -476,7 +480,7 @@ const ProcessFlowEditorContent: React.FC = () => {
   }), [edgeType]);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-white">
       {/* Flow Editor Controls Bar */}
       <div className="bg-white border-b px-4 py-3">
         <div className="flex items-center justify-between">
@@ -629,7 +633,7 @@ const ProcessFlowEditorContent: React.FC = () => {
           snapGrid={[15, 15]}
           fitView
         >
-          <Background color="#aaa" gap={16} />
+          <Background color="#ffffff" gap={16} />
           <Controls />
           <MiniMap nodeColor={nodeColor} />
         </ReactFlow>
@@ -699,6 +703,14 @@ const ProcessFlowEditorContent: React.FC = () => {
           />
         )}
 
+        {groupConfigNode && (
+          <GroupConfigDialog
+            node={groupConfigNode}
+            isOpen={true}
+            onClose={() => setGroupConfigNode(null)}
+            onSave={handleNodeConfigSave}
+          />
+        )}
 
         <DataSourceDialog
           isOpen={isDataSourceDialogOpen}

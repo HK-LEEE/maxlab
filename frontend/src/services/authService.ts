@@ -335,9 +335,38 @@ export const authService = {
       } else {
         console.log('❌ Token refresh failed:', result.error);
         
-        // 갱신 실패 시 기존 토큰이 여전히 유효한지 확인
+        // 특정 에러에 따른 처리
+        if (result.error === 'Cannot attempt silent auth on current page' || 
+            result.error === 'Silent authentication not supported' ||
+            result.error === 'Silent authentication already in progress') {
+          console.log('ℹ️ Silent auth not possible, checking current token validity');
+          
+          // 현재 토큰이 여전히 유효한지 확인
+          if (authService.isAuthenticated()) {
+            console.log('ℹ️ Current token still valid, keeping it');
+            return true;
+          }
+        }
+        
+        // 로그인이 필요한 경우 또는 토큰이 만료된 경우
+        if (result.error === 'login_required' || result.error === 'silent_auth_timeout') {
+          console.log('🔓 Authentication required, checking if token is still usable');
+          
+          // 마지막으로 현재 토큰 검증 시도
+          const isStillValid = await authService.validateToken();
+          if (isStillValid) {
+            console.log('ℹ️ Current token validated successfully, keeping it');
+            return true;
+          } else {
+            console.log('🔓 Token validation failed, clearing auth');
+            await authService.logout();
+            return false;
+          }
+        }
+        
+        // 기타 에러의 경우 기존 토큰 유효성 확인
         if (authService.isAuthenticated()) {
-          console.log('ℹ️ Current token still valid, keeping it');
+          console.log('ℹ️ Current token still valid despite refresh failure, keeping it');
           return true;
         } else {
           console.log('🔓 Token refresh failed and current token expired, clearing auth');
@@ -347,6 +376,13 @@ export const authService = {
       }
     } catch (error: any) {
       console.error('Token refresh error:', error);
+      
+      // 에러 발생 시에도 현재 토큰 확인
+      if (authService.isAuthenticated()) {
+        console.log('ℹ️ Refresh error but current token still valid, keeping it');
+        return true;
+      }
+      
       return false;
     }
   },

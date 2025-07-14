@@ -72,7 +72,7 @@ const FlowCanvas: React.FC<{
       }}
       proOptions={{ hideAttribution: true }}
     >
-      <Background />
+      <Background color="#ffffff" gap={16} />
       <Controls showInteractive={false} />
       <MiniMap />
       <Panel position="bottom-right" className="bg-white p-2 rounded shadow">
@@ -173,7 +173,7 @@ const ProcessFlowMonitorContent: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-white">
       {/* Header */}
       <MonitorHeader
         flows={flows}
