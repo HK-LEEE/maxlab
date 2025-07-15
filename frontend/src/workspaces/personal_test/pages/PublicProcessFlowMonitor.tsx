@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactFlow, {
   Background,
@@ -8,7 +8,7 @@ import ReactFlow, {
   Panel,
   useReactFlow,
 } from 'reactflow';
-import type { Viewport } from 'reactflow';
+import type { Viewport, Edge } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { ZoomIn, Globe, Maximize2, Minimize2, RefreshCw } from 'lucide-react';
@@ -19,6 +19,8 @@ import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { AlarmNotification } from '../components/monitor/AlarmNotification';
+import { StatusSummary } from '../components/monitor/StatusSummary';
+import { EquipmentSidebar } from '../components/monitor/EquipmentSidebar';
 import { usePublicFlowMonitor } from '../hooks/usePublicFlowMonitor';
 
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
@@ -49,14 +51,16 @@ const nodeColor = (node: Node) => {
 // Separate component to use useReactFlow hook
 const FlowCanvas: React.FC<{
   nodes: Node[];
-  edges: any[];
-  nodeTypes: any;
-  edgeTypes: any;
+  edges: Edge[];
+  onNodesChange: (changes: any[]) => void;
+  onEdgesChange: (changes: any[]) => void;
+  nodeTypes: Record<string, any>;
+  edgeTypes: Record<string, any>;
   onNodeClick: (event: React.MouseEvent, node: Node) => void;
   equipmentStatusCount: number;
   activeCount: number;
   defaultViewport?: Viewport;
-}> = React.memo(({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, defaultViewport }) => {
+}> = React.memo(({ nodes, edges, onNodesChange, onEdgesChange, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount, defaultViewport }) => {
   const { fitView, setViewport } = useReactFlow();
 
   // Restore viewport after nodes update
@@ -70,13 +74,15 @@ const FlowCanvas: React.FC<{
     <ReactFlow
       nodes={nodes}
       edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
       fitView={false}
-      nodesDraggable={false}
+      nodesDraggable={true}
       nodesConnectable={false}
-      elementsSelectable={false}
+      elementsSelectable={true}
       panOnDrag={true}
       zoomOnScroll={true}
       minZoom={0.1}
@@ -90,7 +96,7 @@ const FlowCanvas: React.FC<{
       }}
       proOptions={{ hideAttribution: true }}
     >
-      <Background color="#ffffff" gap={16} />
+      <Background color="#ffffff" />
       <Controls showInteractive={false} />
       <MiniMap nodeColor={nodeColor} />
       <Panel position="bottom-right" className="bg-white p-2 rounded shadow">
@@ -126,12 +132,15 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport] = useState<Viewport | undefined>();
   const [showAlarms, setShowAlarms] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const {
     flow,
     nodes,
     edges,
+    onNodesChange,
+    onEdgesChange,
     equipmentStatuses,
     measurements,
     isLoading,
@@ -180,6 +189,15 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
 
   const equipmentStatusCount = equipmentStatuses.length;
   const activeCount = equipmentStatuses.filter(eq => eq.status === 'ACTIVE').length;
+  const pauseCount = equipmentStatuses.filter(eq => eq.status === 'PAUSE').length;
+  const stopCount = equipmentStatuses.filter(eq => eq.status === 'STOP').length;
+
+  // Status counts for StatusSummary component
+  const statusCounts = {
+    ACTIVE: activeCount,
+    PAUSE: pauseCount,
+    STOP: stopCount
+  };
 
   if (error) {
     return (
@@ -247,35 +265,18 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Status Summary */}
-            <div className="flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-gray-600">Active: {activeCount}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-600">
-                  Pause: {equipmentStatuses.filter(eq => eq.status === 'PAUSE').length}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-gray-600">
-                  Stop: {equipmentStatuses.filter(eq => eq.status === 'STOP').length}
-                </span>
-              </div>
-            </div>
-
             {/* Monitoring Controls */}
             <div className="flex items-center space-x-4">
               {/* Refresh Controls */}
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={forceRefresh}
+                  onClick={() => {
+                    console.log('🔄 Manual refresh triggered for published flow');
+                    forceRefresh();
+                  }}
                   disabled={isLoading}
                   className="p-2 hover:bg-gray-100 rounded disabled:opacity-50"
-                  title="Force refresh data"
+                  title="Force refresh data - 최신 데이터 강제 새로고침"
                 >
                   <RefreshCw size={16} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
                 </button>
@@ -343,20 +344,37 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
         </div>
       </div>
 
+      {/* Status Summary */}
+      <StatusSummary statusCounts={statusCounts} isFullscreen={isFullscreen} />
+
       {/* Main Content */}
-      <div className="flex-1 relative">
-        <ReactFlowProvider>
-          <FlowCanvas
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onNodeClick={handleNodeClick}
-            equipmentStatusCount={equipmentStatusCount}
-            activeCount={activeCount}
-            defaultViewport={viewport}
-          />
-        </ReactFlowProvider>
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Equipment Sidebar */}
+        <EquipmentSidebar
+          isOpen={isSidebarOpen}
+          isLoading={isLoading}
+          equipmentStatuses={equipmentStatuses}
+          measurements={measurements}
+          onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
+
+        {/* Flow Canvas */}
+        <div className="flex-1">
+          <ReactFlowProvider>
+            <FlowCanvas
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onNodeClick={handleNodeClick}
+              equipmentStatusCount={equipmentStatusCount}
+              activeCount={activeCount}
+              defaultViewport={viewport}
+            />
+          </ReactFlowProvider>
+        </div>
 
         {/* Equipment Detail Modal */}
         {selectedNode && (

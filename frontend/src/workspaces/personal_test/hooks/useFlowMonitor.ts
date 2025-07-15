@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Node, Edge } from 'reactflow';
+import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
+import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { apiClient } from '../../../api/client';
 import { useWebSocket } from './useWebSocket';
 
@@ -39,6 +40,17 @@ export const useFlowMonitor = (workspaceId: string) => {
   const workspaceUuid = '21ee03db-90c4-4592-b00f-c44801e0b164'; // temporary hardcoded UUID
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+
+  // ReactFlow change handlers for node resizing support
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
+
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    []
+  );
   const [flows, setFlows] = useState<ProcessFlow[]>([]);
   const [selectedFlow, setSelectedFlow] = useState<ProcessFlow | null>(null);
   const [equipmentStatuses, setEquipmentStatuses] = useState<EquipmentStatus[]>([]);
@@ -106,16 +118,21 @@ export const useFlowMonitor = (workspaceId: string) => {
   });
 
   // Load equipment status and measurements (optimized)
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (forceLoad = false) => {
     // Prevent duplicate API calls with stricter timing control
     if (isDataLoadingRef.current) {
+      console.log('📊 LoadData skipped - already loading');
       return;
     }
     
-    // Rate limiting - prevent calls more frequent than every 5 seconds
+    // Rate limiting - prevent calls more frequent than every 5 seconds (unless forced)
     const now = Date.now();
     const lastCallTime = (window as any).lastApiCallTime || 0;
-    if (now - lastCallTime < 5000) {
+    if (!forceLoad && now - lastCallTime < 5000) {
+      console.log('📊 LoadData skipped - rate limited', {
+        timeSinceLastCall: now - lastCallTime,
+        forceLoad
+      });
       return;
     }
     
@@ -246,146 +263,182 @@ export const useFlowMonitor = (workspaceId: string) => {
         });
         setLastUpdate(new Date());
       
-        // Update nodes with real-time data
+        // Update nodes with real-time data - OPTIMIZED: Only update nodes that actually changed
         setNodes((currentNodes) => {
-        const updatedNodes = currentNodes.map((node) => {
-          if (node.type === 'equipment' && node.data.equipmentCode) {
-            const status = equipmentStatusList.find((s: EquipmentStatus) => 
-              s.equipment_code === node.data.equipmentCode
-            );
-            
-            // Filter measurements based on displayMeasurements configuration only
-            const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
-              // If displayMeasurements is not set or empty, show no measurements
-              if (!node.data.displayMeasurements || node.data.displayMeasurements.length === 0) {
-                return false;
-              }
-              // Only show measurements that are in displayMeasurements (equipment code independent)
-              return node.data.displayMeasurements.includes(m.measurement_code);
-            });
-            
-            // Group measurements by code and take the latest
-            const measurementMap = new Map<string, MeasurementData>();
-            configuredMeasurements.forEach((m: MeasurementData) => {
-              const existing = measurementMap.get(m.measurement_code);
-              if (!existing || new Date(m.timestamp) > new Date(existing.timestamp)) {
-                measurementMap.set(m.measurement_code, m);
-              }
-            });
-            
-            const latestMeasurements = Array.from(measurementMap.values()).map((m) => {
-              return {
-                code: m.measurement_code,
-                desc: m.measurement_desc,
-                value: m.measurement_value,
-                spec_status: m.spec_status === 1 ? 'BELOW_SPEC' : 
-                           m.spec_status === 2 ? 'ABOVE_SPEC' : 
-                           m.spec_status === 9 ? 'NO_SPEC' : 'IN_SPEC',
-                usl: m.usl,
-                lsl: m.lsl
-              };
-            });
-            
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                status: status?.status || 'STOP',
-                measurements: latestMeasurements,
-              },
-            };
-          }
-          return node;
-        });
-        
-        // Update edges based on node statuses
-        setEdges((currentEdges) => {
-          const nodeStatusMap = new Map<string, string>();
-          updatedNodes.forEach(node => {
+          let hasAnyNodeChanged = false;
+          
+          const updatedNodes = currentNodes.map((node) => {
             if (node.type === 'equipment' && node.data.equipmentCode) {
-              nodeStatusMap.set(node.id, node.data.status);
+              const status = equipmentStatusList.find((s: EquipmentStatus) => 
+                s.equipment_code === node.data.equipmentCode
+              );
+              
+              // Filter measurements based on displayMeasurements configuration only
+              const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+                // If displayMeasurements is not set or empty, show no measurements
+                if (!node.data.displayMeasurements || node.data.displayMeasurements.length === 0) {
+                  return false;
+                }
+                // Only show measurements that are in displayMeasurements (equipment code independent)
+                return node.data.displayMeasurements.includes(m.measurement_code);
+              });
+              
+              // Group measurements by code and take the latest
+              const measurementMap = new Map<string, MeasurementData>();
+              configuredMeasurements.forEach((m: MeasurementData) => {
+                const existing = measurementMap.get(m.measurement_code);
+                if (!existing || new Date(m.timestamp) > new Date(existing.timestamp)) {
+                  measurementMap.set(m.measurement_code, m);
+                }
+              });
+              
+              const latestMeasurements = Array.from(measurementMap.values()).map((m) => {
+                return {
+                  code: m.measurement_code,
+                  desc: m.measurement_desc,
+                  value: m.measurement_value,
+                  spec_status: m.spec_status === 1 ? 'BELOW_SPEC' : 
+                             m.spec_status === 2 ? 'ABOVE_SPEC' : 
+                             m.spec_status === 9 ? 'NO_SPEC' : 'IN_SPEC',
+                  usl: m.usl,
+                  lsl: m.lsl
+                };
+              });
+              
+              const newStatus = status?.status || 'STOP';
+              
+              // Check if this node actually changed
+              const statusChanged = node.data.status !== newStatus;
+              const measurementsChanged = !node.data.measurements || 
+                JSON.stringify(node.data.measurements) !== JSON.stringify(latestMeasurements);
+              
+              if (statusChanged || measurementsChanged) {
+                hasAnyNodeChanged = true;
+                console.log('🔄 Node data changed:', {
+                  nodeId: node.id,
+                  statusChanged: statusChanged ? `${node.data.status} → ${newStatus}` : false,
+                  measurementsChanged,
+                  measurementCount: latestMeasurements.length
+                });
+                
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    status: newStatus,
+                    measurements: latestMeasurements,
+                  },
+                };
+              }
             }
+            return node;
           });
           
-          return currentEdges.map(edge => {
-            const sourceStatus = nodeStatusMap.get(edge.source) || 'STOP';
-            const targetStatus = nodeStatusMap.get(edge.target) || 'STOP';
+          // Only return updated nodes if something actually changed
+          if (hasAnyNodeChanged) {
+            console.log('📊 Updating nodes due to data changes');
             
-            // Define edge styles based on status combinations
-            const statusKey = `${sourceStatus}-${targetStatus}`;
-            let edgeStyle = {};
-            let label = null;
-            let animated = false;
+            // Update edges based on the UPDATED node statuses (using updatedNodes, not stale nodes state)
+            setEdges((currentEdges) => {
+              const nodeStatusMap = new Map<string, string>();
+              
+              // Use updatedNodes to get the current status information
+              updatedNodes.forEach(node => {
+                if (node.type === 'equipment' && node.data.status) {
+                  nodeStatusMap.set(node.id, node.data.status);
+                  console.log(`🔗 Edge mapping: ${node.id} -> ${node.data.status}`);
+                }
+              });
+              
+              console.log('🔗 NodeStatusMap contents:', Array.from(nodeStatusMap.entries()));
+              
+              return currentEdges.map(edge => {
+                const sourceStatus = nodeStatusMap.get(edge.source) || 'STOP';
+                const targetStatus = nodeStatusMap.get(edge.target) || 'STOP';
+                
+                // Define edge styles based on status combinations
+                const statusKey = `${sourceStatus}-${targetStatus}`;
+                
+                console.log(`🔗 Edge ${edge.source} -> ${edge.target}: ${statusKey}`);
+                
+                let edgeStyle = {};
+                let label = null;
+                let animated = false;
+                
+                switch (statusKey) {
+                  case 'ACTIVE-ACTIVE':
+                    edgeStyle = { stroke: '#10b981', strokeWidth: 3 };
+                    animated = true;
+                    break;
+                  case 'ACTIVE-PAUSE':
+                    edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+                    animated = true;
+                    label = '대상 일시정지';
+                    break;
+                  case 'ACTIVE-STOP':
+                    edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+                    animated = false;
+                    label = '대상 정지';
+                    break;
+                  case 'PAUSE-ACTIVE':
+                    edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+                    animated = true;
+                    label = '출발 일시정지';
+                    break;
+                  case 'PAUSE-PAUSE':
+                    edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+                    animated = true;
+                    label = '모두 일시정지';
+                    break;
+                  case 'PAUSE-STOP':
+                    edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+                    animated = false;
+                    label = '대상 정지';
+                    break;
+                  case 'STOP-ACTIVE':
+                    edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+                    animated = false;
+                    label = '출발 정지';
+                    break;
+                  case 'STOP-PAUSE':
+                    edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+                    animated = false;
+                    label = '출발 정지';
+                    break;
+                  case 'STOP-STOP':
+                    edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+                    animated = false;
+                    label = '모두 정지';
+                    break;
+                  default:
+                    edgeStyle = { stroke: '#000', strokeWidth: 2 };
+                    console.log(`🔗 Unknown status combination: ${statusKey}`);
+                }
+                
+                return {
+                  ...edge,
+                  type: 'custom', // Keep custom type for CustomEdgeWithLabel component
+                  animated: animated,
+                  style: {
+                    ...edge.style,
+                    ...edgeStyle,
+                  },
+                  data: {
+                    ...edge.data,
+                    type: edge.type || edge.data?.type || 'smoothstep', // Preserve original edge type
+                    label: label,
+                    animated: animated,
+                  }
+                };
+              });
+            });
             
-            switch (statusKey) {
-              case 'ACTIVE-ACTIVE':
-                edgeStyle = { stroke: '#10b981', strokeWidth: 3 };
-                animated = true;
-                break;
-              case 'ACTIVE-PAUSE':
-                edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
-                animated = true;
-                label = '대상 일시정지';
-                break;
-              case 'ACTIVE-STOP':
-                edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
-                animated = false;
-                label = '대상 정지';
-                break;
-              case 'PAUSE-ACTIVE':
-                edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
-                animated = true;
-                label = '출발 일시정지';
-                break;
-              case 'PAUSE-PAUSE':
-                edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
-                animated = true;
-                label = '모두 일시정지';
-                break;
-              case 'PAUSE-STOP':
-                edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
-                animated = false;
-                label = '대상 정지';
-                break;
-              case 'STOP-ACTIVE':
-                edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
-                animated = false;
-                label = '출발 정지';
-                break;
-              case 'STOP-PAUSE':
-                edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
-                animated = false;
-                label = '출발 정지';
-                break;
-              case 'STOP-STOP':
-                edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
-                animated = false;
-                label = '모두 정지';
-                break;
-              default:
-                edgeStyle = { stroke: '#000', strokeWidth: 2 };
-            }
-            
-            return {
-              ...edge,
-              type: 'custom', // Keep custom type for CustomEdgeWithLabel component
-              animated: animated,
-              style: {
-                ...edge.style,
-                ...edgeStyle,
-              },
-              data: {
-                ...edge.data,
-                type: edge.type || edge.data?.type || 'smoothstep', // Preserve original edge type
-                label: label,
-                animated: animated,
-              }
-            };
-          });
+            return updatedNodes;
+          } else {
+            console.log('📊 No node updates needed - data unchanged');
+            return currentNodes;
+          }
         });
-        
-        return updatedNodes;
-      });
       } // Close the if (hasStatusChanged || hasMeasurementChanged) block
     } catch (err) {
       console.error('Failed to load data:', err);
@@ -407,15 +460,25 @@ export const useFlowMonitor = (workspaceId: string) => {
     visibleEquipmentCodesRef.current = codes;
   }, [nodes]);
 
-  // Load data when visible equipment codes change or on initial flow selection
+  // Load data immediately when flow is selected, with debounce only for equipment code changes
   useEffect(() => {
     if (selectedFlow) {
+      console.log('🔄 Flow selected, loading data immediately:', selectedFlow.name);
+      // Immediate load for flow selection - bypass rate limiting
+      loadData(true);
+    }
+  }, [selectedFlow]); // Remove loadData from dependencies to prevent loops
+  
+  // Separate effect for equipment code changes with debounce
+  useEffect(() => {
+    if (selectedFlow && visibleEquipmentCodes.size > 0) {
       const timer = setTimeout(() => {
+        console.log('🔄 Equipment codes changed, debounced data load');
         loadData();
-      }, 2000); // Increased debounce time to 2 seconds
+      }, 1000); // Reduced debounce time to 1 second for equipment changes
       return () => clearTimeout(timer);
     }
-  }, [selectedFlow, loadData]);
+  }, [visibleEquipmentCodes, selectedFlow]);
 
   // Auto-refresh with minimum 10 second interval
   useEffect(() => {
@@ -433,6 +496,17 @@ export const useFlowMonitor = (workspaceId: string) => {
   // Update view when flow is selected
   useEffect(() => {
     if (selectedFlow) {
+      // Debug: 선택된 플로우 데이터 확인
+      console.log('🖥️ Private flow data loaded:', {
+        flowName: selectedFlow.name,
+        totalNodes: selectedFlow.flow_data?.nodes?.length || 0,
+        totalEdges: selectedFlow.flow_data?.edges?.length || 0,
+        nodeList: selectedFlow.flow_data?.nodes?.map((n: any) => ({ id: n.id, type: n.type, label: n.data?.label })) || [],
+        flowId: selectedFlow.id,
+        updatedAt: selectedFlow.updated_at,
+        isPublished: selectedFlow.is_published
+      });
+      
       // Clear previous data when switching flows
       setPreviousData({
         statuses: new Map(),
@@ -441,8 +515,54 @@ export const useFlowMonitor = (workspaceId: string) => {
       setEquipmentStatuses([]);
       setMeasurements([]);
       
-      // Set new nodes and edges
-      setNodes(selectedFlow.flow_data.nodes || []);
+      // Set new nodes and edges with saved nodeSize applied
+      const savedNodeSize = selectedFlow.flow_data.nodeSize || '1';
+      const getNodeHeight = (size: '1' | '2' | '3') => {
+        switch (size) {
+          case '1': return 170;
+          case '2': return 220;
+          case '3': return 270;
+          default: return 170;
+        }
+      };
+      
+      const nodesWithSavedSize = (selectedFlow.flow_data.nodes || []).map((node: any) => {
+        if (node.type === 'equipment') {
+          // Use saved nodeSize from flow data, fallback to node data, then default
+          const nodeSize = selectedFlow.flow_data?.nodeSize || node.data?.nodeSize || '1';
+          const defaultHeight = getNodeHeight(nodeSize);
+          const defaultWidth = 200;
+          
+          // CRITICAL: Prioritize stored resized dimensions over nodeSize defaults
+          const finalWidth = node.style?.width || defaultWidth;
+          const finalHeight = node.style?.height || defaultHeight;
+          
+          console.log('🖥️ FlowMonitor - preserving stored dimensions:', {
+            nodeId: node.id,
+            nodeSize,
+            storedStyle: node.style,
+            defaults: { width: defaultWidth, height: defaultHeight },
+            final: { width: finalWidth, height: finalHeight }
+          });
+          
+          return {
+            ...node,
+            style: {
+              // PRESERVE stored resized dimensions - they take priority over nodeSize defaults
+              width: finalWidth,
+              height: finalHeight,
+              ...node.style // Preserve other style properties
+            },
+            data: {
+              ...node.data,
+              nodeSize: nodeSize // Ensure nodeSize is in data
+            }
+          };
+        }
+        return node;
+      });
+      
+      setNodes(nodesWithSavedSize);
       setEdges(selectedFlow.flow_data.edges || []);
     }
   }, [selectedFlow]);
@@ -504,6 +624,8 @@ export const useFlowMonitor = (workspaceId: string) => {
     isSidebarOpen,
     isFullscreen,
     statusCounts: getStatusCounts(),
+    onNodesChange,
+    onEdgesChange,
     setSelectedFlow,
     setAutoRefresh,
     setRefreshInterval,

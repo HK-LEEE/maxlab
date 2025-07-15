@@ -40,18 +40,22 @@ const edgeTypes = Object.freeze({
 const FlowCanvas: React.FC<{
   nodes: Node[];
   edges: any[];
+  onNodesChange: any;
+  onEdgesChange: any;
   nodeTypes: any;
   edgeTypes: any;
   onNodeClick: (event: React.MouseEvent, node: Node) => void;
   equipmentStatusCount: number;
   activeCount: number;
-}> = React.memo(({ nodes, edges, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount }) => {
+}> = React.memo(({ nodes, edges, onNodesChange, onEdgesChange, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount }) => {
   const { fitView } = useReactFlow();
 
   return (
     <ReactFlow
       nodes={nodes}
       edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
@@ -72,7 +76,7 @@ const FlowCanvas: React.FC<{
       }}
       proOptions={{ hideAttribution: true }}
     >
-      <Background color="#ffffff" gap={16} />
+      <Background color="#ffffff" />
       <Controls showInteractive={false} />
       <MiniMap />
       <Panel position="bottom-right" className="bg-white p-2 rounded shadow">
@@ -120,6 +124,8 @@ const ProcessFlowMonitorContent: React.FC = () => {
     isSidebarOpen,
     isFullscreen,
     statusCounts,
+    onNodesChange,
+    onEdgesChange,
     setSelectedFlow,
     setAutoRefresh,
     setRefreshInterval,
@@ -213,6 +219,8 @@ const ProcessFlowMonitorContent: React.FC = () => {
             <FlowCanvas
               nodes={nodes}
               edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               onNodeClick={onNodeClick}

@@ -250,7 +250,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
               {/* Node Size */}
               {selectedElements.nodes > 0 && (
                 <div>
-                  <label className="text-xs text-gray-600 block mb-1">Node Size</label>
+                  <label className="text-xs text-gray-600 block mb-1">Node Size (Selected)</label>
                   <select
                     value={nodeSize}
                     onChange={(e) => onNodeSizeChange(e.target.value as '1' | '2' | '3')}

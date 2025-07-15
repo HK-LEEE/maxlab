@@ -106,6 +106,22 @@ export class TokenRefreshManager {
         return false;
       }
 
+      // 현재 토큰이 여전히 유효한지 먼저 확인
+      if (this.isCurrentTokenValid()) {
+        const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
+        if (tokenExpiryTime) {
+          const expiryTime = parseInt(tokenExpiryTime, 10);
+          const now = Date.now();
+          const timeToExpiry = Math.max(0, Math.floor((expiryTime - now) / 1000));
+          
+          // 토큰이 5분 이상 남았으면 갱신할 필요 없음
+          if (timeToExpiry > 300) {
+            console.log(`ℹ️ Current token is valid for ${timeToExpiry}s, no refresh needed`);
+            return true;
+          }
+        }
+      }
+
       // 토큰 재사용 공격 방지
       const lastRefresh = localStorage.getItem('lastTokenRefresh');
       const now = Date.now();
@@ -139,14 +155,14 @@ export class TokenRefreshManager {
       }
 
       // 모든 갱신 방법 실패
-      console.log('❌ All token refresh methods failed');
+      console.log('❌ All token refresh methods failed, checking current token validity');
 
       // 현재 토큰이 여전히 유효한지 확인
       if (this.isCurrentTokenValid()) {
-        console.log('ℹ️ Current token still valid despite refresh failure');
+        console.log('ℹ️ Current token still valid despite refresh failure - user can continue working');
         return true;
       } else {
-        console.log('🔓 Token validation failed, clearing auth');
+        console.log('🔓 Token validation failed, clearing auth and requiring re-login');
         await this.clearAuth();
         return false;
       }

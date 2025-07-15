@@ -36,6 +36,9 @@ export const OAuthCallback: React.FC = () => {
       
       isProcessingRef.current = true;
       
+      // DOM에 OAuth 처리 중 상태 마킹 (다른 컴포넌트에서 감지 가능)
+      document.body.setAttribute('data-oauth-processing', 'true');
+      
       try {
         const code = searchParams.get('code');
         const state = searchParams.get('state');
@@ -201,6 +204,8 @@ export const OAuthCallback: React.FC = () => {
         }
       } finally {
         isProcessingRef.current = false;
+        // DOM에서 OAuth 처리 중 상태 제거
+        document.body.removeAttribute('data-oauth-processing');
       }
     };
 

@@ -366,21 +366,86 @@ export const authService = {
   },
 
   /**
-   * 인증 토큰 갱신 - Refresh Token 우선 처리
+   * 인증 토큰 갱신 - Refresh Token 우선, Silent Auth 폴백
    */
   refreshToken: async (): Promise<boolean> => {
     return tokenRefreshManager.refreshToken(async () => {
       try {
-        const result = await authService.attemptSilentLogin();
-        return {
-          success: result.success,
-          token: result.success ? localStorage.getItem('accessToken') || undefined : undefined,
-          error: result.error
-        };
+        console.log('🔄 Attempting token refresh with fallback chain...');
+        
+        // 1차: Refresh Token 시도
+        const hasValidRefreshToken = await refreshTokenService.isRefreshTokenValidAsync();
+        if (hasValidRefreshToken) {
+          try {
+            console.log('🎟️ Attempting refresh with refresh token...');
+            const refreshResult = await refreshTokenService.refreshWithRefreshToken();
+            
+            // 토큰 갱신 성공 시 사용자 정보도 업데이트
+            const userInfo = await getUserInfo(refreshResult.access_token);
+            const user: User = {
+              id: userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
+              email: userInfo.email || '',
+              username: userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+              full_name: userInfo.real_name || userInfo.full_name || userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+              is_active: userInfo.is_active !== undefined ? userInfo.is_active : true,
+              is_admin: Boolean(userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
+              role: (userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
+              groups: Array.isArray(userInfo.groups) 
+                ? userInfo.groups.map((g: any) => typeof g === 'string' ? g : (g.name || g.display_name || g)).filter(Boolean)
+                : []
+            };
+            
+            // 사용자 정보 업데이트
+            const currentTime = Date.now();
+            const userWithMetadata = {
+              ...user,
+              created_at: JSON.parse(localStorage.getItem('user') || '{}').created_at || currentTime,
+              updated_at: currentTime
+            };
+            
+            localStorage.setItem('user', JSON.stringify(userWithMetadata));
+            
+            console.log('✅ Refresh token renewal successful');
+            return {
+              success: true,
+              token: refreshResult.access_token
+            };
+          } catch (refreshError: any) {
+            console.warn('⚠️ Refresh token failed, falling back to silent auth:', refreshError.message);
+            // 다음 단계로 진행
+          }
+        }
+        
+        // 2차: Silent Auth 폴백
+        if (isSafePageForTokenRefresh()) {
+          console.log('🔇 Falling back to silent authentication...');
+          const result = await authService.attemptSilentLogin();
+          
+          if (result.success) {
+            console.log('✅ Silent auth fallback successful');
+            return {
+              success: true,
+              token: localStorage.getItem('accessToken') || undefined
+            };
+          } else {
+            console.log('❌ Silent auth fallback failed:', result.error);
+            return {
+              success: false,
+              error: result.error || 'Both refresh token and silent auth failed'
+            };
+          }
+        } else {
+          console.log('❌ Current page not safe for silent auth, refresh completely failed');
+          return {
+            success: false,
+            error: 'Refresh token failed and silent auth not available on current page'
+          };
+        }
       } catch (error: any) {
+        console.error('❌ Complete token refresh chain failed:', error);
         return {
           success: false,
-          error: error.message || 'Silent auth failed'
+          error: error.message || 'Token refresh chain failed'
         };
       }
     });
@@ -548,6 +613,12 @@ export const authService = {
     if (!accessToken || !tokenExpiryTime) {
       return false;
     }
+
+    // 최근 갱신 시간 확인 (OAuth 콜백 중 중복 갱신 방지)
+    const lastRefresh = localStorage.getItem('lastTokenRefresh');
+    if (lastRefresh && (Date.now() - parseInt(lastRefresh)) < 30000) {
+      return false;
+    }
     
     const expiryTime = parseInt(tokenExpiryTime, 10);
     const now = Date.now();
@@ -557,8 +628,25 @@ export const authService = {
     const needsRefresh = now >= (expiryTime - bufferTime);
     
     if (needsRefresh) {
+      // 토큰 갱신이 안전한 환경인지 먼저 확인
+      const canUseSilentAuth = isSafePageForTokenRefresh();
+      
+      if (!canUseSilentAuth) {
+        console.log('🚫 Token refresh not safe in current context, skipping');
+        return false;
+      }
+
       // Refresh token이 유효하거나 silent auth 가능한 경우 갱신 시도
-      return refreshTokenService.isRefreshTokenValid() || isSafePageForTokenRefresh();
+      const hasValidRefreshToken = refreshTokenService.isRefreshTokenValid();
+      
+      console.log('🔄 Token refresh eligibility check:', {
+        needsRefresh,
+        hasValidRefreshToken,
+        canUseSilentAuth,
+        timeToExpiry: authService.getTokenTimeToExpiry()
+      });
+      
+      return hasValidRefreshToken || canUseSilentAuth;
     }
     
     return false;

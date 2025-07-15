@@ -304,27 +304,74 @@ class RefreshTokenService {
   }
 
   /**
-   * Check if stored refresh token is valid
+   * Check if stored refresh token is valid (checks both encrypted and legacy storage)
    */
   isRefreshTokenValid(): boolean {
-    const refreshToken = localStorage.getItem('refreshToken');
+    // Check refresh token existence from multiple sources
+    const legacyRefreshToken = localStorage.getItem('refreshToken');
     const refreshTokenExpiryTime = localStorage.getItem('refreshTokenExpiryTime');
     
-    if (!refreshToken) {
+    // First, check if we have any refresh token at all
+    let hasRefreshToken = !!legacyRefreshToken;
+    
+    // If no legacy token, check if we might have an encrypted one
+    // Note: We can't check encrypted storage synchronously, but we can check if the storage status suggests one exists
+    if (!hasRefreshToken) {
+      // Check if there are any refresh token metadata indicating encrypted storage
+      const hasRefreshMetadata = !!refreshTokenExpiryTime || !!localStorage.getItem('refreshTokenCreatedAt');
+      if (hasRefreshMetadata) {
+        console.log('🔍 Found refresh token metadata, assuming encrypted token exists');
+        hasRefreshToken = true;
+      }
+    }
+    
+    if (!hasRefreshToken) {
       return false;
     }
     
+    // Check expiry time if available
     if (refreshTokenExpiryTime) {
       const expiryTime = parseInt(refreshTokenExpiryTime, 10);
       const now = Date.now();
       
       if (now >= expiryTime) {
-        console.log('Refresh token expired');
+        console.log('🕒 Refresh token expired');
         return false;
       }
     }
     
     return true;
+  }
+
+  /**
+   * Async version of refresh token validation that checks encrypted storage
+   */
+  async isRefreshTokenValidAsync(): Promise<boolean> {
+    try {
+      const refreshToken = await this.getStoredRefreshToken();
+      const refreshTokenExpiryTime = localStorage.getItem('refreshTokenExpiryTime');
+      
+      if (!refreshToken) {
+        console.log('🚫 No refresh token found in any storage');
+        return false;
+      }
+      
+      if (refreshTokenExpiryTime) {
+        const expiryTime = parseInt(refreshTokenExpiryTime, 10);
+        const now = Date.now();
+        
+        if (now >= expiryTime) {
+          console.log('🕒 Refresh token expired');
+          return false;
+        }
+      }
+      
+      console.log('✅ Refresh token is valid');
+      return true;
+    } catch (error) {
+      console.error('❌ Error validating refresh token:', error);
+      return false;
+    }
   }
 
   /**

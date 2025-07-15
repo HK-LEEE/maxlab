@@ -72,28 +72,76 @@ authClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth and CSRF errors for both clients
+// Handle auth and CSRF errors for both clients with token refresh
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
+    const originalRequest = error.config;
     
-    if (status === 401 || status === 403) {
-      console.log(`🔒 Authentication error (${status}):`, error.config?.url);
+    if (status === 401 && !originalRequest._tokenRefreshAttempted) {
+      console.log(`🔒 Authentication error (401) detected:`, originalRequest?.url);
       
-      // ProcessFlowEditor에서는 즉시 리다이렉트하지 않고 이벤트 발송
+      // Mark this request as having attempted token refresh to prevent infinite loops
+      originalRequest._tokenRefreshAttempted = true;
+      
+      try {
+        // Attempt token refresh using authService
+        console.log('🔄 Attempting automatic token refresh...');
+        
+        // Dynamic import to avoid circular dependency
+        const { authService } = await import('../services/authService');
+        const refreshSuccess = await authService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('✅ Token refresh successful, retrying original request');
+          
+          // Update the authorization header with the new token
+          const newToken = localStorage.getItem('accessToken');
+          if (newToken) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+          
+          // Retry the original request
+          return apiClient.request(originalRequest);
+        } else {
+          console.log('❌ Token refresh failed, redirecting to login');
+          throw new Error('Token refresh failed');
+        }
+      } catch (refreshError) {
+        console.error('❌ Token refresh error:', refreshError);
+        
+        // Token refresh failed, handle accordingly
+        const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
+        
+        if (isProcessFlowEditor) {
+          // ProcessFlowEditor에서는 즉시 리다이렉트하지 않고 이벤트 발송
+          window.dispatchEvent(new CustomEvent('auth:token-expired', { 
+            detail: { error, source: 'api', status, refreshFailed: true } 
+          }));
+        } else {
+          // 다른 페이지에서는 자동 로그아웃 이벤트 발송
+          window.dispatchEvent(new CustomEvent('auth:logout', {
+            detail: { reason: 'token_refresh_failed', source: 'api_interceptor' }
+          }));
+        }
+        
+        return Promise.reject(error);
+      }
+    } else if (status === 403) {
+      console.log(`🚫 Authorization error (403):`, originalRequest?.url);
+      
+      // 403은 권한 문제이므로 토큰 갱신으로 해결되지 않음
       const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
       
       if (isProcessFlowEditor) {
-        // 토큰 만료/권한 없음 이벤트 발송 (TokenStatusMonitor에서 처리)
         window.dispatchEvent(new CustomEvent('auth:token-expired', { 
           detail: { error, source: 'api', status } 
         }));
       } else {
-        // 다른 페이지에서는 기존대로 즉시 리다이렉트
-        console.log('🔓 Clearing auth and redirecting to login...');
-        useAuthStore.getState().logout();
-        window.location.href = '/login';
+        window.dispatchEvent(new CustomEvent('auth:logout', {
+          detail: { reason: 'insufficient_permissions', source: 'api_interceptor' }
+        }));
       }
     } else if (status === 419 || (status === 400 && error.response?.data?.detail?.includes('CSRF'))) {
       // CSRF 토큰 에러 처리
@@ -101,9 +149,9 @@ apiClient.interceptors.response.use(
       csrfProtection.forceRegenerate();
       
       // 자동 재시도 (한 번만)
-      if (!error.config._csrfRetry) {
-        error.config._csrfRetry = true;
-        return apiClient.request(error.config);
+      if (!originalRequest._csrfRetry) {
+        originalRequest._csrfRetry = true;
+        return apiClient.request(originalRequest);
       }
     }
     return Promise.reject(error);
@@ -112,22 +160,66 @@ apiClient.interceptors.response.use(
 
 authClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
+    const originalRequest = error.config;
     
-    if (status === 401 || status === 403) {
-      console.log(`🔒 Auth API error (${status}):`, error.config?.url);
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+    if (status === 401 && !originalRequest._tokenRefreshAttempted) {
+      console.log(`🔒 Auth API authentication error (401):`, originalRequest?.url);
+      
+      // Mark this request as having attempted token refresh
+      originalRequest._tokenRefreshAttempted = true;
+      
+      try {
+        // For auth client, we should be more conservative about token refresh
+        // since this might be the auth endpoints themselves
+        console.log('🔄 Attempting token refresh for auth API...');
+        
+        // Dynamic import to avoid circular dependency
+        const { authService } = await import('../services/authService');
+        const refreshSuccess = await authService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('✅ Token refresh successful for auth API, retrying request');
+          
+          // Update the authorization header with the new token
+          const newToken = localStorage.getItem('accessToken');
+          if (newToken) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+          
+          // Retry the original request
+          return authClient.request(originalRequest);
+        } else {
+          console.log('❌ Token refresh failed for auth API');
+          throw new Error('Auth API token refresh failed');
+        }
+      } catch (refreshError) {
+        console.error('❌ Auth API token refresh error:', refreshError);
+        
+        // For auth API failures, always trigger logout
+        window.dispatchEvent(new CustomEvent('auth:logout', {
+          detail: { reason: 'auth_api_token_refresh_failed', source: 'auth_client' }
+        }));
+        
+        return Promise.reject(error);
+      }
+    } else if (status === 403) {
+      console.log(`🚫 Auth API authorization error (403):`, originalRequest?.url);
+      
+      // 403 in auth API is serious - trigger logout
+      window.dispatchEvent(new CustomEvent('auth:logout', {
+        detail: { reason: 'auth_api_insufficient_permissions', source: 'auth_client' }
+      }));
     } else if (status === 419 || (status === 400 && error.response?.data?.detail?.includes('CSRF'))) {
       // CSRF 토큰 에러 처리
       console.warn('🚫 CSRF token error in auth client, regenerating token...');
       csrfProtection.forceRegenerate();
       
       // 자동 재시도 (한 번만)
-      if (!error.config._csrfRetry) {
-        error.config._csrfRetry = true;
-        return authClient.request(error.config);
+      if (!originalRequest._csrfRetry) {
+        originalRequest._csrfRetry = true;
+        return authClient.request(originalRequest);
       }
     }
     return Promise.reject(error);

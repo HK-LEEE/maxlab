@@ -5,6 +5,7 @@ export interface FlowBackupData {
   edges: Edge[];
   flowName: string;
   dataSourceId?: string;
+  nodeSize?: '1' | '2' | '3';
   timestamp: number;
   workspaceId: string;
   flowId?: string;
@@ -24,6 +25,7 @@ export const saveFlowBackup = (
     edges: Edge[];
     flowName: string;
     dataSourceId?: string;
+    nodeSize?: '1' | '2' | '3';
   }
 ): void => {
   try {

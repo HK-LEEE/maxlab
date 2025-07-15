@@ -104,21 +104,44 @@ export const useFlowEditor = (workspaceId: string) => {
     }
     setError(null);
     
-    console.log('Saving flow with nodes:', nodes);
-    console.log('Node types:', nodes.map(n => ({ id: n.id, type: n.type, data: n.data })));
+    console.log('💾 SAVE FLOW - Complete Analysis:', {
+      totalNodes: nodes.length,
+      flowName,
+      nodeSize: nodeSize
+    });
+    
+    // Log equipment nodes with their style properties in detail
+    const equipmentNodes = nodes.filter(n => n.type === 'equipment');
+    console.log('💾 SAVE FLOW - Equipment Nodes Style Data:', equipmentNodes.map(node => ({
+      id: node.id,
+      type: node.type,
+      nodeSize: node.data?.nodeSize,
+      style: node.style,
+      styleTypes: node.style ? Object.entries(node.style).map(([key, value]) => 
+        [key, typeof value, value]) : null,
+      position: node.position
+    })));
+    
+    // Log the exact flow_data structure being sent to API
+    console.log('💾 SAVE FLOW - Exact API Payload:', {
+      flow_data: { nodes, edges, nodeSize },
+      nodeCount: nodes.length,
+      edgeCount: edges.length,
+      equipmentNodeStyles: equipmentNodes.map(n => ({ id: n.id, style: n.style }))
+    });
     
     try {
       const flowData = {
         workspace_id: workspaceUuid,
         name: flowName,
-        flow_data: { nodes, edges },
+        flow_data: { nodes, edges, nodeSize },
         data_source_id: selectedDataSourceId,
       };
 
       if (currentFlow) {
         const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
           name: flowName,
-          flow_data: { nodes, edges },
+          flow_data: { nodes, edges, nodeSize },
           data_source_id: selectedDataSourceId,
         });
         // Update currentFlow with the response to ensure we have the latest data
@@ -158,9 +181,32 @@ export const useFlowEditor = (workspaceId: string) => {
   };
 
   const loadFlow = async (flow: ProcessFlow) => {
-    console.log('Loading flow:', flow);
-    console.log('Flow nodes:', flow.flow_data?.nodes);
-    console.log('Flow data_source_id:', flow.data_source_id);
+    console.log('📂 LOAD FLOW - Complete Analysis:', {
+      flowId: flow.id,
+      flowName: flow.name,
+      totalNodes: flow.flow_data?.nodes?.length || 0,
+      flowDataSource: flow.data_source_id
+    });
+    
+    // Log detailed analysis of received equipment nodes from API
+    const apiEquipmentNodes = (flow.flow_data?.nodes || []).filter(n => n.type === 'equipment');
+    console.log('📂 LOAD FLOW - API Equipment Nodes Data:', apiEquipmentNodes.map(node => ({
+      id: node.id,
+      type: node.type,
+      nodeSize: node.data?.nodeSize,
+      style: node.style,
+      styleTypes: node.style ? Object.entries(node.style).map(([key, value]) => 
+        [key, typeof value, value]) : null,
+      position: node.position
+    })));
+    
+    // Log the raw flow_data structure received from API
+    console.log('📂 LOAD FLOW - Raw API Response Structure:', {
+      flow_data: flow.flow_data,
+      savedNodeSize: flow.flow_data?.nodeSize,
+      nodeCount: flow.flow_data?.nodes?.length || 0,
+      edgeCount: flow.flow_data?.edges?.length || 0
+    });
     
     // 로드하는 플로우의 백업 데이터 삭제 (새로운 플로우 로드 시 백업 불필요)
     deleteFlowBackup(workspaceId, flow.id);
@@ -169,6 +215,14 @@ export const useFlowEditor = (workspaceId: string) => {
     setCurrentFlow(flow);
     setFlowName(flow.name);
     setSelectedDataSourceId(flow.data_source_id || null);
+    
+    // Restore nodeSize from flow data
+    if (flow.flow_data?.nodeSize) {
+      setNodeSize(flow.flow_data.nodeSize);
+      console.log('Node size restored to:', flow.flow_data.nodeSize);
+    } else {
+      setNodeSize('1'); // Default size if not saved
+    }
     
     // Debug: Log the selected data source ID
     console.log('Selected data source ID set to:', flow.data_source_id || null);
@@ -182,13 +236,38 @@ export const useFlowEditor = (workspaceId: string) => {
       };
 
       // Add default styles based on node type
-      if (node.type === 'equipment' && !node.style?.width) {
+      if (node.type === 'equipment') {
+        // Use saved nodeSize from flow data, fallback to node data, then default
+        const savedNodeSize = flow.flow_data?.nodeSize || node.data?.nodeSize || '1';
+        const defaultHeight = getNodeHeight(savedNodeSize);
+        const defaultWidth = 200;
+        
+        // CRITICAL: Prioritize stored resized dimensions over nodeSize defaults
+        // This ensures user-resized nodes maintain their custom sizes
+        const finalWidth = baseNode.style?.width || defaultWidth;
+        const finalHeight = baseNode.style?.height || defaultHeight;
+        
+        console.log('🔄 LoadFlow - preserving stored dimensions:', {
+          nodeId: baseNode.id,
+          savedNodeSize,
+          storedStyle: baseNode.style,
+          storedStyleTypes: baseNode.style ? Object.entries(baseNode.style).map(([k,v]) => [k, typeof v, v]) : null,
+          defaults: { width: defaultWidth, height: defaultHeight },
+          final: { width: finalWidth, height: finalHeight },
+          finalTypes: { width: typeof finalWidth, height: typeof finalHeight }
+        });
+        
         return {
           ...baseNode,
           style: {
-            ...baseNode.style,
-            width: 200,
-            height: 150
+            // PRESERVE stored resized dimensions - they take priority over nodeSize defaults
+            width: finalWidth,
+            height: finalHeight,
+            ...baseNode.style // Preserve other style properties like position, etc.
+          },
+          data: {
+            ...baseNode.data,
+            nodeSize: savedNodeSize // Ensure nodeSize is in data for UI controls
           }
         };
       } else if (node.type === 'group') {
@@ -502,15 +581,50 @@ export const useFlowEditor = (workspaceId: string) => {
     }
   }, [nodes, setNodes]);
 
-  // Update node sizes when nodeSize changes
+  // Update node sizes when nodeSize changes - apply to selected equipment nodes only, PRESERVE larger dimensions
   useEffect(() => {
     setNodes((nds) => nds.map((node) => {
       if (node.type === 'equipment' && node.selected) {
+        const currentHeight = node.style?.height || getNodeHeight('1');
+        const currentWidth = node.style?.width || 200;
+        const newMinHeight = getNodeHeight(nodeSize);
+        const newMinWidth = 200;
+        
+        // Parse current dimensions properly
+        const parsedCurrentHeight = typeof currentHeight === 'number' 
+          ? currentHeight 
+          : parseFloat(String(currentHeight).replace('px', ''));
+        const parsedCurrentWidth = typeof currentWidth === 'number' 
+          ? currentWidth 
+          : parseFloat(String(currentWidth).replace('px', ''));
+        
+        // CRITICAL: Only update if current dimensions are smaller than minimums
+        // This preserves user-resized larger dimensions
+        const shouldUpdateHeight = parsedCurrentHeight < newMinHeight;
+        const shouldUpdateWidth = parsedCurrentWidth < newMinWidth;
+        
+        const finalHeight = shouldUpdateHeight ? newMinHeight : parsedCurrentHeight;
+        const finalWidth = shouldUpdateWidth ? newMinWidth : parsedCurrentWidth;
+
+        console.log('🔧 FlowEditor nodeSize change - preserving larger dimensions:', {
+          nodeId: node.id,
+          nodeSize,
+          current: { height: parsedCurrentHeight, width: parsedCurrentWidth },
+          minimums: { height: newMinHeight, width: newMinWidth },
+          shouldUpdate: { height: shouldUpdateHeight, width: shouldUpdateWidth },
+          final: { height: finalHeight, width: finalWidth }
+        });
+
         return {
           ...node,
           style: {
             ...node.style,
-            height: getNodeHeight(nodeSize)
+            height: finalHeight,
+            width: finalWidth
+          },
+          data: {
+            ...node.data,
+            nodeSize: nodeSize
           }
         };
       }

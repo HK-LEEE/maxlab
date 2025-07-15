@@ -18,8 +18,9 @@ import { NodeConfigDialog } from '../components/common/NodeConfigDialog';
 import { TextConfigDialog } from '../components/common/TextConfigDialog';
 import { GroupConfigDialog } from '../components/common/GroupConfigDialog';
 import { FloatingActionButton } from '../components/common/FloatingActionButton';
-import { TokenStatusMonitor } from '../components/common/TokenStatusMonitor';
 import { BackupRecoveryModal } from '../components/common/BackupRecoveryModal';
+import { ReactFlowErrorBoundary } from '../components/common/ReactFlowErrorBoundary';
+import { EquipmentNodeErrorBoundary, GroupNodeErrorBoundary, TextNodeErrorBoundary } from '../components/common/NodeErrorBoundary';
 
 import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
@@ -33,6 +34,8 @@ import { Layout } from '../../../components/common/Layout';
 import { saveFlowBackup, loadFlowBackup, deleteFlowBackup, cleanupExpiredBackups, hasSignificantChanges, type FlowBackupData } from '../utils/flowBackup';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../../api/client';
+import { PageErrorBoundary } from '../../../components/common/ErrorBoundary';
+import { errorReportingService } from '../../../services/errorReportingService';
 
 
 const equipmentTypes = [
@@ -49,11 +52,36 @@ const equipmentTypes = [
   { code: 'H1', name: '냉각기', icon: 'snowflake' },
 ];
 
+// Create wrapped node components with error boundaries
+const WrappedEquipmentNode = (props: any) => (
+  <EquipmentNodeErrorBoundary 
+    nodeId={props.id} 
+    equipmentType={props.data?.equipmentType}
+  >
+    <EquipmentNode {...props} />
+  </EquipmentNodeErrorBoundary>
+);
+
+const WrappedGroupNode = (props: any) => (
+  <GroupNodeErrorBoundary 
+    nodeId={props.id} 
+    groupName={props.data?.label}
+  >
+    <GroupNode {...props} />
+  </GroupNodeErrorBoundary>
+);
+
+const WrappedTextNode = (props: any) => (
+  <TextNodeErrorBoundary nodeId={props.id}>
+    <TextNode {...props} />
+  </TextNodeErrorBoundary>
+);
+
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = Object.freeze({
-  equipment: EquipmentNode,
-  group: GroupNode,
-  text: TextNode,
+  equipment: WrappedEquipmentNode,
+  group: WrappedGroupNode,
+  text: WrappedTextNode,
 });
 
 const edgeTypes = Object.freeze({
@@ -120,10 +148,6 @@ const ProcessFlowEditorContent: React.FC = () => {
   // Data sources hook
   const { dataSources, isLoading: isLoadingDataSources } = useDataSources(workspaceId);
   
-  // Debug: Log data sources and selected data source ID
-  console.log('Data sources:', dataSources);
-  console.log('Selected data source ID:', selectedDataSourceId);
-  console.log('Is loading data sources:', isLoadingDataSources);
   
   // Ensure selected data source is valid when data sources are loaded
   React.useEffect(() => {
@@ -164,6 +188,7 @@ const ProcessFlowEditorContent: React.FC = () => {
           edges,
           flowName,
           dataSourceId: selectedDataSourceId,
+          nodeSize,
         },
         existingBackup
       );
@@ -199,6 +224,7 @@ const ProcessFlowEditorContent: React.FC = () => {
           edges,
           flowName,
           dataSourceId: selectedDataSourceId || undefined,
+          nodeSize,
         });
       }
     }, 2000); // 2초 디바운스
@@ -214,6 +240,9 @@ const ProcessFlowEditorContent: React.FC = () => {
     setFlowName(backup.flowName);
     if (backup.dataSourceId) {
       setSelectedDataSourceId(backup.dataSourceId);
+    }
+    if (backup.nodeSize) {
+      setNodeSize(backup.nodeSize);
     }
     
     toast.success('백업 데이터가 복구되었습니다', {
@@ -239,13 +268,6 @@ const ProcessFlowEditorContent: React.FC = () => {
     }
   }, [lastAutoSaveTime]);
 
-  // 토큰 만료 전 저장 핸들러
-  const handleSaveBeforeExpiry = useCallback(async () => {
-    await saveFlow(false);
-    setLastSaveTime(new Date());
-    // 저장 성공 시 백업 삭제
-    deleteFlowBackup(workspaceId, currentFlow?.id || null);
-  }, [saveFlow, workspaceId, currentFlow?.id]);
 
   // 수동 저장 래퍼 (저장 시간 추적)
   const handleManualSave = useCallback(async () => {
@@ -262,22 +284,38 @@ const ProcessFlowEditorContent: React.FC = () => {
       return;
     }
 
+    // First, try to save normally to ensure data is persisted
+    try {
+      await saveFlow(false);
+      setLastSaveTime(new Date());
+      toast.success('Flow saved successfully', {
+        duration: 3000,
+        icon: '✅'
+      });
+    } catch (saveError) {
+      console.error('Failed to save flow:', saveError);
+      toast.error('Failed to save flow');
+      return; // Don't proceed with versioning if save failed
+    }
+
+    // Then attempt versioning (this is optional and can fail)
     const versionName = `${flowName} - Version ${new Date().toLocaleString()}`;
     const description = `Saved from editor at ${new Date().toLocaleString()}`;
     
     try {
+      console.log('🔄 Attempting to create new version...');
       const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/versions`, {
         name: versionName,
         description,
-        flow_data: { nodes, edges }
+        flow_data: { nodes, edges, nodeSize }
       });
       
-      // Update the current version number in currentFlow
+      // Update the flow data in currentFlow (version number is optional)
       if (response.data && currentFlow) {
         const updatedFlow = {
           ...currentFlow,
-          current_version: response.data.version_number,
-          flow_data: { nodes, edges }  // Include current editor state
+          flow_data: { nodes, edges, nodeSize },  // Include current editor state
+          ...(response.data.version_number && { current_version: response.data.version_number })  // Only add if available
         };
         // Update flows list to reflect new version
         setFlows(prevFlows => 
@@ -287,20 +325,37 @@ const ProcessFlowEditorContent: React.FC = () => {
         setCurrentFlow(updatedFlow);
       }
       
-      setLastSaveTime(new Date());
-      toast.success('Saved as new version successfully');
+      toast.success('New version created successfully', {
+        duration: 3000,
+        icon: '🆕'
+      });
     } catch (error: any) {
-      console.error('Failed to save as new version:', error);
-      if (error.response?.status === 503 || error.response?.status === 500) {
-        toast.error('Version management is not available. The flow has been saved normally.', {
+      console.error('Failed to create new version (but flow was saved):', error);
+      
+      // More detailed error handling
+      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+        toast.error('Version management service is unavailable. Your changes have been saved to the main flow.', {
+          duration: 5000,
+          icon: '⚠️'
+        });
+      } else if (error.response?.status === 500) {
+        toast.error('Server error during version creation. Your changes have been saved to the main flow.', {
+          duration: 5000,
+          icon: '⚠️'
+        });
+      } else if (error.response?.status === 503) {
+        toast.error('Version management is temporarily unavailable. Your changes have been saved to the main flow.', {
           duration: 5000,
           icon: '⚠️'
         });
       } else {
-        toast.error('Failed to save as new version');
+        toast.error('Could not create new version, but your changes have been saved to the main flow.', {
+          duration: 5000,
+          icon: '⚠️'
+        });
       }
     }
-  }, [currentFlow, flowName, nodes, edges, saveFlow, setFlows, setCurrentFlow]);
+  }, [currentFlow, flowName, nodes, edges, nodeSize, saveFlow, setFlows, setCurrentFlow]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -345,7 +400,7 @@ const ProcessFlowEditorContent: React.FC = () => {
           id: `${data.code}_${Date.now()}`,
           type: 'equipment',
           position,
-          style: { width: 200, height: getNodeHeight(nodeSize) },
+          style: { width: 200, height: getNodeHeight('1') },
           data: {
             label: data.name,
             equipmentType: data.code,
@@ -354,6 +409,7 @@ const ProcessFlowEditorContent: React.FC = () => {
             status: 'STOP',
             icon: data.icon,
             displayMeasurements: [],
+            nodeSize: '1',
           },
         };
       } else if (type === 'text') {
@@ -395,8 +451,8 @@ const ProcessFlowEditorContent: React.FC = () => {
           id: `${templateType}_${Date.now()}`,
           type: templateType,
           position,
-          style: templateType === 'group' ? { width: 300, height: 200 } : templateType === 'equipment' ? { width: 200, height: getNodeHeight(nodeSize) } : undefined,
-          data: { ...data },
+          style: templateType === 'group' ? { width: 300, height: 200 } : templateType === 'equipment' ? { width: 200, height: getNodeHeight('1') } : undefined,
+          data: { ...data, nodeSize: templateType === 'equipment' ? '1' : data.nodeSize },
         };
       } else {
         return;
@@ -450,9 +506,9 @@ const ProcessFlowEditorContent: React.FC = () => {
   const handleExportFlow = () => {
     const exportData = {
       name: flowName,
-      flow_data: { nodes, edges },
+      flow_data: { nodes, edges, nodeSize },
       exported_at: new Date().toISOString(),
-      version: currentFlow?.current_version || 1
+      version: (currentFlow as any)?.current_version || 1
     };
     
     const dataStr = JSON.stringify(exportData, null, 2);
@@ -495,7 +551,7 @@ const ProcessFlowEditorContent: React.FC = () => {
               />
               {currentFlow && (
                 <span className="text-sm text-gray-500">
-                  v{currentFlow.current_version || 1}
+                  v{(currentFlow as any)?.current_version || 1}
                 </span>
               )}
             </div>
@@ -524,9 +580,9 @@ const ProcessFlowEditorContent: React.FC = () => {
                   >
                     <div className="flex items-center space-x-2">
                       <Save size={14} />
-                      <span>Save as New Version</span>
+                      <span>Save & Create Version</span>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Creates a new version</div>
+                    <div className="text-xs text-gray-500 mt-1">Saves flow and attempts to create version</div>
                   </button>
                   <button
                     onClick={() => {
@@ -615,28 +671,73 @@ const ProcessFlowEditorContent: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 relative">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onNodeDoubleClick={onNodeDoubleClick}
-          nodeTypes={memoizedNodeTypes}
-          edgeTypes={memoizedEdgeTypes}
-          defaultEdgeOptions={defaultEdgeOptions}
-          connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
-          connectionMode="loose"
-          snapToGrid={true}
-          snapGrid={[15, 15]}
-          fitView
+        <ReactFlowErrorBoundary
+          flowData={{ nodes, edges, flowName, dataSourceId: selectedDataSourceId, nodeSize }}
+          onError={(error) => {
+            errorReportingService.reportError({
+              component: 'ReactFlow',
+              message: error.message,
+              stack: error.stack,
+              level: 'error',
+              context: {
+                nodeCount: nodes.length,
+                edgeCount: edges.length,
+                flowName,
+                selectedDataSourceId
+              },
+              tags: ['reactflow', 'flow-editor']
+            });
+          }}
+          onSaveBackup={() => {
+            saveFlowBackup(workspaceId, currentFlow?.id || null, {
+              nodes,
+              edges,
+              flowName,
+              dataSourceId: selectedDataSourceId || undefined,
+              nodeSize,
+            });
+          }}
+          onLoadBackup={() => {
+            const backup = loadFlowBackup(workspaceId, currentFlow?.id || null);
+            if (backup) {
+              setNodes(backup.nodes);
+              setEdges(backup.edges);
+              setFlowName(backup.flowName);
+              if (backup.dataSourceId) {
+                setSelectedDataSourceId(backup.dataSourceId);
+              }
+              if (backup.nodeSize) {
+                setNodeSize(backup.nodeSize);
+              }
+            }
+          }}
         >
-          <Background color="#ffffff" gap={16} />
-          <Controls />
-          <MiniMap nodeColor={nodeColor} />
-        </ReactFlow>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onNodeDoubleClick={onNodeDoubleClick}
+            nodeTypes={memoizedNodeTypes}
+            edgeTypes={memoizedEdgeTypes}
+            defaultEdgeOptions={defaultEdgeOptions}
+            connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
+            connectionMode="loose"
+            nodesDraggable={true}
+            nodesConnectable={true}
+            elementsSelectable={true}
+            snapToGrid={true}
+            snapGrid={[15, 15]}
+            fitView
+          >
+            <Background variant="dots" gap={20} size={1} color="#e5e7eb" />
+            <Controls />
+            <MiniMap nodeColor={nodeColor} />
+          </ReactFlow>
+        </ReactFlowErrorBoundary>
 
         {/* Sidebar */}
         <EditorSidebar
@@ -723,10 +824,6 @@ const ProcessFlowEditorContent: React.FC = () => {
           onClose={() => setIsMeasurementSpecDialogOpen(false)}
         />
 
-        {/* Token Status Monitor */}
-        <TokenStatusMonitor
-          onSaveBeforeExpiry={handleSaveBeforeExpiry}
-        />
 
         {/* Backup Recovery Modal */}
         <BackupRecoveryModal
@@ -743,10 +840,12 @@ const ProcessFlowEditorContent: React.FC = () => {
 
 export const ProcessFlowEditor: React.FC = () => {
   return (
-    <Layout title="Process Flow Editor">
-      <ReactFlowProvider>
-        <ProcessFlowEditorContent />
-      </ReactFlowProvider>
-    </Layout>
+    <PageErrorBoundary>
+      <Layout title="Process Flow Editor">
+        <ReactFlowProvider>
+          <ProcessFlowEditorContent />
+        </ReactFlowProvider>
+      </Layout>
+    </PageErrorBoundary>
   );
 };

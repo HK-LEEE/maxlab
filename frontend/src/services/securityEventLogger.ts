@@ -43,7 +43,7 @@ export class SecurityEventLogger {
 
   private constructor(config?: Partial<SecurityEventConfig>) {
     this.config = {
-      enabled: true,
+      enabled: process.env.NODE_ENV === 'production', // 개발 환경에서는 비활성화
       serverEndpoint: '/api/security/events',
       batchSize: 10,
       flushInterval: 30000, // 30초
@@ -175,6 +175,12 @@ export class SecurityEventLogger {
    * 서버로 이벤트 전송
    */
   private async sendEventsToServer(events: SecurityEvent[]): Promise<void> {
+    // 개발 환경에서는 콘솔에만 로그
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔒 Security Events (Development Mode):', events);
+      return;
+    }
+
     const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
     const endpoint = `${authUrl}${this.config.serverEndpoint}`;
 

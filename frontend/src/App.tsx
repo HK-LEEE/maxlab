@@ -72,32 +72,88 @@ function App() {
   const logout = useAuthStore((state) => state.logout);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   
-  // 자동 로그아웃 이벤트 리스너
+  // 통합 인증 상태 관리 및 리다이렉트 시스템
   useEffect(() => {
     const handleAutoLogout = (event: CustomEvent) => {
       console.log('🔓 Auto logout triggered:', event.detail);
       
-      // Public 페이지인지 확인 (로그인 불필요)
       const currentPath = window.location.pathname;
+      const currentSearch = window.location.search;
       const isPublicPage = currentPath.startsWith('/public/flow/');
+      const isLoginPage = currentPath === '/login';
+      const isOAuthCallback = currentPath === '/oauth/callback';
+      
+      // 이미 로그인 페이지나 OAuth 콜백 페이지에 있으면 추가 처리 불요
+      if (isLoginPage || isOAuthCallback) {
+        console.log('Already on auth page, skipping redirect');
+        logout();
+        return;
+      }
       
       logout();
       
       // Public 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
-      if (!isPublicPage && event.detail?.reason === 'token_refresh_failed') {
+      if (!isPublicPage) {
         console.log('Session expired, redirecting to login...');
         // 현재 페이지를 기억해서 로그인 후 돌아올 수 있도록
-        const returnUrl = encodeURIComponent(currentPath + window.location.search);
+        const returnUrl = encodeURIComponent(currentPath + currentSearch);
         window.location.href = `/login?return=${returnUrl}`;
-      } else if (isPublicPage) {
+      } else {
         console.log('Session expired on public page, staying on current page...');
       }
     };
 
+    // 토큰 만료 경고 이벤트 리스너
+    const handleTokenExpiring = (event: CustomEvent) => {
+      console.log('⚠️ Token expiring soon:', event.detail);
+      
+      // 사용자에게 세션 만료 임박 알림
+      const timeToExpiry = event.detail.timeToExpiry;
+      const message = event.detail.message || 'Your session will expire soon. Please save your work.';
+      
+      // 커스텀 이벤트로 UI 컴포넌트에 알림 전달
+      window.dispatchEvent(new CustomEvent('ui:show_expiry_warning', {
+        detail: { timeToExpiry, message }
+      }));
+    };
+
+    // Refresh Token 만료 임박 이벤트 리스너
+    const handleRefreshTokenExpiring = (event: CustomEvent) => {
+      console.log('⚠️ Refresh token expiring soon:', event.detail);
+      
+      const timeToExpiry = event.detail.timeToExpiry;
+      const message = event.detail.message || 'Your session will expire soon. Please log in again to maintain access.';
+      
+      // 중요한 경고이므로 더 강한 알림
+      window.dispatchEvent(new CustomEvent('ui:show_critical_warning', {
+        detail: { timeToExpiry, message, action: 'login' }
+      }));
+    };
+
+    // 네트워크 오류로 인한 토큰 갱신 실패 이벤트 리스너
+    const handleTokenRefreshNetworkError = (event: CustomEvent) => {
+      console.log('🌐 Token refresh network error:', event.detail);
+      
+      // 네트워크 오류는 일시적일 수 있으므로 즉시 로그아웃하지 않음
+      window.dispatchEvent(new CustomEvent('ui:show_network_warning', {
+        detail: { 
+          message: 'Connection issues detected. Your session may expire if the problem persists.',
+          canRetry: true
+        }
+      }));
+    };
+
+    // 이벤트 리스너 등록
     window.addEventListener('auth:logout', handleAutoLogout as EventListener);
+    window.addEventListener('auth:token_expiring', handleTokenExpiring as EventListener);
+    window.addEventListener('auth:refresh_token_expiring', handleRefreshTokenExpiring as EventListener);
+    window.addEventListener('auth:network_error', handleTokenRefreshNetworkError as EventListener);
     
     return () => {
       window.removeEventListener('auth:logout', handleAutoLogout as EventListener);
+      window.removeEventListener('auth:token_expiring', handleTokenExpiring as EventListener);
+      window.removeEventListener('auth:refresh_token_expiring', handleRefreshTokenExpiring as EventListener);
+      window.removeEventListener('auth:network_error', handleTokenRefreshNetworkError as EventListener);
     };
   }, [logout]);
   

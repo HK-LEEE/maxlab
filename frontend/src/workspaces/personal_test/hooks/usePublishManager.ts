@@ -113,10 +113,22 @@ export const usePublishManager = (workspaceId: string) => {
     }
 
     try {
+      // Debug: 게시하려는 플로우 확인
+      const flowToPublish = flows.find(f => f.id === flowId);
+      console.log('📤 Publishing flow:', {
+        flowId,
+        flowName: flowToPublish?.name,
+        totalNodes: flowToPublish?.flow_data?.nodes?.length || 0,
+        nodeList: flowToPublish?.flow_data?.nodes?.map((n: any) => ({ id: n.id, type: n.type, label: n.data?.label })) || [],
+        flowData: flowToPublish?.flow_data
+      });
+
       const response = await apiClient.put(
         `/api/v1/personal-test/process-flow/flows/${flowId}/publish`,
         { workspace_id: workspaceUuid }
       );
+      
+      console.log('✅ Publish response:', response.data);
       
       // Update the flow in state
       setFlows(prev => prev.map(flow => 

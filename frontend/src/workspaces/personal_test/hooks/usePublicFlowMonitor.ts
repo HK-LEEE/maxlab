@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Node, Edge } from 'reactflow';
+import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
+import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { apiClient } from '../../../api/client';
 import { useWebSocket } from './useWebSocket';
 import axios from 'axios';
@@ -22,7 +23,7 @@ interface EquipmentStatus {
   equipment_code: string;
   equipment_name: string;
   status: 'ACTIVE' | 'PAUSE' | 'STOP';
-  last_run_time?: string;
+  last_run_time: string | null;
 }
 
 interface MeasurementData {
@@ -45,6 +46,17 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   const [flow, setFlow] = useState<ProcessFlow | null>(null);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+
+  // ReactFlow change handlers for node resizing support
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
+
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    []
+  );
   const [equipmentStatuses, setEquipmentStatuses] = useState<EquipmentStatus[]>([]);
   const [measurements, setMeasurements] = useState<MeasurementData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,9 +81,10 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   const publicClient = axios.create({
     baseURL: apiClient.defaults.baseURL,
     headers: {
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0',
+      'If-Modified-Since': 'Mon, 26 Jul 1997 05:00:00 GMT',
     },
   });
 
@@ -107,16 +120,74 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       }
       setError(null);
 
-      // Get the published flow with cache-busting
+      // Get the published flow with aggressive cache-busting
       const flowResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}?_t=${Date.now()}`
+        `/api/v1/personal-test/process-flow/public/${publishToken}?_t=${Date.now()}&_r=${Math.random().toString(36).substring(2)}`
       );
       const flowData = flowResponse.data;
+      
+      // Debug: 로드된 플로우 데이터 확인
+      console.log('🌐 Published flow data loaded:', {
+        flowName: flowData.name,
+        totalNodes: flowData.flow_data?.nodes?.length || 0,
+        totalEdges: flowData.flow_data?.edges?.length || 0,
+        nodeList: flowData.flow_data?.nodes?.map((n: any) => ({ id: n.id, type: n.type, label: n.data?.label })) || [],
+        publishToken,
+        flowId: flowData.id,
+        updatedAt: flowData.updated_at,
+        isPublished: flowData.is_published
+      });
+      
       setFlow(flowData);
 
       // Set nodes and edges only on initial load
       if (isInitialLoad && flowData.flow_data) {
-        setNodes(flowData.flow_data.nodes || []);
+        // Process nodes to ensure proper sizing like in useFlowEditor
+        const processedNodes = (flowData.flow_data.nodes || []).map((node: any) => {
+          if (node.type === 'equipment') {
+            // Use saved nodeSize from flow data, fallback to node data, then default
+            const savedNodeSize = flowData.flow_data?.nodeSize || node.data?.nodeSize || '1';
+            const getNodeHeight = (size: '1' | '2' | '3') => {
+              switch (size) {
+                case '1': return 170;
+                case '2': return 220; 
+                case '3': return 270;
+                default: return 170;
+              }
+            };
+            const defaultHeight = getNodeHeight(savedNodeSize);
+            const defaultWidth = 200;
+            
+            // CRITICAL: Prioritize stored resized dimensions over nodeSize defaults
+            const finalWidth = node.style?.width || defaultWidth;
+            const finalHeight = node.style?.height || defaultHeight;
+            
+            console.log('🌐 PublicFlowMonitor - preserving stored dimensions:', {
+              nodeId: node.id,
+              savedNodeSize,
+              storedStyle: node.style,
+              defaults: { width: defaultWidth, height: defaultHeight },
+              final: { width: finalWidth, height: finalHeight }
+            });
+            
+            return {
+              ...node,
+              style: {
+                // PRESERVE stored resized dimensions - they take priority over nodeSize defaults
+                width: finalWidth,
+                height: finalHeight,
+                ...node.style // Preserve other style properties
+              },
+              data: {
+                ...node.data,
+                nodeSize: savedNodeSize // Ensure nodeSize is in data
+              }
+            };
+          }
+          return node;
+        });
+        
+        setNodes(processedNodes);
         setEdges(flowData.flow_data.edges || []);
       }
 
@@ -219,8 +290,10 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         measurements: newMeasurementMap
       });
 
-      // Update nodes with real-time data
+      // Update nodes with real-time data - OPTIMIZED: Only update nodes that actually changed
       const updatedNodes = isInitialLoad ? flowData.flow_data?.nodes || [] : nodes;
+      let hasAnyNodeChanged = false;
+      
       const finalNodes = updatedNodes.map((node: Node) => {
         if (node.type === 'equipment' && node.data.equipmentCode) {
           const status = validStatuses.find(
@@ -260,19 +333,54 @@ export const usePublicFlowMonitor = (publishToken: string) => {
             };
           });
 
+          const newStatus = status?.status || 'STOP';
+          const newLastRunTime = status?.last_run_time || null;
+          
+          // Check if this node actually changed (skip on initial load)
+          if (!isInitialLoad) {
+            const statusChanged = node.data.status !== newStatus;
+            const lastRunTimeChanged = node.data.last_run_time !== newLastRunTime;
+            const measurementsChanged = !node.data.measurements || 
+              JSON.stringify(node.data.measurements) !== JSON.stringify(latestMeasurements);
+            
+            if (statusChanged || lastRunTimeChanged || measurementsChanged) {
+              hasAnyNodeChanged = true;
+              console.log('🌐 Public node data changed:', {
+                nodeId: node.id,
+                statusChanged: statusChanged ? `${node.data.status} → ${newStatus}` : false,
+                lastRunTimeChanged,
+                measurementsChanged,
+                measurementCount: latestMeasurements.length
+              });
+            } else {
+              return node; // No change, return original node
+            }
+          } else {
+            hasAnyNodeChanged = true; // Initial load always counts as change
+          }
+
           return {
             ...node,
             data: {
               ...node.data,
-              status: status?.status || 'STOP',
+              status: newStatus,
               measurements: latestMeasurements,
-              last_run_time: status?.last_run_time || null,
+              last_run_time: newLastRunTime,
             },
           };
         }
         return node;
       });
-      setNodes(finalNodes);
+      
+      // Only update nodes if something actually changed or it's initial load
+      if (hasAnyNodeChanged || isInitialLoad) {
+        if (!isInitialLoad) {
+          console.log('🌐 Updating public nodes due to data changes');
+        }
+        setNodes(finalNodes);
+      } else {
+        console.log('🌐 No public node updates needed - data unchanged');
+      }
 
       // Update edges based on node statuses
       const edgesToUpdate = isInitialLoad ? flowData.flow_data?.edges || [] : edges;
@@ -431,6 +539,8 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     flow,
     nodes,
     edges,
+    onNodesChange,
+    onEdgesChange,
     equipmentStatuses,
     measurements,
     isLoading,

@@ -194,6 +194,18 @@ export async function attemptSilentLogin(): Promise<SilentAuthResult> {
     return { success: false, error: 'Silent authentication already in progress' };
   }
 
+  // OAuth 콜백 처리 중인지 추가 확인
+  if (document.body.hasAttribute('data-oauth-processing')) {
+    console.log('🚫 OAuth callback processing in progress, cannot start silent auth');
+    return { success: false, error: 'OAuth callback in progress' };
+  }
+
+  // 팝업 OAuth 진행 중인지 확인
+  if (sessionStorage.getItem('oauth_popup_mode') === 'true') {
+    console.log('🚫 Popup OAuth in progress, cannot start silent auth');
+    return { success: false, error: 'Popup OAuth in progress' };
+  }
+
   console.log('✅ Silent auth conditions met, starting...');
   const silentAuth = new SilentAuth();
   try {
@@ -231,9 +243,27 @@ export function isSafePageForTokenRefresh(): boolean {
     sessionStorage.getItem('silent_oauth_state') ||
     sessionStorage.getItem('oauth_code_verifier')
   );
+
+  // 글로벌 OAuth 콜백 처리 상태 확인 (DOM 기반)
+  const isOAuthCallbackProcessing = Boolean(
+    document.querySelector('[data-oauth-processing="true"]') ||
+    window.location.search.includes('code=') ||
+    window.location.search.includes('state=')
+  );
+
+  // 최근 토큰 갱신 시간 확인 (너무 빈번한 갱신 방지)
+  const lastTokenRefresh = localStorage.getItem('lastTokenRefresh');
+  const recentRefreshThreshold = 30000; // 30초
+  const now = Date.now();
+  
+  if (lastTokenRefresh && (now - parseInt(lastTokenRefresh)) < recentRefreshThreshold) {
+    console.log('🚫 Token was refreshed recently, skipping to prevent excessive refresh attempts');
+    return false;
+  }
   
   // 현재 페이지가 안전하지 않거나 OAuth 처리 중이면 false
   if (unsafePaths.some(path => currentPath.startsWith(path))) {
+    console.log('🚫 Unsafe path for token refresh:', currentPath);
     return false;
   }
   
@@ -244,6 +274,11 @@ export function isSafePageForTokenRefresh(): boolean {
   
   if (isOAuthInProgress) {
     console.log('🚫 OAuth flow in progress, token refresh not safe');
+    return false;
+  }
+
+  if (isOAuthCallbackProcessing) {
+    console.log('🚫 OAuth callback processing detected, token refresh not safe');
     return false;
   }
   
