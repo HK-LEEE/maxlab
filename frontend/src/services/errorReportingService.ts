@@ -74,6 +74,11 @@ export class ErrorReportingService {
   private setupGlobalErrorHandlers(): void {
     // Global error handler
     window.addEventListener('error', (event) => {
+      // Filter out ResizeObserver loop errors - these are harmless performance warnings
+      if (event.message && event.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+        return; // Suppress ResizeObserver loop errors
+      }
+      
       this.reportError({
         component: 'Global',
         message: event.message,
