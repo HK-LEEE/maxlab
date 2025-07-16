@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Database, Plus, Edit2, Trash2, Check, Settings, ArrowRight, Code } from 'lucide-react';
+import { X, Database, Plus, Edit2, Trash2, Check, ArrowRight, Code } from 'lucide-react';
 import { apiClient } from '../../../../api/client';
-import { DataSourceMappingDialog } from './DataSourceMappingDialog';
 import { FieldMappingDialog } from './FieldMappingDialog';
 import { QueryEditor } from './QueryEditor';
 
@@ -34,7 +33,6 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [editingSource, setEditingSource] = useState<DataSource | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const [mappingDialogSource, setMappingDialogSource] = useState<{ id: string; name: string } | null>(null);
   const [fieldDialogSource, setFieldDialogSource] = useState<{ id: string; type: string } | null>(null);
   
   // Form state
@@ -470,16 +468,6 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
                           <ArrowRight size={16} />
                         </button>
                         <button
-                          onClick={() => setMappingDialogSource({
-                            id: source.id,
-                            name: source.source_type.toUpperCase()
-                          })}
-                          className="p-2 hover:bg-gray-100 rounded"
-                          title="Equipment/Measurement Mappings"
-                        >
-                          <Settings size={16} />
-                        </button>
-                        <button
                           onClick={() => handleEdit(source)}
                           className="p-2 hover:bg-gray-100 rounded"
                           title="Edit"
@@ -504,14 +492,6 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
       </div>
 
       {/* Mapping Dialog */}
-      {mappingDialogSource && (
-        <DataSourceMappingDialog
-          isOpen={true}
-          onClose={() => setMappingDialogSource(null)}
-          dataSourceId={mappingDialogSource.id}
-          dataSourceName={mappingDialogSource.name}
-        />
-      )}
 
       {/* Field Mapping Dialog */}
       {fieldDialogSource && (

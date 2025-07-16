@@ -470,7 +470,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     <>
       <NodeResizer
         color="#3b82f6"
-        isVisible={selected}
+        isVisible={selected && !window.location.pathname.includes('monitor') && !window.location.pathname.includes('public')}
         minWidth={200}
         minHeight={120}
         handleStyle={{ width: 8, height: 8 }}

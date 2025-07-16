@@ -8,7 +8,7 @@ import ReactFlow, {
 } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Save, FolderOpen, Download, Database, Ruler, Server, ChevronDown } from 'lucide-react';
+import { Save, FolderOpen, Download, Database, Server, ChevronDown } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
 import { GroupNode } from '../components/common/GroupNode';
@@ -25,7 +25,6 @@ import { EquipmentNodeErrorBoundary, GroupNodeErrorBoundary, TextNodeErrorBounda
 import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
 import { AlignmentMenu } from '../components/editor/AlignmentMenu';
-import { MeasurementSpecDialog } from '../components/editor/MeasurementSpecDialog';
 import { DataSourceDialog } from '../components/editor/DataSourceDialog';
 
 import { useFlowEditor } from '../hooks/useFlowEditor';
@@ -371,7 +370,6 @@ const ProcessFlowEditorContent: React.FC = () => {
     }
   }, [isDropdownOpen]);
 
-  const [isMeasurementSpecDialogOpen, setIsMeasurementSpecDialogOpen] = useState(false);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -648,13 +646,6 @@ const ProcessFlowEditorContent: React.FC = () => {
               <Database size={16} />
               <span>Data Sources</span>
             </button>
-            <button
-              onClick={() => setIsMeasurementSpecDialogOpen(true)}
-              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-            >
-              <Ruler size={16} />
-              <span>Measurement Specs</span>
-            </button>
           </div>
           <div className="flex items-center space-x-4">
             {lastAutoSaveTime && (
@@ -819,10 +810,6 @@ const ProcessFlowEditorContent: React.FC = () => {
           workspaceId={workspaceId}
         />
 
-        <MeasurementSpecDialog
-          isOpen={isMeasurementSpecDialogOpen}
-          onClose={() => setIsMeasurementSpecDialogOpen(false)}
-        />
 
 
         {/* Backup Recovery Modal */}

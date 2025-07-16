@@ -54,15 +54,15 @@ const FlowCanvas: React.FC<{
     <ReactFlow
       nodes={nodes}
       edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
+      onNodesChange={() => {}}
+      onEdgesChange={() => {}}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
       fitView={false}
-      nodesDraggable={true}
+      nodesDraggable={false}
       nodesConnectable={false}
-      elementsSelectable={true}
+      elementsSelectable={false}
       panOnDrag={true}
       zoomOnScroll={true}
       minZoom={0.1}

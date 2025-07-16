@@ -78,7 +78,7 @@ export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => 
       
       <NodeResizer
         color="#3b82f6"
-        isVisible={selected}
+        isVisible={selected && !window.location.pathname.includes('monitor') && !window.location.pathname.includes('public')}
         minWidth={100}
         minHeight={100}
       />
