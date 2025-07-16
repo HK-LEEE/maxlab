@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import log from '../../../utils/logger';
 import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { apiClient } from '../../../api/client';
@@ -110,7 +111,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
   });
 
   // Load flow data
-  const loadFlow = useCallback(async () => {
+  const loadFlow = useCallback(async (forceRefresh: boolean = false) => {
     if (!publishToken) return;
 
     try {
@@ -119,6 +120,16 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         setIsLoading(true);
       }
       setError(null);
+      
+      // Reset global scroll states for all nodes when force refreshing
+      if (forceRefresh && typeof window !== 'undefined') {
+        Object.keys(window).forEach(key => {
+          if (key.startsWith('autoScroll_')) {
+            delete (window as any)[key];
+          }
+        });
+        log.info('Global scroll states reset for force refresh (Public)');
+      }
 
       // Get the published flow with aggressive cache-busting
       const flowResponse = await publicClient.get(
@@ -126,16 +137,12 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       );
       const flowData = flowResponse.data;
       
-      // Debug: 로드된 플로우 데이터 확인
-      console.log('🌐 Published flow data loaded:', {
+      log.debug('Published flow data loaded', {
         flowName: flowData.name,
         totalNodes: flowData.flow_data?.nodes?.length || 0,
         totalEdges: flowData.flow_data?.edges?.length || 0,
-        nodeList: flowData.flow_data?.nodes?.map((n: any) => ({ id: n.id, type: n.type, label: n.data?.label })) || [],
         publishToken,
-        flowId: flowData.id,
-        updatedAt: flowData.updated_at,
-        isPublished: flowData.is_published
+        flowId: flowData.id
       });
       
       setFlow(flowData);
@@ -162,13 +169,6 @@ export const usePublicFlowMonitor = (publishToken: string) => {
             const finalWidth = node.style?.width || defaultWidth;
             const finalHeight = node.style?.height || defaultHeight;
             
-            console.log('🌐 PublicFlowMonitor - preserving stored dimensions:', {
-              nodeId: node.id,
-              savedNodeSize,
-              storedStyle: node.style,
-              defaults: { width: defaultWidth, height: defaultHeight },
-              final: { width: finalWidth, height: finalHeight }
-            });
             
             return {
               ...node,
@@ -196,7 +196,6 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         `/api/v1/personal-test/process-flow/public/${publishToken}/equipment/status?limit=100&_t=${Date.now()}`
       );
       const statuses = statusResponse.data.items || statusResponse.data;
-      // console.log('Public Equipment Status Response:', statuses);
       // Ensure statuses is always an array
       const validStatuses = Array.isArray(statuses) ? statuses : [];
       setEquipmentStatuses(validStatuses);
@@ -345,11 +344,9 @@ export const usePublicFlowMonitor = (publishToken: string) => {
             
             if (statusChanged || lastRunTimeChanged || measurementsChanged) {
               hasAnyNodeChanged = true;
-              console.log('🌐 Public node data changed:', {
+              log.debug('Public node data changed', {
                 nodeId: node.id,
                 statusChanged: statusChanged ? `${node.data.status} → ${newStatus}` : false,
-                lastRunTimeChanged,
-                measurementsChanged,
                 measurementCount: latestMeasurements.length
               });
             } else {
@@ -375,11 +372,9 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       // Only update nodes if something actually changed or it's initial load
       if (hasAnyNodeChanged || isInitialLoad) {
         if (!isInitialLoad) {
-          console.log('🌐 Updating public nodes due to data changes');
+          log.debug('Updating public nodes due to data changes');
         }
         setNodes(finalNodes);
-      } else {
-        console.log('🌐 No public node updates needed - data unchanged');
       }
 
       // Update edges based on node statuses
@@ -476,7 +471,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         setRetryCount(0);
       }
     } catch (err: any) {
-      console.error('Failed to load public flow:', err);
+      log.error('Failed to load public flow', { error: err });
       
       // Check if this is a retryable error
       const isRetryableError = err.response?.status === 503 || 
@@ -487,7 +482,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       if (isRetryableError && retryCount < maxRetries) {
         const nextRetry = retryCount + 1;
         setRetryCount(nextRetry);
-        console.log(`Retrying... (${nextRetry}/${maxRetries})`);
+        log.info(`Retrying public flow load (${nextRetry}/${maxRetries})`);
         
         // Exponential backoff: 2s, 4s, 8s
         const delay = Math.pow(2, nextRetry) * 1000;
@@ -554,7 +549,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     setAutoScroll,
     alarmCheck,
     setAlarmCheck,
-    forceRefresh: loadFlow,
+    forceRefresh: () => loadFlow(true),
     retryCount,
     maxRetries,
   };

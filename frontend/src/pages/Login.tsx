@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { LogIn, Shield } from 'lucide-react';
 import { authService } from '../services/authService';
 import { useAuthStore } from '../stores/authStore';
+import { devLog } from '../utils/logger';
 
 const MLLogo: React.FC = () => (
   <div className="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center">
@@ -88,10 +89,10 @@ export const Login: React.FC = () => {
           const returnUrl = getReturnUrl();
           navigate(returnUrl, { replace: true });
         } else {
-          console.log('Silent login failed, showing manual login options');
+          devLog.debug('Silent login failed, showing manual login options');
         }
       } catch (error) {
-        console.log('Silent login error:', error);
+        devLog.debug('Silent login error:', error);
       } finally {
         if (mountedRef.current) {
           setSilentLoginAttempting(false);
@@ -114,21 +115,21 @@ export const Login: React.FC = () => {
     setOauthLoading(true);
     
     try {
-      console.log('🚀 Login.tsx: Starting OAuth login...');
+      devLog.debug('🚀 Login.tsx: Starting OAuth login...');
       const user = await authService.loginWithPopupOAuth();
-      console.log('✅ Login.tsx: OAuth login successful, user:', user);
+      devLog.debug('✅ Login.tsx: OAuth login successful, user:', user);
       
-      console.log('🔍 Login.tsx: mountedRef.current =', mountedRef.current);
+      devLog.debug('🔍 Login.tsx: mountedRef.current =', mountedRef.current);
       if (!mountedRef.current) {
-        console.log('⚠️ Login.tsx: Component unmounted, but continuing anyway for OAuth completion');
+        devLog.debug('⚠️ Login.tsx: Component unmounted, but continuing anyway for OAuth completion');
         // OAuth 완료를 위해 계속 진행
       }
       
       // Create token for compatibility with existing auth store
       const token = localStorage.getItem('accessToken') || '';
-      console.log('🔑 Login.tsx: Setting auth with token:', token.substring(0, 20) + '...');
+      devLog.debug('🔑 Login.tsx: Setting auth with token:', token.substring(0, 20) + '...');
       setAuth(token, user);
-      console.log('🎉 Login.tsx: Auth set successfully, navigating to return URL');
+      devLog.debug('🎉 Login.tsx: Auth set successfully, navigating to return URL');
       
       toast.success(`Welcome back, ${user.full_name || user.username}!`);
       const returnUrl = getReturnUrl();

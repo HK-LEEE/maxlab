@@ -97,11 +97,12 @@ export const TokenRefreshTester: React.FC = () => {
     setIsRunning(false);
   };
 
-  const runRotationTest = async () => {
+  const runRotationTest = async (forceRefresh: boolean = false) => {
     setIsRunning(true);
     try {
-      const result = await runTokenRotationTest();
-      addResult('rotation_test', result.rotationResults.rotationMethod !== 'failed', result);
+      const result = await runTokenRotationTest(forceRefresh);
+      const success = result.rotationResults.rotationMethod !== 'failed';
+      addResult('rotation_test', success, result);
     } catch (error: any) {
       addResult('rotation_test', false, null, error.message);
     }
@@ -253,11 +254,18 @@ export const TokenRefreshTester: React.FC = () => {
             Session Test
           </button>
           <button
-            onClick={runRotationTest}
+            onClick={() => runRotationTest(false)}
             disabled={isRunning}
             className="bg-pink-500 text-white px-2 py-1 rounded text-xs disabled:opacity-50"
           >
             Rotation Test
+          </button>
+          <button
+            onClick={() => runRotationTest(true)}
+            disabled={isRunning}
+            className="bg-pink-600 text-white px-2 py-1 rounded text-xs disabled:opacity-50"
+          >
+            Force Rotation
           </button>
           <button
             onClick={runEncryptionTest}

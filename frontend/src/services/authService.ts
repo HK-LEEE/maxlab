@@ -368,7 +368,7 @@ export const authService = {
   /**
    * 인증 토큰 갱신 - Refresh Token 우선, Silent Auth 폴백
    */
-  refreshToken: async (): Promise<boolean> => {
+  refreshToken: async (forceRefresh: boolean = false): Promise<boolean> => {
     return tokenRefreshManager.refreshToken(async () => {
       try {
         console.log('🔄 Attempting token refresh with fallback chain...');
@@ -412,6 +412,20 @@ export const authService = {
             };
           } catch (refreshError: any) {
             console.warn('⚠️ Refresh token failed, falling back to silent auth:', refreshError.message);
+            
+            // 401 오류인 경우 특별한 처리
+            if (refreshError.message === 'refresh_token_invalid') {
+              console.error('🔒 Refresh token is invalid - likely expired or revoked');
+              
+              // 사용자에게 알림 이벤트 발송
+              window.dispatchEvent(new CustomEvent('auth:refresh_token_invalid', {
+                detail: { 
+                  message: 'Your session has expired. Please log in again.',
+                  reason: 'refresh_token_invalid',
+                  action: 'login_required'
+                }
+              }));
+            }
             // 다음 단계로 진행
           }
         }
@@ -448,7 +462,7 @@ export const authService = {
           error: error.message || 'Token refresh chain failed'
         };
       }
-    });
+    }, { forceRefresh });
   },
 
   /**

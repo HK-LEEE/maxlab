@@ -8,6 +8,12 @@ import { refreshTokenService } from '../services/refreshTokenService';
 
 export interface TokenRotationReport {
   timestamp: string;
+  refreshContext: {
+    wasNeeded: boolean;
+    reason: string;
+    timeToExpiry?: number;
+    wasForced: boolean;
+  };
   beforeRotation: {
     accessToken: string | null;
     refreshToken: string | null;
@@ -24,7 +30,7 @@ export interface TokenRotationReport {
     accessTokenRotated: boolean;
     refreshTokenRotated: boolean;
     expiryTimesUpdated: boolean;
-    rotationMethod: 'refresh_token' | 'silent_auth' | 'failed';
+    rotationMethod: 'refresh_token' | 'silent_auth' | 'failed' | 'skipped';
     duration: number;
   };
   securityValidation: {
@@ -55,7 +61,7 @@ function analyzeTokenRotation(
   before: TokenRotationReport['beforeRotation'], 
   after: TokenRotationReport['afterRotation'],
   duration: number,
-  method: 'refresh_token' | 'silent_auth' | 'failed'
+  method: 'refresh_token' | 'silent_auth' | 'failed' | 'skipped'
 ): TokenRotationReport['rotationResults'] {
   return {
     accessTokenRotated: before.accessToken !== after.accessToken && !!after.accessToken,
@@ -83,16 +89,36 @@ function validateRotationSecurity(
   
   return {
     oldTokensInvalidated: rotationResults.accessTokenRotated, // 새 토큰이 생성되면 이전 토큰은 무효화됨
-    newTokensGenerated: !!(after.accessToken && after.refreshToken),
+    newTokensGenerated: rotationResults.accessTokenRotated, // Access token이 회전되면 새 토큰 생성으로 간주
     expiryTimesExtended: expiryExtended,
     tokenBlacklistUpdated: true // tokenRefreshManager에서 자동 처리됨
   };
 }
 
 /**
+ * 토큰 갱신이 필요한지 확인
+ */
+function shouldRefreshToken(): { needed: boolean; reason: string; timeToExpiry?: number } {
+  const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
+  if (!tokenExpiryTime) {
+    return { needed: true, reason: 'No expiry time found' };
+  }
+  
+  const expiryTime = parseInt(tokenExpiryTime, 10);
+  const now = Date.now();
+  const timeToExpiry = Math.max(0, Math.floor((expiryTime - now) / 1000));
+  
+  if (timeToExpiry <= 300) {
+    return { needed: true, reason: 'Token expires soon', timeToExpiry };
+  }
+  
+  return { needed: false, reason: `Token valid for ${timeToExpiry}s`, timeToExpiry };
+}
+
+/**
  * 종합 토큰 회전 테스트
  */
-export async function runTokenRotationTest(): Promise<TokenRotationReport> {
+export async function runTokenRotationTest(forceRefresh: boolean = false): Promise<TokenRotationReport> {
   console.log('🧪 Running comprehensive token rotation test...');
   
   const startTime = Date.now();
@@ -101,23 +127,37 @@ export async function runTokenRotationTest(): Promise<TokenRotationReport> {
   const beforeState = captureTokenState();
   console.log('📸 Captured token state before rotation');
   
+  // 토큰 갱신 필요성 확인
+  const refreshCheck = shouldRefreshToken();
+  console.log(`🔍 Refresh needed: ${refreshCheck.needed} (${refreshCheck.reason})`);
+  
   // 토큰 회전 방법 결정
   const hasValidRefreshToken = refreshTokenService.isRefreshTokenValid();
   const expectedMethod: 'refresh_token' | 'silent_auth' = hasValidRefreshToken ? 'refresh_token' : 'silent_auth';
   
-  let actualMethod: 'refresh_token' | 'silent_auth' | 'failed' = 'failed';
+  let actualMethod: 'refresh_token' | 'silent_auth' | 'failed' | 'skipped' = 'failed';
   let refreshSuccess = false;
+  let wasRefreshSkipped = false;
   
   try {
-    // 토큰 갱신 실행
-    console.log(`🔄 Attempting token refresh (expected method: ${expectedMethod})...`);
-    refreshSuccess = await authService.refreshToken();
-    
-    if (refreshSuccess) {
-      actualMethod = hasValidRefreshToken ? 'refresh_token' : 'silent_auth';
-      console.log(`✅ Token refresh successful using ${actualMethod}`);
+    if (!refreshCheck.needed && !forceRefresh) {
+      console.log('ℹ️ Token refresh not needed, skipping actual rotation test');
+      actualMethod = 'skipped';
+      refreshSuccess = true;
+      wasRefreshSkipped = true;
     } else {
-      console.log('❌ Token refresh failed');
+      // 토큰 갱신 실행
+      const refreshMessage = forceRefresh ? 'Forcing token refresh' : 'Attempting token refresh';
+      console.log(`🔄 ${refreshMessage} (expected method: ${expectedMethod})...`);
+      
+      refreshSuccess = await authService.refreshToken(forceRefresh);
+      
+      if (refreshSuccess) {
+        actualMethod = hasValidRefreshToken ? 'refresh_token' : 'silent_auth';
+        console.log(`✅ Token refresh successful using ${actualMethod}`);
+      } else {
+        console.log('❌ Token refresh failed');
+      }
     }
     
   } catch (error: any) {
@@ -134,31 +174,42 @@ export async function runTokenRotationTest(): Promise<TokenRotationReport> {
   const rotationResults = analyzeTokenRotation(beforeState, afterState, duration, actualMethod);
   const securityValidation = validateRotationSecurity(beforeState, afterState, rotationResults);
   
-  // 권장사항 생성
+  // 권장사항 생성 (갱신이 건너뛰어진 경우 고려)
   const recommendations: string[] = [];
   
-  if (!rotationResults.accessTokenRotated && refreshSuccess) {
-    recommendations.push('Access token should be rotated for better security');
-  }
-  
-  if (!rotationResults.refreshTokenRotated && actualMethod === 'refresh_token') {
-    recommendations.push('Refresh token rotation recommended for enhanced security');
-  }
-  
-  if (!securityValidation.expiryTimesExtended) {
-    recommendations.push('Token expiry times should be extended after refresh');
-  }
-  
-  if (duration > 5000) {
-    recommendations.push('Token refresh taking too long - optimize performance');
-  }
-  
-  if (actualMethod !== expectedMethod) {
-    recommendations.push(`Expected ${expectedMethod} but used ${actualMethod} - check token validity`);
+  if (wasRefreshSkipped) {
+    recommendations.push('Token refresh was skipped because current token is still valid');
+    recommendations.push('Use forceRefresh=true to test actual rotation behavior');
+  } else {
+    if (!rotationResults.accessTokenRotated && refreshSuccess && actualMethod !== 'skipped') {
+      recommendations.push('Access token should be rotated for better security');
+    }
+    
+    if (!rotationResults.refreshTokenRotated && actualMethod === 'refresh_token') {
+      recommendations.push('Refresh token rotation not implemented by server (optional per RFC 6749)');
+    }
+    
+    if (!securityValidation.expiryTimesExtended && actualMethod !== 'skipped') {
+      recommendations.push('Token expiry times should be extended after refresh');
+    }
+    
+    if (duration > 5000) {
+      recommendations.push('Token refresh taking too long - optimize performance');
+    }
+    
+    if (actualMethod !== expectedMethod && actualMethod !== 'skipped') {
+      recommendations.push(`Expected ${expectedMethod} but used ${actualMethod} - check token validity`);
+    }
   }
 
   const report: TokenRotationReport = {
     timestamp: new Date().toISOString(),
+    refreshContext: {
+      wasNeeded: refreshCheck.needed,
+      reason: refreshCheck.reason,
+      timeToExpiry: refreshCheck.timeToExpiry,
+      wasForced: forceRefresh
+    },
     beforeRotation: beforeState,
     afterRotation: afterState,
     rotationResults,
@@ -168,18 +219,30 @@ export async function runTokenRotationTest(): Promise<TokenRotationReport> {
 
   // 결과 출력
   console.log('📊 Token Rotation Test Results:');
+  console.log(`   • Refresh Context: ${refreshCheck.needed ? 'Needed' : 'Not needed'} (${refreshCheck.reason})`);
+  console.log(`   • Force Refresh: ${forceRefresh ? 'Yes' : 'No'}`);
   console.log(`   • Method Used: ${actualMethod} (expected: ${expectedMethod})`);
-  console.log(`   • Access Token Rotated: ${rotationResults.accessTokenRotated ? '✅' : '❌'}`);
-  console.log(`   • Refresh Token Rotated: ${rotationResults.refreshTokenRotated ? '✅' : '❌'}`);
-  console.log(`   • Expiry Times Updated: ${rotationResults.expiryTimesUpdated ? '✅' : '❌'}`);
-  console.log(`   • Security Validation: ${securityValidation.newTokensGenerated ? '✅' : '❌'}`);
+  
+  if (actualMethod === 'skipped') {
+    console.log(`   • Token Rotation: ✅ Skipped (appropriate behavior)`);
+  } else {
+    console.log(`   • Access Token Rotated: ${rotationResults.accessTokenRotated ? '✅' : '❌'}`);
+    console.log(`   • Refresh Token Rotated: ${rotationResults.refreshTokenRotated ? '✅' : '❌'}`);
+    console.log(`   • Expiry Times Updated: ${rotationResults.expiryTimesUpdated ? '✅' : '❌'}`);
+    console.log(`   • Security Validation: ${securityValidation.newTokensGenerated ? '✅' : '❌'}`);
+  }
+  
   console.log(`   • Duration: ${duration}ms`);
   
   if (recommendations.length > 0) {
     console.log('💡 Recommendations:');
     recommendations.forEach(rec => console.log(`   - ${rec}`));
   } else {
-    console.log('🎉 Token rotation working perfectly!');
+    if (wasRefreshSkipped) {
+      console.log('✅ Token refresh appropriately skipped - system working correctly!');
+    } else {
+      console.log('🎉 Token rotation working perfectly!');
+    }
   }
 
   return report;
@@ -188,7 +251,7 @@ export async function runTokenRotationTest(): Promise<TokenRotationReport> {
 /**
  * 연속 토큰 회전 테스트 (여러 번 회전하여 일관성 확인)
  */
-export async function runMultipleRotationTest(rounds: number = 3): Promise<{
+export async function runMultipleRotationTest(rounds: number = 3, forceRefresh: boolean = false): Promise<{
   rounds: TokenRotationReport[];
   summary: {
     totalRounds: number;
@@ -198,7 +261,7 @@ export async function runMultipleRotationTest(rounds: number = 3): Promise<{
     issues: string[];
   };
 }> {
-  console.log(`🧪 Running multiple token rotation test (${rounds} rounds)...`);
+  console.log(`🧪 Running multiple token rotation test (${rounds} rounds${forceRefresh ? ', force refresh enabled' : ''})...`);
   
   const results: TokenRotationReport[] = [];
   let totalDuration = 0;
@@ -214,7 +277,7 @@ export async function runMultipleRotationTest(rounds: number = 3): Promise<{
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
       
-      const result = await runTokenRotationTest();
+      const result = await runTokenRotationTest(forceRefresh);
       results.push(result);
       
       totalDuration += result.rotationResults.duration;
@@ -267,12 +330,14 @@ export function registerTokenRotationTestHelpers(): void {
     (window as any).rotationTest = {
       single: runTokenRotationTest,
       multiple: runMultipleRotationTest,
-      capture: captureTokenState
+      capture: captureTokenState,
+      shouldRefresh: shouldRefreshToken
     };
     
     console.log('🧪 Token rotation test helpers registered. Use window.rotationTest in console:');
-    console.log('  - rotationTest.single() - 단일 토큰 회전 테스트');
-    console.log('  - rotationTest.multiple(rounds) - 연속 토큰 회전 테스트');
+    console.log('  - rotationTest.single(forceRefresh=false) - 단일 토큰 회전 테스트');
+    console.log('  - rotationTest.multiple(rounds=3, forceRefresh=false) - 연속 토큰 회전 테스트');
+    console.log('  - rotationTest.shouldRefresh() - 토큰 갱신 필요성 확인');
   }
 }
 

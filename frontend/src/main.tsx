@@ -1,11 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
+import { devLog } from './utils/logger'
 
-console.log('main.tsx loaded');
+devLog.debug('main.tsx loaded');
 
 const rootElement = document.getElementById('root');
-console.log('Root element:', rootElement);
+devLog.debug('Root element:', rootElement);
 
 if (rootElement) {
   createRoot(rootElement).render(
@@ -13,7 +14,7 @@ if (rootElement) {
       <App />
     </StrictMode>,
   );
-  console.log('App rendered');
+  devLog.debug('App rendered');
 } else {
   console.error('Root element not found!');
 }

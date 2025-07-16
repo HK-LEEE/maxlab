@@ -1,4 +1,5 @@
 import type { Node, Edge } from 'reactflow';
+import log from '../../../utils/logger';
 
 export interface FlowBackupData {
   nodes: Node[];
@@ -38,9 +39,9 @@ export const saveFlowBackup = (
     };
 
     localStorage.setItem(backupKey, JSON.stringify(backupData));
-    console.log('🔄 Flow backup saved:', backupKey);
+    log.debug('Flow backup saved', { backupKey });
   } catch (error) {
-    console.error('Failed to save flow backup:', error);
+    log.error('Failed to save flow backup', { error });
   }
 };
 
@@ -68,10 +69,10 @@ export const loadFlowBackup = (
       return null;
     }
 
-    console.log('📁 Flow backup loaded:', backupKey);
+    log.debug('Flow backup loaded', { backupKey });
     return backupData;
   } catch (error) {
-    console.error('Failed to load flow backup:', error);
+    log.error('Failed to load flow backup', { error });
     return null;
   }
 };
@@ -86,9 +87,9 @@ export const deleteFlowBackup = (
   try {
     const backupKey = getBackupKey(workspaceId, flowId);
     localStorage.removeItem(backupKey);
-    console.log('🗑️ Flow backup deleted:', backupKey);
+    log.debug('Flow backup deleted', { backupKey });
   } catch (error) {
-    console.error('Failed to delete flow backup:', error);
+    log.error('Failed to delete flow backup', { error });
   }
 };
 
@@ -117,7 +118,7 @@ export const getAllWorkspaceBackups = (workspaceId: string): FlowBackupData[] =>
             
             backups.push(backupData);
           } catch (parseError) {
-            console.error('Failed to parse backup data:', parseError);
+            log.error('Failed to parse backup data', { parseError });
             localStorage.removeItem(key);
           }
         }
@@ -126,7 +127,7 @@ export const getAllWorkspaceBackups = (workspaceId: string): FlowBackupData[] =>
     
     return backups.sort((a, b) => b.timestamp - a.timestamp);
   } catch (error) {
-    console.error('Failed to get workspace backups:', error);
+    log.error('Failed to get workspace backups', { error });
     return [];
   }
 };
@@ -159,14 +160,14 @@ export const cleanupExpiredBackups = (): void => {
     
     keysToRemove.forEach(key => {
       localStorage.removeItem(key);
-      console.log('🧹 Cleaned up expired backup:', key);
+      log.debug('Cleaned up expired backup', { key });
     });
     
     if (keysToRemove.length > 0) {
-      console.log(`🧹 Cleaned up ${keysToRemove.length} expired backups`);
+      log.info('Cleaned up expired backups', { count: keysToRemove.length });
     }
   } catch (error) {
-    console.error('Failed to cleanup expired backups:', error);
+    log.error('Failed to cleanup expired backups', { error });
   }
 };
 
@@ -213,7 +214,7 @@ export const hasSignificantChanges = (
 ): boolean => {
   // 1. 플로우 이름 비교
   if (current.flowName !== backup.flowName) {
-    console.log('🔍 Flow name differs:', current.flowName, 'vs', backup.flowName);
+    log.debug('Flow name differs', { current: current.flowName, backup: backup.flowName });
     return true;
   }
 
@@ -221,19 +222,19 @@ export const hasSignificantChanges = (
   const currentDataSourceId = current.dataSourceId || undefined;
   const backupDataSourceId = backup.dataSourceId || undefined;
   if (currentDataSourceId !== backupDataSourceId) {
-    console.log('🔍 Data source differs:', currentDataSourceId, 'vs', backupDataSourceId);
+    log.debug('Data source differs', { current: currentDataSourceId, backup: backupDataSourceId });
     return true;
   }
 
   // 3. 노드 개수 비교
   if (current.nodes.length !== backup.nodes.length) {
-    console.log('🔍 Node count differs:', current.nodes.length, 'vs', backup.nodes.length);
+    log.debug('Node count differs', { current: current.nodes.length, backup: backup.nodes.length });
     return true;
   }
 
   // 4. 엣지 개수 비교
   if (current.edges.length !== backup.edges.length) {
-    console.log('🔍 Edge count differs:', current.edges.length, 'vs', backup.edges.length);
+    log.debug('Edge count differs', { current: current.edges.length, backup: backup.edges.length });
     return true;
   }
 
@@ -243,7 +244,7 @@ export const hasSignificantChanges = (
     const backupNode = backup.nodes.find(n => n.id === currentNode.id);
     
     if (!backupNode) {
-      console.log('🔍 Node missing in backup:', currentNode.id);
+      log.debug('Node missing in backup', { nodeId: currentNode.id });
       return true;
     }
 
@@ -254,14 +255,17 @@ export const hasSignificantChanges = (
     const backupY = Math.round(backupNode.position.y * 10) / 10;
     
     if (currentX !== backupX || currentY !== backupY) {
-      console.log('🔍 Node position differs:', currentNode.id, 
-                  `(${currentX},${currentY})`, 'vs', `(${backupX},${backupY})`);
+      log.debug('Node position differs', { 
+        nodeId: currentNode.id, 
+        current: { x: currentX, y: currentY }, 
+        backup: { x: backupX, y: backupY } 
+      });
       return true;
     }
 
     // 노드 타입 비교
     if (currentNode.type !== backupNode.type) {
-      console.log('🔍 Node type differs:', currentNode.id, currentNode.type, 'vs', backupNode.type);
+      log.debug('Node type differs', { nodeId: currentNode.id, current: currentNode.type, backup: backupNode.type });
       return true;
     }
 
@@ -269,7 +273,7 @@ export const hasSignificantChanges = (
     const currentDataStr = JSON.stringify(currentNode.data || {});
     const backupDataStr = JSON.stringify(backupNode.data || {});
     if (currentDataStr !== backupDataStr) {
-      console.log('🔍 Node data differs:', currentNode.id);
+      log.debug('Node data differs', { nodeId: currentNode.id });
       return true;
     }
   }
@@ -280,7 +284,7 @@ export const hasSignificantChanges = (
     const backupEdge = backup.edges.find(e => e.id === currentEdge.id);
     
     if (!backupEdge) {
-      console.log('🔍 Edge missing in backup:', currentEdge.id);
+      log.debug('Edge missing in backup', { edgeId: currentEdge.id });
       return true;
     }
 
@@ -289,17 +293,17 @@ export const hasSignificantChanges = (
         currentEdge.target !== backupEdge.target ||
         currentEdge.sourceHandle !== backupEdge.sourceHandle ||
         currentEdge.targetHandle !== backupEdge.targetHandle) {
-      console.log('🔍 Edge connection differs:', currentEdge.id);
+      log.debug('Edge connection differs', { edgeId: currentEdge.id });
       return true;
     }
 
     // 엣지 타입 비교
     if (currentEdge.type !== backupEdge.type) {
-      console.log('🔍 Edge type differs:', currentEdge.id, currentEdge.type, 'vs', backupEdge.type);
+      log.debug('Edge type differs', { edgeId: currentEdge.id, current: currentEdge.type, backup: backupEdge.type });
       return true;
     }
   }
 
-  console.log('✅ No significant changes found between current and backup');
+  log.debug('No significant changes found between current and backup');
   return false;
 };

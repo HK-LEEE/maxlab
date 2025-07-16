@@ -3,6 +3,7 @@ import { apiClient } from '../../../api/client';
 import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../stores/authStore';
 import { authService } from '../../../services/authService';
+import log from '../../../utils/logger';
 
 export interface ProcessFlow {
   id: string;
@@ -44,7 +45,7 @@ export const usePublishManager = (workspaceId: string) => {
     
     // 인증 상태 확인
     if (!isAuthenticated) {
-      console.log('🔒 User not authenticated, skipping flow load');
+      log.warn('User not authenticated, skipping flow load');
       setError('로그인이 필요합니다.');
       setIsLoading(false);
       return;
@@ -79,18 +80,18 @@ export const usePublishManager = (workspaceId: string) => {
       const status = err.response?.status;
       
       if (status === 401 || status === 403) {
-        console.log('🔒 Authentication error, attempting token refresh...');
+        log.info('Authentication error, attempting token refresh');
         
         // 토큰 갱신 시도
         const refreshSuccess = await authService.refreshToken();
         
         if (refreshSuccess) {
-          console.log('✅ Token refreshed, retrying flow load...');
+          log.info('Token refreshed, retrying flow load');
           // 재시도
           setTimeout(() => loadFlows(), 1000);
           return;
         } else {
-          console.log('❌ Token refresh failed, redirecting to login...');
+          log.warn('Token refresh failed, redirecting to login');
           setError('인증이 만료되었습니다. 다시 로그인해주세요.');
           toast.error('인증이 만료되었습니다. 다시 로그인해주세요.');
           // authService.logout이 이미 호출됨
@@ -115,12 +116,10 @@ export const usePublishManager = (workspaceId: string) => {
     try {
       // Debug: 게시하려는 플로우 확인
       const flowToPublish = flows.find(f => f.id === flowId);
-      console.log('📤 Publishing flow:', {
+      log.info('Publishing flow', {
         flowId,
         flowName: flowToPublish?.name,
-        totalNodes: flowToPublish?.flow_data?.nodes?.length || 0,
-        nodeList: flowToPublish?.flow_data?.nodes?.map((n: any) => ({ id: n.id, type: n.type, label: n.data?.label })) || [],
-        flowData: flowToPublish?.flow_data
+        totalNodes: flowToPublish?.flow_data?.nodes?.length || 0
       });
 
       const response = await apiClient.put(
@@ -128,7 +127,7 @@ export const usePublishManager = (workspaceId: string) => {
         { workspace_id: workspaceUuid }
       );
       
-      console.log('✅ Publish response:', response.data);
+      log.info('Flow published successfully', { flowId });
       
       // Update the flow in state
       setFlows(prev => prev.map(flow => 
@@ -158,12 +157,12 @@ export const usePublishManager = (workspaceId: string) => {
       const status = err.response?.status;
       
       if (status === 401 || status === 403) {
-        console.log('🔒 Authentication error during publish, attempting token refresh...');
+        log.info('Authentication error during publish, attempting token refresh');
         
         const refreshSuccess = await authService.refreshToken();
         
         if (refreshSuccess) {
-          console.log('✅ Token refreshed, retrying publish...');
+          log.info('Token refreshed, retrying publish');
           // 재시도
           return publishFlow(flowId);
         } else {
@@ -219,12 +218,12 @@ export const usePublishManager = (workspaceId: string) => {
       const status = err.response?.status;
       
       if (status === 401 || status === 403) {
-        console.log('🔒 Authentication error during unpublish, attempting token refresh...');
+        log.info('Authentication error during unpublish, attempting token refresh');
         
         const refreshSuccess = await authService.refreshToken();
         
         if (refreshSuccess) {
-          console.log('✅ Token refreshed, retrying unpublish...');
+          log.info('Token refreshed, retrying unpublish');
           // 재시도
           return unpublishFlow(flowId);
         } else {

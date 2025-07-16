@@ -104,16 +104,25 @@ export async function testTokenEndpointCapabilities(): Promise<OAuthServerTestRe
     }
 
     // 잘못된 refresh_token으로 테스트 (엔드포인트 존재 여부만 확인)
+    const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
+    const requestBody = new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: 'test_invalid_token',
+      client_id: import.meta.env.VITE_CLIENT_ID || 'maxlab'
+    });
+    
+    // Client secret이 설정되어 있으면 추가
+    if (clientSecret) {
+      requestBody.append('client_secret', clientSecret);
+      console.log('🔐 Including client_secret in test request');
+    }
+    
     const testResponse = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: 'test_invalid_token',
-        client_id: import.meta.env.VITE_CLIENT_ID || 'maxlab'
-      })
+      body: requestBody
     });
 
     // 400 (Bad Request) 또는 401 (Unauthorized)은 엔드포인트가 존재함을 의미

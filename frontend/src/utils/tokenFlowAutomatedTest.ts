@@ -110,6 +110,9 @@ export function createBasicTokenFlowTestSuite(): TokenFlowTestSuite {
         execute: async (): Promise<TokenFlowStepResult> => {
           const startTime = Date.now();
           try {
+            // 실제 토큰 상태 백업
+            const originalToken = await secureTokenStorage.getRefreshToken();
+            
             const testToken = `test_token_${Date.now()}`;
             
             // 저장 테스트
@@ -124,8 +127,15 @@ export function createBasicTokenFlowTestSuite(): TokenFlowTestSuite {
               throw new Error('Retrieved token does not match stored token');
             }
             
-            // 정리
-            await secureTokenStorage.clearRefreshToken();
+            // 실제 토큰 상태 복원
+            if (originalToken.token) {
+              await secureTokenStorage.storeRefreshToken(originalToken.token);
+            } else {
+              await secureTokenStorage.clearRefreshToken();
+            }
+            
+            // 정리 - 테스트 토큰만 제거하고 원래 토큰 유지
+            // 이미 위에서 복원했으므로 추가 정리 불필요
             
             return {
               success: true,

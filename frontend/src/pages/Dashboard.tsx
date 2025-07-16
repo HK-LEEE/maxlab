@@ -7,6 +7,7 @@ import { CreateWorkspaceModal } from '../components/workspace/CreateWorkspaceMod
 import { MVPModulesView } from '../components/mvp/MVPModulesView';
 import { workspaceApi } from '../api/workspaces';
 import { useAuthStore } from '../stores/authStore';
+import { devLog } from '../utils/logger';
 import type { Workspace, WorkspaceCreate } from '../types/workspace';
 
 export const Dashboard: React.FC = () => {
@@ -18,12 +19,12 @@ export const Dashboard: React.FC = () => {
   const { data: workspaceTree, isLoading, error } = useQuery({
     queryKey: ['workspaceTree'],
     queryFn: async () => {
-      console.log('🔄 Fetching workspace tree...');
-      console.log('🔑 Access token:', localStorage.getItem('accessToken') ? 'Present' : 'Missing');
-      console.log('👤 Current user:', user);
+      devLog.debug('🔄 Fetching workspace tree...');
+      devLog.debug('🔑 Access token:', localStorage.getItem('accessToken') ? 'Present' : 'Missing');
+      devLog.debug('👤 Current user:', user);
       
       const result = await workspaceApi.getWorkspaceTree();
-      console.log('✅ Workspace tree loaded:', result);
+      devLog.debug('✅ Workspace tree loaded:', result);
       return result;
     },
   });

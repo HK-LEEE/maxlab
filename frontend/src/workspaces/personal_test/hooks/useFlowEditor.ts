@@ -4,6 +4,7 @@ import { addEdge, useNodesState, useEdgesState } from 'reactflow';
 import { apiClient } from '../../../api/client';
 import { toast } from 'react-hot-toast';
 import { deleteFlowBackup } from '../utils/flowBackup';
+import log from '../../../utils/logger';
 
 interface ProcessFlow {
   id: string;
@@ -104,30 +105,10 @@ export const useFlowEditor = (workspaceId: string) => {
     }
     setError(null);
     
-    console.log('💾 SAVE FLOW - Complete Analysis:', {
+    log.debug('Flow save initiated', {
       totalNodes: nodes.length,
       flowName,
       nodeSize: nodeSize
-    });
-    
-    // Log equipment nodes with their style properties in detail
-    const equipmentNodes = nodes.filter(n => n.type === 'equipment');
-    console.log('💾 SAVE FLOW - Equipment Nodes Style Data:', equipmentNodes.map(node => ({
-      id: node.id,
-      type: node.type,
-      nodeSize: node.data?.nodeSize,
-      style: node.style,
-      styleTypes: node.style ? Object.entries(node.style).map(([key, value]) => 
-        [key, typeof value, value]) : null,
-      position: node.position
-    })));
-    
-    // Log the exact flow_data structure being sent to API
-    console.log('💾 SAVE FLOW - Exact API Payload:', {
-      flow_data: { nodes, edges, nodeSize },
-      nodeCount: nodes.length,
-      edgeCount: edges.length,
-      equipmentNodeStyles: equipmentNodes.map(n => ({ id: n.id, style: n.style }))
     });
     
     try {
@@ -145,7 +126,7 @@ export const useFlowEditor = (workspaceId: string) => {
           data_source_id: selectedDataSourceId,
         });
         // Update currentFlow with the response to ensure we have the latest data
-        console.log('Update response:', response.data);
+        log.debug('Flow update response received', { flowId: response.data.id });
         setCurrentFlow(response.data);
         if (!isAutoSave) {
           toast.success('Flow updated successfully');
@@ -165,14 +146,14 @@ export const useFlowEditor = (workspaceId: string) => {
       // 저장 성공 시 백업 삭제 (수동 저장일 때만, 자동 저장은 백업을 유지)
       if (!isAutoSave) {
         deleteFlowBackup(workspaceId, currentFlow?.id || null);
-        console.log('🗑️ Backup deleted after successful save');
+        log.debug('Backup deleted after successful save');
       }
     } catch (err) {
       setError('Failed to save process flow');
       if (!isAutoSave) {
         toast.error('Failed to save flow');
       }
-      console.error('Save error:', err);
+      log.error('Flow save failed', { error: err });
     } finally {
       if (!isAutoSave) {
         setIsSaving(false);
@@ -181,36 +162,16 @@ export const useFlowEditor = (workspaceId: string) => {
   };
 
   const loadFlow = async (flow: ProcessFlow) => {
-    console.log('📂 LOAD FLOW - Complete Analysis:', {
+    log.debug('Flow load initiated', {
       flowId: flow.id,
       flowName: flow.name,
       totalNodes: flow.flow_data?.nodes?.length || 0,
       flowDataSource: flow.data_source_id
     });
     
-    // Log detailed analysis of received equipment nodes from API
-    const apiEquipmentNodes = (flow.flow_data?.nodes || []).filter(n => n.type === 'equipment');
-    console.log('📂 LOAD FLOW - API Equipment Nodes Data:', apiEquipmentNodes.map(node => ({
-      id: node.id,
-      type: node.type,
-      nodeSize: node.data?.nodeSize,
-      style: node.style,
-      styleTypes: node.style ? Object.entries(node.style).map(([key, value]) => 
-        [key, typeof value, value]) : null,
-      position: node.position
-    })));
-    
-    // Log the raw flow_data structure received from API
-    console.log('📂 LOAD FLOW - Raw API Response Structure:', {
-      flow_data: flow.flow_data,
-      savedNodeSize: flow.flow_data?.nodeSize,
-      nodeCount: flow.flow_data?.nodes?.length || 0,
-      edgeCount: flow.flow_data?.edges?.length || 0
-    });
-    
     // 로드하는 플로우의 백업 데이터 삭제 (새로운 플로우 로드 시 백업 불필요)
     deleteFlowBackup(workspaceId, flow.id);
-    console.log('🗑️ Backup deleted for loaded flow:', flow.id);
+    log.debug('Backup deleted for loaded flow', { flowId: flow.id });
     
     setCurrentFlow(flow);
     setFlowName(flow.name);
@@ -219,13 +180,12 @@ export const useFlowEditor = (workspaceId: string) => {
     // Restore nodeSize from flow data
     if (flow.flow_data?.nodeSize) {
       setNodeSize(flow.flow_data.nodeSize);
-      console.log('Node size restored to:', flow.flow_data.nodeSize);
+      log.debug('Node size restored', { nodeSize: flow.flow_data.nodeSize });
     } else {
       setNodeSize('1'); // Default size if not saved
     }
     
-    // Debug: Log the selected data source ID
-    console.log('Selected data source ID set to:', flow.data_source_id || null);
+    log.debug('Data source ID set', { dataSourceId: flow.data_source_id || null });
     
     const nodesWithDefaults = (flow.flow_data.nodes || []).map((node: Node) => {
       // Ensure all nodes have proper structure
@@ -247,15 +207,6 @@ export const useFlowEditor = (workspaceId: string) => {
         const finalWidth = baseNode.style?.width || defaultWidth;
         const finalHeight = baseNode.style?.height || defaultHeight;
         
-        console.log('🔄 LoadFlow - preserving stored dimensions:', {
-          nodeId: baseNode.id,
-          savedNodeSize,
-          storedStyle: baseNode.style,
-          storedStyleTypes: baseNode.style ? Object.entries(baseNode.style).map(([k,v]) => [k, typeof v, v]) : null,
-          defaults: { width: defaultWidth, height: defaultHeight },
-          final: { width: finalWidth, height: finalHeight },
-          finalTypes: { width: typeof finalWidth, height: typeof finalHeight }
-        });
         
         return {
           ...baseNode,
@@ -606,14 +557,6 @@ export const useFlowEditor = (workspaceId: string) => {
         const finalHeight = shouldUpdateHeight ? newMinHeight : parsedCurrentHeight;
         const finalWidth = shouldUpdateWidth ? newMinWidth : parsedCurrentWidth;
 
-        console.log('🔧 FlowEditor nodeSize change - preserving larger dimensions:', {
-          nodeId: node.id,
-          nodeSize,
-          current: { height: parsedCurrentHeight, width: parsedCurrentWidth },
-          minimums: { height: newMinHeight, width: newMinWidth },
-          shouldUpdate: { height: shouldUpdateHeight, width: shouldUpdateWidth },
-          final: { height: finalHeight, width: finalWidth }
-        });
 
         return {
           ...node,
@@ -673,10 +616,7 @@ export const useFlowEditor = (workspaceId: string) => {
       setHasMoreEquipment(false);
       setMeasurementsList(measurementsRes.data);
     }).catch((err) => {
-      console.error('Failed to load equipment data:', err);
-      if (err.response?.data) {
-        console.error('Error details:', err.response.data);
-      }
+      log.error('Failed to load equipment data', { error: err });
     });
 
     // Load available flows
@@ -685,7 +625,7 @@ export const useFlowEditor = (workspaceId: string) => {
         setFlows(response.data);
       })
       .catch((err) => {
-        console.error('Failed to load flows:', err);
+        log.error('Failed to load flows', { error: err });
       });
 
     // Load existing flow if ID is provided
@@ -696,7 +636,7 @@ export const useFlowEditor = (workspaceId: string) => {
           loadFlow(response.data);
         })
         .catch((err) => {
-          console.error('Failed to load flow:', err);
+          log.error('Failed to load flow', { error: err });
           setError('Failed to load process flow');
         });
     }

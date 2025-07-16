@@ -36,6 +36,10 @@ export const OAuthCallback: React.FC = () => {
       
       isProcessingRef.current = true;
       
+      // OAuth 플로우 진행 중 상태 설정 (토큰 갱신 차단용)
+      sessionStorage.setItem('oauth_flow_in_progress', 'true');
+      sessionStorage.setItem('oauth_callback_processing', Date.now().toString());
+      
       // DOM에 OAuth 처리 중 상태 마킹 (다른 컴포넌트에서 감지 가능)
       document.body.setAttribute('data-oauth-processing', 'true');
       
@@ -100,6 +104,8 @@ export const OAuthCallback: React.FC = () => {
             sessionStorage.removeItem('oauth_popup_mode');
             sessionStorage.removeItem('silent_oauth_state');
             sessionStorage.removeItem('silent_oauth_code_verifier');
+            sessionStorage.removeItem('oauth_flow_in_progress');
+            sessionStorage.removeItem('oauth_callback_processing');
             
             // 성공 메시지 전송
             window.opener?.postMessage({
@@ -204,6 +210,9 @@ export const OAuthCallback: React.FC = () => {
         }
       } finally {
         isProcessingRef.current = false;
+        // OAuth 플로우 상태 정리
+        sessionStorage.removeItem('oauth_flow_in_progress');
+        sessionStorage.removeItem('oauth_callback_processing');
         // DOM에서 OAuth 처리 중 상태 제거
         document.body.removeAttribute('data-oauth-processing');
       }

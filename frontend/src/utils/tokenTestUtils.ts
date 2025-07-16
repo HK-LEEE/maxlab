@@ -6,6 +6,7 @@
 import { authService } from '../services/authService';
 import { refreshTokenService } from '../services/refreshTokenService';
 import { tokenRefreshManager } from '../services/tokenRefreshManager';
+import { isDevelopment } from './logger';
 
 export interface TokenTestReport {
   timestamp: string;

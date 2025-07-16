@@ -19,16 +19,10 @@ import { PublicProcessFlowMonitor } from './workspaces/personal_test/pages/Publi
 import { Profile } from './pages/Profile';
 import { TokenExpiryNotification, TokenStatusDebug } from './components/TokenExpiryNotification';
 import TokenRefreshTester from './components/TokenRefreshTester';
-import { registerGlobalTokenTestHelpers } from './utils/tokenTestUtils';
-import { registerOAuthTestHelpers } from './utils/oauthServerTest';
-import { registerSessionTestHelpers } from './utils/sessionPersistenceTest';
-import { registerTokenRotationTestHelpers } from './utils/tokenRotationTest';
-import { registerEncryptionTestHelpers } from './utils/encryptionTestUtils';
-import { registerSecurityEventTestHelpers } from './utils/securityEventTestUtils';
-import { registerTokenFlowTestHelpers } from './utils/tokenFlowAutomatedTest';
+import { isDevelopment, devLog } from './utils/logger';
 import './styles/index.css';
 
-console.log('App.tsx loaded');
+devLog.log('App.tsx loaded');
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,7 +60,7 @@ const AuthRefreshProvider: React.FC = () => {
 };
 
 function App() {
-  console.log('App component rendering');
+  devLog.debug('App component rendering');
   const [isInitializing, setIsInitializing] = useState(true);
   const setAuth = useAuthStore((state) => state.setAuth);
   const logout = useAuthStore((state) => state.logout);
@@ -75,7 +69,7 @@ function App() {
   // 통합 인증 상태 관리 및 리다이렉트 시스템
   useEffect(() => {
     const handleAutoLogout = (event: CustomEvent) => {
-      console.log('🔓 Auto logout triggered:', event.detail);
+      devLog.info('🔓 Auto logout triggered:', event.detail);
       
       const currentPath = window.location.pathname;
       const currentSearch = window.location.search;
@@ -85,7 +79,7 @@ function App() {
       
       // 이미 로그인 페이지나 OAuth 콜백 페이지에 있으면 추가 처리 불요
       if (isLoginPage || isOAuthCallback) {
-        console.log('Already on auth page, skipping redirect');
+        devLog.debug('Already on auth page, skipping redirect');
         logout();
         return;
       }
@@ -94,18 +88,18 @@ function App() {
       
       // Public 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
       if (!isPublicPage) {
-        console.log('Session expired, redirecting to login...');
+        devLog.info('Session expired, redirecting to login...');
         // 현재 페이지를 기억해서 로그인 후 돌아올 수 있도록
         const returnUrl = encodeURIComponent(currentPath + currentSearch);
         window.location.href = `/login?return=${returnUrl}`;
       } else {
-        console.log('Session expired on public page, staying on current page...');
+        devLog.info('Session expired on public page, staying on current page...');
       }
     };
 
     // 토큰 만료 경고 이벤트 리스너
     const handleTokenExpiring = (event: CustomEvent) => {
-      console.log('⚠️ Token expiring soon:', event.detail);
+      devLog.warn('⚠️ Token expiring soon:', event.detail);
       
       // 사용자에게 세션 만료 임박 알림
       const timeToExpiry = event.detail.timeToExpiry;
@@ -143,29 +137,69 @@ function App() {
       }));
     };
 
+    // Refresh Token 무효 이벤트 리스너
+    const handleRefreshTokenInvalid = (event: CustomEvent) => {
+      console.log('🔒 Refresh token invalid:', event.detail);
+      
+      // 중요한 오류이므로 사용자에게 강한 알림
+      window.dispatchEvent(new CustomEvent('ui:show_critical_warning', {
+        detail: { 
+          message: event.detail.message || 'Your session has expired. Please log in again.',
+          action: 'login',
+          reason: 'refresh_token_invalid'
+        }
+      }));
+    };
+
     // 이벤트 리스너 등록
     window.addEventListener('auth:logout', handleAutoLogout as EventListener);
     window.addEventListener('auth:token_expiring', handleTokenExpiring as EventListener);
     window.addEventListener('auth:refresh_token_expiring', handleRefreshTokenExpiring as EventListener);
     window.addEventListener('auth:network_error', handleTokenRefreshNetworkError as EventListener);
+    window.addEventListener('auth:refresh_token_invalid', handleRefreshTokenInvalid as EventListener);
     
     return () => {
       window.removeEventListener('auth:logout', handleAutoLogout as EventListener);
       window.removeEventListener('auth:token_expiring', handleTokenExpiring as EventListener);
       window.removeEventListener('auth:refresh_token_expiring', handleRefreshTokenExpiring as EventListener);
       window.removeEventListener('auth:network_error', handleTokenRefreshNetworkError as EventListener);
+      window.removeEventListener('auth:refresh_token_invalid', handleRefreshTokenInvalid as EventListener);
     };
   }, [logout]);
   
-  // 개발 환경에서 토큰 테스트 헬퍼 등록
+  // 개발 환경에서만 토큰 테스트 헬퍼 등록
   useEffect(() => {
-    registerGlobalTokenTestHelpers();
-    registerOAuthTestHelpers();
-    registerSessionTestHelpers();
-    registerTokenRotationTestHelpers();
-    registerEncryptionTestHelpers();
-    registerSecurityEventTestHelpers();
-    registerTokenFlowTestHelpers();
+    if (isDevelopment()) {
+      // 동적 import로 개발 환경에서만 테스트 헬퍼들을 로드
+      Promise.all([
+        import('./utils/tokenTestUtils'),
+        import('./utils/oauthServerTest'),
+        import('./utils/sessionPersistenceTest'),
+        import('./utils/tokenRotationTest'),
+        import('./utils/encryptionTestUtils'),
+        import('./utils/securityEventTestUtils'),
+        import('./utils/tokenFlowAutomatedTest')
+      ]).then(([
+        tokenTestUtils,
+        oauthServerTest,
+        sessionPersistenceTest,
+        tokenRotationTest,
+        encryptionTestUtils,
+        securityEventTestUtils,
+        tokenFlowAutomatedTest
+      ]) => {
+        tokenTestUtils.registerGlobalTokenTestHelpers();
+        oauthServerTest.registerOAuthTestHelpers();
+        sessionPersistenceTest.registerSessionTestHelpers();
+        tokenRotationTest.registerTokenRotationTestHelpers();
+        encryptionTestUtils.registerEncryptionTestHelpers();
+        securityEventTestUtils.registerSecurityEventTestHelpers();
+        tokenFlowAutomatedTest.registerTokenFlowTestHelpers();
+        devLog.debug('🧪 Development test helpers loaded');
+      }).catch((error) => {
+        devLog.warn('Failed to load test helpers:', error);
+      });
+    }
   }, []);
   
   // App 시작 시 자동 Silent 로그인 시도
@@ -178,7 +212,7 @@ function App() {
           return;
         }
         
-        console.log('🔄 Initializing app authentication...');
+        devLog.info('🔄 Initializing app authentication...');
         
         // Silent 로그인 시도
         const result = await authService.attemptSilentLogin();
@@ -186,12 +220,12 @@ function App() {
         if (result.success && result.user) {
           const token = localStorage.getItem('accessToken') || '';
           setAuth(token, result.user);
-          console.log('✅ App initialized with silent login');
+          devLog.info('✅ App initialized with silent login');
         } else {
-          console.log('ℹ️ Silent login not available, user needs to login manually');
+          devLog.info('ℹ️ Silent login not available, user needs to login manually');
         }
       } catch (error) {
-        console.log('⚠️ Silent login failed during app initialization:', error);
+        devLog.warn('⚠️ Silent login failed during app initialization:', error);
       } finally {
         setIsInitializing(false);
       }

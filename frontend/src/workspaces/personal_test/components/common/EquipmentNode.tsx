@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
+import log from '../../../../utils/logger';
 import { Handle, Position, NodeResizer, useReactFlow } from 'reactflow';
 import type { Node, NodeProps } from 'reactflow';
 import { 
@@ -98,15 +99,6 @@ const getStatusConfig = (status: string) => {
 export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
   const { data, selected, style, id, ...nodeProps } = props;
   
-  // Comprehensive props logging
-  console.log('📦 EquipmentNode props received:', {
-    id,
-    selected,
-    style,
-    data,
-    allProps: props,
-    nodeProps
-  });
   const status = getStatusConfig(data.status);
   const icon = data.icon ? iconMap[data.icon] : <Gauge size={20} />;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -124,13 +116,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     const storedHeight = currentNode?.style?.height;
     const storedWidth = currentNode?.style?.width;
     
-    console.log('🚀 Initializing resizedDimensions:', {
-      nodeId: id,
-      storedHeight,
-      storedWidth,
-      typeHeight: typeof storedHeight,
-      typeWidth: typeof storedWidth
-    });
     
     return {
       width: typeof storedWidth === 'number' ? storedWidth : undefined,
@@ -139,12 +124,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
   };
   
   const [resizedDimensions, setResizedDimensions] = useState<{width?: number, height?: number}>(getInitialDimensions);
-  console.log('🔍 Current node from ReactFlow:', {
-    nodeId: id,
-    currentNode,
-    nodeStyle: currentNode?.style,
-    nodeData: currentNode?.data
-  });
   
   // Check if any measurements are out of spec
   const hasSpecOut = data.measurements?.some(m => 
@@ -167,17 +146,14 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     const logPrefix = `parseStyleValue${context ? ` [${context}]` : ''}:`;
     
     if (value === null || value === undefined) {
-      console.log(`${logPrefix} value is null/undefined`);
       return undefined;
     }
     
     // Handle numbers (including those that might be stored as strings by API)
     if (typeof value === 'number') {
       if (isFinite(value) && value >= 0) {
-        console.log(`${logPrefix} valid number:`, value);
         return value;
       } else {
-        console.log(`${logPrefix} invalid number (NaN/Infinity/negative):`, value);
         return undefined;
       }
     }
@@ -187,7 +163,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       // First, try direct number conversion for pure numeric strings
       const directParsed = parseFloat(value);
       if (!isNaN(directParsed) && isFinite(directParsed) && directParsed >= 0) {
-        console.log(`${logPrefix} numeric string parsed directly:`, value, '→ result:', directParsed);
         return directParsed;
       }
       
@@ -196,28 +171,21 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       const parsed = parseFloat(cleaned);
       
       if (isNaN(parsed) || !isFinite(parsed) || parsed < 0) {
-        console.log(`${logPrefix} string parsing failed:`, value, '→ cleaned:', cleaned, '→ invalid result:', parsed);
         return undefined;
       }
-      
-      console.log(`${logPrefix} string parsed successfully:`, value, '→ cleaned:', cleaned, '→ result:', parsed);
       return parsed;
     }
     
     // Handle edge cases where API might return unexpected types
     if (typeof value === 'object' && value !== null) {
-      console.log(`${logPrefix} unexpected object type:`, value);
       return undefined;
     }
     
     // Try to convert any other type to number as last resort
     const lastResortParsed = Number(value);
     if (!isNaN(lastResortParsed) && isFinite(lastResortParsed) && lastResortParsed >= 0) {
-      console.log(`${logPrefix} converted via Number():`, value, '→ result:', lastResortParsed);
       return lastResortParsed;
     }
-    
-    console.log(`${logPrefix} unknown/invalid type:`, typeof value, value);
     return undefined;
   };
 
@@ -257,79 +225,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
   const actualNodeHeight = Math.max(calculatedHeight, minHeight);
   const actualNodeWidth = Math.max(calculatedWidth, minWidth);
   
-  // Comprehensive debug logging for size calculation chain
-  console.log('🔍 EquipmentNode Size Calculation Chain:', {
-    nodeId: id,
-    selected,
-    nodeSize,
-    
-    // Raw stored values
-    rawData: {
-      reactFlowStyle: currentNode?.style,
-      propsStyle: style,
-      resizedDimensions
-    },
-    
-    // Direct access values
-    directAccess: {
-      reactFlowHeight: directReactFlowHeight,
-      reactFlowWidth: directReactFlowWidth,
-      propsHeight: directPropsHeight,
-      propsWidth: directPropsWidth
-    },
-    
-    // Parsed values
-    parsedValues: {
-      reactFlowHeight: reactFlowStyleHeight,
-      reactFlowWidth: reactFlowStyleWidth,
-      propsHeight: propsStyleHeight,
-      propsWidth: propsStyleWidth
-    },
-    
-    // Fallback chain results
-    fallbackChain: {
-      height: {
-        '1_reactFlowParsed': reactFlowStyleHeight,
-        '2_reactFlowDirect': typeof directReactFlowHeight === 'number' ? directReactFlowHeight : undefined,
-        '3_resizedDimensions': resizedDimensions.height,
-        '4_propsParsed': propsStyleHeight,
-        '5_propsDirect': typeof directPropsHeight === 'number' ? directPropsHeight : undefined,
-        '6_default': defaultHeight,
-        'selected': actualNodeHeight
-      },
-      width: {
-        '1_reactFlowParsed': reactFlowStyleWidth,
-        '2_reactFlowDirect': typeof directReactFlowWidth === 'number' ? directReactFlowWidth : undefined,
-        '3_resizedDimensions': resizedDimensions.width,
-        '4_propsParsed': propsStyleWidth,
-        '5_propsDirect': typeof directPropsWidth === 'number' ? directPropsWidth : undefined,
-        '6_default': 200,
-        'selected': actualNodeWidth
-      }
-    },
-    
-    // Final results
-    final: { height: actualNodeHeight, width: actualNodeWidth },
-    
-    // Priority determination
-    usedSource: {
-      height: actualNodeHeight === reactFlowStyleHeight ? 'reactFlowParsed' :
-              actualNodeHeight === directReactFlowHeight ? 'reactFlowDirect' :
-              actualNodeHeight === resizedDimensions.height ? 'resizedDimensions' :
-              actualNodeHeight === propsStyleHeight ? 'propsParsed' :
-              actualNodeHeight === directPropsHeight ? 'propsDirect' : 'default',
-      width: actualNodeWidth === reactFlowStyleWidth ? 'reactFlowParsed' :
-             actualNodeWidth === directReactFlowWidth ? 'reactFlowDirect' :
-             actualNodeWidth === resizedDimensions.width ? 'resizedDimensions' :
-             actualNodeWidth === propsStyleWidth ? 'propsParsed' :
-             actualNodeWidth === directPropsWidth ? 'propsDirect' : 'default'
-    },
-    
-    handlePositions: {
-      topHandle: { top: -16 },
-      bottomHandle: { top: `${actualNodeHeight + 16}px` }
-    }
-  });
 
   // Legacy debug logging removed - using enhanced logging above
   
@@ -342,15 +237,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     const propsHeight = parseStyleValue(style?.height);
     const propsWidth = parseStyleValue(style?.width);
     
-    console.log('🔄 resizedDimensions sync check:', {
-      nodeId: id,
-      currentResized: resizedDimensions,
-      reactFlowStyle: { height: currentNode?.style?.height, width: currentNode?.style?.width },
-      propsStyle: { height: style?.height, width: style?.width },
-      parsedReactFlow: { height: reactFlowHeight, width: reactFlowWidth },
-      parsedProps: { height: propsHeight, width: propsWidth },
-      nodeSize
-    });
     
     // Use ReactFlow style as primary source, but preserve larger existing values
     const sourceHeight = reactFlowHeight || propsHeight;
@@ -382,16 +268,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
           )
         };
         
-        console.log('📐 Syncing dimensions (preserving larger values):', {
-          from: resizedDimensions,
-          to: newDimensions,
-          sources: { 
-            reactFlow: { height: reactFlowHeight, width: reactFlowWidth },
-            props: { height: propsHeight, width: propsWidth }
-          },
-          minimums: { height: minHeight, width: minWidth },
-          reason: !resizedDimensions.height && !resizedDimensions.width ? 'initial' : 'style_changed'
-        });
         
         setResizedDimensions(newDimensions);
       }
@@ -402,21 +278,10 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         height: getNodeHeight(nodeSize)
       };
       
-      console.log('📐 Setting default resizedDimensions:', defaultDimensions);
       setResizedDimensions(defaultDimensions);
     }
   }, [currentNode?.style?.height, currentNode?.style?.width, style?.height, style?.width, nodeSize, id]); // Sync when ReactFlow or props style changes, but NOT on selection changes
 
-  // Monitor selection state changes to ensure size doesn't change
-  useEffect(() => {
-    console.log('🎯 Selection state changed:', {
-      nodeId: id,
-      selected,
-      actualNodeHeight,
-      actualNodeWidth,
-      message: selected ? 'Node SELECTED - size should remain stable' : 'Node DESELECTED - size should remain stable'
-    });
-  }, [selected, id, actualNodeHeight, actualNodeWidth]);
 
   // Force re-render when style changes (reduced logging)
   useEffect(() => {
@@ -448,14 +313,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         height: needsHeightUpdate ? newMinHeight : currentStoredHeight
       };
       
-      console.log('📏 NodeSize changed - preserving larger dimensions:', {
-        nodeId: id,
-        nodeSize,
-        currentStored: { width: currentStoredWidth, height: currentStoredHeight },
-        newMinimums: { width: newWidth, height: newMinHeight },
-        needsUpdate: { width: needsWidthUpdate, height: needsHeightUpdate },
-        finalDimensions: updatedDimensions
-      });
       
       setResizedDimensions(updatedDimensions);
       
@@ -475,14 +332,6 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
           return node;
         }));
       }
-    } else {
-      console.log('📏 NodeSize changed - keeping existing larger dimensions:', {
-        nodeId: id,
-        nodeSize,
-        currentStored: { width: currentStoredWidth, height: currentStoredHeight },
-        newMinimums: { width: newWidth, height: newMinHeight },
-        action: 'preserved'
-      });
     }
   }, [nodeSize]); // Remove setNodes and id from dependencies to prevent infinite loop
 
@@ -501,20 +350,18 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
   // Initialize or update scroll based on conditions (not on data changes)
   useEffect(() => {
     const timer = setTimeout(() => {
-      const isMonitor = window.location.pathname.includes('monitor');
+      const isMonitorPage = window.location.pathname.includes('monitor') || 
+                           window.location.pathname.includes('public');
       const globalAutoScrollValue = (window as any).autoScrollMeasurements;
-      const shouldScroll = isMonitor && globalAutoScrollValue;
+      const shouldScroll = isMonitorPage && globalAutoScrollValue;
       
-      console.log('🔄 Auto-scroll check for node:', id, {
-        isMonitor,
-        globalAutoScrollValue,
-        shouldScroll,
-        hasMeasurements: !!data.measurements,
-        measurementCount: data.measurements?.length || 0,
-        hasScrollRef: !!scrollRef.current,
-        isResizing,
-        pathname: window.location.pathname
-      });
+      // Only log if there's an issue or first time scroll starts
+      if (shouldScroll && data.measurements && !isScrollActiveRef.current) {
+        log.debug('Auto-scroll starting for equipment node', { 
+          nodeId: id, 
+          measurementCount: data.measurements.length 
+        });
+      }
       
       // Don't auto-scroll during resizing to prevent ResizeObserver conflicts
       if (shouldScroll && data.measurements && scrollRef.current && !isResizing) {
@@ -528,20 +375,9 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         // Only scroll if we have more measurements than can fit
         const needsScroll = data.measurements.length > visibleMeasurements;
         
-        console.log('📏 Auto-scroll calculations for node:', id, {
-          nodeHeight,
-          measurementCount: data.measurements.length,
-          visibleMeasurements,
-          needsScroll,
-          isScrollActiveRef: isScrollActiveRef.current,
-          isGlobalScrollActive: isGlobalScrollActive(),
-          scrollContainerExists: !!scrollRef.current,
-          scrollContainerClientHeight: scrollRef.current?.clientHeight,
-          scrollContainerScrollHeight: scrollRef.current?.scrollHeight
-        });
         
         if (needsScroll && !isScrollActiveRef.current && !isGlobalScrollActive()) {
-          console.log('🔄 Starting auto-scroll for node:', id);
+          log.info('Auto-scroll started for equipment node', { nodeId: id });
           setIsScrolling(true);
           isScrollActiveRef.current = true;
           setGlobalScrollActive(true);
@@ -559,23 +395,20 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
               
               if (scrollPositionRef.current >= maxScroll) {
                 scrollPositionRef.current = 0;
-                console.log('🔄 Auto-scroll reset to top for node:', id);
               }
               
               scrollContainer.scrollTop = scrollPositionRef.current;
               
-              // Log every 100 scroll increments to avoid spam
-              if (Math.floor(scrollPositionRef.current) % 50 === 0) {
-                console.log('🔄 Auto-scroll progress for node:', id, {
-                  currentPosition: scrollPositionRef.current,
-                  maxScroll,
-                  scrollTop: scrollContainer.scrollTop,
-                  clientHeight: scrollContainer.clientHeight,
-                  scrollHeight: scrollContainer.scrollHeight
-                });
-              }
             } else {
-              console.log('🛑 Auto-scroll stopped due to conditions for node:', id, {
+              // Check if only global state is missing - try to recover
+              if (scrollContainer && isScrollActiveRef.current && !isGlobalScrollActive()) {
+                log.debug('Recovering global scroll state for equipment node', { nodeId: id });
+                setGlobalScrollActive(true);
+                return; // Don't log stop message, try to continue
+              }
+              
+              log.warn('Auto-scroll stopped unexpectedly for equipment node', { 
+                nodeId: id,
                 hasContainer: !!scrollContainer,
                 isActive: isScrollActiveRef.current,
                 globalActive: isGlobalScrollActive()
@@ -591,7 +424,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
           scrollIntervalRef.current = setInterval(scroll, 50); // Smooth scrolling
         } else if (!needsScroll && isScrollActiveRef.current) {
           // Stop scrolling if no longer needed
-          console.log('🛑 Stopping auto-scroll for node:', id);
+          log.debug('Stopping auto-scroll for equipment node - no longer needed', { nodeId: id });
           if (scrollIntervalRef.current) {
             clearInterval(scrollIntervalRef.current);
             scrollIntervalRef.current = null;
@@ -603,7 +436,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         }
       } else if (isScrollActiveRef.current) {
         // Stop scrolling if conditions no longer met
-        console.log('🛑 Stopping auto-scroll (conditions not met) for node:', id);
+        log.debug('Stopping auto-scroll for equipment node - conditions not met', { nodeId: id });
         if (scrollIntervalRef.current) {
           clearInterval(scrollIntervalRef.current);
           scrollIntervalRef.current = null;
@@ -616,7 +449,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     }, 250); // Debounce to prevent rapid state changes
 
     return () => clearTimeout(timer);
-  }, [actualNodeHeight, isResizing, id]); // REMOVED data.measurements to prevent restart on data updates
+  }, [actualNodeHeight, isResizing, id]); // Detect size and resize changes for scroll recalculation
   
   // Cleanup scroll interval on unmount
   useEffect(() => {
@@ -643,18 +476,14 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         handleStyle={{ width: 8, height: 8 }}
         onResizeStart={() => {
           setIsResizing(true);
-          console.log('NodeResizer resize started');
         }}
         onResizeEnd={() => {
           setIsResizing(false);
-          console.log('NodeResizer resize ended');
         }}
         onResize={(event, params) => {
-          console.log('🎛️ NodeResizer onResize triggered:', {
+          log.debug('Equipment node resized', {
             nodeId: id,
-            newSize: { width: params.width, height: params.height },
-            newPosition: { x: params.x, y: params.y },
-            previousResized: resizedDimensions
+            newSize: { width: params.width, height: params.height }
           });
           
           // Update local state immediately for instant visual feedback
@@ -683,9 +512,8 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
                 }
                 return node;
               }));
-              console.log('✅ Node updated via setNodes successfully');
             } catch (error) {
-              console.error('❌ Failed to update node:', error);
+              log.error('Failed to update equipment node size', { nodeId: id, error });
             }
           }
         }}
@@ -696,13 +524,13 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       <Handle
         type="target"
         position={Position.Top}
+        className="target"
         style={{
-          top: -16,
+          top: -8,
           left: '50%',
           transform: 'translateX(-50%)',
-          backgroundColor: '#6b7280',
-          width: 12,
-          height: 12,
+          width: 10,
+          height: 10,
           border: 'none',
           zIndex: 20
         }}
@@ -834,13 +662,13 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       <Handle
         type="source"
         position={Position.Bottom}
+        className="source"
         style={{
-          top: `${actualNodeHeight + 16}px`,
+          bottom: -8,
           left: '50%',
           transform: 'translateX(-50%)',
-          backgroundColor: '#6b7280',
-          width: 12,
-          height: 12,
+          width: 10,
+          height: 10,
           border: 'none',
           zIndex: 20
         }}

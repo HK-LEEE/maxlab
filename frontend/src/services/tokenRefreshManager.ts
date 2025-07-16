@@ -28,6 +28,9 @@ export class TokenRefreshManager {
   private config: TokenRefreshConfig;
   private blacklist: Map<string, TokenBlacklistEntry> = new Map();
   private refreshStartTime: number | null = null;
+  private lastTokenValidationTime: number = 0;
+  private lastTokenValidationResult: boolean = false;
+  private tokenValidationCacheDuration: number = 5000; // 5초 캐시
 
   private constructor(config?: Partial<TokenRefreshConfig>) {
     this.config = {
@@ -82,7 +85,8 @@ export class TokenRefreshManager {
    * 2순위: Silent Auth (fallback)
    */
   public async refreshToken(
-    silentAuthFunction?: () => Promise<{ success: boolean; token?: string; error?: string }>
+    silentAuthFunction?: () => Promise<{ success: boolean; token?: string; error?: string }>,
+    options?: { forceRefresh?: boolean }
   ): Promise<boolean> {
     // 이미 갱신 중인 경우 대기
     if (this.refreshInProgress) {
@@ -106,8 +110,8 @@ export class TokenRefreshManager {
         return false;
       }
 
-      // 현재 토큰이 여전히 유효한지 먼저 확인
-      if (this.isCurrentTokenValid()) {
+      // 강제 갱신이 아닌 경우에만 유효성 검사
+      if (!options?.forceRefresh && this.isCurrentTokenValid()) {
         const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
         if (tokenExpiryTime) {
           const expiryTime = parseInt(tokenExpiryTime, 10);
@@ -120,6 +124,11 @@ export class TokenRefreshManager {
             return true;
           }
         }
+      }
+
+      // 강제 갱신 로그
+      if (options?.forceRefresh) {
+        console.log('🔄 Force refresh requested, bypassing token validity check');
       }
 
       // 토큰 재사용 공격 방지
@@ -205,6 +214,9 @@ export class TokenRefreshManager {
         this.blacklistToken(currentToken, 'refreshed');
       }
 
+      // 토큰이 갱신되었으므로 캐시 무효화
+      this.invalidateTokenValidationCache();
+
       return { success: true, shouldTrySilentAuth: false };
       
     } catch (error: any) {
@@ -251,6 +263,9 @@ export class TokenRefreshManager {
           if (currentToken && currentToken !== result.token) {
             this.blacklistToken(currentToken, 'refreshed');
           }
+
+          // 토큰이 갱신되었으므로 캐시 무효화
+          this.invalidateTokenValidationCache();
 
           return { success: true };
         } else {
@@ -326,21 +341,32 @@ export class TokenRefreshManager {
   }
 
   /**
-   * 현재 토큰 유효성 확인 - Access Token 및 Refresh Token 고려
+   * 현재 토큰 유효성 확인 - Access Token 및 Refresh Token 고려 (캐싱 적용)
    */
   private isCurrentTokenValid(): boolean {
+    // 캐시된 결과가 유효한지 확인
+    const now = Date.now();
+    if (now - this.lastTokenValidationTime < this.tokenValidationCacheDuration) {
+      return this.lastTokenValidationResult;
+    }
+
     const accessToken = localStorage.getItem('accessToken');
     const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
     
-    if (!accessToken) return false;
+    if (!accessToken) {
+      this.updateTokenValidationCache(false);
+      return false;
+    }
     
     // 블랙리스트 확인
-    if (this.isTokenBlacklisted(accessToken)) return false;
+    if (this.isTokenBlacklisted(accessToken)) {
+      this.updateTokenValidationCache(false);
+      return false;
+    }
 
     // Access Token 만료 시간 확인
     if (tokenExpiryTime) {
       const expiryTime = parseInt(tokenExpiryTime, 10);
-      const now = Date.now();
       
       if (now >= expiryTime) {
         this.blacklistToken(accessToken, 'expired');
@@ -348,14 +374,33 @@ export class TokenRefreshManager {
         // Access Token이 만료되었지만 Refresh Token이 유효하면 갱신 가능으로 간주
         if (refreshTokenService.isRefreshTokenValid()) {
           console.log('ℹ️ Access token expired but refresh token is valid');
+          this.updateTokenValidationCache(false);
           return false; // 갱신이 필요하므로 false 반환
         }
         
+        this.updateTokenValidationCache(false);
         return false;
       }
     }
 
+    this.updateTokenValidationCache(true);
     return true;
+  }
+
+  /**
+   * 토큰 유효성 검사 캐시 업데이트
+   */
+  private updateTokenValidationCache(isValid: boolean): void {
+    this.lastTokenValidationTime = Date.now();
+    this.lastTokenValidationResult = isValid;
+  }
+
+  /**
+   * 토큰 유효성 검사 캐시 무효화 (토큰이 변경될 때 호출)
+   */
+  public invalidateTokenValidationCache(): void {
+    this.lastTokenValidationTime = 0;
+    this.lastTokenValidationResult = false;
   }
 
   /**
@@ -369,6 +414,9 @@ export class TokenRefreshManager {
 
     // Refresh Token 정리
     await refreshTokenService.clearAllTokens();
+    
+    // 캐시 무효화
+    this.invalidateTokenValidationCache();
     
     console.log('🧹 All authentication data cleared');
   }

@@ -59,16 +59,34 @@ export const TextNode: React.FC<NodeProps<TextNodeData>> = ({ data, selected }) 
         {text}
       </div>
       
-      {/* Connection handles */}
+      {/* Enhanced Connection handles */}
       <Handle
         type="target"
         position={Position.Top}
-        style={{ opacity: 0 }}
+        className="target"
+        style={{
+          top: -8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 8,
+          height: 8,
+          border: 'none',
+          zIndex: 20
+        }}
       />
       <Handle
         type="source"
         position={Position.Bottom}
-        style={{ opacity: 0 }}
+        className="source"
+        style={{
+          bottom: -8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 8,
+          height: 8,
+          border: 'none',
+          zIndex: 20
+        }}
       />
     </div>
   );

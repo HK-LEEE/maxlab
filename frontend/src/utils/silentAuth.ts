@@ -237,11 +237,13 @@ export function isSafePageForTokenRefresh(): boolean {
   // 해시에 OAuth 정보가 있는지 확인 (implicit flow)
   const isImplicitOAuth = currentHash.includes('access_token') || currentHash.includes('code');
   
-  // OAuth 처리 진행 중인지 확인
+  // OAuth 처리 진행 중인지 확인 (더 엄격한 검증)
   const isOAuthInProgress = Boolean(
     sessionStorage.getItem('oauth_state') || 
     sessionStorage.getItem('silent_oauth_state') ||
-    sessionStorage.getItem('oauth_code_verifier')
+    sessionStorage.getItem('oauth_code_verifier') ||
+    sessionStorage.getItem('oauth_flow_in_progress') ||
+    window.location.search.includes('oauth_callback_processing')
   );
 
   // 글로벌 OAuth 콜백 처리 상태 확인 (DOM 기반)

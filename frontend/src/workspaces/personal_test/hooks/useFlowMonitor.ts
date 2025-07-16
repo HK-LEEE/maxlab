@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import log from '../../../utils/logger';
 import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { apiClient } from '../../../api/client';
@@ -121,7 +122,6 @@ export const useFlowMonitor = (workspaceId: string) => {
   const loadData = useCallback(async (forceLoad = false) => {
     // Prevent duplicate API calls with stricter timing control
     if (isDataLoadingRef.current) {
-      console.log('📊 LoadData skipped - already loading');
       return;
     }
     
@@ -129,11 +129,17 @@ export const useFlowMonitor = (workspaceId: string) => {
     const now = Date.now();
     const lastCallTime = (window as any).lastApiCallTime || 0;
     if (!forceLoad && now - lastCallTime < 5000) {
-      console.log('📊 LoadData skipped - rate limited', {
-        timeSinceLastCall: now - lastCallTime,
-        forceLoad
-      });
       return;
+    }
+    
+    // Reset global scroll states for all nodes when force refreshing
+    if (forceLoad && typeof window !== 'undefined') {
+      Object.keys(window).forEach(key => {
+        if (key.startsWith('autoScroll_')) {
+          delete (window as any)[key];
+        }
+      });
+      log.info('Global scroll states reset for force refresh');
     }
     
     isDataLoadingRef.current = true;
@@ -314,12 +320,6 @@ export const useFlowMonitor = (workspaceId: string) => {
               
               if (statusChanged || measurementsChanged) {
                 hasAnyNodeChanged = true;
-                console.log('🔄 Node data changed:', {
-                  nodeId: node.id,
-                  statusChanged: statusChanged ? `${node.data.status} → ${newStatus}` : false,
-                  measurementsChanged,
-                  measurementCount: latestMeasurements.length
-                });
                 
                 return {
                   ...node,
@@ -336,8 +336,6 @@ export const useFlowMonitor = (workspaceId: string) => {
           
           // Only return updated nodes if something actually changed
           if (hasAnyNodeChanged) {
-            console.log('📊 Updating nodes due to data changes');
-            
             // Update edges based on the UPDATED node statuses (using updatedNodes, not stale nodes state)
             setEdges((currentEdges) => {
               const nodeStatusMap = new Map<string, string>();
@@ -346,11 +344,8 @@ export const useFlowMonitor = (workspaceId: string) => {
               updatedNodes.forEach(node => {
                 if (node.type === 'equipment' && node.data.status) {
                   nodeStatusMap.set(node.id, node.data.status);
-                  console.log(`🔗 Edge mapping: ${node.id} -> ${node.data.status}`);
                 }
               });
-              
-              console.log('🔗 NodeStatusMap contents:', Array.from(nodeStatusMap.entries()));
               
               return currentEdges.map(edge => {
                 const sourceStatus = nodeStatusMap.get(edge.source) || 'STOP';
@@ -358,8 +353,6 @@ export const useFlowMonitor = (workspaceId: string) => {
                 
                 // Define edge styles based on status combinations
                 const statusKey = `${sourceStatus}-${targetStatus}`;
-                
-                console.log(`🔗 Edge ${edge.source} -> ${edge.target}: ${statusKey}`);
                 
                 let edgeStyle = {};
                 let label = null;
@@ -412,7 +405,6 @@ export const useFlowMonitor = (workspaceId: string) => {
                     break;
                   default:
                     edgeStyle = { stroke: '#000', strokeWidth: 2 };
-                    console.log(`🔗 Unknown status combination: ${statusKey}`);
                 }
                 
                 return {
@@ -435,13 +427,12 @@ export const useFlowMonitor = (workspaceId: string) => {
             
             return updatedNodes;
           } else {
-            console.log('📊 No node updates needed - data unchanged');
             return currentNodes;
           }
         });
       } // Close the if (hasStatusChanged || hasMeasurementChanged) block
     } catch (err) {
-      console.error('Failed to load data:', err);
+      log.error('Failed to load flow monitor data', { error: err });
     } finally {
       setIsLoading(false);
       isDataLoadingRef.current = false;
@@ -463,7 +454,7 @@ export const useFlowMonitor = (workspaceId: string) => {
   // Load data immediately when flow is selected, with debounce only for equipment code changes
   useEffect(() => {
     if (selectedFlow) {
-      console.log('🔄 Flow selected, loading data immediately:', selectedFlow.name);
+      log.info('Flow selected, loading data', { flowName: selectedFlow.name });
       // Immediate load for flow selection - bypass rate limiting
       loadData(true);
     }
@@ -473,7 +464,6 @@ export const useFlowMonitor = (workspaceId: string) => {
   useEffect(() => {
     if (selectedFlow && visibleEquipmentCodes.size > 0) {
       const timer = setTimeout(() => {
-        console.log('🔄 Equipment codes changed, debounced data load');
         loadData();
       }, 1000); // Reduced debounce time to 1 second for equipment changes
       return () => clearTimeout(timer);
@@ -496,16 +486,6 @@ export const useFlowMonitor = (workspaceId: string) => {
   // Update view when flow is selected
   useEffect(() => {
     if (selectedFlow) {
-      // Debug: 선택된 플로우 데이터 확인
-      console.log('🖥️ Private flow data loaded:', {
-        flowName: selectedFlow.name,
-        totalNodes: selectedFlow.flow_data?.nodes?.length || 0,
-        totalEdges: selectedFlow.flow_data?.edges?.length || 0,
-        nodeList: selectedFlow.flow_data?.nodes?.map((n: any) => ({ id: n.id, type: n.type, label: n.data?.label })) || [],
-        flowId: selectedFlow.id,
-        updatedAt: selectedFlow.updated_at,
-        isPublished: selectedFlow.is_published
-      });
       
       // Clear previous data when switching flows
       setPreviousData({
@@ -537,13 +517,6 @@ export const useFlowMonitor = (workspaceId: string) => {
           const finalWidth = node.style?.width || defaultWidth;
           const finalHeight = node.style?.height || defaultHeight;
           
-          console.log('🖥️ FlowMonitor - preserving stored dimensions:', {
-            nodeId: node.id,
-            nodeSize,
-            storedStyle: node.style,
-            defaults: { width: defaultWidth, height: defaultHeight },
-            final: { width: finalWidth, height: finalHeight }
-          });
           
           return {
             ...node,
@@ -633,7 +606,7 @@ export const useFlowMonitor = (workspaceId: string) => {
     setAlarmCheck,
     setIsSidebarOpen,
     loadData,
-    forceRefresh: loadData,
+    forceRefresh: () => loadData(true),
     toggleFullscreen,
   };
 };

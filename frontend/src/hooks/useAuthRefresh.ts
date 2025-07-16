@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { authService } from '../services/authService';
@@ -17,31 +17,33 @@ export const useAuthRefresh = () => {
   const isInitializedRef = useRef(false);
   const lastLocationRef = useRef(location.pathname);
 
+  // 페이지 안전성 확인을 메모화 (성능 최적화)
+  const isSafePage = useMemo(() => {
+    return isSafePageForTokenRefresh();
+  }, [location.pathname]);
+
   useEffect(() => {
     // 페이지 변경 감지
     const currentPath = location.pathname;
     const hasLocationChanged = lastLocationRef.current !== currentPath;
     lastLocationRef.current = currentPath;
-
-    // 현재 페이지에서 토큰 갱신이 안전한지 확인
-    const isSafePage = isSafePageForTokenRefresh();
     
-    // React Strict Mode에서 이중 실행 방지
+    // React Strict Mode에서 이중 실행 방지 (더 엄격한 조건)
     if (isInitializedRef.current && isAuthenticated && cleanupRef.current && !hasLocationChanged && isSafePage) {
-      console.log('🔄 Token refresh already initialized, skipping...');
+      // console.log('🔄 Token refresh already initialized, skipping...'); // 로그 줄이기
       return;
     }
 
     // 기존 갱신 정리 (페이지 변경 시 또는 안전하지 않은 페이지)
     if (cleanupRef.current) {
-      console.log('🛑 Cleaning up existing token refresh');
+      // console.log('🛑 Cleaning up existing token refresh'); // 로그 줄이기
       cleanupRef.current();
       cleanupRef.current = null;
       isInitializedRef.current = false;
     }
 
     if (isAuthenticated && isSafePage) {
-      console.log('🔄 Starting automatic token refresh on safe page:', currentPath);
+      // console.log('🔄 Starting automatic token refresh on safe page:', currentPath); // 로그 줄이기
       
       // 자동 토큰 갱신 시작
       cleanupRef.current = authService.startAutoTokenRefresh();
@@ -63,7 +65,7 @@ export const useAuthRefresh = () => {
       console.log('🛑 User not authenticated, stopping token refresh');
       isInitializedRef.current = false;
     }
-  }, [isAuthenticated, location.pathname]);
+  }, [isAuthenticated, isSafePage]); // dependency를 최적화
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {

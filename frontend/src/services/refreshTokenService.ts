@@ -72,10 +72,12 @@ class RefreshTokenService {
     const refreshToken = await this.getStoredRefreshToken();
     
     if (!refreshToken) {
+      console.error('❌ No refresh token available for renewal');
       throw new Error(TokenRefreshError.REFRESH_TOKEN_INVALID);
     }
 
     if (!this.isRefreshTokenValid()) {
+      console.error('❌ Stored refresh token is expired or invalid');
       throw new Error(TokenRefreshError.REFRESH_TOKEN_EXPIRED);
     }
 
@@ -83,6 +85,11 @@ class RefreshTokenService {
       console.log('🔄 Attempting refresh with refresh token...');
       
       const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+      console.log('📡 Auth Server URL:', authUrl);
+      console.log('🔑 Client ID:', this.clientId);
+      console.log('🔐 Has Client Secret:', !!this.clientSecret);
+      console.log('🎟️ Refresh Token Available:', !!refreshToken);
+      console.log('🎟️ Refresh Token Prefix:', refreshToken.substring(0, 10) + '...');
       
       // 네트워크 요청에 타임아웃 및 재시도 로직 추가
       const response = await this.fetchWithRetry(`${authUrl}/api/oauth/token`, {
@@ -101,8 +108,17 @@ class RefreshTokenService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         
+        console.error('❌ Token refresh request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          errorData,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+        
         if (response.status === 400) {
           // Invalid or expired refresh token
+          console.error('🚫 400 Bad Request - Invalid refresh token parameters');
           securityEventLogger.logRefreshTokenEvent('invalid_or_expired', {
             status: response.status,
             response: errorData,
@@ -114,6 +130,7 @@ class RefreshTokenService {
         
         if (response.status >= 500) {
           // Server error - 재시도 가능한 오류
+          console.error('🔥 5xx Server Error - Auth server internal error');
           securityEventLogger.logRefreshTokenEvent('server_error', {
             status: response.status,
             response: errorData,
@@ -124,10 +141,23 @@ class RefreshTokenService {
         
         if (response.status === 401) {
           // Unauthorized - 토큰 무효
+          console.error('🔒 401 Unauthorized - Token expired or client authentication failed');
+          console.error('🔍 Possible causes:', [
+            '1. Refresh token has expired',
+            '2. Client ID/Secret mismatch',
+            '3. Auth server configuration issue',
+            '4. Token was revoked'
+          ]);
           securityEventLogger.logRefreshTokenEvent('unauthorized', {
             status: response.status,
             response: errorData,
-            action: 'clearing_token'
+            action: 'clearing_token',
+            debugInfo: {
+              authUrl,
+              clientId: this.clientId,
+              hasClientSecret: !!this.clientSecret,
+              tokenPrefix: refreshToken.substring(0, 10)
+            }
           });
           await this.clearRefreshToken();
           throw new Error(TokenRefreshError.REFRESH_TOKEN_INVALID);
@@ -257,18 +287,26 @@ class RefreshTokenService {
       const result = await secureTokenStorage.storeRefreshToken(refreshToken);
       
       if (result.success) {
+        // 저장 후 즉시 검증
+        const verificationResult = await secureTokenStorage.getRefreshToken();
+        if (!verificationResult.token) {
+          throw new Error('Token storage verification failed - token not found after storage');
+        }
+        
         if (result.encrypted) {
           securityEventLogger.logEncryptionEvent('token_encrypted_stored', {
             storageType: 'encrypted',
-            success: true
+            success: true,
+            verified: true
           });
-          console.log('✅ Refresh token encrypted and stored securely');
+          console.log('✅ Refresh token encrypted, stored, and verified securely');
         } else {
           securityEventLogger.logEncryptionEvent('token_plaintext_stored', {
             storageType: 'plaintext',
-            reason: 'encryption_not_available'
+            reason: 'encryption_not_available',
+            verified: true
           });
-          console.log('💾 Refresh token stored (encryption not available, using plaintext fallback)');
+          console.log('💾 Refresh token stored and verified (encryption not available, using plaintext fallback)');
         }
       } else {
         securityEventLogger.logEncryptionEvent('token_storage_failed', {
@@ -278,7 +316,13 @@ class RefreshTokenService {
         throw new Error(result.error || 'Failed to store refresh token');
       }
     } catch (error: any) {
-      console.error('Failed to store refresh token:', error);
+      console.error('❌ Failed to store refresh token:', error);
+      // 저장 실패 시 정리
+      try {
+        await secureTokenStorage.clearRefreshToken();
+      } catch (cleanupError) {
+        console.error('Failed to cleanup after storage failure:', cleanupError);
+      }
       throw new Error('Failed to store refresh token securely');
     }
   }
@@ -310,6 +354,7 @@ class RefreshTokenService {
     // Check refresh token existence from multiple sources
     const legacyRefreshToken = localStorage.getItem('refreshToken');
     const refreshTokenExpiryTime = localStorage.getItem('refreshTokenExpiryTime');
+    const refreshTokenCreatedAt = localStorage.getItem('refreshTokenCreatedAt');
     
     // First, check if we have any refresh token at all
     let hasRefreshToken = !!legacyRefreshToken;
@@ -318,14 +363,23 @@ class RefreshTokenService {
     // Note: We can't check encrypted storage synchronously, but we can check if the storage status suggests one exists
     if (!hasRefreshToken) {
       // Check if there are any refresh token metadata indicating encrypted storage
-      const hasRefreshMetadata = !!refreshTokenExpiryTime || !!localStorage.getItem('refreshTokenCreatedAt');
+      const hasRefreshMetadata = !!refreshTokenExpiryTime || !!refreshTokenCreatedAt;
       if (hasRefreshMetadata) {
-        console.log('🔍 Found refresh token metadata, assuming encrypted token exists');
+        // Only log this once per session to avoid spam
+        const logKey = 'refresh_token_metadata_logged';
+        if (!sessionStorage.getItem(logKey)) {
+          console.log('🔍 Found refresh token metadata, will verify encrypted token exists');
+          sessionStorage.setItem(logKey, 'true');
+          
+          // Schedule async verification to clean up inconsistent state
+          this.verifyTokenConsistencyAsync();
+        }
         hasRefreshToken = true;
       }
     }
     
     if (!hasRefreshToken) {
+      // No token and no metadata - definitely no refresh token
       return false;
     }
     
@@ -609,6 +663,94 @@ class RefreshTokenService {
       });
       
       throw error;
+    }
+  }
+
+  /**
+   * Verify token consistency between metadata and actual tokens (async)
+   */
+  private async verifyTokenConsistencyAsync(): Promise<void> {
+    try {
+      console.log('🔍 Verifying token consistency...');
+      
+      const actualToken = await this.getStoredRefreshToken();
+      const hasMetadata = !!localStorage.getItem('refreshTokenExpiryTime') || !!localStorage.getItem('refreshTokenCreatedAt');
+      
+      if (hasMetadata && !actualToken) {
+        console.warn('⚠️ Token metadata exists but no actual token found - cleaning up inconsistent state');
+        
+        // Clear metadata to prevent confusion
+        const metadataKeys = [
+          'refreshExpiresIn',
+          'refreshTokenExpiryTime', 
+          'refreshTokenCreatedAt'
+        ];
+        
+        metadataKeys.forEach(key => {
+          const oldValue = localStorage.getItem(key);
+          if (oldValue) {
+            localStorage.removeItem(key);
+            console.log(`🧹 Removed orphaned metadata: ${key} = ${oldValue}`);
+          }
+        });
+        
+        console.log('✅ Token consistency restored - metadata cleaned up');
+      } else if (actualToken && hasMetadata) {
+        console.log('✅ Token consistency verified - metadata and token both exist');
+      } else {
+        console.log('ℹ️ No token metadata found - consistency check skipped');
+      }
+    } catch (error) {
+      console.error('❌ Token consistency verification failed:', error);
+    }
+  }
+
+  /**
+   * Check OAuth server connectivity and configuration
+   */
+  async checkServerConnectivity(): Promise<{
+    isOnline: boolean;
+    serverUrl: string;
+    clientId: string;
+    hasClientSecret: boolean;
+    responseTime?: number;
+    error?: string;
+  }> {
+    const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+    const startTime = Date.now();
+    
+    try {
+      console.log('🌐 Checking OAuth server connectivity...');
+      
+      // 간단한 health check 요청
+      const response = await fetch(`${authUrl}/api/oauth/.well-known`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      const responseTime = Date.now() - startTime;
+      
+      return {
+        isOnline: response.ok,
+        serverUrl: authUrl,
+        clientId: this.clientId,
+        hasClientSecret: !!this.clientSecret,
+        responseTime,
+        error: response.ok ? undefined : `HTTP ${response.status} ${response.statusText}`
+      };
+    } catch (error: any) {
+      const responseTime = Date.now() - startTime;
+      
+      return {
+        isOnline: false,
+        serverUrl: authUrl,
+        clientId: this.clientId,
+        hasClientSecret: !!this.clientSecret,
+        responseTime,
+        error: error.message || 'Network error'
+      };
     }
   }
 

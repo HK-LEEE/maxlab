@@ -45,6 +45,37 @@ export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => 
 
   return (
     <>
+      {/* Enhanced Ports for Group Node */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="target"
+        style={{
+          top: -8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 8,
+          height: 8,
+          border: 'none',
+          zIndex: 30
+        }}
+      />
+      
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="source"
+        style={{
+          bottom: -8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 8,
+          height: 8,
+          border: 'none',
+          zIndex: 30
+        }}
+      />
+      
       <NodeResizer
         color="#3b82f6"
         isVisible={selected}
