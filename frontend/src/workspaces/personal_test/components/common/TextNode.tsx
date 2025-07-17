@@ -1,5 +1,4 @@
 import React from 'react';
-import { Handle, Position } from 'reactflow';
 import type { NodeProps } from 'reactflow';
 import { Type } from 'lucide-react';
 
@@ -14,6 +13,7 @@ interface TextNodeData {
   borderStyle?: 'none' | 'solid' | 'dashed' | 'dotted';
   borderWidth?: number;
   borderColor?: string;
+  zIndex?: number;
 }
 
 export const TextNode: React.FC<NodeProps<TextNodeData>> = ({ data, selected }) => {
@@ -28,6 +28,7 @@ export const TextNode: React.FC<NodeProps<TextNodeData>> = ({ data, selected }) 
     borderStyle = 'none',
     borderWidth = 1,
     borderColor = '#999999',
+    zIndex = 0,
   } = data;
 
   const getBorderStyle = () => {
@@ -36,58 +37,36 @@ export const TextNode: React.FC<NodeProps<TextNodeData>> = ({ data, selected }) 
   };
 
   return (
-    <div
-      className={`text-node ${selected ? 'ring-2 ring-black' : ''}`}
-      style={{
-        backgroundColor,
-        padding: `${padding}px`,
-        minWidth: '50px',
-        borderRadius: '4px',
-        border: getBorderStyle(),
-      }}
-    >
+    <div style={{ zIndex: zIndex, position: 'relative' }}>
+      {/* Z-index indicator */}
+      {selected && zIndex !== 0 && (
+        <div className="absolute top-1 right-1 text-xs bg-gray-800 text-white px-1.5 py-0.5 rounded z-10">
+          z: {zIndex}
+        </div>
+      )}
       <div
+        className={`text-node ${selected ? 'ring-2 ring-black' : ''}`}
         style={{
-          fontSize: `${fontSize}px`,
-          fontWeight,
-          color,
-          textAlign,
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
+          backgroundColor,
+          padding: `${padding}px`,
+          minWidth: '50px',
+          borderRadius: '4px',
+          border: getBorderStyle(),
         }}
       >
-        {text}
+        <div
+          style={{
+            fontSize: `${fontSize}px`,
+            fontWeight,
+            color,
+            textAlign,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {text}
+        </div>
       </div>
-      
-      {/* Enhanced Connection handles */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="target"
-        style={{
-          top: -8,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 8,
-          height: 8,
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="source"
-        style={{
-          bottom: -8,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 8,
-          height: 8,
-          border: 'none',
-          zIndex: 20
-        }}
-      />
     </div>
   );
 };

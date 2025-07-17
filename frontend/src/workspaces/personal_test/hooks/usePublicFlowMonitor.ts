@@ -398,46 +398,46 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         
         switch (statusKey) {
           case 'ACTIVE-ACTIVE':
-            edgeStyle = { stroke: '#10b981', strokeWidth: 3 };
+            edgeStyle = { stroke: '#10b981', strokeWidth: 1.5 };
             animated = true;
             break;
           case 'ACTIVE-PAUSE':
-            edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+            edgeStyle = { stroke: '#eab308', strokeWidth: 2, strokeDasharray: '8 4' };
             animated = true;
             label = '대상 일시정지';
             break;
           case 'ACTIVE-STOP':
-            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 1.5 };
             animated = false;
             label = '대상 정지';
             break;
           case 'PAUSE-ACTIVE':
-            edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+            edgeStyle = { stroke: '#eab308', strokeWidth: 2, strokeDasharray: '8 4' };
             animated = true;
             label = '출발 일시정지';
             break;
           case 'PAUSE-PAUSE':
-            edgeStyle = { stroke: '#eab308', strokeWidth: 4, strokeDasharray: '8 4' };
+            edgeStyle = { stroke: '#eab308', strokeWidth: 2, strokeDasharray: '8 4' };
             animated = true;
             label = '모두 일시정지';
             break;
           case 'PAUSE-STOP':
-            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 1.5 };
             animated = false;
             label = '대상 정지';
             break;
           case 'STOP-ACTIVE':
-            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 1.5 };
             animated = false;
             label = '출발 정지';
             break;
           case 'STOP-PAUSE':
-            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 1.5 };
             animated = false;
             label = '출발 정지';
             break;
           case 'STOP-STOP':
-            edgeStyle = { stroke: '#ef4444', strokeWidth: 3 };
+            edgeStyle = { stroke: '#ef4444', strokeWidth: 1.5 };
             animated = false;
             label = '모두 정지';
             break;

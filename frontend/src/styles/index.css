@@ -32,6 +32,20 @@
   }
 }
 
+/* Remove ReactFlow default node styles for GroupNode */
+.react-flow__node-group {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node-group.selected {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* Hide scrollbar for auto-scrolling measurements */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
@@ -42,8 +56,12 @@
   display: none;  /* Chrome, Safari and Opera */
 }
 
-/* Animated flow effect for active connections */
+/* Enhanced animated flow effect for active connections */
 .react-flow__edge-path {
+  transition: all 0.3s ease-in-out;
+}
+
+.react-flow__edge-path.animated {
   animation: flow 2s linear infinite;
 }
 
@@ -58,6 +76,91 @@
 
 .react-flow__edge.animated .react-flow__edge-path {
   stroke-dasharray: 8 4;
+}
+
+/* 파티클 시스템 스타일 */
+.particle-flow-system {
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 파티클별 추가 효과 */
+.particle-flow-system circle {
+  filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.4));
+}
+
+.particle-flow-system polygon {
+  filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.4));
+}
+
+.particle-flow-system g line {
+  filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.4));
+}
+
+/* 상태 전환 애니메이션 */
+@keyframes particleAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes particleDisappear {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+/* 라벨 강조 효과 (경고 상태용) - 펄스 크기 1/2로 축소 */
+@keyframes labelPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: none; /* 그림자 제거 */
+  }
+  50% {
+    transform: scale(1.025); /* 1.05에서 1.025로 줄임 (1/2) */
+    box-shadow: none; /* 그림자 제거 */
+  }
+}
+
+.edgebutton-foreignobject.warning {
+  animation: labelPulse 2s ease-in-out infinite;
+}
+
+/* 라벨 텍스트 가독성 개선 */
+.edgebutton-foreignobject {
+  /* 브라우저별 호환성을 위한 backdrop-filter fallback */
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+/* 고대비 텍스트 효과 */
+@supports (text-stroke: 1px white) {
+  .edgebutton-foreignobject div {
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* 대체 텍스트 외곽선 효과 */
+@supports not (text-stroke: 1px white) {
+  .edgebutton-foreignobject div {
+    text-shadow: 
+      -1px -1px 0 rgba(255, 255, 255, 0.8),
+      1px -1px 0 rgba(255, 255, 255, 0.8),
+      -1px 1px 0 rgba(255, 255, 255, 0.8),
+      1px 1px 0 rgba(255, 255, 255, 0.8),
+      0 0 4px rgba(255, 255, 255, 0.8),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+  }
 }
 
 /* Enhanced Port (Handle) Styling */

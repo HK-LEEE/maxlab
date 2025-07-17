@@ -521,9 +521,7 @@ const ProcessFlowEditorContent: React.FC = () => {
   };
 
 
-  // Memoize node and edge types to prevent ReactFlow warnings
-  const memoizedNodeTypes = useMemo(() => nodeTypes, []);
-  const memoizedEdgeTypes = useMemo(() => edgeTypes, []);
+  // Note: nodeTypes and edgeTypes are already Object.freeze() outside component
 
   // Memoize default edge options
   const defaultEdgeOptions = useMemo(() => ({
@@ -712,8 +710,8 @@ const ProcessFlowEditorContent: React.FC = () => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             onNodeDoubleClick={onNodeDoubleClick}
-            nodeTypes={memoizedNodeTypes}
-            edgeTypes={memoizedEdgeTypes}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
             connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
             connectionMode="loose"

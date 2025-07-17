@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { Handle, Position, NodeResizer } from 'reactflow';
+import React, { memo, useState, useEffect } from 'react';
+import { NodeResizer, useReactFlow } from 'reactflow';
 import type { NodeProps } from 'reactflow';
 
 interface GroupNodeData {
@@ -14,7 +14,7 @@ interface GroupNodeData {
   borderStyle?: 'solid' | 'dashed' | 'dotted';
 }
 
-export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => {
+export const GroupNode = memo(({ data, selected, style, id }: NodeProps<GroupNodeData>) => {
   const {
     label = 'Group',
     color = '#3b82f6',
@@ -26,6 +26,63 @@ export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => 
     zIndex = 0,
     borderStyle = 'dashed',
   } = data;
+
+  const { getNode, setNodes } = useReactFlow();
+
+  // Get current node data directly from ReactFlow
+  const currentNode = getNode(id);
+
+  // Helper function to parse style values
+  const parseStyleValue = (value: any): number | undefined => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value.replace('px', ''));
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return undefined;
+  };
+
+  // Initialize resized dimensions with stored values
+  const getInitialDimensions = () => {
+    const storedHeight = currentNode?.style?.height;
+    const storedWidth = currentNode?.style?.width;
+    
+    return {
+      width: typeof storedWidth === 'number' ? storedWidth : undefined,
+      height: typeof storedHeight === 'number' ? storedHeight : undefined
+    };
+  };
+
+  const [resizedDimensions, setResizedDimensions] = useState<{width?: number, height?: number}>(getInitialDimensions);
+
+  // Default dimensions
+  const minWidth = 200;
+  const minHeight = 150;
+
+  // Calculate actual dimensions
+  const propsStyleHeight = parseStyleValue(style?.height);
+  const propsStyleWidth = parseStyleValue(style?.width);
+  const resizedHeight = resizedDimensions.height;
+  const resizedWidth = resizedDimensions.width;
+
+  const calculatedHeight = resizedHeight || propsStyleHeight || minHeight;
+  const calculatedWidth = resizedWidth || propsStyleWidth || minWidth;
+
+  const actualNodeHeight = Math.max(calculatedHeight, minHeight);
+  const actualNodeWidth = Math.max(calculatedWidth, minWidth);
+
+  // Sync resized dimensions when ReactFlow style changes
+  useEffect(() => {
+    const reactFlowHeight = parseStyleValue(currentNode?.style?.height);
+    const reactFlowWidth = parseStyleValue(currentNode?.style?.width);
+    
+    if (reactFlowHeight !== undefined || reactFlowWidth !== undefined) {
+      setResizedDimensions(prev => ({
+        width: reactFlowWidth !== undefined ? reactFlowWidth : prev.width,
+        height: reactFlowHeight !== undefined ? reactFlowHeight : prev.height,
+      }));
+    }
+  }, [currentNode?.style?.height, currentNode?.style?.width, style?.height, style?.width, id]);
 
   // Convert opacity from 0-100 to 0-1
   const opacity = backgroundOpacity / 100;
@@ -45,57 +102,52 @@ export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => 
 
   return (
     <>
-      {/* Enhanced Ports for Group Node */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="target"
-        style={{
-          top: -8,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 8,
-          height: 8,
-          border: 'none',
-          zIndex: 30
-        }}
-      />
-      
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="source"
-        style={{
-          bottom: -8,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 8,
-          height: 8,
-          border: 'none',
-          zIndex: 30
-        }}
-      />
-      
       <NodeResizer
-        color="#3b82f6"
+        color={color}
         isVisible={selected && !window.location.pathname.includes('monitor') && !window.location.pathname.includes('public')}
-        minWidth={100}
-        minHeight={100}
+        minWidth={minWidth}
+        minHeight={minHeight}
+        onResize={(event, params) => {
+          // Update local state immediately for instant visual feedback
+          setResizedDimensions({
+            width: params.width,
+            height: params.height
+          });
+          
+          // Update the node with new size using setNodes
+          if (setNodes && id) {
+            setNodes((nodes) =>
+              nodes.map((node) =>
+                node.id === id
+                  ? {
+                      ...node,
+                      style: {
+                        ...node.style,
+                        width: params.width,
+                        height: params.height,
+                      },
+                    }
+                  : node
+              )
+            );
+          }
+        }}
       />
       <div
-        className="w-full h-full rounded-lg border-2 relative"
         style={{
+          width: `${actualNodeWidth}px`,
+          height: `${actualNodeHeight}px`,
           backgroundColor: getBgColorWithOpacity(),
-          borderColor: selected ? '#3b82f6' : color,
-          borderStyle: borderStyle,
-          minWidth: 200,
-          minHeight: 150,
+          border: `2px solid ${color}`,
+          borderRadius: '8px',
+          position: 'relative',
           zIndex: zIndex,
+          boxSizing: 'border-box',
         }}
       >
         {/* Z-index indicator */}
         {selected && zIndex !== 0 && (
-          <div className="absolute top-1 right-1 text-xs bg-gray-800 text-white px-1.5 py-0.5 rounded">
+          <div className="absolute top-1 right-1 text-xs bg-gray-800 text-white px-1.5 py-0.5 rounded z-10">
             z: {zIndex}
           </div>
         )}
