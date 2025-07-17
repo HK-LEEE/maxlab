@@ -70,9 +70,55 @@ export function DataSourceConfigDialog({
     try {
       setIsLoading(true);
       
+      // Enhanced validation to prevent default/empty data sources
+      const connectionString = selectedSource.connection_string?.trim();
+      
+      // Check for invalid connection strings
+      if (!connectionString || 
+          connectionString === 'default' || 
+          connectionString === '' ||
+          connectionString.length < 10) {
+        alert('❌ 기본 데이터베이스 설정으로는 저장할 수 없습니다.\n\n올바른 데이터베이스 연결 문자열을 입력해주세요.\n예: Server=yourserver;Database=yourdb;User=username;Password=password;');
+        return;
+      }
+      
+      // Check for valid source type
+      if (!selectedSource.source_type || selectedSource.source_type === 'default') {
+        alert('❌ 올바른 데이터 소스 타입을 선택해주세요.\n\n지원되는 타입: MSSQL, PostgreSQL, API');
+        return;
+      }
+      
+      // Additional validation for MSSQL
+      if (selectedSource.source_type === 'mssql' || selectedSource.source_type === 'MSSQL') {
+        if (!connectionString.toLowerCase().includes('server=') && 
+            !connectionString.toLowerCase().includes('data source=')) {
+          alert('❌ MSSQL 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nServer=서버주소;Database=데이터베이스명;User=사용자명;Password=비밀번호;');
+          return;
+        }
+      }
+      
+      // Additional validation for PostgreSQL
+      if (selectedSource.source_type === 'postgresql' || selectedSource.source_type === 'POSTGRESQL') {
+        if (!connectionString.toLowerCase().includes('host=') && 
+            !connectionString.toLowerCase().includes('postgresql://')) {
+          alert('❌ PostgreSQL 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nHost=호스트;Database=데이터베이스명;Username=사용자명;Password=비밀번호;\n또는\npostgresql://username:password@host:port/database');
+          return;
+        }
+      }
+      
+      // Additional validation for API
+      if (selectedSource.source_type === 'api' || selectedSource.source_type === 'API') {
+        if (!connectionString.toLowerCase().startsWith('http://') && 
+            !connectionString.toLowerCase().startsWith('https://')) {
+          alert('❌ API 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nhttps://api.example.com/endpoint');
+          return;
+        }
+      }
+      
       const config = {
         ...selectedSource,
         workspace_id: workspaceId,
+        connection_string: connectionString,
       };
 
       if (selectedSource.id) {
@@ -92,8 +138,13 @@ export function DataSourceConfigDialog({
       await fetchDataSources();
       setSelectedSource(null);
       setIsEditing(false);
+      
+      // Success message
+      alert('✅ 데이터 소스가 성공적으로 저장되었습니다!');
+      
     } catch (error) {
       console.error('Failed to save data source:', error);
+      alert('❌ 데이터 소스 저장에 실패했습니다.\n\n연결 문자열과 설정을 다시 확인해주세요.');
     } finally {
       setIsLoading(false);
     }

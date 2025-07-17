@@ -18,10 +18,12 @@ import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
+import { DatabaseConfigAlert } from '../components/common/DatabaseConfigAlert';
 import { AlarmNotification } from '../components/monitor/AlarmNotification';
 import { StatusSummary } from '../components/monitor/StatusSummary';
 import { EquipmentSidebar } from '../components/monitor/EquipmentSidebar';
 import { usePublicFlowMonitor } from '../hooks/usePublicFlowMonitor';
+import { useDataSources } from '../hooks/useDataSources';
 
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = Object.freeze({
@@ -133,7 +135,12 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   const [viewport] = useState<Viewport | undefined>();
   const [showAlarms, setShowAlarms] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Remove database alert from public monitoring
+  // const [showDBAlert, setShowDBAlert] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Remove data source validation from public monitoring - handle at save time instead
+  // const { isDefaultDatabase, isLoading: isLoadingDataSources } = useDataSources('personal_test');
   
   const {
     flow,
@@ -187,10 +194,30 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
     };
   }, []);
 
-  const equipmentStatusCount = equipmentStatuses.length;
-  const activeCount = equipmentStatuses.filter(eq => eq.status === 'ACTIVE').length;
-  const pauseCount = equipmentStatuses.filter(eq => eq.status === 'PAUSE').length;
-  const stopCount = equipmentStatuses.filter(eq => eq.status === 'STOP').length;
+  // Remove database configuration check from public monitoring
+  // useEffect(() => {
+  //   if (!isLoadingDataSources && isDefaultDatabase) {
+  //     setShowDBAlert(true);
+  //   }
+  // }, [isDefaultDatabase, isLoadingDataSources]);
+
+  // 현재 Flow에 등록된 equipment 노드의 equipmentCode 추출
+  const nodeEquipmentCodes = new Set<string>();
+  nodes.forEach(node => {
+    if (node.type === 'equipment' && node.data.equipmentCode) {
+      nodeEquipmentCodes.add(node.data.equipmentCode);
+    }
+  });
+
+  // 노드에 등록된 설비만 필터링하여 카운팅
+  const filteredStatuses = equipmentStatuses.filter(eq => 
+    nodeEquipmentCodes.has(eq.equipment_code)
+  );
+
+  const equipmentStatusCount = filteredStatuses.length;
+  const activeCount = filteredStatuses.filter(eq => eq.status === 'ACTIVE').length;
+  const pauseCount = filteredStatuses.filter(eq => eq.status === 'PAUSE').length;
+  const stopCount = filteredStatuses.filter(eq => eq.status === 'STOP').length;
 
   // Status counts for StatusSummary component
   const statusCounts = {
@@ -399,6 +426,12 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
         {showAlarms && alarmCheck && (
           <AlarmNotification onClose={() => setShowAlarms(false)} />
         )}
+
+        {/* Remove Database Configuration Alert from public monitoring */}
+        {/* <DatabaseConfigAlert
+          isVisible={showDBAlert}
+          onClose={() => setShowDBAlert(false)}
+        /> */}
       </div>
     </div>
   );

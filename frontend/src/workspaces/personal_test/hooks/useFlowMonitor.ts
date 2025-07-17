@@ -148,7 +148,29 @@ export const useFlowMonitor = (workspaceId: string) => {
     
     try {
       // Build API URLs with data_source_id if available
-      const dataSourceParam = selectedFlow?.data_source_id ? `&data_source_id=${selectedFlow.data_source_id}` : '';
+      // If no data_source_id in flow, try to get the first active data source from workspace
+      let dataSourceParam = '';
+      
+      if (selectedFlow?.data_source_id) {
+        dataSourceParam = `&data_source_id=${selectedFlow.data_source_id}`;
+      } else {
+        // Fallback: get active data sources for workspace and use the first active one
+        try {
+          const dataSourcesResponse = await apiClient.get(`/api/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`);
+          
+          const activeSources = dataSourcesResponse.data.filter((ds: any) => 
+            ds.is_active && 
+            ds.source_type !== 'default' &&
+            (ds.source_type === 'mssql' || ds.source_type === 'postgresql' || ds.source_type === 'api')
+          );
+          
+          if (activeSources.length > 0) {
+            dataSourceParam = `&data_source_id=${activeSources[0].id}`;
+          }
+        } catch (error) {
+          console.warn('Failed to get data sources for fallback:', error);
+        }
+      }
       
       const [statusResponse, measurementResponse] = await Promise.all([
         apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}&limit=100${dataSourceParam}&_t=${Date.now()}`),
@@ -542,10 +564,22 @@ export const useFlowMonitor = (workspaceId: string) => {
 
   const getStatusCounts = () => {
     const counts = { ACTIVE: 0, PAUSE: 0, STOP: 0 };
-    equipmentStatuses.forEach((status) => {
-      counts[status.status]++;
+    
+    // 현재 Flow에 등록된 equipment 노드의 equipmentCode 추출
+    const nodeEquipmentCodes = new Set<string>();
+    nodes.forEach(node => {
+      if (node.type === 'equipment' && node.data.equipmentCode) {
+        nodeEquipmentCodes.add(node.data.equipmentCode);
+      }
     });
-    // console.log('Status Counts:', counts, 'from', equipmentStatuses.length, 'equipment');
+    
+    // 노드에 등록된 설비만 카운팅
+    equipmentStatuses.forEach((status) => {
+      if (nodeEquipmentCodes.has(status.equipment_code)) {
+        counts[status.status]++;
+      }
+    });
+    
     return counts;
   };
 
@@ -593,6 +627,7 @@ export const useFlowMonitor = (workspaceId: string) => {
     autoRefresh,
     refreshInterval,
     autoScroll,
+    setAutoScroll,
     alarmCheck,
     isSidebarOpen,
     isFullscreen,
@@ -602,7 +637,6 @@ export const useFlowMonitor = (workspaceId: string) => {
     setSelectedFlow,
     setAutoRefresh,
     setRefreshInterval,
-    setAutoScroll,
     setAlarmCheck,
     setIsSidebarOpen,
     loadData,

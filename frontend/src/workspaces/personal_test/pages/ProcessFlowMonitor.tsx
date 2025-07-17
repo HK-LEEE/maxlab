@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -16,6 +16,7 @@ import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
+import { DatabaseConfigAlert } from '../components/common/DatabaseConfigAlert';
 
 import { MonitorHeader } from '../components/monitor/MonitorHeader';
 import { StatusSummary } from '../components/monitor/StatusSummary';
@@ -23,6 +24,7 @@ import { EquipmentSidebar } from '../components/monitor/EquipmentSidebar';
 import { AlarmNotification } from '../components/monitor/AlarmNotification';
 
 import { useFlowMonitor } from '../hooks/useFlowMonitor';
+import { useDataSources } from '../hooks/useDataSources';
 import { Layout } from '../../../components/common/Layout';
 
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
@@ -108,6 +110,9 @@ const FlowCanvas: React.FC<{
 const ProcessFlowMonitorContent: React.FC = () => {
   const workspaceId = 'personal_test';
   
+  // Remove data source validation from monitoring - handle at save time instead
+  // const { isDefaultDatabase, isLoading: isLoadingDataSources } = useDataSources(workspaceId);
+  
   const {
     nodes,
     edges,
@@ -140,6 +145,8 @@ const ProcessFlowMonitorContent: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showAlarms, setShowAlarms] = useState(true);
+  // Remove database alert from monitoring
+  // const [showDBAlert, setShowDBAlert] = useState(false);
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {
@@ -177,6 +184,13 @@ const ProcessFlowMonitorContent: React.FC = () => {
       setSelectedFlow(flow);
     }
   };
+
+  // Remove database configuration check from monitoring
+  // useEffect(() => {
+  //   if (!isLoadingDataSources && isDefaultDatabase) {
+  //     setShowDBAlert(true);
+  //   }
+  // }, [isDefaultDatabase, isLoadingDataSources]);
 
   return (
     <div className="h-screen flex flex-col bg-white">
@@ -247,6 +261,12 @@ const ProcessFlowMonitorContent: React.FC = () => {
       {showAlarms && alarmCheck && (
         <AlarmNotification onClose={() => setShowAlarms(false)} />
       )}
+
+      {/* Remove Database Configuration Alert from monitoring */}
+      {/* <DatabaseConfigAlert
+        isVisible={showDBAlert}
+        onClose={() => setShowDBAlert(false)}
+      /> */}
     </div>
   );
 };

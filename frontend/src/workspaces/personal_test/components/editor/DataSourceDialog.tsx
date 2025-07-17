@@ -127,10 +127,55 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
 
   const handleSave = async () => {
     try {
+      // Enhanced validation to prevent default/empty data sources
+      const connectionString = formData.connection_string?.trim();
+      
+      // Check for invalid connection strings
+      if (!connectionString || 
+          connectionString === 'default' || 
+          connectionString === '' ||
+          connectionString.length < 10) {
+        alert('❌ 기본 데이터베이스 설정으로는 저장할 수 없습니다.\n\n올바른 데이터베이스 연결 문자열을 입력해주세요.\n예: Server=yourserver;Database=yourdb;User=username;Password=password;');
+        return;
+      }
+      
+      // Check for valid source type
+      if (!formData.source_type || formData.source_type === 'default') {
+        alert('❌ 올바른 데이터 소스 타입을 선택해주세요.\n\n지원되는 타입: MSSQL, PostgreSQL, API');
+        return;
+      }
+      
+      // Additional validation for MSSQL
+      if (formData.source_type === 'mssql' || formData.source_type === 'MSSQL') {
+        if (!connectionString.toLowerCase().includes('server=') && 
+            !connectionString.toLowerCase().includes('data source=')) {
+          alert('❌ MSSQL 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nServer=서버주소;Database=데이터베이스명;User=사용자명;Password=비밀번호;');
+          return;
+        }
+      }
+      
+      // Additional validation for PostgreSQL
+      if (formData.source_type === 'postgresql' || formData.source_type === 'POSTGRESQL') {
+        if (!connectionString.toLowerCase().includes('host=') && 
+            !connectionString.toLowerCase().includes('postgresql://')) {
+          alert('❌ PostgreSQL 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nHost=호스트;Database=데이터베이스명;Username=사용자명;Password=비밀번호;\n또는\npostgresql://username:password@host:port/database');
+          return;
+        }
+      }
+      
+      // Additional validation for API
+      if (formData.source_type === 'api' || formData.source_type === 'API') {
+        if (!connectionString.toLowerCase().startsWith('http://') && 
+            !connectionString.toLowerCase().startsWith('https://')) {
+          alert('❌ API 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nhttps://api.example.com/endpoint');
+          return;
+        }
+      }
+
       const payload = {
         workspace_id: workspaceId,
         source_type: formData.source_type,
-        connection_string: formData.connection_string,
+        connection_string: connectionString,
         api_key: formData.api_key || undefined,
         headers: formData.headers ? JSON.parse(formData.headers) : undefined,
         custom_queries: formData.custom_queries,
@@ -153,9 +198,13 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
       await loadDataSources();
       setIsAddingNew(false);
       setEditingSource(null);
+      
+      // Success message
+      alert('✅ 데이터 소스가 성공적으로 저장되었습니다!');
+      
     } catch (error) {
       console.error('Failed to save data source:', error);
-      alert('Failed to save data source');
+      alert('❌ 데이터 소스 저장에 실패했습니다.\n\n연결 문자열과 설정을 다시 확인해주세요.');
     }
   };
 

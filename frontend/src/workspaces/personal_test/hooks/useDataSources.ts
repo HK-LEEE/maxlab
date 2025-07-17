@@ -23,6 +23,35 @@ export const useDataSources = (workspaceId: string) => {
   const [dataSources, setDataSources] = useState<DataSource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Check if using default database (simplified - no longer used in monitoring)
+  const isDefaultDatabase = (sources: DataSource[]) => {
+    // No data sources configured
+    if (sources.length === 0) {
+      return true;
+    }
+    
+    // Check if there are any properly configured active data sources
+    const hasActiveDataSource = sources.some(ds => {
+      const isActive = ds.is_active;
+      const isNotDefault = ds.source_type !== 'default';
+      
+      // Check for connection string in multiple fields depending on source type
+      let connectionString = ds.connection_string;
+      if (ds.source_type === 'mssql' && !connectionString) {
+        // For MSSQL, check mssql_connection_string field
+        connectionString = (ds as any).mssql_connection_string;
+      }
+      
+      const hasConnectionString = !!connectionString;
+      const isNotDefaultConnectionString = connectionString !== 'default' && connectionString !== '';
+      const isValidType = ds.source_type === 'mssql' || ds.source_type === 'postgresql' || ds.source_type === 'api';
+      
+      return isActive && isNotDefault && hasConnectionString && isNotDefaultConnectionString && isValidType;
+    });
+    
+    return !hasActiveDataSource;
+  };
 
   useEffect(() => {
     const fetchDataSources = async () => {
@@ -35,6 +64,7 @@ export const useDataSources = (workspaceId: string) => {
         );
         
         setDataSources(response.data);
+        
       } catch (err: any) {
         console.error('Failed to fetch data sources:', err);
         setError('Failed to load data sources');
@@ -52,6 +82,7 @@ export const useDataSources = (workspaceId: string) => {
     dataSources,
     isLoading,
     error,
+    isDefaultDatabase: isDefaultDatabase(dataSources),
   };
 };
 
