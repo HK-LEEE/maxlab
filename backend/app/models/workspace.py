@@ -9,6 +9,7 @@ from sqlalchemy.sql import func
 from app.core.database import Base
 import uuid
 import enum
+from typing import Optional
 
 
 class WorkspaceType(str, enum.Enum):
@@ -81,6 +82,7 @@ class WorkspaceUser(Base):
     """
     워크스페이스 사용자 권한 테이블
     사용자별 워크스페이스 접근 권한을 관리합니다.
+    UUID 기반 사용자 식별로 외부 인증 시스템과 연동합니다.
     """
     __tablename__ = "workspace_users"
     
@@ -90,24 +92,53 @@ class WorkspaceUser(Base):
     # 외래 키
     workspace_id = Column(UUID(as_uuid=True), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False)
     
-    # 사용자 정보
-    user_id = Column(String(255), nullable=False, comment="사용자 ID")
-    user_display_name = Column(String(255), nullable=True, comment="사용자 표시명")
+    # 사용자 정보 - 과도기 스키마 (기존 String + 새로운 UUID)
+    user_id = Column(String(255), nullable=False, comment="사용자 식별자 (레거시, 마이그레이션 후 제거)")  # 기존 필드
+    user_id_uuid = Column(UUID(as_uuid=True), nullable=True, comment="사용자 UUID (새로운 필드)")  # 새로운 필드
+    user_email = Column(String(255), nullable=True, comment="사용자 이메일 (캐싱용)")
+    user_display_name = Column(String(255), nullable=True, comment="사용자 표시명 (캐싱용)")
     permission_level = Column(String(50), default="read", nullable=False, comment="권한 레벨 (read/write/admin)")
+    
+    # 캐싱 정보
+    user_info_updated_at = Column(DateTime(timezone=True), nullable=True, comment="사용자 정보 마지막 업데이트")
     
     # 메타데이터
     created_by = Column(String(255), nullable=False, comment="생성자")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), comment="생성일시")
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), comment="수정일시")
     
     # 관계 설정
     workspace = relationship("Workspace", back_populates="workspace_users")
     
-    # 인덱스 및 제약조건
+    # 과도기 호환성을 위한 속성들
+    @property
+    def user_uuid(self) -> Optional[uuid.UUID]:
+        """사용자 UUID 반환 (새로운 필드 우선, 레거시 fallback)"""
+        if self.user_id_uuid:
+            return self.user_id_uuid
+        # 레거시 문자열에서 UUID 추출 시도
+        try:
+            return uuid.UUID(self.user_id) if self.user_id and len(self.user_id) == 36 else None
+        except (ValueError, TypeError):
+            return None
+    
+    @user_uuid.setter 
+    def user_uuid(self, value: Optional[uuid.UUID]):
+        """사용자 UUID 설정"""
+        self.user_id_uuid = value
+        if value:
+            self.user_id = str(value)  # 레거시 호환성
+    
+    # 인덱스 및 제약조건 (과도기 스키마)
     __table_args__ = (
         Index('idx_workspace_user_workspace', 'workspace_id'),
-        Index('idx_workspace_user_user', 'user_id'),
+        Index('idx_workspace_user_user_legacy', 'user_id'),  # 기존 레거시 인덱스
+        Index('idx_workspace_user_user_uuid', 'user_id_uuid'),  # 새로운 UUID 인덱스
+        Index('idx_workspace_user_email', 'user_email'),
         Index('idx_workspace_user_permission', 'permission_level'),
-        Index('idx_workspace_user_unique', 'workspace_id', 'user_id', unique=True),
+        Index('idx_workspace_user_unique_legacy', 'workspace_id', 'user_id'),  # 기존 제약조건 (unique 제거)
+        Index('idx_workspace_user_unique_uuid', 'workspace_id', 'user_id_uuid'),  # 새로운 UUID 제약조건
+        Index('idx_workspace_user_updated', 'user_info_updated_at'),
     )
 
 
@@ -115,6 +146,7 @@ class WorkspaceGroup(Base):
     """
     워크스페이스 그룹 권한 테이블
     그룹별 워크스페이스 접근 권한을 관리합니다.
+    UUID 기반 그룹 식별로 외부 그룹 시스템과 연동합니다.
     """
     __tablename__ = "workspace_groups"
     
@@ -124,24 +156,51 @@ class WorkspaceGroup(Base):
     # 외래 키
     workspace_id = Column(UUID(as_uuid=True), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False)
     
-    # 그룹 정보
-    group_name = Column(String(255), nullable=False, comment="그룹명")
-    group_display_name = Column(String(255), nullable=True, comment="그룹 표시명")
+    # 그룹 정보 - 과도기 스키마 (기존 String + 새로운 UUID)
+    group_name = Column(String(255), nullable=False, comment="그룹명 (레거시, 마이그레이션 후 제거)")  # 기존 필드
+    group_id_uuid = Column(UUID(as_uuid=True), nullable=True, comment="그룹 UUID (새로운 필드)")  # 새로운 필드
+    group_display_name = Column(String(255), nullable=True, comment="그룹 표시명 (캐싱용)")
     permission_level = Column(String(50), default="read", nullable=False, comment="권한 레벨 (read/write/admin)")
+    
+    # 캐싱 정보
+    group_info_updated_at = Column(DateTime(timezone=True), nullable=True, comment="그룹 정보 마지막 업데이트")
     
     # 메타데이터
     created_by = Column(String(255), nullable=False, comment="생성자")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), comment="생성일시")
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), comment="수정일시")
     
     # 관계 설정
     workspace = relationship("Workspace", back_populates="workspace_groups")
     
-    # 인덱스 및 제약조건
+    # 과도기 호환성을 위한 속성들
+    @property
+    def group_uuid(self) -> Optional[uuid.UUID]:
+        """그룹 UUID 반환 (새로운 필드 우선, 레거시 fallback)"""
+        if self.group_id_uuid:
+            return self.group_id_uuid
+        # 레거시: group_name이 UUID 형식인지 확인
+        try:
+            return uuid.UUID(self.group_name) if self.group_name and len(self.group_name) == 36 else None
+        except (ValueError, TypeError):
+            return None
+    
+    @group_uuid.setter
+    def group_uuid(self, value: Optional[uuid.UUID]):
+        """그룹 UUID 설정"""
+        self.group_id_uuid = value
+        if value:
+            self.group_name = str(value)  # 레거시 호환성 (임시)
+    
+    # 인덱스 및 제약조건 (과도기 스키마)
     __table_args__ = (
         Index('idx_workspace_group_workspace', 'workspace_id'),
-        Index('idx_workspace_group_name', 'group_name'),
+        Index('idx_workspace_group_name_legacy', 'group_name'),  # 기존 레거시 인덱스
+        Index('idx_workspace_group_uuid', 'group_id_uuid'),  # 새로운 UUID 인덱스
         Index('idx_workspace_group_permission', 'permission_level'),
-        Index('idx_workspace_group_unique', 'workspace_id', 'group_name', unique=True),
+        Index('idx_workspace_group_unique_legacy', 'workspace_id', 'group_name'),  # 기존 제약조건
+        Index('idx_workspace_group_unique_uuid', 'workspace_id', 'group_id_uuid'),  # 새로운 UUID 제약조건
+        Index('idx_workspace_group_updated', 'group_info_updated_at'),
     )
 
 

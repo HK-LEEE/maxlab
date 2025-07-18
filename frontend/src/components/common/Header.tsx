@@ -23,21 +23,34 @@ interface ProfileAvatarProps {
 }
 
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, onClick }) => {
+  const isAdmin = user?.is_admin || user?.role === 'admin';
+  
   return (
     <button
       onClick={onClick}
-      className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+      className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors relative"
     >
-      <div className="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center">
+      <div className={`w-8 h-8 bg-gradient-to-br ${isAdmin ? 'from-red-700 to-red-900' : 'from-gray-700 to-gray-900'} rounded-lg flex items-center justify-center relative`}>
         <User className="w-4 h-4 text-white" />
+        {isAdmin && (
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white"></div>
+        )}
       </div>
       <div className="hidden md:block text-left">
         <div className="text-sm font-medium text-gray-900">
           {user?.full_name || user?.username || 'Unknown User'}
+          {isAdmin && (
+            <span className="ml-2 text-xs font-bold text-red-600">ADMIN</span>
+          )}
         </div>
         <div className="text-xs text-gray-500">
           {user?.email || 'No email'}
         </div>
+        {isAdmin && (
+          <div className="text-xs text-red-600 font-medium mt-0.5">
+            Activated admin mode
+          </div>
+        )}
       </div>
     </button>
   );
@@ -52,6 +65,7 @@ interface ProfileDropdownProps {
 const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onClose, onLogout }) => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isAdmin = user?.is_admin || user?.role === 'admin';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -72,8 +86,33 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onClose, onLogo
   return (
     <div 
       ref={dropdownRef}
-      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50"
+      className={`absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border ${isAdmin ? 'border-red-200' : 'border-gray-100'} py-1 z-50`}
     >
+      {/* 관리자 상태 표시 */}
+      {isAdmin && (
+        <>
+          <div className="px-4 py-2 bg-red-50 border-b border-red-100">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span className="text-xs font-medium text-red-700">Administrator Mode</span>
+            </div>
+            <div className="text-xs text-red-600 mt-1">
+              Full system access enabled
+            </div>
+          </div>
+        </>
+      )}
+      
+      {/* 사용자 정보 */}
+      <div className="px-4 py-2 border-b border-gray-100">
+        <div className="text-sm font-medium text-gray-900">
+          {user?.full_name || user?.username || 'Unknown User'}
+        </div>
+        <div className="text-xs text-gray-500">
+          {user?.email || 'No email'}
+        </div>
+      </div>
+      
       <button
         onClick={handleProfileClick}
         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
@@ -99,6 +138,7 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
   const { user } = useAuthStore();
   const isMainPage = location.pathname === '/';
   const [showDropdown, setShowDropdown] = useState(false);
+  const isAdmin = user?.is_admin || user?.role === 'admin';
   
   // Secure logout functionality
   const {
@@ -146,7 +186,13 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
+    <nav className={`${isAdmin ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'} border-b shadow-sm sticky top-0 z-50`}>
+      {/* 관리자 모드 알림 바 */}
+      {isAdmin && (
+        <div className="bg-red-600 text-white text-center py-1 text-sm font-medium">
+          🔒 Activated admin mode - {user?.email || user?.username || 'Admin User'}
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}

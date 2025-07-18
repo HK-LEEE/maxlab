@@ -77,27 +77,57 @@ class WorkspaceCRUD:
             db.add(db_obj)
             await db.flush()  # Get the ID without committing
             
-            # Add user permissions if specified
-            if obj_in.permission_mode == 'user' and obj_in.selected_users:
-                for user_id in obj_in.selected_users:
-                    workspace_user = WorkspaceUser(
-                        workspace_id=db_obj.id,
-                        user_id=user_id,
-                        permission_level='read',
-                        created_by=creator_id
-                    )
-                    db.add(workspace_user)
+            # Add user permissions if specified (혼합 모드 지원)
+            if obj_in.selected_users and len(obj_in.selected_users) > 0:
+                from ..services.user_mapping import user_mapping_service
+                
+                for user_identifier in obj_in.selected_users:
+                    # UUID로 변환 시도 (string이면 UUID로 매핑)
+                    try:
+                        user_uuid = uuid.UUID(user_identifier) if isinstance(user_identifier, str) and len(user_identifier) == 36 else None
+                    except ValueError:
+                        user_uuid = None
+                    
+                    if not user_uuid:
+                        user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier)
+                    
+                    if user_uuid:
+                        workspace_user = WorkspaceUser(
+                            workspace_id=db_obj.id,
+                            user_id=str(user_uuid),  # 레거시 호환성
+                            user_id_uuid=user_uuid,  # 새로운 UUID 필드
+                            permission_level='read',
+                            created_by=creator_id
+                        )
+                        db.add(workspace_user)
+                    else:
+                        logger.warning(f"Could not resolve user identifier '{user_identifier}' to UUID during workspace creation")
             
-            # Add group permissions if specified
-            if obj_in.permission_mode == 'group' and obj_in.selected_groups:
-                for group_name in obj_in.selected_groups:
-                    workspace_group = WorkspaceGroup(
-                        workspace_id=db_obj.id,
-                        group_name=group_name,
-                        permission_level='read',
-                        created_by=creator_id
-                    )
-                    db.add(workspace_group)
+            # Add group permissions if specified (혼합 모드 지원)
+            if obj_in.selected_groups and len(obj_in.selected_groups) > 0:
+                from ..services.group_mapping import group_mapping_service
+                
+                for group_identifier in obj_in.selected_groups:
+                    # UUID로 변환 시도 (string이면 UUID로 매핑)
+                    try:
+                        group_uuid = uuid.UUID(group_identifier) if isinstance(group_identifier, str) and len(group_identifier) == 36 else None
+                    except ValueError:
+                        group_uuid = None
+                    
+                    if not group_uuid:
+                        group_uuid = await group_mapping_service.get_group_uuid_by_name(group_identifier)
+                    
+                    if group_uuid:
+                        workspace_group = WorkspaceGroup(
+                            workspace_id=db_obj.id,
+                            group_name=str(group_uuid),  # 레거시 호환성 (임시)
+                            group_id_uuid=group_uuid,    # 새로운 UUID 필드
+                            permission_level='read',
+                            created_by=creator_id
+                        )
+                        db.add(workspace_group)
+                    else:
+                        logger.warning(f"Could not resolve group identifier '{group_identifier}' to UUID during workspace creation")
             
             await db.commit()
             await db.refresh(db_obj)
@@ -146,97 +176,198 @@ class WorkspaceCRUD:
         skip: int = 0, 
         limit: int = 1000,
         active_only: bool = True,
+        # UUID 기반 파라미터
+        user_uuid: Optional[uuid.UUID] = None,
+        user_group_uuids: Optional[List[uuid.UUID]] = None,
+        is_admin: bool = False,
+        # 레거시 호환성 파라미터 (deprecated)
         user_id: Optional[str] = None,
-        user_groups: Optional[List[str]] = None,
-        is_admin: bool = False
+        user_groups: Optional[List[str]] = None
     ) -> List[Workspace]:
-        """워크스페이스 목록 조회"""
+        """
+        워크스페이스 목록 조회 (UUID 기반)
+        관리자가 아닌 사용자는 접근 권한이 있는 워크스페이스만 조회
+        """
+        from ..services.user_mapping import user_mapping_service
+        from ..services.group_mapping import group_mapping_service
+        
         stmt = select(Workspace)
         
         # 활성 워크스페이스만 조회
         if active_only:
             stmt = stmt.where(Workspace.is_active == True)
         
-        # 관리자가 아닌 경우 접근 권한이 있는 워크스페이스만 조회 - EXISTS 최적화
+        # 관리자가 아닌 경우 접근 권한이 있는 워크스페이스만 조회
         if not is_admin:
+            # 레거시 파라미터 처리 (String 기반 -> UUID 변환)
+            if user_id and not user_uuid:
+                try:
+                    user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_id)
+                    logger.warning(f"레거시 user_id 파라미터 사용 in get_multi: {user_id} -> {user_uuid}")
+                except Exception as e:
+                    logger.error(f"레거시 user_id 변환 실패 in get_multi: {e}")
+            
+            if user_groups and not user_group_uuids:
+                try:
+                    group_mapping = await group_mapping_service.map_legacy_groups_to_uuid(user_groups)
+                    user_group_uuids = [uuid for uuid in group_mapping.values() if uuid is not None]
+                    logger.warning(f"레거시 user_groups 파라미터 사용 in get_multi: {user_groups} -> {user_group_uuids}")
+                except Exception as e:
+                    logger.error(f"레거시 user_groups 변환 실패 in get_multi: {e}")
+                    user_group_uuids = []
+            
             # EXISTS를 사용하여 IN 서브쿼리보다 성능 향상
             permission_conditions = []
             
-            # 소유자 권한 확인
-            if user_id:
+            # 1. 소유자 권한 확인 (UUID 우선, 레거시 fallback)
+            if user_uuid:
+                permission_conditions.append(Workspace.owner_id == str(user_uuid))
+            elif user_id:
                 permission_conditions.append(Workspace.owner_id == user_id)
             
-            # 사용자 기반 권한 확인 (EXISTS 사용)
-            if user_id:
+            # 2. 사용자 기반 권한 확인 (EXISTS 사용, UUID 기반)
+            if user_uuid:
                 user_exists = exists().where(
                     and_(
                         WorkspaceUser.workspace_id == Workspace.id,
-                        WorkspaceUser.user_id == user_id
+                        or_(
+                            WorkspaceUser.user_id_uuid == user_uuid,  # 새로운 UUID 필드
+                            WorkspaceUser.user_id == str(user_uuid)   # 레거시 호환성
+                        )
                     )
                 )
                 permission_conditions.append(user_exists)
             
-            # 그룹 기반 권한 확인 (EXISTS 사용)
-            if user_groups:
+            # 3. 그룹 기반 권한 확인 (EXISTS 사용, UUID 기반)
+            if user_group_uuids:
                 group_exists = exists().where(
+                    and_(
+                        WorkspaceGroup.workspace_id == Workspace.id,
+                        or_(
+                            WorkspaceGroup.group_id_uuid.in_(user_group_uuids),  # 새로운 UUID 필드
+                            WorkspaceGroup.group_name.in_([str(g) for g in user_group_uuids])  # 레거시 호환성
+                        )
+                    )
+                )
+                permission_conditions.append(group_exists)
+            
+            # 4. 레거시 그룹 권한 확인 (deprecated, but for compatibility)
+            if user_groups and not user_group_uuids:
+                legacy_group_exists = exists().where(
                     and_(
                         WorkspaceGroup.workspace_id == Workspace.id,
                         WorkspaceGroup.group_name.in_(user_groups)
                     )
                 )
-                permission_conditions.append(group_exists)
+                permission_conditions.append(legacy_group_exists)
             
             # OR 조건 적용
             if permission_conditions:
                 stmt = stmt.where(or_(*permission_conditions))
+                logger.debug(f"워크스페이스 필터링 적용: 사용자 {user_uuid or user_id}, 그룹 {user_group_uuids or user_groups}")
             else:
                 # 권한 없음 - 빈 결과 반환
+                logger.warning("워크스페이스 접근 권한이 없는 사용자")
                 stmt = stmt.where(False)
         
         stmt = stmt.offset(skip).limit(limit).order_by(Workspace.created_at.desc())
         
         result = await db.execute(stmt)
-        return result.scalars().all()
+        workspaces = result.scalars().all()
+        
+        logger.info(f"워크스페이스 목록 조회 완료: {len(workspaces)}개 워크스페이스 반환")
+        return workspaces
     
     async def count(
         self, 
         db: AsyncSession, 
         active_only: bool = True,
+        # UUID 기반 파라미터
+        user_uuid: Optional[uuid.UUID] = None,
+        user_group_uuids: Optional[List[uuid.UUID]] = None,
+        is_admin: bool = False,
+        # 레거시 호환성 파라미터 (deprecated)
         user_id: Optional[str] = None,
-        user_groups: Optional[List[str]] = None,
-        is_admin: bool = False
+        user_groups: Optional[List[str]] = None
     ) -> int:
-        """워크스페이스 개수 조회"""
+        """
+        워크스페이스 개수 조회 (UUID 기반)
+        관리자가 아닌 사용자는 접근 권한이 있는 워크스페이스만 카운트
+        """
+        from ..services.user_mapping import user_mapping_service
+        from ..services.group_mapping import group_mapping_service
+        
         stmt = select(func.count(Workspace.id))
         
         if active_only:
             stmt = stmt.where(Workspace.is_active == True)
         
         if not is_admin:
+            # 레거시 파라미터 처리 (String 기반 -> UUID 변환)
+            if user_id and not user_uuid:
+                try:
+                    user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_id)
+                    logger.warning(f"레거시 user_id 파라미터 사용 in count: {user_id} -> {user_uuid}")
+                except Exception as e:
+                    logger.error(f"레거시 user_id 변환 실패 in count: {e}")
+            
+            if user_groups and not user_group_uuids:
+                try:
+                    group_mapping = await group_mapping_service.map_legacy_groups_to_uuid(user_groups)
+                    user_group_uuids = [uuid for uuid in group_mapping.values() if uuid is not None]
+                    logger.warning(f"레거시 user_groups 파라미터 사용 in count: {user_groups} -> {user_group_uuids}")
+                except Exception as e:
+                    logger.error(f"레거시 user_groups 변환 실패 in count: {e}")
+                    user_group_uuids = []
+            
             permission_conditions = []
             
-            # Check user-based permissions
-            if user_id:
+            # 1. 소유자 권한 확인
+            if user_uuid:
+                permission_conditions.append(Workspace.owner_id == str(user_uuid))
+            elif user_id:
+                permission_conditions.append(Workspace.owner_id == user_id)
+            
+            # 2. 사용자 기반 권한 확인 (UUID 기반)
+            if user_uuid:
                 user_subquery = select(WorkspaceUser.workspace_id).where(
-                    WorkspaceUser.user_id == user_id
+                    or_(
+                        WorkspaceUser.user_id_uuid == user_uuid,  # 새로운 UUID 필드
+                        WorkspaceUser.user_id == str(user_uuid)   # 레거시 호환성
+                    )
                 )
                 permission_conditions.append(Workspace.id.in_(user_subquery))
             
-            # Check group-based permissions
-            if user_groups:
+            # 3. 그룹 기반 권한 확인 (UUID 기반)
+            if user_group_uuids:
                 group_subquery = select(WorkspaceGroup.workspace_id).where(
-                    WorkspaceGroup.group_name.in_(user_groups)
+                    or_(
+                        WorkspaceGroup.group_id_uuid.in_(user_group_uuids),  # 새로운 UUID 필드
+                        WorkspaceGroup.group_name.in_([str(g) for g in user_group_uuids])  # 레거시 호환성
+                    )
                 )
                 permission_conditions.append(Workspace.id.in_(group_subquery))
+            
+            # 4. 레거시 그룹 권한 확인 (deprecated, but for compatibility)
+            if user_groups and not user_group_uuids:
+                legacy_group_subquery = select(WorkspaceGroup.workspace_id).where(
+                    WorkspaceGroup.group_name.in_(user_groups)
+                )
+                permission_conditions.append(Workspace.id.in_(legacy_group_subquery))
             
             # Apply OR condition if we have any permission conditions
             if permission_conditions:
                 stmt = stmt.where(or_(*permission_conditions))
+                logger.debug(f"워크스페이스 카운트 필터링 적용: 사용자 {user_uuid or user_id}, 그룹 {user_group_uuids or user_groups}")
             else:
+                logger.warning("워크스페이스 카운트: 접근 권한이 없는 사용자")
                 stmt = stmt.where(False)
         
         result = await db.execute(stmt)
-        return result.scalar()
+        count = result.scalar()
+        
+        logger.debug(f"워크스페이스 카운트 결과: {count}개")
+        return count
     
     async def update(
         self, 
@@ -514,11 +645,20 @@ class WorkspaceGroupCRUD:
         self, 
         db: AsyncSession, 
         workspace_id: uuid.UUID,
+        user_uuid: Optional[uuid.UUID] = None,
+        user_group_uuids: Optional[List[uuid.UUID]] = None, 
+        required_permission: str = "read",
+        # 레거시 지원을 위한 파라미터 (deprecated)
         user_id: Optional[str] = None,
-        user_groups: Optional[List[str]] = None, 
-        required_permission: str = "read"
+        user_groups: Optional[List[str]] = None
     ) -> Dict[str, Any]:
-        """사용자 권한 확인 (사용자 개별 권한 및 그룹 권한 모두 확인)"""
+        """
+        사용자 권한 확인 (UUID 기반)
+        사용자 개별 권한 및 그룹 권한을 모두 확인하여 최고 권한 레벨을 반환
+        """
+        from ..services.user_mapping import user_mapping_service
+        from ..services.group_mapping import group_mapping_service
+        
         permission_hierarchy = {"read": 1, "write": 2, "admin": 3}
         required_level = permission_hierarchy.get(required_permission, 1)
         
@@ -527,50 +667,86 @@ class WorkspaceGroupCRUD:
         granted_groups = []
         granted_users = []
         
-        # Check user-based permissions
-        if user_id:
+        # 레거시 파라미터 처리 (String 기반 -> UUID 변환)
+        if user_id and not user_uuid:
+            try:
+                user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_id)
+                logger.warning(f"레거시 user_id 파라미터 사용: {user_id} -> {user_uuid}")
+            except Exception as e:
+                logger.error(f"레거시 user_id 변환 실패: {e}")
+        
+        if user_groups and not user_group_uuids:
+            try:
+                group_mapping = await group_mapping_service.map_legacy_groups_to_uuid(user_groups)
+                user_group_uuids = [uuid for uuid in group_mapping.values() if uuid is not None]
+                logger.warning(f"레거시 user_groups 파라미터 사용: {user_groups} -> {user_group_uuids}")
+            except Exception as e:
+                logger.error(f"레거시 user_groups 변환 실패: {e}")
+                user_group_uuids = []
+        
+        # 1. 사용자 기반 권한 확인 (UUID 기반)
+        if user_uuid:
             user_stmt = select(WorkspaceUser).where(
                 and_(
                     WorkspaceUser.workspace_id == workspace_id,
-                    WorkspaceUser.user_id == user_id
+                    or_(
+                        WorkspaceUser.user_id_uuid == user_uuid,  # 새로운 UUID 필드
+                        WorkspaceUser.user_id == str(user_uuid)   # 레거시 호환성
+                    )
                 )
             )
             user_result = await db.execute(user_stmt)
             workspace_user = user_result.scalar_one_or_none()
             
             if workspace_user:
-                granted_users.append(user_id)
+                granted_users.append(str(user_uuid))
                 level = permission_hierarchy.get(workspace_user.permission_level, 0)
                 if level > max_permission_level:
                     max_permission_level = level
                     user_permission_level = workspace_user.permission_level
+                
+                logger.debug(f"사용자 권한 확인: {user_uuid} -> {workspace_user.permission_level}")
         
-        # Check group-based permissions
-        if user_groups:
+        # 2. 그룹 기반 권한 확인 (UUID 기반)
+        if user_group_uuids:
             group_stmt = select(WorkspaceGroup).where(
                 and_(
                     WorkspaceGroup.workspace_id == workspace_id,
-                    WorkspaceGroup.group_name.in_(user_groups)
+                    or_(
+                        WorkspaceGroup.group_id_uuid.in_(user_group_uuids),  # 새로운 UUID 필드
+                        WorkspaceGroup.group_name.in_([str(g) for g in user_group_uuids])  # 레거시 호환성
+                    )
                 )
             )
             group_result = await db.execute(group_stmt)
             workspace_groups = group_result.scalars().all()
             
             for wg in workspace_groups:
-                granted_groups.append(wg.group_name)
+                # UUID 우선, 레거시 fallback
+                group_id = wg.group_id_uuid or wg.group_name
+                granted_groups.append(str(group_id))
                 level = permission_hierarchy.get(wg.permission_level, 0)
                 if level > max_permission_level:
                     max_permission_level = level
                     user_permission_level = wg.permission_level
+                
+                logger.debug(f"그룹 권한 확인: {group_id} -> {wg.permission_level}")
         
         has_permission = max_permission_level >= required_level
         
-        return {
+        result = {
             "has_permission": has_permission,
             "user_permission_level": user_permission_level,
             "granted_groups": granted_groups,
-            "granted_users": granted_users
+            "granted_users": granted_users,
+            "max_permission_level": max_permission_level,
+            "required_level": required_level
         }
+        
+        logger.info(f"권한 확인 결과 - 워크스페이스: {workspace_id}, 사용자: {user_uuid}, "
+                   f"권한: {has_permission}, 레벨: {user_permission_level}")
+        
+        return result
     
     async def delete(self, db: AsyncSession, group_id: uuid.UUID) -> bool:
         """워크스페이스 그룹 삭제"""

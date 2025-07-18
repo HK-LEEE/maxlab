@@ -79,6 +79,25 @@ class Settings(BaseSettings):
     AUTH_SERVER_URL: str = "http://localhost:8000"
     AUTH_SERVER_TIMEOUT: int = 10
     
+    # External Authentication Service Settings (UUID 매핑용)
+    SERVICE_TOKEN: str = ""  # Service-to-service authentication token
+    AUTH_CLIENT_ID: str = "maxlab-service"
+    AUTH_CLIENT_SECRET: str = ""
+    
+    # User/Group UUID Mapping Settings
+    USER_MAPPING_CACHE_TTL: int = 3600  # User mapping cache TTL (seconds)
+    GROUP_MAPPING_CACHE_TTL: int = 3600  # Group mapping cache TTL (seconds)
+    
+    # External API Endpoints for UUID mapping
+    AUTH_USERS_SEARCH_URL: str = "/api/users/search"
+    AUTH_GROUPS_SEARCH_URL: str = "/api/groups/search"
+    AUTH_USER_GROUPS_URL: str = "/api/users/{user_id}/groups"
+    
+    # UUID Mapping Fallback Settings
+    ENABLE_DETERMINISTIC_UUID_GENERATION: bool = True
+    UUID_NAMESPACE_USERS: str = "maxlab_users"
+    UUID_NAMESPACE_GROUPS: str = "maxlab_groups"
+    
     # Legacy/External API URLs (for compatibility)
     MAXPLATFORM_API_URL: Optional[str] = None  # Added for .env compatibility
     
@@ -149,6 +168,20 @@ class Settings(BaseSettings):
     def get_auth_server_url(self) -> str:
         """외부 인증 서버 URL 반환 (호환성을 위해 MAXPLATFORM_API_URL도 확인)"""
         return self.MAXPLATFORM_API_URL or self.AUTH_SERVER_URL
+    
+    @property
+    def full_auth_users_search_url(self) -> str:
+        """Get full URL for users search API"""
+        return f"{self.get_auth_server_url().rstrip('/')}{self.AUTH_USERS_SEARCH_URL}"
+    
+    @property
+    def full_auth_groups_search_url(self) -> str:
+        """Get full URL for groups search API"""
+        return f"{self.get_auth_server_url().rstrip('/')}{self.AUTH_GROUPS_SEARCH_URL}"
+    
+    def get_user_groups_url(self, user_id: str) -> str:
+        """Get full URL for user groups API"""
+        return f"{self.get_auth_server_url().rstrip('/')}{self.AUTH_USER_GROUPS_URL.format(user_id=user_id)}"
 
 
 settings = Settings()

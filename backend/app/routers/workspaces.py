@@ -65,31 +65,48 @@ async def list_workspaces(
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """사용자가 접근 가능한 워크스페이스 목록 조회"""
+    """사용자가 접근 가능한 워크스페이스 목록 조회 (UUID 기반)"""
     
     is_admin = current_user.get("is_admin", False) or current_user.get("role") == "admin"
+    
+    # UUID 기반 사용자 정보 추출
+    user_uuid = current_user.get("user_uuid")
+    user_group_uuids = current_user.get("group_uuids", [])
+    
+    # 레거시 호환성
     user_id = current_user.get("user_id", current_user.get("id"))
     user_groups = current_user.get("groups", [])
     
-    # 워크스페이스 목록 조회
+    logger.info(f"워크스페이스 목록 조회 요청: 사용자 UUID {user_uuid}, "
+               f"그룹 UUIDs {user_group_uuids}, 관리자 {is_admin}")
+    
+    # 워크스페이스 목록 조회 (UUID 우선, 레거시 fallback)
     workspaces = await workspace_crud.get_multi(
         db=db,
         skip=skip,
         limit=limit,
         active_only=active_only,
+        user_uuid=user_uuid,
+        user_group_uuids=user_group_uuids,
+        is_admin=is_admin,
+        # 레거시 호환성
         user_id=user_id,
-        user_groups=user_groups,
-        is_admin=is_admin
+        user_groups=user_groups
     )
     
-    # 전체 개수 조회
+    # 전체 개수 조회 (UUID 우선, 레거시 fallback)
     total = await workspace_crud.count(
         db=db,
         active_only=active_only,
+        user_uuid=user_uuid,
+        user_group_uuids=user_group_uuids,
+        is_admin=is_admin,
+        # 레거시 호환성
         user_id=user_id,
-        user_groups=user_groups,
-        is_admin=is_admin
+        user_groups=user_groups
     )
+    
+    logger.info(f"워크스페이스 목록 조회 완료: {len(workspaces)}개 반환, 전체 {total}개")
     
     return WorkspaceListResponse(
         workspaces=workspaces,
@@ -281,7 +298,8 @@ async def list_workspace_users(
         {
             "id": str(user.id),
             "workspace_id": str(user.workspace_id),
-            "user_id": user.user_id,
+            "user_id": str(user.user_id_uuid) if user.user_id_uuid else user.user_id,
+            "user_email": user.user_email,
             "user_display_name": user.user_display_name,
             "permission_level": user.permission_level,
             "created_at": user.created_at.isoformat() if user.created_at else None,
@@ -298,16 +316,41 @@ async def create_workspace_user(
     current_user: Dict[str, Any] = Depends(require_workspace_permission("admin")),
     db: AsyncSession = Depends(get_db)
 ):
-    """워크스페이스에 사용자 권한 추가"""
+    """워크스페이스에 사용자 권한 추가 (UUID 기반)"""
     from ..crud.workspace import WorkspaceUserCRUD
     from ..models.workspace import WorkspaceUser
+    from ..services.user_mapping import user_mapping_service
     
     workspace_user_crud = WorkspaceUserCRUD()
+    
+    # 사용자 식별자를 UUID로 변환
+    user_identifier = user_data['user_id']
+    
+    # UUID로 변환 시도
+    try:
+        user_uuid = uuid.UUID(user_identifier) if isinstance(user_identifier, str) and len(user_identifier) == 36 else None
+    except ValueError:
+        user_uuid = None
+    
+    if not user_uuid:
+        user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier)
+        
+        if not user_uuid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Could not resolve user identifier '{user_identifier}' to UUID"
+            )
+    
+    # 사용자 정보 조회 (캐싱용)
+    user_info = await user_mapping_service.get_user_info_by_uuid(user_uuid)
     
     # Create user permission
     db_user = WorkspaceUser(
         workspace_id=workspace_id,
-        user_id=user_data['user_id'],
+        user_id=str(user_uuid),  # 레거시 호환성
+        user_id_uuid=user_uuid,  # 새로운 UUID 필드
+        user_email=user_info.get('email') if user_info else None,
+        user_display_name=user_info.get('display_name') if user_info else str(user_uuid),
         permission_level=user_data.get('permission_level', 'read'),
         created_by=current_user.get("user_id", current_user.get("id"))
     )
@@ -319,7 +362,8 @@ async def create_workspace_user(
     return {
         "id": str(db_user.id),
         "workspace_id": str(db_user.workspace_id),
-        "user_id": db_user.user_id,
+        "user_id": str(db_user.user_id_uuid) if db_user.user_id_uuid else db_user.user_id,
+        "user_email": db_user.user_email,
         "user_display_name": db_user.user_display_name,
         "permission_level": db_user.permission_level,
         "created_at": db_user.created_at.isoformat(),
@@ -362,6 +406,7 @@ async def list_workspace_groups(
         {
             "id": str(group.id),
             "workspace_id": str(group.workspace_id),
+            "group_id": str(group.group_id_uuid) if group.group_id_uuid else group.group_name,
             "group_name": group.group_name,
             "group_display_name": group.group_display_name,
             "permission_level": group.permission_level,
@@ -372,32 +417,68 @@ async def list_workspace_groups(
     ]
 
 
-@router.post("/workspaces/{workspace_id}/groups/", response_model=WorkspaceGroup, status_code=status.HTTP_201_CREATED)
+@router.post("/workspaces/{workspace_id}/groups/", response_model=Dict[str, Any], status_code=status.HTTP_201_CREATED)
 async def create_workspace_group(
     workspace_id: uuid.UUID,
-    group_in: WorkspaceGroupCreate,
+    group_data: Dict[str, Any],
     current_user: Dict[str, Any] = Depends(require_workspace_permission("admin")),
     db: AsyncSession = Depends(get_db)
 ):
-    """워크스페이스에 그룹 권한 추가"""
+    """워크스페이스에 그룹 권한 추가 (UUID 기반)"""
+    from ..models.workspace import WorkspaceGroup
+    from ..services.group_mapping import group_mapping_service
     
-    # 워크스페이스 ID 설정
-    group_in.workspace_id = workspace_id
+    # 그룹 식별자를 UUID로 변환
+    group_identifier = group_data.get('group_name') or group_data.get('group_id')
     
-    try:
-        group = await workspace_group_crud.create(
-            db=db,
-            obj_in=group_in,
-            created_by=current_user.get("user_id", current_user.get("id"))
-        )
-        return group
-        
-    except Exception as e:
-        logger.error(f"Failed to create workspace group: {e}")
+    if not group_identifier:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create workspace group"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="group_name or group_id is required"
         )
+    
+    # UUID로 변환 시도
+    try:
+        group_uuid = uuid.UUID(group_identifier) if isinstance(group_identifier, str) and len(group_identifier) == 36 else None
+    except ValueError:
+        group_uuid = None
+    
+    if not group_uuid:
+        group_uuid = await group_mapping_service.get_group_uuid_by_name(group_identifier)
+        
+        if not group_uuid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Could not resolve group identifier '{group_identifier}' to UUID"
+            )
+    
+    # 그룹 정보 조회 (캐싱용)
+    group_info = await group_mapping_service.get_group_info_by_uuid(group_uuid)
+    
+    # Create group permission
+    db_group = WorkspaceGroup(
+        workspace_id=workspace_id,
+        group_name=group_info.get('name') if group_info else str(group_uuid),  # 레거시 호환성
+        group_id_uuid=group_uuid,  # 새로운 UUID 필드
+        group_display_name=group_info.get('display_name') if group_info else str(group_uuid),
+        permission_level=group_data.get('permission_level', 'read'),
+        created_by=current_user.get("user_id", current_user.get("id"))
+    )
+    
+    db.add(db_group)
+    await db.commit()
+    await db.refresh(db_group)
+    
+    return {
+        "id": str(db_group.id),
+        "workspace_id": str(db_group.workspace_id),
+        "group_id": str(db_group.group_id_uuid) if db_group.group_id_uuid else db_group.group_name,
+        "group_name": db_group.group_name,
+        "group_display_name": db_group.group_display_name,
+        "permission_level": db_group.permission_level,
+        "created_at": db_group.created_at.isoformat(),
+        "created_by": db_group.created_by
+    }
 
 
 @router.delete("/workspaces/{workspace_id}/groups/{group_id}", status_code=status.HTTP_204_NO_CONTENT)

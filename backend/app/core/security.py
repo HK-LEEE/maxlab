@@ -249,14 +249,14 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> Dict[str, Any]:
     """
-    현재 사용자 정보 획득
+    현재 사용자 정보 획득 (UUID 기반)
     FastAPI 의존성 주입으로 사용됩니다.
     
     Args:
         credentials: HTTP Bearer 토큰
         
     Returns:
-        dict: 사용자 정보 딕셔너리
+        dict: 사용자 정보 딕셔너리 (UUID 기반)
         
     Raises:
         AuthenticationError: 인증 실패시
@@ -286,7 +286,72 @@ async def get_current_user(
     user_data["groups"] = groups
     user_data["token"] = token  # 추후 API 호출시 사용
     
+    # UUID 기반 정보 추가
+    user_data = await enrich_user_data_with_uuids(user_data)
+    
     return user_data
+
+
+async def enrich_user_data_with_uuids(user_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    사용자 정보에 UUID 기반 정보 추가
+    
+    Args:
+        user_data: 기존 사용자 정보
+        
+    Returns:
+        dict: UUID 정보가 추가된 사용자 정보
+    """
+    from ..services.user_mapping import user_mapping_service
+    from ..services.group_mapping import group_mapping_service
+    
+    try:
+        # 1. 사용자 UUID 확인/추가
+        user_uuid = user_data.get("user_uuid")
+        if not user_uuid:
+            # 이메일 또는 사용자 ID로 UUID 조회
+            user_identifier = user_data.get("email") or user_data.get("user_id") or user_data.get("username")
+            if user_identifier:
+                user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier)
+                if user_uuid:
+                    user_data["user_uuid"] = user_uuid
+                    logger.debug(f"사용자 UUID 매핑: {user_identifier} -> {user_uuid}")
+                else:
+                    logger.warning(f"사용자 UUID 매핑 실패: {user_identifier}")
+        
+        # 2. 그룹 UUID 목록 추가
+        group_names = user_data.get("groups", [])
+        if group_names:
+            try:
+                # 그룹명을 UUID로 매핑
+                group_mapping = await group_mapping_service.map_legacy_groups_to_uuid(group_names)
+                group_uuids = [uuid for uuid in group_mapping.values() if uuid is not None]
+                user_data["group_uuids"] = group_uuids
+                
+                logger.debug(f"그룹 UUID 매핑: {group_names} -> {group_uuids}")
+                
+                # 매핑되지 않은 그룹 로그
+                unmapped_groups = [name for name, uuid in group_mapping.items() if uuid is None]
+                if unmapped_groups:
+                    logger.warning(f"UUID로 매핑되지 않은 그룹: {unmapped_groups}")
+                    
+            except Exception as e:
+                logger.error(f"그룹 UUID 매핑 실패: {e}")
+                user_data["group_uuids"] = []
+        else:
+            user_data["group_uuids"] = []
+        
+        # 3. 레거시 호환성을 위한 정보 유지
+        # (기존 코드에서 사용하는 필드들 유지)
+        
+        return user_data
+        
+    except Exception as e:
+        logger.error(f"사용자 UUID 정보 추가 실패: {e}")
+        # 실패해도 기존 사용자 정보는 반환
+        user_data["user_uuid"] = None
+        user_data["group_uuids"] = []
+        return user_data
 
 async def get_current_active_user(
     current_user: Dict[str, Any] = Depends(get_current_user)
@@ -415,7 +480,7 @@ def verify_token(token: str) -> Dict[str, Any]:
 
 # 워크스페이스 권한 체크
 class WorkspacePermissionChecker:
-    """워크스페이스 권한 확인 도우미 클래스"""
+    """워크스페이스 권한 확인 도우미 클래스 (UUID 기반)"""
     
     def __init__(self, required_permission: str = "read"):
         self.required_permission = required_permission
@@ -426,36 +491,62 @@ class WorkspacePermissionChecker:
         current_user: Dict[str, Any] = Depends(get_current_active_user),
         db: AsyncSession = Depends(get_db)
     ) -> Dict[str, Any]:
-        """워크스페이스 접근 권한 확인"""
+        """워크스페이스 접근 권한 확인 (UUID 기반)"""
         
         # 관리자는 모든 워크스페이스 접근 가능
         is_admin = current_user.get("is_admin", False) or current_user.get("role") == "admin"
         if is_admin:
+            logger.info(f"관리자 권한으로 워크스페이스 {workspace_id} 접근 허용: {current_user.get('email')}")
+            current_user["workspace_permission"] = {
+                "has_permission": True,
+                "user_permission_level": "admin",
+                "granted_groups": ["admin"],
+                "granted_users": [str(current_user.get("user_uuid", ""))],
+                "admin_access": True
+            }
             return current_user
         
         # Import here to avoid circular imports
         from ..crud.workspace import workspace_group_crud
         
-        # Get user information
+        # UUID 기반 사용자 정보 추출
+        user_uuid = current_user.get("user_uuid")
+        user_group_uuids = current_user.get("group_uuids", [])
+        
+        # 레거시 호환성 (UUID가 없는 경우)
         user_id = current_user.get("user_id", current_user.get("id"))
         user_groups = current_user.get("groups", [])
         
-        # Check workspace permissions
+        if not user_uuid and not user_id:
+            logger.error("사용자 식별자가 없습니다.")
+            raise AuthorizationError("Invalid user identification")
+        
+        # Check workspace permissions (UUID 우선, 레거시 fallback)
         permission_result = await workspace_group_crud.check_permission(
             db=db,
             workspace_id=workspace_id,
+            user_uuid=user_uuid,
+            user_group_uuids=user_group_uuids,
+            required_permission=self.required_permission,
+            # 레거시 호환성
             user_id=user_id,
-            user_groups=user_groups,
-            required_permission=self.required_permission
+            user_groups=user_groups
         )
         
         if not permission_result["has_permission"]:
+            logger.warning(f"워크스페이스 {workspace_id} 접근 권한 부족: "
+                          f"사용자 {user_uuid or user_id}, 필요 권한: {self.required_permission}, "
+                          f"보유 권한: {permission_result.get('user_permission_level')}")
             raise AuthorizationError(
-                f"Insufficient permission for workspace. Required: {self.required_permission}"
+                f"Insufficient permission for workspace. Required: {self.required_permission}, "
+                f"Current: {permission_result.get('user_permission_level', 'none')}"
             )
         
         # Add permission info to current_user
         current_user["workspace_permission"] = permission_result
+        
+        logger.info(f"워크스페이스 {workspace_id} 접근 허용: 사용자 {user_uuid or user_id}, "
+                   f"권한 레벨: {permission_result.get('user_permission_level')}")
         
         return current_user
 
