@@ -14,23 +14,8 @@ interface EditWorkspaceModalProps {
   onSubmit: (id: string, data: WorkspaceUpdate) => Promise<void>;
 }
 
-interface WorkspaceGroup {
-  id: string;
-  group_name: string;
-  group_display_name?: string;
-  permission_level: 'read' | 'write' | 'admin';
-  created_at: string;
-  created_by: string;
-}
-
-interface WorkspaceUser {
-  id: string;
-  user_id: string;
-  user_display_name?: string;
-  permission_level: 'read' | 'write' | 'admin';
-  created_at: string;
-  created_by: string;
-}
+// Import from unified types
+import type { WorkspaceGroup, WorkspaceUser } from '../../types/workspace';
 
 export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   workspace,
@@ -95,6 +80,12 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
     queryKey: ['available-groups'],
     queryFn: async () => {
       const response = await apiClient.get('/api/v1/external/groups');
+      console.log('Available groups from API:', response.data);
+      if (response.data && response.data.length > 0) {
+        console.log('First group structure:', response.data[0]);
+        console.log('First group ID:', response.data[0].id);
+        console.log('First group name:', response.data[0].name);
+      }
       return response.data;
     },
     enabled: isOpen,
@@ -170,7 +161,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
 
   // Add group mutation
   const addGroupMutation = useMutation({
-    mutationFn: async (data: { group_name: string; permission_level: string }) => {
+    mutationFn: async (data: { group_id: string; permission_level: string }) => {
       const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, data);
       return response.data;
     },
@@ -251,8 +242,12 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
       toast.error('Please select a group');
       return;
     }
+    console.log('Adding group with ID:', selectedGroup);
+    console.log('Selected group value type:', typeof selectedGroup);
+    console.log('Selected group value length:', selectedGroup.length);
+    
     addGroupMutation.mutate({
-      group_name: selectedGroup,
+      group_id: selectedGroup,
       permission_level: selectedPermission,
     });
   };
@@ -265,13 +260,20 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
 
   const filteredAvailableGroups = availableGroups?.filter((group: Group) => 
     group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    group.display_name.toLowerCase().includes(searchTerm.toLowerCase())
+    (group.display_name && group.display_name.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
-  const assignedGroupNames = workspaceGroups?.map((g: WorkspaceGroup) => g.group_name) || [];
+  const assignedGroupIds = workspaceGroups?.map((g: WorkspaceGroup) => g.group_id) || [];
+  console.log('Assigned group IDs:', assignedGroupIds);
+  
   const unassignedGroups = filteredAvailableGroups.filter((g: Group) => 
-    !assignedGroupNames.includes(g.name)
+    !assignedGroupIds.includes(g.id)
   );
+  console.log('Unassigned groups:', unassignedGroups);
+  console.log('Unassigned groups count:', unassignedGroups.length);
+  if (unassignedGroups.length > 0) {
+    console.log('First unassigned group:', unassignedGroups[0]);
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -515,15 +517,22 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
                   </div>
                   <select
                     value={selectedGroup}
-                    onChange={(e) => setSelectedGroup(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Selected option value:', e.target.value);
+                      console.log('Selected option text:', e.target.options[e.target.selectedIndex].text);
+                      setSelectedGroup(e.target.value);
+                    }}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   >
                     <option value="">Select a group</option>
-                    {unassignedGroups.map((group: Group) => (
-                      <option key={group.name} value={group.name}>
-                        {group.display_name} ({group.name})
-                      </option>
-                    ))}
+                    {unassignedGroups.map((group: Group) => {
+                      console.log(`Rendering option for group: ${group.name}, ID: ${group.id}`);
+                      return (
+                        <option key={group.id} value={group.id}>
+                          {group.display_name || group.name}
+                        </option>
+                      );
+                    })}
                   </select>
                   <select
                     value={selectedPermission}
@@ -561,10 +570,10 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
                       >
                         <div className="flex-1">
                           <div className="font-medium">
-                            {group.group_display_name || group.group_name}
+                            {group.group_display_name || group.group_id}
                           </div>
                           <div className="text-sm text-gray-600">
-                            Group: {group.group_name}
+                            Group ID: {group.group_id}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">

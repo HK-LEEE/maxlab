@@ -2,709 +2,345 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
-        "title": "Database Security and Performance Optimization",
-        "description": "Optimize PostgreSQL database performance, implement security measures, and establish connection pooling for production readiness",
-        "details": "Implement database query optimization with proper indexing, configure connection pooling with SQLAlchemy, set up SSL/TLS encryption for database connections, implement database backup strategy, optimize slow queries identified through EXPLAIN ANALYZE, configure PostgreSQL for production settings including shared_buffers, work_mem, and maintenance_work_mem, implement database monitoring with query performance tracking",
-        "testStrategy": "Performance testing with large datasets, security audit of database connections, backup/restore testing, connection pool stress testing, query performance benchmarking",
+        "id": 11,
+        "title": "Remove Fallback Authentication Logic",
+        "description": "Complete removal of all fallback authentication mechanisms including decode_jwt_token_locally() function and traditional auth fallback logic",
+        "details": "Delete decode_jwt_token_locally() function, remove traditional auth endpoint fallback logic, eliminate multi-tier verification system, and remove environment-specific branching logic. Focus on cleaning up the verify_token_with_auth_server() function to only use OAuth userinfo endpoint. Remove all conditional fallback paths and simplify the authentication flow to a single OAuth-only path.",
+        "testStrategy": "Unit tests to verify fallback functions are completely removed, integration tests to ensure authentication only uses OAuth path, negative testing to confirm fallback paths no longer exist",
         "priority": "high",
         "dependencies": [],
         "status": "done",
         "subtasks": [
           {
             "id": 1,
-            "title": "Database Performance Optimization - Indexing and Query Analysis",
-            "description": "Analyze slow queries using EXPLAIN ANALYZE, implement strategic indexing, and optimize database query performance",
+            "title": "Identify and document all fallback code locations",
+            "description": "Comprehensive audit to locate all instances of fallback authentication logic throughout the codebase",
             "dependencies": [],
-            "details": "Use EXPLAIN ANALYZE to identify slow queries, create appropriate B-tree, partial, and composite indexes, optimize JOIN operations, implement query result caching, configure query planner statistics, and establish query performance baselines with before/after metrics\n<info added on 2025-07-14T00:22:45.291Z>\nDatabase performance optimization implementation completed with comprehensive improvements:\n\nConnection pooling configuration optimized (pool_size=20, max_overflow=30) for enhanced concurrency. Permission check queries refactored from IN subqueries to EXISTS operations for improved performance. Resolved N+1 query issues by switching from selectinload to joinedload strategies. File statistics aggregation queries consolidated into single optimized queries to reduce database round trips. \n\nImplemented performance monitoring utilities and automated index creation scripts. Added specialized indexes including JSONB indexes for document queries, composite indexes for multi-column searches, and time-series data optimization indexes.\n\nKey performance improvements achieved:\n- Increased connection pool capacity for better concurrent request handling\n- EXISTS-based permission queries showing significant performance gains over subquery approach\n- Single-query statistics calculation reducing database interaction overhead\n- Automated performance monitoring and index management system established\n</info added on 2025-07-14T00:22:45.291Z>",
+            "details": "Search for decode_jwt_token_locally() function definition and all references, identify traditional auth endpoint fallback logic, locate multi-tier verification system components, find environment-specific authentication branching code, and document all locations in a removal checklist. Include file paths, line numbers, and function names for each identified location.",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Connection Pooling Setup with SQLAlchemy",
-            "description": "Configure production-ready database connection pooling to handle concurrent connections efficiently",
+            "title": "Remove decode_jwt_token_locally() and its references",
+            "description": "Delete the decode_jwt_token_locally() function and remove all code that calls or references it",
             "dependencies": [
               1
             ],
-            "details": "Configure SQLAlchemy connection pool settings (pool_size, max_overflow, pool_timeout), implement connection health checks, set up proper connection recycling, configure pool pre-ping for stale connection detection, implement connection pool monitoring and metrics collection",
+            "details": "Remove the decode_jwt_token_locally() function definition from the codebase, delete all import statements referencing this function, remove all function calls to decode_jwt_token_locally(), update any conditional logic that checks for or uses this function, and ensure no orphaned code remains after removal.",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "SSL/TLS Security Implementation",
-            "description": "Implement encrypted database connections and secure communication protocols",
-            "dependencies": [],
-            "details": "Configure PostgreSQL SSL/TLS encryption, implement certificate-based authentication, set up secure connection strings with sslmode settings, configure client certificates if needed, implement connection security validation and monitoring\n<info added on 2025-07-14T00:25:55.077Z>\nImplementation completed successfully with comprehensive SSL/TLS security system:\n\nConfiguration System:\n- Added SSL parameters to config.py: DB_SSL_MODE, DB_SSL_CERT_PATH, DB_SSL_KEY_PATH, DB_SSL_CA_PATH\n- Support for multiple SSL modes: prefer, require, verify-ca, verify-full\n- Environment-based SSL configuration management\n\nDynamic SSL Connection Management:\n- Implemented _get_database_connect_args() function for automatic SSL context creation\n- SSL mode-based certificate validation levels\n- Automatic client certificate and CA certificate loading\n- Secure connection string generation with proper SSL parameters\n\nSecurity Monitoring and Management:\n- Created DatabaseSecurityManager class for SSL status monitoring\n- Certificate validity verification and expiration warning system\n- Real-time SSL connection status tracking via PostgreSQL pg_stat_ssl\n- Automated security health checks\n\nDevelopment and Testing Tools:\n- Self-signed certificate generation functionality for development\n- SSL configuration testing script (test_ssl_security.py)\n- Example SSL configuration file (.env.ssl.example)\n- Comprehensive SSL setup documentation\n\nProduction Readiness:\n- Flexible SSL mode configuration for different security requirements\n- Certificate monitoring and expiration notification system\n- PostgreSQL SSL configuration guidelines\n- Mutual TLS authentication support\n\nSecurity enhancements achieved:\n- End-to-end database connection encryption\n- Certificate-based authentication\n- Automated certificate validation and monitoring\n- Real-time SSL connection status tracking\n</info added on 2025-07-14T00:25:55.077Z>",
+            "title": "Clean up verify_token_with_auth_server() to remove conditional paths",
+            "description": "Refactor verify_token_with_auth_server() to eliminate all fallback logic and conditional authentication paths",
+            "dependencies": [
+              2
+            ],
+            "details": "Remove all if/else blocks that check for fallback conditions, delete code paths for traditional authentication endpoints, eliminate multi-tier verification logic within the function, simplify the function to only use OAuth userinfo endpoint path, and ensure error handling only covers OAuth-specific failures without fallback options.",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Database Backup Strategy Implementation",
-            "description": "Establish automated backup and recovery procedures for production database",
+            "title": "Remove environment-specific auth branching and multi-tier verification",
+            "description": "Eliminate all environment-based conditional authentication logic and multi-tier verification systems",
             "dependencies": [
               3
             ],
-            "details": "Implement automated pg_dump backups with compression, set up point-in-time recovery with WAL archiving, configure backup retention policies, implement backup verification procedures, create disaster recovery documentation and testing procedures\n<info added on 2025-07-14T00:57:17.823Z>\nImplementation successfully completed with comprehensive database backup system:\n\n**Core Backup Management System:**\n- DatabaseBackupManager class handles complete backup lifecycle with pg_dump integration\n- Automated compression and MD5 checksum verification for data integrity\n- JSON metadata tracking for backup status and history\n- Full status tracking: pending, running, completed, failed, verified, corrupted\n\n**Automated Scheduling Infrastructure:**\n- backup_scheduler.py with cron and daemon mode capabilities\n- Daily 2 AM automated backups with weekly cleanup routines\n- Robust retry logic and comprehensive error handling\n- Manual backup, restore, and status check commands\n\n**REST API Management Interface:**\n- FastAPI endpoints for web-based backup administration\n- Background task processing for backup and restore operations\n- Complete backup inventory with detailed information and deletion capabilities\n- Administrator-level access control and security\n\n**Production Operations Support:**\n- backup_cron.sh script for cron job installation and management\n- maxlab-backup.service systemd service configuration\n- Centralized logging and monitoring infrastructure\n\n**Security and Validation Framework:**\n- MD5 checksum validation ensuring backup file integrity\n- Compressed file verification and corruption detection\n- Post-backup automatic verification processes\n- 30-day retention policy with automated cleanup\n\n**Monitoring and Resource Management:**\n- Disk usage tracking and capacity planning\n- Backup size limitations and monitoring alerts\n- Statistical reporting and success rate tracking\n- Performance metrics and operational insights\n\nAll backup procedures now fully automated with comprehensive error handling, security validation, and production-ready monitoring capabilities.\n</info added on 2025-07-14T00:57:17.823Z>",
-            "status": "done",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "PostgreSQL Production Configuration Optimization",
-            "description": "Configure PostgreSQL server settings for optimal production performance and reliability",
-            "dependencies": [
-              1,
-              2
-            ],
-            "details": "Optimize shared_buffers, work_mem, maintenance_work_mem, and effective_cache_size based on system resources, configure checkpoint settings for performance, set up proper logging levels and log rotation, configure memory and CPU settings for production workload\n<info added on 2025-07-14T01:08:35.318Z>\n실제 구현 완료: PostgreSQLOptimizer 클래스로 시스템 자동 분석 (메모리 15.5GB, CPU 10코어/20스레드, HDD 감지), 하드웨어 기반 최적화 설정 적용 (shared_buffers 3958MB, work_mem 63MB, maintenance_work_mem 791MB, effective_cache_size 11876MB), 연결 설정 최적화 (max_connections 250, max_worker_processes 20), 체크포인트 및 WAL 최적화 (checkpoint_completion_target 0.9, wal_buffers 16MB, wal_compression on), 로깅 설정 (느린 쿼리 1초 이상, 체크포인트/락 대기 로깅), 성능 튜닝 (random_page_cost 4.0, default_statistics_target 100, partitionwise 조인/집계 활성화), optimize_postgresql.py 자동화 스크립트 및 REST API 엔드포인트 구현, 설정 검증 시스템 및 튜닝 보고서 생성 기능 완료. 최종 결과물: postgresql_optimized_20250714_100655.conf, tuning_report_20250714_100704.json, 설치 가이드\n</info added on 2025-07-14T01:08:35.318Z>",
-            "status": "done",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Database Monitoring and Performance Tracking Implementation",
-            "description": "Set up comprehensive database monitoring with query performance tracking and alerting",
-            "dependencies": [
-              4,
-              5
-            ],
-            "details": "Implement pg_stat_statements for query performance monitoring, set up database metrics collection with Prometheus, configure slow query logging and analysis, implement connection pool monitoring, create database performance dashboards, set up alerting for critical database events",
+            "details": "Remove environment checks (development/production) in authentication code, delete multi-tier verification system components, eliminate conditional branching based on configuration flags, ensure single authentication flow regardless of environment, and update configuration files to remove obsolete authentication settings.",
             "status": "done",
             "testStrategy": ""
           }
         ]
       },
       {
-        "id": 2,
-        "title": "Authentication System Security Hardening",
-        "description": "Strengthen OAuth 2.0 integration, implement CSRF protection, enhance session management, and add API rate limiting",
-        "details": "Implement secure token refresh logic with proper error handling, add CSRF protection using anti-CSRF tokens, enhance session security with secure cookies and proper expiration, implement API rate limiting using Redis, strengthen JWT token validation and blacklisting, implement proper logout with token revocation, add brute force protection for login attempts, implement secure password policies if applicable",
-        "testStrategy": "Security penetration testing, token expiration testing, CSRF attack simulation, rate limiting verification, session hijacking prevention testing",
+        "id": 12,
+        "title": "Implement OAuth-Only Authentication Flow",
+        "description": "Completely rewrite verify_token_with_auth_server() to use only MAX Platform OAuth userinfo endpoint",
+        "details": "Rewrite verify_token_with_auth_server() function to exclusively call MAX Platform OAuth userinfo endpoint. Implement proper Bearer token handling, fix HTTP header formatting issues (resolve 'Illegal header value b'Bearer '' error), ensure SERVICE_TOKEN is properly configured and used. Create a single, linear authentication flow: Frontend -> Backend -> MAX Platform OAuth -> Backend -> Frontend.",
+        "testStrategy": "Unit tests for OAuth userinfo endpoint integration, integration tests for complete authentication flow, mock testing for MAX Platform OAuth responses, load testing for performance under 200ms requirement",
         "priority": "high",
         "dependencies": [
-          1
+          11
         ],
         "status": "done",
         "subtasks": [
           {
             "id": 1,
-            "title": "Secure Token Refresh Implementation",
-            "description": "Implement secure OAuth 2.0 token refresh logic with proper error handling and rotation",
+            "title": "Design and document new OAuth-only authentication architecture",
+            "description": "Create comprehensive design documentation for the new verify_token_with_auth_server() function that exclusively uses MAX Platform OAuth userinfo endpoint",
             "dependencies": [],
-            "details": "Implement automatic token refresh with secure rotation, add proper error handling for expired tokens, implement token refresh queue to prevent multiple simultaneous requests, add retry logic with exponential backoff, ensure thread-safety for concurrent refresh attempts\n<info added on 2025-07-14T01:28:16.074Z>\n**COMPLETION STATUS: FULLY IMPLEMENTED**\n\nSuccessfully completed secure token refresh implementation with enterprise-grade security features:\n\n- TokenRefreshManager class deployed with singleton pattern for centralized management\n- Token blacklisting system operational preventing reuse attacks\n- Concurrent refresh protection implemented with queue-based waiting system\n- Exponential backoff retry logic configured (1s, 2s, 5s delays, max 3 retries)\n- Thread-safe architecture ensuring no race conditions\n\nSecurity enhancements operational:\n- 30-second minimum refresh interval preventing token reuse attacks\n- Critical error detection with immediate termination for login_required/invalid_token/token_revoked\n- Automatic token rotation verification ensuring new tokens differ from previous\n- Comprehensive token cleanup on logout with automatic blacklist addition\n\nIntegration completed:\n- TokenRefreshManager integrated into existing authService architecture\n- Enhanced isAuthenticated() function with blacklist validation\n- Secure cleanup process operational for logout scenarios\n- Memory-efficient blacklist management with 24-hour automatic expiration\n\nAll security requirements satisfied with protection against common attack vectors while maintaining optimal user experience through intelligent retry and fallback mechanisms.\n</info added on 2025-07-14T01:28:16.074Z>",
+            "details": "Document the new authentication flow: Frontend -> Backend -> MAX Platform OAuth -> Backend -> Frontend. Define API contracts, data structures, and sequence diagrams. Specify Bearer token format, HTTP header requirements, and SERVICE_TOKEN usage. Include error handling flows and performance considerations for 200ms target.",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "CSRF Protection Setup",
-            "description": "Implement comprehensive CSRF protection using anti-CSRF tokens and SameSite cookies",
-            "dependencies": [],
-            "details": "Generate and validate anti-CSRF tokens for state-changing requests, configure SameSite cookie attributes, implement double-submit cookie pattern, add CSRF token to all forms and AJAX requests, validate tokens on server-side for all mutations\n<info added on 2025-07-14T01:33:01.466Z>\nIMPLEMENTATION COMPLETE - Full CSRF protection system successfully deployed with enterprise-grade security features. Core components include CSRFProtection service with Web Crypto API token generation, CSRFProtectionMiddleware with HMAC validation and timing attack prevention, automatic token rotation at 75% lifetime, React CSRFTokenProvider for application-wide integration, and axios interceptor for seamless request handling. Security measures implemented: double-submit cookie pattern, strict SameSite policy, constant-time token comparison, configurable exempt paths, and comprehensive error handling with automatic retry. All API endpoints functional (/api/v1/csrf/token, /api/v1/csrf/validate, /api/v1/csrf/status) with development debugging capabilities. System provides transparent protection against CSRF attacks while maintaining optimal user experience through automatic token management.\n</info added on 2025-07-14T01:33:01.466Z>",
+            "title": "Implement Bearer token parsing and HTTP header formatting",
+            "description": "Create robust Bearer token handling logic that properly formats Authorization headers and prevents 'Illegal header value b'Bearer '' errors",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement token extraction from request headers, validate Bearer token format, create proper HTTP Authorization header for MAX Platform OAuth calls. Handle edge cases like missing tokens, malformed headers, and empty token values. Ensure proper string encoding and formatting to prevent byte string errors.",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Session Security Enhancement",
-            "description": "Enhance session management with secure cookies, proper expiration, and session fixation protection",
+            "title": "Configure SERVICE_TOKEN management and environment setup",
+            "description": "Implement secure SERVICE_TOKEN configuration, storage, and usage for backend-to-OAuth server communication",
             "dependencies": [
               1
             ],
-            "details": "Configure secure session cookies with HttpOnly and Secure flags, implement proper session expiration and renewal, add session fixation protection by regenerating session IDs, implement concurrent session limiting, add secure session storage with encryption\n<info added on 2025-07-14T01:54:54.345Z>\nImplementation completed with comprehensive session security framework. Created SessionManager service with Fernet encryption for secure session storage, implemented SecureSessionMiddleware for FastAPI with automatic validation, added cryptographically secure session ID generation using secrets.token_urlsafe, implemented session fixation protection with automatic ID regeneration, and added concurrent session limiting with configurable max sessions per user.\n\nImplemented secure cookie configuration with HttpOnly, Secure, and SameSite attributes, added session hijacking protection through IP address and User-Agent validation, implemented automatic session expiration and renewal with configurable thresholds, added session age limits preventing indefinite sessions (24 hour maximum), and implemented PBKDF2-based encryption key derivation for session data protection.\n\nAdded advanced security features including session validation middleware with timing attack prevention, suspicious activity detection with automatic session invalidation, security event logging for monitoring and audit trails, session cleanup mechanisms for expired sessions, and client IP/User-Agent consistency checking.\n\nIntegrated frontend session management with useSecureSession React hook, real-time session monitoring with automatic expiration handling, security alert system for session anomalies, session statistics interfaces, and automatic session renewal before expiration.\n\nCreated comprehensive API endpoints for session management: /api/v1/session/current, /api/v1/session/regenerate, /api/v1/session/logout, /api/v1/session/logout-all, /api/v1/session/list, /api/v1/session/security-info, and /api/v1/session/stats (admin only).\n\nImplemented environment-based session configuration with flexible lifetime and renewal settings, configurable security policies and thresholds, and development/production mode support. The system provides enterprise-grade protection against session hijacking, fixation attacks, and unauthorized access while maintaining seamless user experience.\n</info added on 2025-07-14T01:54:54.345Z>",
+            "details": "Set up environment variable management for SERVICE_TOKEN, implement secure token loading and validation at startup, create token refresh mechanism if needed. Ensure SERVICE_TOKEN is properly included in all MAX Platform OAuth API calls. Add configuration validation and clear error messages for missing tokens.",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "API Rate Limiting with Redis",
-            "description": "Implement distributed API rate limiting using Redis with sliding window algorithm",
-            "dependencies": [],
-            "details": "Set up Redis for distributed rate limiting, implement sliding window rate limiting algorithm, configure different rate limits per endpoint and user role, add rate limit headers in responses, implement graceful degradation when rate limits exceeded, add whitelist/blacklist functionality",
+            "title": "Implement MAX Platform OAuth userinfo endpoint integration",
+            "description": "Develop the core verify_token_with_auth_server() function that calls MAX Platform OAuth userinfo endpoint with proper error handling",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Implement HTTP client for OAuth userinfo endpoint, handle request/response serialization, parse user information from OAuth response. Implement timeout handling (target < 200ms), connection pooling for performance, and proper error propagation. Remove all legacy authentication code and database lookups.\n<info added on 2025-07-18T01:07:33.878Z>\nCOMPLETED: OAuth userinfo endpoint integration fully implemented with comprehensive optimizations including httpx.AsyncClient for HTTP handling, reduced timeout configuration (5s total, 2s connect) targeting <200ms performance, connection pooling (max_keepalive: 20, max_connections: 100), HTTP/2 support enabled, performance monitoring with warnings for requests exceeding 200ms target, comprehensive error handling with specific error messages, and complete removal of legacy authentication code including decode_jwt_token_locally and traditional auth fallback mechanisms. Both verify_token_with_auth_server() and get_user_groups_from_auth_server() functions are optimized and ready for production use.\n</info added on 2025-07-18T01:07:33.878Z>",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 5,
-            "title": "JWT Validation and Blacklisting",
-            "description": "Strengthen JWT token validation and implement token blacklisting for revoked tokens",
+            "title": "Implement comprehensive OAuth error handling and recovery",
+            "description": "Create robust error handling for all OAuth failure scenarios including timeouts, invalid tokens, and service unavailability",
             "dependencies": [
-              1
+              4
             ],
-            "details": "Implement comprehensive JWT signature validation, add token blacklisting with Redis storage, validate token expiration and issuer claims, implement proper token revocation on logout, add token introspection for security validation, implement JWT refresh token rotation",
+            "details": "Implement specific error handlers for: OAuth server timeouts, 401/403 responses, network failures, malformed responses, and SERVICE_TOKEN issues. Map errors to user-friendly messages, implement circuit breaker pattern for OAuth service failures. Ensure all errors fail fast without retries to meet performance requirements.\n<info added on 2025-07-18T01:09:55.284Z>\nImplementation completed successfully with comprehensive OAuth error handling system that meets all requirements. All specific error handlers implemented including OAuth server timeouts, authentication errors, network failures, malformed responses, and SERVICE_TOKEN issues. Circuit breaker pattern successfully deployed with configurable thresholds and automatic state management. Fail-fast strategy ensures no retry mechanisms with immediate error responses. Performance optimized for sub-200ms response times. System now provides robust error coverage while maintaining performance targets.\n</info added on 2025-07-18T01:09:55.284Z>",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 6,
-            "title": "Logout with Token Revocation",
-            "description": "Implement secure logout functionality with proper token revocation and cleanup",
+            "title": "Optimize performance and conduct load testing",
+            "description": "Optimize the authentication flow to consistently meet the 200ms response time requirement under load",
             "dependencies": [
+              4,
               5
             ],
-            "details": "Implement server-side token revocation on logout, clear all session data and cookies, revoke refresh tokens in database, implement global logout functionality, add logout confirmation for security, ensure proper cleanup of user context and cached data",
-            "status": "done",
-            "testStrategy": ""
-          },
-          {
-            "id": 7,
-            "title": "Brute Force Protection",
-            "description": "Implement comprehensive brute force protection for login attempts and API endpoints",
-            "dependencies": [
-              4
-            ],
-            "details": "Implement account lockout after failed login attempts, add progressive delays for repeated failures, implement CAPTCHA integration for suspicious activity, add IP-based rate limiting for login endpoints, implement monitoring for brute force patterns, add email notifications for security events",
+            "details": "Profile authentication flow to identify bottlenecks, implement connection pooling and keep-alive for OAuth requests, optimize JSON parsing and serialization. Add performance monitoring and metrics collection. Conduct load testing with concurrent users, measure p50/p95/p99 latencies. Implement caching strategies if needed while maintaining security.\n<info added on 2025-07-18T01:13:17.540Z>\nIMPLEMENTATION COMPLETED - All performance optimization and load testing requirements have been successfully implemented:\n\nPerformance optimization achieved through HTTP/2 enablement, connection pooling configuration (max_keepalive: 20, max_connections: 100), and optimized timeouts (5s total, 2s connect). PerformanceMetrics class implemented for comprehensive monitoring with real-time p50/p95/p99 percentile calculations and alerting when targets exceeded.\n\nMetrics collection system deployed with admin-only /api/v1/metrics/performance endpoint and /api/v1/metrics/health/oauth health monitoring endpoint. Circuit breaker status integration ensures system stability under load.\n\nLoad testing infrastructure completed with oauth_load_test.py script providing configurable concurrent user testing, statistical analysis including mean/median/p95/p99 response times, and automated performance target validation against 200ms response time and 99% success rate requirements.\n\nPerformance targets consistently met with optimized authentication flow, fail-fast error handling preventing performance degradation, and circuit breaker protection against cascading failures. System is production-ready with robust performance monitoring and comprehensive testing capabilities.\n</info added on 2025-07-18T01:13:17.540Z>",
             "status": "done",
             "testStrategy": ""
           }
         ]
       },
       {
-        "id": 3,
-        "title": "Process Flow Editor Stability Enhancement",
-        "description": "Optimize ReactFlow performance for large flows, implement error boundaries, and enhance memory management",
-        "details": "Implement React Error Boundaries for graceful error handling, optimize ReactFlow performance with virtualization for large node counts, implement auto-save functionality with debouncing, fix memory leaks in flow editor components using useCallback and useMemo, implement proper cleanup in useEffect hooks, add performance monitoring for flow rendering, implement lazy loading for flow components, optimize node rendering with React.memo",
-        "testStrategy": "Load testing with 1000+ nodes, memory leak detection, error boundary testing, auto-save functionality verification, performance profiling",
-        "priority": "high",
+        "id": 13,
+        "title": "Design Comprehensive Error Code System",
+        "description": "Create structured error code system (AUTH_001, AUTH_002, etc.) with user-friendly messages for all authentication failure scenarios",
+        "details": "Define specific error codes for different failure scenarios: AUTH_001 (Invalid token), AUTH_002 (Expired token), AUTH_003 (Service unavailable), AUTH_004 (Missing SERVICE_TOKEN), AUTH_005 (Redis connection failure), etc. Create mapping between technical errors and user-friendly messages. Implement error response structure with code, message, and recommended action fields.",
+        "testStrategy": "Unit tests for each error code scenario, integration tests for error propagation from backend to frontend, user acceptance testing for error message clarity",
+        "priority": "medium",
         "dependencies": [
-          1
+          12
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
-            "title": "Implement React Error Boundaries",
-            "description": "Create comprehensive error boundary components for graceful error handling in the Process Flow Editor",
+            "title": "Define Error Code Structure and Categories",
+            "description": "Create a comprehensive error code taxonomy with clear categorization (AUTH_XXX, CONN_XXX, CONFIG_XXX) and define naming conventions for consistent error identification",
             "dependencies": [],
-            "details": "Implement ErrorBoundary component with proper error catching, logging, and fallback UI. Create specific error boundaries for ReactFlow components, node rendering, and flow operations. Add error reporting integration and user-friendly error messages with recovery options.",
+            "details": "Design error code structure with prefixes: AUTH_ for authentication errors (001-099), CONN_ for connection errors (100-199), CONFIG_ for configuration errors (200-299). Create error code registry with: AUTH_001 (Invalid token format), AUTH_002 (Expired token), AUTH_003 (Token validation failed), AUTH_004 (Missing authorization header), AUTH_005 (Insufficient permissions), CONN_001 (OAuth server unreachable), CONN_002 (Redis connection failed), CONFIG_001 (Missing SERVICE_TOKEN), CONFIG_002 (Invalid OAuth configuration). Document error code allocation strategy and maintain central error code constants file.\n<info added on 2025-07-18T01:31:25.730Z>\nImplementation completed successfully. Error code system now includes 6 main categories (AUTH_, PERM_, CONN_, CONFIG_, VALID_, SYS_) with 18 specific error codes covering all authentication scenarios. Created comprehensive ErrorCodeDefinition dataclass with user-friendly messages, UserAction enum for recommended actions, ErrorSeverity levels, and HTTP status code mapping. Implemented MaxLabErrorCodes registry class with helper methods for code lookup and expansion tracking. Foundation files created: /backend/app/core/error_codes.py and /backend/app/core/exceptions.py with structured exception classes and factory methods. Error code allocation strategy documented and ready for next phase implementation.\n</info added on 2025-07-18T01:31:25.730Z>",
             "status": "done",
             "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "ReactFlow Performance Optimization with Virtualization",
-            "description": "Optimize ReactFlow performance for large flows using virtualization and rendering optimizations",
+            "title": "Map Technical Errors to User-Friendly Messages",
+            "description": "Create comprehensive mapping between technical error conditions and clear, actionable user messages with internationalization support",
             "dependencies": [
               1
             ],
-            "details": "Implement viewport-based node virtualization to handle 1000+ nodes efficiently. Add React.memo for node components, optimize edge rendering, implement dynamic loading of visible nodes only. Configure ReactFlow settings for optimal performance including nodesDraggable, nodesConnectable optimization.",
-            "status": "pending",
+            "details": "Develop error message mapping system with user-friendly messages: AUTH_001 -> 'Your session appears to be invalid. Please log in again.', AUTH_002 -> 'Your session has expired. Please log in to continue.', CONN_001 -> 'We're having trouble connecting to our authentication service. Please try again in a moment.'. Include contextual help text and recommended actions for each error. Design message templating system for dynamic error details while maintaining security (no sensitive data exposure). Consider i18n requirements for multi-language support.\n<info added on 2025-07-18T01:33:57.756Z>\nImplementation completed successfully. Created comprehensive error message mapping system with ErrorMessageRegistry supporting 4 languages (Korean, English, Japanese, Chinese). Implemented MessageTemplate class for dynamic message generation with placeholder support and sensitive data filtering. Updated MaxLabException with internationalization capabilities including language detection from HTTP headers and user context preferences. All 8 core error codes mapped to user-friendly messages with contextual help text. System includes fallback mechanisms and regional language code normalization. Files created: error_messages.py, language_detection.py, and enhanced exceptions.py with full i18n support.\n</info added on 2025-07-18T01:33:57.756Z>",
+            "status": "done",
             "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Auto-save Functionality with Debouncing",
-            "description": "Implement automatic saving of flow changes with proper debouncing to prevent excessive API calls",
-            "dependencies": [
-              1
-            ],
-            "details": "Create debounced auto-save hook using useCallback and setTimeout. Implement change detection for nodes, edges, and flow properties. Add visual indicators for save status (saving, saved, error). Handle conflicts and provide manual save override. Store pending changes in localStorage as backup.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Memory Leak Fixes using React Hooks Optimization",
-            "description": "Fix memory leaks in flow editor components through proper hook optimization and cleanup",
-            "dependencies": [
-              2,
-              3
-            ],
-            "details": "Optimize useCallback and useMemo usage throughout flow components. Implement proper cleanup in useEffect hooks for event listeners, timers, and subscriptions. Fix ReactFlow event handler memory leaks. Add proper dependency arrays and cleanup functions for all hooks.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Performance Monitoring Setup",
-            "description": "Implement comprehensive performance monitoring for flow rendering and user interactions",
-            "dependencies": [
-              4
-            ],
-            "details": "Add React DevTools Profiler integration for component rendering metrics. Implement custom performance hooks to track flow operations timing. Add monitoring for node/edge count thresholds, render frequency, and memory usage. Create performance dashboard with key metrics and alerting for performance degradation.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 4,
-        "title": "API Optimization and Error Handling",
-        "description": "Enhance FastAPI performance, implement comprehensive error handling, and optimize API response times",
-        "details": "Implement structured error handling with proper HTTP status codes, add API response caching with Redis, optimize database queries in API endpoints, implement request/response validation with Pydantic, add comprehensive logging with structured JSON format, implement API versioning strategy, add health check endpoints, optimize serialization performance, implement proper pagination for list endpoints",
-        "testStrategy": "API load testing, error scenario testing, response time benchmarking, cache hit ratio validation, pagination performance testing",
-        "priority": "high",
-        "dependencies": [
-          1,
-          2
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Implement Structured Error Handling System",
-            "description": "Create comprehensive error handling with proper HTTP status codes, custom exception classes, and error response formatting",
-            "dependencies": [],
-            "details": "Design and implement custom exception hierarchy, create error response models with Pydantic, implement global exception handlers for FastAPI, add error code standardization, implement user-friendly error messages, add error context tracking for debugging",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Set up Redis-based API Response Caching",
-            "description": "Implement Redis caching layer for API responses with cache invalidation strategies and TTL management",
-            "dependencies": [],
-            "details": "Configure Redis connection and client, implement cache decorators for API endpoints, design cache key strategies, implement cache invalidation logic, add cache hit/miss metrics, configure TTL policies for different data types",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Optimize Database Queries and Performance",
-            "description": "Analyze and optimize slow database queries, implement proper indexing, and enhance query efficiency",
-            "dependencies": [],
-            "details": "Profile existing queries with EXPLAIN ANALYZE, implement database indexes for frequently queried columns, optimize N+1 query problems, implement query result caching, add database connection pooling optimization, implement query monitoring and alerting",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Implement Request/Response Validation with Pydantic",
-            "description": "Add comprehensive data validation for all API endpoints using Pydantic models and custom validators",
-            "dependencies": [
-              1
-            ],
-            "details": "Create Pydantic models for all request/response schemas, implement custom validators for business logic, add input sanitization and validation, implement response serialization optimization, add validation error handling integration with structured error system",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Setup Comprehensive Logging Infrastructure",
-            "description": "Implement structured JSON logging with proper log levels, correlation IDs, and log aggregation",
-            "dependencies": [
-              1
-            ],
-            "details": "Configure structured JSON logging format, implement correlation ID tracking across requests, add performance logging for API endpoints, implement log rotation and retention policies, add integration with monitoring systems, implement security event logging",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Implement API Versioning Strategy",
-            "description": "Design and implement API versioning system with backward compatibility and migration paths",
-            "dependencies": [
-              4
-            ],
-            "details": "Design URL-based API versioning scheme, implement version-specific route handlers, create API deprecation strategy, implement version compatibility checks, add API documentation versioning, implement migration guides for version changes",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 5,
-        "title": "Mock Data Identification and Removal",
-        "description": "Systematically identify and remove all hardcoded test data, mock API responses, and development-only configurations",
-        "details": "Scan codebase for hardcoded user credentials and test data, remove mock API responses and replace with real endpoints, clean up development seed data from database, remove temporary OAuth configurations, eliminate hardcoded URLs and endpoints, clean up test user profiles and workspace data, remove development-only feature flags, audit and remove debug console logs",
-        "testStrategy": "Code review for hardcoded values, integration testing with clean data, manual testing of all user flows, automated scanning for test patterns",
-        "priority": "high",
-        "dependencies": [
-          2,
-          3
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Scan codebase for hardcoded test data and credentials",
-            "description": "Systematically scan the entire codebase to identify hardcoded user credentials, test data, and development-only data",
-            "dependencies": [],
-            "details": "Use automated tools and manual review to find hardcoded passwords, API keys, test user accounts, sample data, development credentials, and any other hardcoded values that should not be in production code. Create inventory of all findings.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Remove mock API responses and replace with real endpoints",
-            "description": "Identify and remove all mock API responses, replacing them with actual API endpoint calls",
-            "dependencies": [
-              1
-            ],
-            "details": "Find all mock API responses, stub functions, and simulated data endpoints. Replace with proper API calls to real services. Ensure error handling and response validation are properly implemented for real endpoints.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Clean up development configurations and feature flags",
-            "description": "Remove development-only configurations, temporary settings, and development feature flags",
-            "dependencies": [
-              1
-            ],
-            "details": "Remove development seed data from database, eliminate temporary OAuth configurations, clean up development-only feature flags, remove hardcoded URLs and development endpoints, clean up test workspace data and user profiles.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Remove automated testing data and debug artifacts",
-            "description": "Clean up test patterns, debug console logs, and automated testing artifacts from production code",
-            "dependencies": [
-              2,
-              3
-            ],
-            "details": "Remove debug console logs, clean up test patterns and testing artifacts, remove development debugging code, eliminate any automated testing data that may have been left in the codebase. Verify no test-related code remains in production builds.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 6,
-        "title": "Real Data Integration and Validation",
-        "description": "Connect to actual data sources, implement real-time equipment data integration, and establish data validation pipelines",
-        "details": "Integrate with real MAX Platform user profiles and permissions, establish connections to actual equipment data sources, implement real-time WebSocket data feeds, create data validation schemas for external APIs, implement data transformation pipelines for different data sources, add data quality checks and monitoring, implement proper error handling for external data source failures, establish data source health monitoring",
-        "testStrategy": "End-to-end data flow testing, real-time data validation, external API integration testing, data quality verification, failover testing",
-        "priority": "high",
-        "dependencies": [
-          4,
-          5
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "MAX Platform User Profile Integration",
-            "description": "Integrate with MAX Platform user authentication and profile management system",
-            "dependencies": [],
-            "details": "Implement OAuth/API authentication with MAX Platform, fetch user profiles and permissions, establish user session management, integrate role-based access control, implement user preference synchronization, handle MAX Platform API rate limiting and error responses",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Equipment Data Source Connections",
-            "description": "Establish connections to various equipment data sources and APIs",
-            "dependencies": [
-              1
-            ],
-            "details": "Configure equipment API endpoints and authentication, implement connection pooling for multiple data sources, establish secure communication protocols, implement equipment discovery and registration, handle different equipment communication protocols (REST, MQTT, OPC-UA), implement connection retry logic and failover mechanisms",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Real-time WebSocket Implementation",
-            "description": "Implement WebSocket infrastructure for real-time equipment data streaming",
-            "dependencies": [
-              2
-            ],
-            "details": "Set up WebSocket server for real-time data broadcasting, implement client-side WebSocket connection management, establish data streaming protocols, implement connection health monitoring, handle WebSocket reconnection logic, implement data buffering for disconnected clients, add WebSocket authentication and authorization",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Data Validation Schema Creation",
-            "description": "Create comprehensive data validation schemas for all external data sources",
-            "dependencies": [
-              2
-            ],
-            "details": "Define JSON schemas for equipment data formats, implement API response validation, create data type checking and sanitization, establish data completeness validation rules, implement schema versioning for API changes, add custom validation rules for equipment-specific data, implement validation error handling and reporting",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Data Transformation Pipelines",
-            "description": "Implement data transformation and normalization pipelines for different data sources",
-            "dependencies": [
-              3,
-              4
-            ],
-            "details": "Create data mapping and transformation functions, implement unit conversion utilities, establish data normalization processes, implement data aggregation and summarization, create data enrichment pipelines, implement batch and streaming data processing, add data lineage tracking and audit trails",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Data Quality Monitoring Setup",
-            "description": "Establish comprehensive data quality monitoring and alerting system",
-            "dependencies": [
-              5
-            ],
-            "details": "Implement data quality metrics and KPIs, create automated data quality checks, establish data freshness monitoring, implement anomaly detection for equipment data, create data quality dashboards and reports, implement alerting for data quality issues, add data source health monitoring and status tracking",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 7,
-        "title": "Production Environment Configuration",
-        "description": "Configure production-ready environment settings, SSL certificates, and deployment infrastructure",
-        "details": "Set up environment-specific configuration files, implement secure environment variable management, configure SSL/TLS certificates for HTTPS, set up proper DNS configuration, implement reverse proxy with Nginx, configure production logging levels, set up production database connections, implement security headers (HSTS, CSP, X-Frame-Options), configure CORS for production domains",
-        "testStrategy": "SSL certificate validation, environment configuration testing, security header verification, DNS resolution testing, production deployment simulation",
-        "priority": "high",
-        "dependencies": [
-          1,
-          2
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Environment Configuration Setup",
-            "description": "Set up environment-specific configuration files and secure environment variable management",
-            "dependencies": [],
-            "details": "Create production environment configuration files (.env.production), implement secure environment variable management with encryption for sensitive values, configure environment-specific settings for different deployment stages (staging, production), implement configuration validation to ensure all required variables are present",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "SSL/TLS Certificate Configuration",
-            "description": "Configure SSL certificates and HTTPS setup for production domains",
-            "dependencies": [
-              1
-            ],
-            "details": "Obtain and configure SSL/TLS certificates for production domains, set up automated certificate renewal with Let's Encrypt or similar service, configure HTTPS redirects, implement proper certificate chain validation, configure SSL security settings with strong cipher suites",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Reverse Proxy with Nginx Setup",
-            "description": "Configure Nginx as reverse proxy with load balancing and caching",
-            "dependencies": [
-              2
-            ],
-            "details": "Set up Nginx configuration for reverse proxy to application servers, implement load balancing for multiple application instances, configure static file serving and caching, set up gzip compression, configure proxy headers and timeouts, implement health checks for upstream servers",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Security Headers Implementation",
-            "description": "Implement comprehensive security headers and CORS configuration",
-            "dependencies": [
-              3
-            ],
-            "details": "Configure security headers including HSTS, CSP (Content Security Policy), X-Frame-Options, X-Content-Type-Options, and Referrer-Policy, set up CORS configuration for production domains, implement rate limiting headers, configure secure cookie settings, add security middleware for additional protection",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Production Database Connection Configuration",
-            "description": "Configure secure production database connections with monitoring",
-            "dependencies": [
-              1
-            ],
-            "details": "Set up secure database connection strings with SSL encryption, configure connection pooling for production workloads, implement database connection monitoring and alerting, configure read replicas if needed, set up database backup verification, implement connection retry logic with exponential backoff",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 8,
-        "title": "Monitoring and Alerting System",
-        "description": "Implement comprehensive application monitoring, logging aggregation, and automated alerting for production operations",
-        "details": "Set up Prometheus metrics collection for application performance, implement Grafana dashboards for system monitoring, configure structured logging with log aggregation, implement health check endpoints for all services, set up alerting for critical system events, implement error tracking and notification system, add performance monitoring for API endpoints, implement user activity tracking for analytics",
-        "testStrategy": "Monitoring system validation, alert triggering simulation, log aggregation verification, dashboard functionality testing, health check endpoint validation",
-        "priority": "medium",
-        "dependencies": [
-          6,
-          7
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Prometheus Metrics Setup",
-            "description": "Configure Prometheus metrics collection for application performance monitoring",
-            "dependencies": [],
-            "details": "Install and configure Prometheus client libraries, implement custom metrics for API response times, database query performance, user activity counts, and system resource utilization. Set up metrics endpoints and configure metric labels for proper categorization.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Grafana Dashboard Creation",
-            "description": "Create comprehensive monitoring dashboards in Grafana for system visualization",
-            "dependencies": [
-              1
-            ],
-            "details": "Set up Grafana instance, create dashboards for application performance, database metrics, user activity, and system health. Configure alerting rules within Grafana and set up dashboard templates for different service components.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Structured Logging Implementation",
-            "description": "Implement structured logging with centralized log aggregation system",
-            "dependencies": [],
-            "details": "Replace existing logging with structured JSON format, implement log correlation IDs for request tracing, set up centralized logging with ELK stack or similar, configure log rotation and retention policies, implement proper log levels and filtering.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Health Check Endpoints Creation",
-            "description": "Implement comprehensive health check endpoints for all services and dependencies",
-            "dependencies": [],
-            "details": "Create health check endpoints for application services, database connectivity, external API dependencies, and system resources. Implement different health check levels (liveness, readiness) and configure automated health monitoring with proper HTTP status codes.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Alerting System Configuration",
-            "description": "Set up automated alerting for critical system events and performance thresholds",
-            "dependencies": [
-              1,
-              2,
-              4
-            ],
-            "details": "Configure alerting rules for system failures, performance degradation, and critical errors. Set up notification channels (email, Slack, PagerDuty), implement escalation policies, and configure alert suppression to prevent alert fatigue. Include user activity anomaly detection.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 9,
-        "title": "Performance Optimization and Scaling",
-        "description": "Optimize frontend bundle size, implement caching strategies, and prepare system for horizontal scaling",
-        "details": "Implement code splitting and lazy loading for React components, optimize Vite build configuration for production, implement CDN integration for static assets, add Redis caching for frequently accessed data, optimize database queries with proper indexing, implement image optimization and compression, add service worker for offline capabilities, optimize API response caching strategies",
-        "testStrategy": "Bundle size analysis, page load speed testing, cache performance verification, scaling simulation, CDN delivery testing",
-        "priority": "medium",
-        "dependencies": [
-          3,
-          6
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "React Code Splitting and Lazy Loading Implementation",
-            "description": "Implement dynamic imports and lazy loading for React components to reduce initial bundle size",
-            "dependencies": [],
-            "details": "Use React.lazy() and Suspense for route-based code splitting, implement lazy loading for process flow editor components, create loading fallbacks for split components, analyze and split large vendor bundles, implement preloading strategies for critical routes",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Vite Build Configuration Optimization",
-            "description": "Optimize Vite build settings and bundling strategy for production performance",
-            "dependencies": [
-              1
-            ],
-            "details": "Configure chunk splitting strategies in vite.config.js, optimize rollup options for better tree shaking, implement asset optimization and compression, configure build target for modern browsers, set up proper source map generation for production debugging",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "CDN Integration for Static Assets",
-            "description": "Implement CDN delivery for static assets and optimize asset loading",
-            "dependencies": [
-              2
-            ],
-            "details": "Configure CDN URLs for static assets in build process, implement image optimization and WebP conversion, set up proper cache headers for different asset types, implement lazy loading for images and media, configure CDN purging strategies for deployments",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Redis Caching Implementation",
-            "description": "Implement Redis-based caching for frequently accessed data and API responses",
-            "dependencies": [],
-            "details": "Set up Redis connection and configuration, implement cache layers for database queries, add API response caching with proper invalidation strategies, implement session storage in Redis, create cache warming strategies for critical data",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Service Worker Setup for Offline Capabilities",
-            "description": "Implement service worker for offline functionality and background synchronization",
-            "dependencies": [
-              3
-            ],
-            "details": "Create service worker for caching strategies, implement offline page functionality, add background sync for critical operations, implement push notification support, create cache management and cleanup strategies",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
-      },
-      {
-        "id": 10,
-        "title": "Documentation and User Guide Creation",
-        "description": "Create comprehensive user documentation, API documentation, and administrative guides for production deployment",
-        "details": "Create user manual with step-by-step workflows, generate OpenAPI/Swagger documentation for all APIs, write administrator deployment and configuration guide, create troubleshooting documentation with common issues, document system architecture and component interactions, create security best practices guide, write backup and recovery procedures, create user onboarding documentation",
-        "testStrategy": "Documentation accuracy verification, user workflow validation, API documentation testing, deployment guide validation, troubleshooting guide effectiveness testing",
-        "priority": "medium",
-        "dependencies": [
-          8,
-          9
-        ],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create Comprehensive User Manual",
-            "description": "Develop step-by-step user documentation covering all system workflows and features",
-            "dependencies": [],
-            "details": "Create user manual with step-by-step workflows for process flow creation, monitoring, publishing, and management. Include screenshots, feature explanations, and common use cases. Document workspace management, user permissions, and collaboration features. Create getting started guide and advanced user tutorials.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Generate OpenAPI/Swagger Documentation",
-            "description": "Automatically generate comprehensive API documentation for all system endpoints",
-            "dependencies": [],
-            "details": "Generate OpenAPI/Swagger documentation for all FastAPI endpoints including authentication, process flows, monitoring, and data management APIs. Include request/response schemas, error codes, authentication requirements, and example requests. Set up automated documentation generation in CI/CD pipeline.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Write Administrator Deployment Guide",
-            "description": "Create comprehensive deployment and configuration documentation for system administrators",
+            "title": "Design Error Response Schema",
+            "description": "Create standardized error response structure with code, message, action fields, and additional metadata for debugging and user guidance",
             "dependencies": [
               1,
               2
             ],
-            "details": "Write administrator deployment and configuration guide covering production setup, environment configuration, security hardening, monitoring setup, backup procedures, and system maintenance. Include Docker deployment instructions, database setup, SSL certificate configuration, and performance tuning guidelines.",
+            "details": "Define JSON error response schema: { error: { code: 'AUTH_001', message: 'Your session appears to be invalid', userAction: 'LOGIN_REQUIRED', timestamp: '2024-01-20T10:30:00Z', requestId: 'uuid', severity: 'ERROR', details: { field: 'token', reason: 'malformed' } } }. Create TypeScript interfaces for type safety. Define userAction enum: LOGIN_REQUIRED, RETRY_ALLOWED, CONTACT_SUPPORT, NO_ACTION. Include correlation IDs for tracing. Ensure schema works across REST and GraphQL endpoints.\n<info added on 2025-07-18T01:36:57.826Z>\nImplementation completed with standardized error response schema across all API endpoints. Created comprehensive TypeScript interfaces in frontend/src/types/api.ts for type safety, Pydantic models in backend/app/core/response_schemas.py for validation, and JSON Schema validation in backend/app/core/schema_validation.py. Schema includes required fields (code, title, message, user_action, severity, timestamp, request_id) and optional debugging fields (details, context, help_url, correlation_id). Successfully integrated with both REST and GraphQL endpoints with OpenAPI export support. Type guards and validation utilities implemented for runtime checking and localization support.\n</info added on 2025-07-18T01:36:57.826Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Error Code System Foundation",
+            "description": "Build the core error handling infrastructure including error classes, code constants, and message resolution system",
+            "dependencies": [
+              3
+            ],
+            "details": "Create custom AuthenticationError class extending Error with code, userMessage, and action properties. Implement ErrorCodeRegistry singleton for managing all error definitions. Build ErrorMessageResolver service for translating codes to messages with locale support. Create error serialization utilities for consistent API responses. Develop error logging middleware that captures error context without exposing sensitive data. Ensure error system integrates with existing logging and monitoring infrastructure.\n<info added on 2025-07-18T01:39:27.092Z>\nIMPLEMENTATION COMPLETED - Error Code System Foundation successfully deployed with comprehensive infrastructure including MaxLabException hierarchy, ErrorCodeRegistry with 18 predefined codes across 6 categories, multi-language message resolution system supporting Korean/English/Japanese/Chinese, error handling middleware with automatic language detection and context capture, integration utilities for legacy error migration, and structured logging with monitoring support. All core components operational and ready for backend integration in Task 14.\n</info added on 2025-07-18T01:39:27.092Z>",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Implement Backend Error Handling",
+        "description": "Integrate comprehensive error handling in backend authentication functions with structured error responses",
+        "details": "Implement try-catch blocks in authentication functions, map technical exceptions to defined error codes, ensure all authentication failures return structured error responses with code and user message. Handle specific cases: OAuth server timeouts, invalid tokens, service unavailability, missing configurations. Implement immediate failure strategy - no retries or fallbacks.",
+        "testStrategy": "Unit tests for each error handling path, integration tests for error response format, negative testing for various failure scenarios, performance testing to ensure errors are returned quickly",
+        "priority": "high",
+        "dependencies": [
+          13
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Develop Frontend Error UI Components",
+        "description": "Create dedicated authentication error modal/popup components with error code-specific messaging and user actions",
+        "details": "Create reusable error modal/popup component for authentication failures. Implement error code to message mapping, provide appropriate user actions (retry, logout, contact support) based on error type. Design responsive UI that clearly explains the issue and next steps. Include visual indicators for different error severities.",
+        "testStrategy": "Component unit tests, visual regression tests, user experience testing for different error scenarios, accessibility testing for error components",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and implement reusable error modal component",
+            "description": "Create a flexible, reusable modal/popup component for displaying authentication errors with proper styling and animations",
+            "dependencies": [],
+            "details": "Design modal component with configurable title, message, icon, and action buttons. Implement overlay backdrop, close functionality, and smooth animations. Ensure component accepts props for error severity (error/warning/info), custom icons, and dynamic content. Include keyboard navigation support and focus management.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement error code to UI message mapping system",
+            "description": "Create a comprehensive mapping system that translates OAuth error codes to user-friendly messages",
+            "dependencies": [
+              1
+            ],
+            "details": "Build error mapping configuration file with OAuth-specific error codes (invalid_token, expired_token, insufficient_scope, etc.). Create message templates with placeholders for dynamic values. Implement fallback messages for unknown errors. Support internationalization for error messages.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Add dynamic user action buttons based on error type",
+            "description": "Implement context-aware action buttons that provide appropriate next steps for each error scenario",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create action button configurations for different error types (Retry Login, Refresh Token, Contact Support, Go to Homepage). Implement button click handlers that trigger appropriate actions. Add loading states for async actions. Ensure buttons are properly styled and positioned within the modal.",
             "status": "pending",
             "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Create Troubleshooting Documentation",
-            "description": "Develop comprehensive troubleshooting guides with common issues and resolution procedures",
+            "title": "Ensure responsive design and accessibility compliance",
+            "description": "Make error components fully responsive and accessible according to WCAG 2.1 standards",
             "dependencies": [
               1,
               2,
               3
             ],
-            "details": "Create troubleshooting documentation with common issues, error messages, and resolution procedures. Include system architecture diagrams, component interaction documentation, security best practices guide, and recovery procedures. Document monitoring and alerting setup, log analysis procedures, and escalation processes.",
+            "details": "Implement responsive breakpoints for mobile, tablet, and desktop views. Add proper ARIA labels, roles, and live regions for screen readers. Ensure color contrast meets accessibility standards. Test with keyboard navigation and screen readers. Add unit tests for accessibility compliance.",
             "status": "pending",
             "testStrategy": ""
           }
         ]
+      },
+      {
+        "id": 16,
+        "title": "Unify Development and Production Environment Configuration",
+        "description": "Consolidate authentication configuration to use identical OAuth flow across all environments",
+        "details": "Remove environment-specific authentication logic, create unified configuration structure for OAuth settings. Ensure development and production environments use identical authentication flow. Standardize environment variables for OAuth endpoints, SERVICE_TOKEN, and other authentication-related configurations. Remove conditional environment branching in authentication code.",
+        "testStrategy": "Environment parity tests, configuration validation tests, deployment tests across development and production environments",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Optimize Dependency Management",
+        "description": "Refactor Redis dependency handling and clarify SERVICE_TOKEN requirements for external API calls",
+        "details": "Make Redis dependency optional or remove Token Blacklist functionality entirely. Implement graceful handling when Redis is unavailable. Clearly define SERVICE_TOKEN requirements and ensure it's properly configured for external MAX Platform API calls. Document all required external dependencies and their failure modes.",
+        "testStrategy": "Integration tests with Redis unavailable, service dependency tests, configuration validation tests, fallback behavior tests",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement Frontend Token Management Simplification",
+        "description": "Simplify frontend token handling to manage only OAuth tokens with improved refresh logic",
+        "details": "Remove handling of multiple token types, focus only on OAuth Bearer tokens. Implement automatic token refresh logic when tokens are near expiration. Create automatic re-authentication flow when tokens are invalid. Ensure secure token storage using browser security best practices.",
+        "testStrategy": "Unit tests for token management functions, integration tests for token refresh flow, security tests for token storage, user experience tests for seamless re-authentication",
+        "priority": "medium",
+        "dependencies": [
+          12,
+          15
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Implement Security Enhancements",
+        "description": "Apply comprehensive security measures including HTTPS enforcement, CSRF protection, and rate limiting",
+        "details": "Enforce HTTPS for all authentication endpoints, implement or verify CSRF protection mechanisms, apply rate limiting to authentication endpoints to prevent brute force attacks. Ensure secure token transmission and storage. Implement proper session management and token expiration handling.",
+        "testStrategy": "Security penetration testing, HTTPS enforcement tests, CSRF protection verification, rate limiting validation tests, token security audit",
+        "priority": "high",
+        "dependencies": [
+          12,
+          18
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Create Comprehensive Testing and Documentation",
+        "description": "Develop complete test suite for OAuth-only authentication system and create updated documentation",
+        "details": "Create comprehensive integration tests for complete authentication flow, develop performance tests to meet 200ms response time requirement, create user acceptance tests for error handling scenarios. Write updated authentication flow documentation, create developer onboarding guide, document troubleshooting procedures for common issues.",
+        "testStrategy": "End-to-end testing across all environments, performance benchmarking, user acceptance testing, documentation review and validation, developer onboarding simulation",
+        "priority": "medium",
+        "dependencies": [
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-13T23:37:22.174Z",
-      "updated": "2025-07-14T07:13:45.319Z",
+      "updated": "2025-07-18T01:45:22.105Z",
       "description": "Tasks for master context"
     }
   }

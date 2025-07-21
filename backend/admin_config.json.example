@@ -1,0 +1,26 @@
+{
+  "admin_emails": [
+    "admin@example.com",
+    "superuser@company.com"
+  ],
+  "admin_uuids": [
+    "58ba91a5-0cba-563c-b2c3-8de00eb4b3b6"
+  ],
+  "_comment": "MaxLab Admin Configuration",
+  "_usage": {
+    "description": "This file defines which users should have admin privileges in MaxLab, independent of OAuth server settings",
+    "instructions": [
+      "1. Copy this file to 'admin_config.json'",
+      "2. Add email addresses of admin users to 'admin_emails' array",
+      "3. Add UUIDs of admin users to 'admin_uuids' array (optional)",
+      "4. Email addresses should be lowercase",
+      "5. Restart the backend service after changes"
+    ],
+    "environment_variables": {
+      "MAXLAB_ADMIN_EMAILS": "Comma-separated list of admin emails (overrides file)",
+      "MAXLAB_ADMIN_UUIDS": "Comma-separated list of admin UUIDs (overrides file)",
+      "MAXLAB_ADMIN_CONFIG_FILE": "Path to admin config file (default: admin_config.json)",
+      "MAXLAB_TRUST_OAUTH_ADMIN": "Whether to trust OAuth server's is_admin field (true/false, default: false)"
+    }
+  }
+}

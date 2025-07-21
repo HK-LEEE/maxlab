@@ -48,8 +48,8 @@ class BlacklistStatsResponse(BaseModel):
 @router.post("/blacklist", response_model=BlacklistTokenResponse)
 async def blacklist_token(
     request: BlacklistTokenRequest,
-    current_user: Dict[str, Any] = Depends(get_current_user),
-    http_request: Request = None
+    http_request: Request,
+    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Blacklist a JWT token
@@ -151,9 +151,9 @@ async def blacklist_user_tokens(
 
 @router.get("/check", response_model=TokenInfoResponse)
 async def check_token_blacklist(
+    http_request: Request,
     token: Optional[str] = Query(None, description="Token to check (uses current if not provided)"),
-    current_user: Dict[str, Any] = Depends(get_current_user),
-    http_request: Request = None
+    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Check if a token is blacklisted

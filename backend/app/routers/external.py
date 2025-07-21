@@ -27,6 +27,16 @@ async def get_groups(
         
         groups = await external_api.get_groups(token)
         print(f"📊 Returning {len(groups)} groups to frontend")
+        
+        # Debug: Log the structure of groups being returned
+        if groups and len(groups) > 0:
+            print(f"🔍 Sample group being returned to frontend:")
+            print(f"   First group: {groups[0]}")
+            if isinstance(groups[0], dict):
+                print(f"   Keys: {list(groups[0].keys())}")
+                print(f"   ID field: {groups[0].get('id', 'NO ID FIELD')}")
+                print(f"   Name field: {groups[0].get('name', 'NO NAME FIELD')}")
+        
         return groups
         
     except Exception as e:
@@ -97,6 +107,9 @@ async def search_groups(
         
         # For groups, we get all groups and filter by search query
         all_groups = await external_api.get_groups(token)
+        
+        # Note: external_api.get_groups already sets display_name from description
+        # Just filter based on that
         filtered_groups = [
             group for group in all_groups 
             if q.lower() in group.get('name', '').lower() or 

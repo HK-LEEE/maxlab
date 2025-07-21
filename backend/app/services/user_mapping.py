@@ -23,7 +23,7 @@ class UserMappingService:
         self.cache = {}  # 메모리 캐시 (실제로는 Redis 등 사용 권장)
         self.cache_ttl = settings.USER_MAPPING_CACHE_TTL
     
-    async def get_user_uuid_by_email(self, email: str) -> Optional[uuid.UUID]:
+    async def get_user_uuid_by_email(self, email: str, user_token: str) -> Optional[uuid.UUID]:
         """이메일을 통해 사용자 UUID 조회"""
         try:
             # 1. 캐시 확인
@@ -33,8 +33,8 @@ class UserMappingService:
                 if datetime.now() < cached_data['expires']:
                     return cached_data['uuid']
             
-            # 2. 외부 인증 서버에서 사용자 정보 조회
-            user_uuid = await self._fetch_user_uuid_from_auth_server(email)
+            # 2. 외부 인증 서버에서 사용자 정보 조회 (사용자 토큰 사용)
+            user_uuid = await self._fetch_user_uuid_from_auth_server(email, user_token)
             
             if user_uuid:
                 # 3. 캐시에 저장
@@ -50,7 +50,7 @@ class UserMappingService:
             logger.error(f"Failed to get user UUID for email {email}: {e}")
             return None
     
-    async def get_user_info_by_uuid(self, user_uuid: uuid.UUID) -> Optional[Dict[str, Any]]:
+    async def get_user_info_by_uuid(self, user_uuid: uuid.UUID, user_token: str) -> Optional[Dict[str, Any]]:
         """UUID를 통해 사용자 정보 조회"""
         try:
             # 1. 캐시 확인
@@ -60,8 +60,8 @@ class UserMappingService:
                 if datetime.now() < cached_data['expires']:
                     return cached_data['info']
             
-            # 2. 외부 인증 서버에서 사용자 정보 조회
-            user_info = await self._fetch_user_info_from_auth_server(user_uuid)
+            # 2. 외부 인증 서버에서 사용자 정보 조회 (사용자 토큰 사용)
+            user_info = await self._fetch_user_info_from_auth_server(user_uuid, user_token)
             
             if user_info:
                 # 3. 캐시에 저장
@@ -77,27 +77,27 @@ class UserMappingService:
             logger.error(f"Failed to get user info for UUID {user_uuid}: {e}")
             return None
     
-    async def get_user_uuid_by_identifier(self, identifier: str) -> Optional[uuid.UUID]:
+    async def get_user_uuid_by_identifier(self, identifier: str, user_token: str) -> Optional[uuid.UUID]:
         """식별자(이메일 또는 사용자명)를 통해 UUID 조회"""
         try:
             # 이메일 형식인지 확인
             if '@' in identifier:
-                return await self.get_user_uuid_by_email(identifier)
+                return await self.get_user_uuid_by_email(identifier, user_token)
             else:
                 # 사용자명으로 조회
-                return await self._fetch_user_uuid_by_username(identifier)
+                return await self._fetch_user_uuid_by_username(identifier, user_token)
                 
         except Exception as e:
             logger.error(f"Failed to get user UUID for identifier {identifier}: {e}")
             return None
     
-    async def map_legacy_users_to_uuid(self, user_identifiers: List[str]) -> Dict[str, Optional[uuid.UUID]]:
+    async def map_legacy_users_to_uuid(self, user_identifiers: List[str], user_token: str) -> Dict[str, Optional[uuid.UUID]]:
         """레거시 사용자 식별자들을 일괄 UUID로 매핑"""
         mapping = {}
         
         for identifier in user_identifiers:
             try:
-                user_uuid = await self.get_user_uuid_by_identifier(identifier)
+                user_uuid = await self.get_user_uuid_by_identifier(identifier, user_token)
                 mapping[identifier] = user_uuid
                 
                 if user_uuid is None:
@@ -109,25 +109,22 @@ class UserMappingService:
         
         return mapping
     
-    async def _fetch_user_uuid_from_auth_server(self, email: str) -> Optional[uuid.UUID]:
-        """외부 인증 서버에서 이메일로 사용자 UUID 조회"""
+    async def _fetch_user_uuid_from_auth_server(self, email: str, user_token: str) -> Optional[uuid.UUID]:
+        """외부 인증 서버에서 이메일로 사용자 UUID 조회 (사용자 토큰 사용)"""
         try:
             async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
-                # OAuth userinfo API 또는 사용자 검색 API 사용
+                # 사용자 토큰으로 /api/users/email/{email} API 호출
                 response = await client.get(
-                    settings.full_auth_users_search_url,
-                    params={"email": email},
-                    headers={"Authorization": f"Bearer {await self._get_service_token()}"}
+                    f"{settings.AUTH_SERVER_URL}/api/users/email/{email}",
+                    headers={"Authorization": f"Bearer {user_token}"}
                 )
                 
                 if response.status_code == 200:
-                    users = response.json()
-                    if users and len(users) > 0:
-                        user_data = users[0]
-                        # 사용자 ID를 UUID로 변환
-                        user_id = user_data.get('id') or user_data.get('user_id') or user_data.get('sub')
-                        if user_id:
-                            return uuid.UUID(str(user_id)) if not isinstance(user_id, uuid.UUID) else user_id
+                    user_data = response.json()
+                    # 사용자 ID를 UUID로 변환
+                    user_id = user_data.get('id') or user_data.get('user_id') or user_data.get('sub')
+                    if user_id:
+                        return uuid.UUID(str(user_id)) if not isinstance(user_id, uuid.UUID) else user_id
                 
                 return None
                 
@@ -135,13 +132,14 @@ class UserMappingService:
             logger.error(f"Failed to fetch user UUID from auth server for email {email}: {e}")
             return None
     
-    async def _fetch_user_info_from_auth_server(self, user_uuid: uuid.UUID) -> Optional[Dict[str, Any]]:
-        """외부 인증 서버에서 UUID로 사용자 정보 조회"""
+    async def _fetch_user_info_from_auth_server(self, user_uuid: uuid.UUID, user_token: str) -> Optional[Dict[str, Any]]:
+        """외부 인증 서버에서 UUID로 사용자 정보 조회 (사용자 토큰 사용)"""
         try:
             async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
+                # 사용자 토큰으로 /api/users/{user_id} API 호출
                 response = await client.get(
-                    f"{settings.get_auth_server_url().rstrip('/')}/api/users/{str(user_uuid)}",
-                    headers={"Authorization": f"Bearer {await self._get_service_token()}"}
+                    f"{settings.AUTH_SERVER_URL}/api/users/{str(user_uuid)}",
+                    headers={"Authorization": f"Bearer {user_token}"}
                 )
                 
                 if response.status_code == 200:
@@ -161,14 +159,15 @@ class UserMappingService:
             logger.error(f"Failed to fetch user info from auth server for UUID {user_uuid}: {e}")
             return None
     
-    async def _fetch_user_uuid_by_username(self, username: str) -> Optional[uuid.UUID]:
-        """사용자명으로 UUID 조회"""
+    async def _fetch_user_uuid_by_username(self, username: str, user_token: str) -> Optional[uuid.UUID]:
+        """사용자명으로 UUID 조회 (사용자 토큰 사용)"""
         try:
             async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
+                # 사용자 토큰으로 /api/users/search API 호출
                 response = await client.get(
-                    settings.full_auth_users_search_url,
+                    f"{settings.AUTH_SERVER_URL}/api/users/search",
                     params={"username": username},
-                    headers={"Authorization": f"Bearer {await self._get_service_token()}"}
+                    headers={"Authorization": f"Bearer {user_token}"}
                 )
                 
                 if response.status_code == 200:
@@ -185,10 +184,6 @@ class UserMappingService:
             logger.error(f"Failed to fetch user UUID by username {username}: {e}")
             return None
     
-    async def _get_service_token(self) -> str:
-        """서비스 간 통신용 토큰 획득"""
-        # 실제로는 서비스 계정 토큰 또는 클라이언트 자격 증명 플로우 사용
-        return settings.SERVICE_TOKEN
     
     def generate_deterministic_uuid(self, identifier: str, namespace: str = None) -> uuid.UUID:
         """식별자 기반 결정적 UUID 생성 (마이그레이션용)"""

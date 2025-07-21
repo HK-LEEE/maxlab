@@ -155,10 +155,10 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
 
   // Add group mutation
   const addGroupMutation = useMutation({
-    mutationFn: async (data: { group_name: string; permission_level: string }) => {
+    mutationFn: async (data: { group_id: string; permission_level: string }) => {
       const requestData = {
         workspace_id: workspace?.id,
-        group_name: data.group_name,
+        group_id: data.group_id,
         permission_level: data.permission_level
       };
       console.log('Sending group creation request:', requestData);
@@ -209,7 +209,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
       return;
     }
     addGroupMutation.mutate({
-      group_name: selectedGroup,
+      group_id: selectedGroup,
       permission_level: selectedPermission,
     });
   };
@@ -405,8 +405,8 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
               >
                 <option value="">Select a group</option>
                 {unassignedGroups.map((group: Group) => (
-                  <option key={group.name} value={group.name}>
-                    {group.display_name || group.name} ({group.name})
+                  <option key={group.id} value={group.id}>
+                    {group.display_name || group.name}
                   </option>
                 ))}
               </select>

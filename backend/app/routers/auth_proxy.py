@@ -1,7 +1,11 @@
-from fastapi import APIRouter, HTTPException, status, Header
+from fastapi import APIRouter, HTTPException, status, Header, Request
 import httpx
 from app.core.config import settings
+from app.core.security import create_oauth_headers, validate_bearer_token, AuthenticationError
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -9,8 +13,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.get("/me")
 async def proxy_me(authorization: Optional[str] = Header(None)):
     """
-    Proxy user info request to maxplatform authentication server.
-    This supports both OAuth userinfo and traditional auth endpoints.
+    Proxy user info request to MAX Platform OAuth server (OAuth only).
     """
     if not authorization:
         raise HTTPException(
@@ -18,12 +21,34 @@ async def proxy_me(authorization: Optional[str] = Header(None)):
             detail="Authorization header is required"
         )
     
+    try:
+        # Extract token from "Bearer {token}" format
+        if not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authorization header format"
+            )
+        
+        token = authorization.split(" ", 1)[1]
+        headers = create_oauth_headers(token)
+        
+    except AuthenticationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e)
+        )
+    except IndexError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Malformed authorization header"
+        )
+    
     async with httpx.AsyncClient() as client:
         try:
-            # First try OAuth userinfo endpoint
+            # OAuth userinfo endpoint only
             oauth_response = await client.get(
                 f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
-                headers={"Authorization": authorization},
+                headers=headers,
                 timeout=httpx.Timeout(10.0)
             )
             
@@ -38,7 +63,7 @@ async def proxy_me(authorization: Optional[str] = Header(None)):
                     else:
                         groups.append(str(g))
                 
-                # Convert OAuth userinfo to traditional format for compatibility
+                # Convert OAuth userinfo to internal format
                 return {
                     "user_id": oauth_data.get("sub") or oauth_data.get("id"),
                     "username": oauth_data.get("display_name") or oauth_data.get("username"),
@@ -51,30 +76,24 @@ async def proxy_me(authorization: Optional[str] = Header(None)):
                     "auth_type": "oauth"
                 }
             
-            # Fallback to traditional auth endpoint
-            response = await client.get(
-                f"{settings.AUTH_SERVER_URL}/api/auth/me",
-                headers={"Authorization": authorization},
-                timeout=httpx.Timeout(10.0)
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                data["auth_type"] = "traditional"
-                return data
+            elif oauth_response.status_code == 401:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Authentication failed: Invalid or expired token"
+                )
             else:
                 raise HTTPException(
-                    status_code=response.status_code,
-                    detail=response.json().get("detail", "Failed to get user info")
+                    status_code=oauth_response.status_code,
+                    detail="OAuth authentication service error"
                 )
                 
         except httpx.RequestError as e:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"Cannot connect to authentication server: {str(e)}"
+                detail=f"Cannot connect to OAuth server: {str(e)}"
             )
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"User info error: {str(e)}"
+                detail=f"OAuth authentication error: {str(e)}"
             )

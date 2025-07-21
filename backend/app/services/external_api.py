@@ -36,6 +36,10 @@ class ExternalAPIService:
                 
                 if response.status_code == 200:
                     result = response.json()
+                    print(f"🔍 Raw response type: {type(result)}")
+                    if isinstance(result, dict):
+                        print(f"🔍 Response keys: {list(result.keys())}")
+                    
                     # Handle both direct list and paginated response formats
                     if isinstance(result, dict) and "items" in result:
                         groups = result["items"]
@@ -45,8 +49,21 @@ class ExternalAPIService:
                         groups = result
                     else:
                         groups = []
+                        print(f"⚠️ Unexpected response format: {result}")
                     
                     print(f"✅ Success! Found {len(groups)} groups")
+                    
+                    # Log the structure of the first group for debugging
+                    if groups and len(groups) > 0:
+                        print(f"🔍 First group data structure: {groups[0]}")
+                        print(f"🔍 Group keys: {list(groups[0].keys()) if isinstance(groups[0], dict) else 'Not a dict'}")
+                        
+                        # 외부 서버에 display_name이 있으면 사용, 없으면 name 사용
+                        for group in groups:
+                            if isinstance(group, dict) and 'display_name' not in group:
+                                group['display_name'] = group.get('name', 'Unknown')
+                                print(f"📝 Group {group.get('name', 'unknown')}: No display_name, using name as fallback: {group['display_name']}")
+                    
                     return groups
                 else:
                     print(f"⚠️ Status {response.status_code}: {response.text[:200]}")
@@ -95,6 +112,12 @@ class ExternalAPIService:
                         users = []
                     
                     print(f"✅ Success! Found {len(users)} users")
+                    
+                    # 사용자도 display_name이 없으면 다른 필드 사용
+                    for user in users:
+                        if isinstance(user, dict) and 'display_name' not in user:
+                            user['display_name'] = user.get('full_name', user.get('username', user.get('email', 'Unknown')))
+                    
                     return users
                 else:
                     print(f"⚠️ Status {response.status_code}: {response.text[:200]}")

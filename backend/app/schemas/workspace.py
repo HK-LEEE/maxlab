@@ -48,8 +48,8 @@ class WorkspaceCreate(WorkspaceBase):
     """워크스페이스 생성 스키마"""
     # Permission fields
     permission_mode: Optional[str] = Field(None, description="권한 모드 (user/group)")
-    selected_users: Optional[List[str]] = Field(default_factory=list, description="선택된 사용자 목록")
-    selected_groups: Optional[List[str]] = Field(default_factory=list, description="선택된 그룹 목록")
+    selected_users: Optional[List[uuid.UUID]] = Field(default_factory=list, description="선택된 사용자 UUID 목록")
+    selected_groups: Optional[List[uuid.UUID]] = Field(default_factory=list, description="선택된 그룹 UUID 목록")
 
 class WorkspaceUpdate(BaseModel):
     """워크스페이스 수정 스키마"""
@@ -96,7 +96,7 @@ class WorkspaceDetail(WorkspaceInDBBase):
 # WorkspaceGroup Schemas
 class WorkspaceGroupBase(BaseModel):
     """워크스페이스 그룹 기본 스키마"""
-    group_name: str = Field(..., min_length=1, max_length=255, description="그룹명")
+    group_id: uuid.UUID = Field(..., description="그룹 UUID")
     group_display_name: Optional[str] = Field(None, max_length=255, description="그룹 표시명")
     permission_level: str = Field(default="read", description="권한 레벨")
     
@@ -124,17 +124,108 @@ class WorkspaceGroupUpdate(BaseModel):
                 raise ValueError(f'Permission level must be one of: {allowed_permissions}')
         return v
 
-class WorkspaceGroupInDBBase(WorkspaceGroupBase):
+class WorkspaceGroupInDBBase(BaseModel):
     """데이터베이스 워크스페이스 그룹 기본 스키마"""
     id: uuid.UUID
     workspace_id: uuid.UUID
+    group_id: uuid.UUID = Field(..., description="그룹 UUID")
+    group_display_name: Optional[str] = Field(None, description="그룹 표시명")
+    permission_level: str = Field(default="read", description="권한 레벨")
+    group_info_updated_at: Optional[datetime] = Field(None, description="그룹 정보 업데이트 시간")
     created_at: datetime
     created_by: str
+    updated_at: Optional[datetime]
+    
+    # Legacy compatibility fields (to be removed after migration)
+    group_name: Optional[str] = Field(None, description="레거시 그룹명 (deprecated)")
+    group_id_uuid: Optional[uuid.UUID] = Field(None, description="레거시 UUID 필드 (deprecated)")
     
     model_config = ConfigDict(from_attributes=True)
+    
+    @validator('group_id', pre=True, always=True)
+    def set_group_id(cls, v, values):
+        """Handle legacy field mapping during transition"""
+        # If group_id is provided, use it
+        if v:
+            return v
+        # Otherwise, try to use group_id_uuid (legacy field)
+        if 'group_id_uuid' in values and values['group_id_uuid']:
+            return values['group_id_uuid']
+        # Last resort: try to parse group_name as UUID
+        if 'group_name' in values and values['group_name']:
+            try:
+                return uuid.UUID(values['group_name'])
+            except ValueError:
+                pass
+        return v
 
 class WorkspaceGroup(WorkspaceGroupInDBBase):
     """워크스페이스 그룹 응답 스키마"""
+    pass
+
+# WorkspaceUser Schemas
+class WorkspaceUserBase(BaseModel):
+    """워크스페이스 사용자 기본 스키마"""
+    user_id: uuid.UUID = Field(..., description="사용자 UUID")
+    user_display_name: Optional[str] = Field(None, max_length=255, description="사용자 표시명")
+    user_email: Optional[str] = Field(None, max_length=255, description="사용자 이메일")
+    permission_level: str = Field(default="read", description="권한 레벨")
+    
+    @validator('permission_level')
+    def validate_permission_level(cls, v):
+        allowed_permissions = ['read', 'write', 'admin']
+        if v not in allowed_permissions:
+            raise ValueError(f'Permission level must be one of: {allowed_permissions}')
+        return v
+
+class WorkspaceUserCreate(WorkspaceUserBase):
+    """워크스페이스 사용자 생성 스키마"""
+    workspace_id: uuid.UUID
+
+class WorkspaceUserUpdate(BaseModel):
+    """워크스페이스 사용자 수정 스키마"""
+    user_display_name: Optional[str] = Field(None, max_length=255)
+    permission_level: Optional[str] = None
+    
+    @validator('permission_level')
+    def validate_permission_level(cls, v):
+        if v:
+            allowed_permissions = ['read', 'write', 'admin']
+            if v not in allowed_permissions:
+                raise ValueError(f'Permission level must be one of: {allowed_permissions}')
+        return v
+
+class WorkspaceUserInDBBase(BaseModel):
+    """데이터베이스 워크스페이스 사용자 기본 스키마"""
+    id: uuid.UUID
+    workspace_id: uuid.UUID
+    user_id: uuid.UUID = Field(..., description="사용자 UUID")
+    user_display_name: Optional[str] = Field(None, description="사용자 표시명")
+    user_email: Optional[str] = Field(None, description="사용자 이메일")
+    permission_level: str = Field(default="read", description="권한 레벨")
+    user_info_updated_at: Optional[datetime] = Field(None, description="사용자 정보 업데이트 시간")
+    created_at: datetime
+    created_by: str
+    updated_at: Optional[datetime]
+    
+    # Legacy compatibility field (to be removed after migration)
+    user_id_uuid: Optional[uuid.UUID] = Field(None, description="레거시 UUID 필드 (deprecated)")
+    
+    model_config = ConfigDict(from_attributes=True)
+    
+    @validator('user_id', pre=True, always=True)
+    def set_user_id(cls, v, values):
+        """Handle legacy field mapping during transition"""
+        # If user_id is provided as UUID, use it
+        if v:
+            return v
+        # Otherwise, try to use user_id_uuid (legacy field)
+        if 'user_id_uuid' in values and values['user_id_uuid']:
+            return values['user_id_uuid']
+        return v
+
+class WorkspaceUser(WorkspaceUserInDBBase):
+    """워크스페이스 사용자 응답 스키마"""
     pass
 
 # MVPModule Schemas

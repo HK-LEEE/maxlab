@@ -15,12 +15,15 @@ from .core.config import settings
 from .core.database import get_db, close_db, create_tables
 from .utils.auto_create_tables import ensure_tables_exist
 from .routers.workspaces import router as workspaces_router
+from .routers.workspaces_v2 import router as workspaces_v2_router
 from .routers.health import router as health_router
 from .routers.auth_proxy import router as auth_proxy_router
 from .routers.files import router as files_router
 from .routers.mvp_modules import router as mvp_modules_router
 from .routers.personal_test_process_flow import router as personal_test_process_flow_router
 from .routers.external import router as external_router
+from .routers.metrics import router as metrics_router
+from .routers.oauth import router as oauth_router
 from .api.v1.endpoints.csrf import router as csrf_router
 from .api.v1.endpoints.session import router as session_router
 from .api.v1.endpoints.rate_limit import router as rate_limit_router
@@ -52,6 +55,14 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 Starting Max Lab MVP Platform...")
     
     try:
+        # Validate OAuth configuration at startup
+        try:
+            settings.validate_oauth_config()
+            logger.info("✅ OAuth configuration validated")
+        except ValueError as e:
+            logger.error(f"❌ OAuth configuration error: {e}")
+            raise
+        
         # 개발 환경에서 테이블 자동 생성
         if settings.ENVIRONMENT == "development":
             await create_tables()
@@ -175,11 +186,19 @@ app.include_router(session_router, prefix="/api/v1/session", tags=["Session"])
 app.include_router(rate_limit_router, prefix="/api/v1/rate-limit", tags=["Rate Limiting"])
 app.include_router(token_blacklist_router, prefix="/api/v1/token-blacklist", tags=["Token Blacklist"])
 app.include_router(workspaces_router, prefix="/api/v1")
+app.include_router(workspaces_v2_router, prefix="/api/v1")
 app.include_router(auth_proxy_router, prefix="/api/v1")
 app.include_router(files_router, prefix="/api/v1")
 app.include_router(mvp_modules_router, prefix="/api/v1")
 app.include_router(personal_test_process_flow_router)
 app.include_router(external_router, prefix="/api/v1")
+app.include_router(metrics_router, prefix="/api/v1/metrics", tags=["Performance Metrics"])
+app.include_router(oauth_router, prefix="/api")
+
+# Debug router (development only)
+if settings.DEBUG:
+    from .routers import debug
+    app.include_router(debug.router, prefix="/api/v1", tags=["Debug"])
 
 # 정적 파일 서빙 설정
 static_dir = Path(settings.STATIC_FILES_DIR)

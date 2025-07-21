@@ -3,6 +3,7 @@ MAX Lab MVP 플랫폼 워크스페이스 관련 CRUD 로직
 데이터베이스와의 모든 워크스페이스 관련 상호작용을 처리합니다.
 """
 from typing import List, Optional, Dict, Any
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_, update, delete, exists
 from sqlalchemy.orm import selectinload, joinedload
@@ -10,6 +11,7 @@ import logging
 import re
 import uuid
 
+from datetime import datetime
 from ..models.workspace import Workspace, WorkspaceUser, WorkspaceGroup, MVPModule, MVPModuleLog
 from ..schemas.workspace import (
     WorkspaceCreate, WorkspaceUpdate, 
@@ -77,57 +79,35 @@ class WorkspaceCRUD:
             db.add(db_obj)
             await db.flush()  # Get the ID without committing
             
-            # Add user permissions if specified (혼합 모드 지원)
+            # Add user permissions if specified (UUID 기반)
             if obj_in.selected_users and len(obj_in.selected_users) > 0:
-                from ..services.user_mapping import user_mapping_service
-                
-                for user_identifier in obj_in.selected_users:
-                    # UUID로 변환 시도 (string이면 UUID로 매핑)
-                    try:
-                        user_uuid = uuid.UUID(user_identifier) if isinstance(user_identifier, str) and len(user_identifier) == 36 else None
-                    except ValueError:
-                        user_uuid = None
-                    
-                    if not user_uuid:
-                        user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier)
-                    
+                for user_uuid in obj_in.selected_users:
                     if user_uuid:
                         workspace_user = WorkspaceUser(
                             workspace_id=db_obj.id,
                             user_id=str(user_uuid),  # 레거시 호환성
                             user_id_uuid=user_uuid,  # 새로운 UUID 필드
                             permission_level='read',
+                            user_info_updated_at=datetime.now(),
                             created_by=creator_id
                         )
                         db.add(workspace_user)
-                    else:
-                        logger.warning(f"Could not resolve user identifier '{user_identifier}' to UUID during workspace creation")
+                        logger.info(f"Added user {user_uuid} to workspace {db_obj.id}")
             
-            # Add group permissions if specified (혼합 모드 지원)
+            # Add group permissions if specified (UUID 기반)
             if obj_in.selected_groups and len(obj_in.selected_groups) > 0:
-                from ..services.group_mapping import group_mapping_service
-                
-                for group_identifier in obj_in.selected_groups:
-                    # UUID로 변환 시도 (string이면 UUID로 매핑)
-                    try:
-                        group_uuid = uuid.UUID(group_identifier) if isinstance(group_identifier, str) and len(group_identifier) == 36 else None
-                    except ValueError:
-                        group_uuid = None
-                    
-                    if not group_uuid:
-                        group_uuid = await group_mapping_service.get_group_uuid_by_name(group_identifier)
-                    
+                for group_uuid in obj_in.selected_groups:
                     if group_uuid:
                         workspace_group = WorkspaceGroup(
                             workspace_id=db_obj.id,
                             group_name=str(group_uuid),  # 레거시 호환성 (임시)
                             group_id_uuid=group_uuid,    # 새로운 UUID 필드
                             permission_level='read',
+                            group_info_updated_at=datetime.now(),
                             created_by=creator_id
                         )
                         db.add(workspace_group)
-                    else:
-                        logger.warning(f"Could not resolve group identifier '{group_identifier}' to UUID during workspace creation")
+                        logger.info(f"Added group {group_uuid} to workspace {db_obj.id}")
             
             await db.commit()
             await db.refresh(db_obj)
@@ -197,8 +177,17 @@ class WorkspaceCRUD:
         if active_only:
             stmt = stmt.where(Workspace.is_active == True)
         
+        # 디버깅: is_admin 값 확인
+        logger.info(f"🔑 is_admin 값: {is_admin} (타입: {type(is_admin).__name__})")
+        
         # 관리자가 아닌 경우 접근 권한이 있는 워크스페이스만 조회
         if not is_admin:
+            logger.info(f"🚫 일반 사용자 권한 필터링 시작")
+            logger.info(f"  - user_uuid: {user_uuid}")
+            logger.info(f"  - user_group_uuids: {user_group_uuids}")
+            logger.info(f"  - user_id (legacy): {user_id}")
+            logger.info(f"  - user_groups (legacy): {user_groups}")
+            
             # 레거시 파라미터 처리 (String 기반 -> UUID 변환)
             if user_id and not user_uuid:
                 try:
@@ -262,12 +251,16 @@ class WorkspaceCRUD:
                 permission_conditions.append(legacy_group_exists)
             
             # OR 조건 적용
+            logger.info(f"📝 권한 조건 개수: {len(permission_conditions)}")
+            for i, condition in enumerate(permission_conditions):
+                logger.info(f"  - 조건 {i+1}: {type(condition).__name__}")
+            
             if permission_conditions:
                 stmt = stmt.where(or_(*permission_conditions))
-                logger.debug(f"워크스페이스 필터링 적용: 사용자 {user_uuid or user_id}, 그룹 {user_group_uuids or user_groups}")
+                logger.info(f"✅ 워크스페이스 필터링 적용: 사용자 {user_uuid or user_id}, 그룹 {user_group_uuids or user_groups}")
             else:
                 # 권한 없음 - 빈 결과 반환
-                logger.warning("워크스페이스 접근 권한이 없는 사용자")
+                logger.warning("❌ 워크스페이스 접근 권한이 없는 사용자 - 빈 결과 반환")
                 stmt = stmt.where(False)
         
         stmt = stmt.offset(skip).limit(limit).order_by(Workspace.created_at.desc())
@@ -276,6 +269,13 @@ class WorkspaceCRUD:
         workspaces = result.scalars().all()
         
         logger.info(f"워크스페이스 목록 조회 완료: {len(workspaces)}개 워크스페이스 반환")
+        
+        # 디버깅: 반환된 워크스페이스 목록
+        if not is_admin and len(workspaces) > 0:
+            logger.info("🔍 일반 사용자에게 반환된 워크스페이스:")
+            for ws in workspaces:
+                logger.info(f"  - {ws.name} (ID: {ws.id}, Owner: {ws.owner_type}/{ws.owner_id})")
+        
         return workspaces
     
     async def count(
@@ -449,10 +449,13 @@ class WorkspaceCRUD:
     async def get_workspace_tree(
         self,
         db: AsyncSession,
-        user_id: Optional[str] = None,
-        user_groups: Optional[List[str]] = None,
+        user_uuid: Optional[UUID] = None,
+        user_group_uuids: Optional[List[UUID]] = None,
         is_admin: bool = False,
-        parent_id: Optional[str] = None
+        parent_id: Optional[str] = None,
+        # 레거시 호환성
+        user_id: Optional[str] = None,
+        user_groups: Optional[List[str]] = None
     ) -> List[Workspace]:
         """워크스페이스 트리 구조 조회"""
         try:
@@ -476,19 +479,53 @@ class WorkspaceCRUD:
             if not is_admin:
                 permission_conditions = []
                 
-                # User-based permissions
-                if user_id:
-                    user_workspace_ids = select(WorkspaceUser.workspace_id).where(
-                        WorkspaceUser.user_id == user_id
-                    )
-                    permission_conditions.append(self.model.id.in_(user_workspace_ids))
+                # 1. 소유자 권한 체크 (UUID 우선)
+                if user_uuid:
+                    permission_conditions.append(self.model.owner_id == str(user_uuid))
+                elif user_id:
+                    permission_conditions.append(self.model.owner_id == user_id)
                 
-                # Group-based permissions
-                if user_groups:
-                    group_workspace_ids = select(WorkspaceGroup.workspace_id).where(
-                        WorkspaceGroup.group_name.in_(user_groups)
+                # 2. 사용자 직접 권한 (UUID 우선)
+                if user_uuid:
+                    user_exists = exists().where(
+                        and_(
+                            WorkspaceUser.workspace_id == self.model.id,
+                            or_(
+                                WorkspaceUser.user_id_uuid == user_uuid,
+                                WorkspaceUser.user_id == str(user_uuid)
+                            )
+                        )
                     )
-                    permission_conditions.append(self.model.id.in_(group_workspace_ids))
+                    permission_conditions.append(user_exists)
+                elif user_id:
+                    user_exists = exists().where(
+                        and_(
+                            WorkspaceUser.workspace_id == self.model.id,
+                            WorkspaceUser.user_id == user_id
+                        )
+                    )
+                    permission_conditions.append(user_exists)
+                
+                # 3. 그룹 권한 (UUID 우선)
+                if user_group_uuids:
+                    group_exists = exists().where(
+                        and_(
+                            WorkspaceGroup.workspace_id == self.model.id,
+                            or_(
+                                WorkspaceGroup.group_id_uuid.in_(user_group_uuids),
+                                WorkspaceGroup.group_name.in_([str(g) for g in user_group_uuids])
+                            )
+                        )
+                    )
+                    permission_conditions.append(group_exists)
+                elif user_groups:
+                    group_exists = exists().where(
+                        and_(
+                            WorkspaceGroup.workspace_id == self.model.id,
+                            WorkspaceGroup.group_name.in_(user_groups)
+                        )
+                    )
+                    permission_conditions.append(group_exists)
                 
                 if permission_conditions:
                     query = query.where(or_(*permission_conditions))
@@ -503,6 +540,12 @@ class WorkspaceCRUD:
             
             result = await db.execute(query)
             workspaces = result.scalars().unique().all()
+            
+            # 디버깅: 반환된 워크스페이스 목록 로깅 (트리 구조)
+            if not is_admin and len(workspaces) > 0:
+                logger.info("🌳 일반 사용자에게 반환된 워크스페이스 (트리 구조):")
+                for ws in workspaces:
+                    logger.info(f"  - {ws.name} (ID: {ws.id}, Owner: {ws.owner_type}/{ws.owner_id})")
             
             return workspaces
             
@@ -597,13 +640,15 @@ class WorkspaceGroupCRUD:
         obj_in: WorkspaceGroupCreate, 
         created_by: str
     ) -> WorkspaceGroup:
-        """워크스페이스 그룹 생성"""
+        """워크스페이스 그룹 생성 (UUID 기반)"""
         try:
             db_obj = WorkspaceGroup(
                 workspace_id=obj_in.workspace_id,
-                group_name=obj_in.group_name,
+                group_id_uuid=obj_in.group_id,  # UUID 사용
+                group_name=str(obj_in.group_id),  # 레거시 호환성 (임시)
                 group_display_name=obj_in.group_display_name,
                 permission_level=obj_in.permission_level,
+                group_info_updated_at=datetime.now(),
                 created_by=created_by
             )
             
@@ -611,7 +656,7 @@ class WorkspaceGroupCRUD:
             await db.commit()
             await db.refresh(db_obj)
             
-            logger.info(f"Workspace group created: {db_obj.id} ({db_obj.group_name}) by {created_by}")
+            logger.info(f"Workspace group created: {db_obj.id} (UUID: {obj_in.group_id}) by {created_by}")
             return db_obj
             
         except Exception as e:
@@ -629,13 +674,13 @@ class WorkspaceGroupCRUD:
         self, 
         db: AsyncSession, 
         workspace_id: uuid.UUID, 
-        group_name: str
+        group_id: uuid.UUID
     ) -> Optional[WorkspaceGroup]:
-        """워크스페이스와 그룹으로 조회"""
+        """워크스페이스와 그룹 UUID로 조회"""
         stmt = select(WorkspaceGroup).where(
             and_(
                 WorkspaceGroup.workspace_id == workspace_id,
-                WorkspaceGroup.group_name == group_name
+                WorkspaceGroup.group_id_uuid == group_id
             )
         )
         result = await db.execute(stmt)

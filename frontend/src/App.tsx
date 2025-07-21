@@ -17,8 +17,7 @@ import { ProcessFlowMonitor } from './workspaces/personal_test/pages/ProcessFlow
 import { ProcessFlowPublish } from './workspaces/personal_test/pages/ProcessFlowPublish';
 import { PublicProcessFlowMonitor } from './workspaces/personal_test/pages/PublicProcessFlowMonitor';
 import { Profile } from './pages/Profile';
-import { TokenExpiryNotification, TokenStatusDebug } from './components/TokenExpiryNotification';
-import TokenRefreshTester from './components/TokenRefreshTester';
+import { TokenExpiryNotification } from './components/TokenExpiryNotification';
 import { isDevelopment, devLog } from './utils/logger';
 import './styles/index.css';
 
@@ -267,8 +266,6 @@ function App() {
       <Router>
         <AuthRefreshProvider />
         <TokenExpiryNotification />
-        <TokenStatusDebug />
-        <TokenRefreshTester />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />

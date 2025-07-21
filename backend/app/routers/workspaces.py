@@ -10,6 +10,7 @@ import uuid
 
 from ..core.database import get_db
 from ..core.security import get_current_active_user, require_admin, AuthorizationError, require_workspace_permission
+from ..core.config import settings
 from ..crud.workspace import workspace_crud, workspace_group_crud, mvp_module_crud
 from ..schemas.workspace import (
     Workspace, WorkspaceCreate, WorkspaceUpdate, WorkspaceDetail, WorkspaceListResponse,
@@ -67,6 +68,12 @@ async def list_workspaces(
 ):
     """사용자가 접근 가능한 워크스페이스 목록 조회 (UUID 기반)"""
     
+    # 상세 디버깅 정보 로깅
+    logger.info("=" * 80)
+    logger.info(f"🔍 워크스페이스 목록 조회 API 호출됨 - /workspaces/")
+    logger.info(f"📋 전체 사용자 정보: {current_user}")
+    logger.info(f"📧 요청한 사용자: {current_user.get('email', 'Unknown')}")
+    
     is_admin = current_user.get("is_admin", False) or current_user.get("role") == "admin"
     
     # UUID 기반 사용자 정보 추출
@@ -77,8 +84,15 @@ async def list_workspaces(
     user_id = current_user.get("user_id", current_user.get("id"))
     user_groups = current_user.get("groups", [])
     
-    logger.info(f"워크스페이스 목록 조회 요청: 사용자 UUID {user_uuid}, "
-               f"그룹 UUIDs {user_group_uuids}, 관리자 {is_admin}")
+    logger.info(f"🔐 권한 정보 상세:")
+    logger.info(f"  - is_admin: {is_admin}")
+    logger.info(f"  - user_uuid: {user_uuid}")
+    logger.info(f"  - user_id (legacy): {user_id}")
+    logger.info(f"  - group_uuids: {user_group_uuids}")
+    logger.info(f"  - groups (legacy): {user_groups}")
+    logger.info(f"  - role: {current_user.get('role')}")
+    logger.info(f"  - username: {current_user.get('username')}")
+    logger.info(f"  - email: {current_user.get('email')}")
     
     # 워크스페이스 목록 조회 (UUID 우선, 레거시 fallback)
     workspaces = await workspace_crud.get_multi(
@@ -119,23 +133,45 @@ async def list_workspaces(
 @router.get("/workspaces/tree", response_model=WorkspaceTreeResponse)
 async def get_workspace_tree(
     parent_id: Optional[uuid.UUID] = Query(None, description="부모 워크스페이스 ID"),
-    # current_user: Dict[str, Any] = Depends(get_current_active_user),  # 임시 비활성화
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """워크스페이스 트리 구조 조회"""
     
-    # 임시로 모든 사용자를 관리자로 처리
-    is_admin = True  # current_user.get("is_admin", False) or current_user.get("role") == "admin"
-    user_id = None  # current_user.get("user_id", current_user.get("id"))
-    user_groups = []  # current_user.get("groups", [])
+    # 상세 디버깅 정보 로깅
+    logger.info("=" * 80)
+    logger.info(f"🌳 워크스페이스 트리 조회 API 호출됨 - /workspaces/tree")
+    logger.info(f"📧 요청한 사용자: {current_user.get('email', 'Unknown')}")
+    logger.info(f"📋 전체 사용자 정보: {current_user}")
     
-    # 트리 구조 조회
+    # 관리자 권한 확인
+    is_admin = current_user.get("is_admin", False) or current_user.get("role") == "admin"
+    
+    # UUID 기반 사용자 정보 추출
+    user_uuid = current_user.get("user_uuid")
+    user_group_uuids = current_user.get("group_uuids", [])
+    
+    # 레거시 호환성
+    user_id = current_user.get("user_id", current_user.get("id"))
+    user_groups = current_user.get("groups", [])
+    
+    logger.info(f"🔐 권한 정보 상세:")
+    logger.info(f"  - is_admin: {is_admin}")
+    logger.info(f"  - user_uuid: {user_uuid}")
+    logger.info(f"  - user_id (legacy): {user_id}")
+    logger.info(f"  - group_uuids: {user_group_uuids}")
+    logger.info(f"  - groups (legacy): {user_groups}")
+    
+    # 트리 구조 조회 (UUID 우선, 레거시 fallback)
     workspaces = await workspace_crud.get_workspace_tree(
         db=db,
-        user_id=user_id,
-        user_groups=user_groups,
+        user_uuid=user_uuid,
+        user_group_uuids=user_group_uuids,
         is_admin=is_admin,
-        parent_id=str(parent_id) if parent_id else None
+        parent_id=str(parent_id) if parent_id else None,
+        # 레거시 호환성
+        user_id=user_id,
+        user_groups=user_groups
     )
     
     # 트리 구조로 변환
@@ -183,6 +219,23 @@ async def create_workspace(
     """새 워크스페이스 생성 (관리자 전용)"""
     
     try:
+        # Validate all groups are UUIDs
+        if workspace_in.selected_groups:
+            validated_groups = []
+            for group_identifier in workspace_in.selected_groups:
+                try:
+                    # Validate UUID format
+                    group_uuid = uuid.UUID(group_identifier)
+                    validated_groups.append(str(group_uuid))
+                except ValueError:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Invalid group UUID: '{group_identifier}'. All groups must be valid UUIDs."
+                    )
+            
+            # Update workspace_in with validated UUIDs
+            workspace_in.selected_groups = validated_groups
+        
         workspace = await workspace_crud.create(
             db=db,
             obj_in=workspace_in,
@@ -326,6 +379,14 @@ async def create_workspace_user(
     # 사용자 식별자를 UUID로 변환
     user_identifier = user_data['user_id']
     
+    # Get user token from current_user
+    user_token = current_user.get("token")
+    if not user_token:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="User token not available"
+        )
+    
     # UUID로 변환 시도
     try:
         user_uuid = uuid.UUID(user_identifier) if isinstance(user_identifier, str) and len(user_identifier) == 36 else None
@@ -333,7 +394,7 @@ async def create_workspace_user(
         user_uuid = None
     
     if not user_uuid:
-        user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier)
+        user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier, user_token)
         
         if not user_uuid:
             raise HTTPException(
@@ -342,7 +403,7 @@ async def create_workspace_user(
             )
     
     # 사용자 정보 조회 (캐싱용)
-    user_info = await user_mapping_service.get_user_info_by_uuid(user_uuid)
+    user_info = await user_mapping_service.get_user_info_by_uuid(user_uuid, user_token)
     
     # Create user permission
     db_user = WorkspaceUser(
@@ -428,39 +489,70 @@ async def create_workspace_group(
     from ..models.workspace import WorkspaceGroup
     from ..services.group_mapping import group_mapping_service
     
-    # 그룹 식별자를 UUID로 변환
-    group_identifier = group_data.get('group_name') or group_data.get('group_id')
+    # 사용자 토큰 먼저 가져오기
+    user_token = current_user.get("token")
+    if not user_token:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="User token not available"
+        )
+    
+    # 그룹 UUID 가져오기 (UUID만 허용)
+    group_identifier = group_data.get('group_id')
     
     if not group_identifier:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="group_name or group_id is required"
+            detail="group_id (UUID) is required"
         )
     
-    # UUID로 변환 시도
+    logger.info(f"Received group identifier: '{group_identifier}' (type: {type(group_identifier).__name__}, length: {len(str(group_identifier))})")
+    
+    # UUID 형식 검증
     try:
-        group_uuid = uuid.UUID(group_identifier) if isinstance(group_identifier, str) and len(group_identifier) == 36 else None
-    except ValueError:
-        group_uuid = None
+        # UUID 형식인지 정규식으로 검증
+        import re
+        uuid_pattern = re.compile(r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$', re.IGNORECASE)
+        if isinstance(group_identifier, str) and len(group_identifier) == 36 and uuid_pattern.match(group_identifier):
+            group_uuid = uuid.UUID(group_identifier)
+            logger.info(f"Successfully parsed UUID: {group_uuid}")
+        else:
+            raise ValueError(f"Invalid UUID format: '{group_identifier}'")
+    except ValueError as e:
+        logger.error(f"Invalid group_id format: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid group_id: '{group_identifier}'. Must be a valid UUID (e.g., '58ba91a5-0cba-563c-b2c3-8de00eb4b3b6')"
+        )
     
-    if not group_uuid:
-        group_uuid = await group_mapping_service.get_group_uuid_by_name(group_identifier)
-        
-        if not group_uuid:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Could not resolve group identifier '{group_identifier}' to UUID"
-            )
+    # 그룹 정보 조회 (선택적 - 외부 인증 서버와 연동)
+    group_info = None
+    try:
+        group_info = await group_mapping_service.get_group_info_by_uuid(group_uuid, user_token)
+        if group_info:
+            logger.info(f"Fetched group info from auth server: {group_info}")
+            logger.info(f"Group name: {group_info.get('name')}")
+            logger.info(f"Group display_name: {group_info.get('display_name')}")
+            logger.info(f"Group description: {group_info.get('description')}")
+    except Exception as e:
+        logger.warning(f"Could not fetch group info from auth server for UUID {group_uuid}: {e}")
+        logger.warning("Proceeding with UUID only. Group display name will be updated later.")
     
-    # 그룹 정보 조회 (캐싱용)
-    group_info = await group_mapping_service.get_group_info_by_uuid(group_uuid)
+    # 그룹 정보가 없는 경우 기본값 설정
+    if not group_info:
+        logger.info(f"Using default values for group {group_uuid}")
+        group_info = {
+            'name': str(group_uuid),  # UUID를 기본 이름으로 사용
+            'display_name': 'Pending Update',  # 나중에 업데이트 예정
+            'description': None
+        }
     
-    # Create group permission
+    # Create group permission with actual group info from auth server
     db_group = WorkspaceGroup(
         workspace_id=workspace_id,
-        group_name=group_info.get('name') if group_info else str(group_uuid),  # 레거시 호환성
-        group_id_uuid=group_uuid,  # 새로운 UUID 필드
-        group_display_name=group_info.get('display_name') if group_info else str(group_uuid),
+        group_name=group_info['name'],  # 실제 그룹명
+        group_id_uuid=group_uuid,  # 그룹 UUID
+        group_display_name=group_info['display_name'],  # 실제 표시명
         permission_level=group_data.get('permission_level', 'read'),
         created_by=current_user.get("user_id", current_user.get("id"))
     )

@@ -6,6 +6,11 @@ from typing import Optional, Any, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 
+from .env_config import (
+    Environment, EnvironmentManager, SecretManager, 
+    get_environment_config, validate_production_settings
+)
+
 
 class Settings(BaseSettings):
     """MAX Lab MVP 플랫폼 설정 클래스"""
@@ -19,25 +24,21 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/max_lab"
     
     # 데이터베이스 SSL/TLS 보안 설정 (환경별 기본값)
-    DB_SSL_MODE: str = "disable"  # 개발: disable, 프로덕션: require
+    DB_SSL_MODE: Optional[str] = None  # 환경별 자동 설정
     DB_SSL_CERT_PATH: Optional[str] = None  # 클라이언트 인증서 경로
     DB_SSL_KEY_PATH: Optional[str] = None   # 클라이언트 키 경로
     DB_SSL_CA_PATH: Optional[str] = None    # CA 인증서 경로
     
     @field_validator('DB_SSL_MODE')
     @classmethod
-    def validate_ssl_mode(cls, v: str, info) -> str:
+    def validate_ssl_mode(cls, v: Optional[str], info) -> str:
         """환경에 따른 SSL 모드 자동 조정"""
-        # 환경 변수에서 직접 설정된 경우 그대로 사용
-        if hasattr(info.data, 'get') and 'ENVIRONMENT' in info.data:
-            env = info.data.get('ENVIRONMENT', 'development')
-        else:
-            env = 'development'
+        # 환경별 기본값 사용
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.db_ssl_mode
         
-        # 프로덕션 환경에서는 SSL 보안 강화 권장
-        if env == 'production' and v == 'disable':
-            return 'require'  # 프로덕션에서는 최소 require 모드
-        
+        # 명시적으로 설정된 경우 검증
         valid_modes = ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full']
         if v not in valid_modes:
             raise ValueError(f"DB_SSL_MODE must be one of {valid_modes}")
@@ -45,48 +46,69 @@ class Settings(BaseSettings):
         return v
     
     # 보안
-    SECRET_KEY: str = "max-lab-secret-key-change-this-in-production"
-    JWT_SECRET_KEY: str = "max-lab-jwt-secret-key-change-this"
+    SECRET_KEY: Optional[str] = None
+    JWT_SECRET_KEY: Optional[str] = None
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
     # CSRF 보안 설정
-    CSRF_SECRET_KEY: str = "csrf-secret-key-change-this-in-production"
+    CSRF_SECRET_KEY: Optional[str] = None
     CSRF_TOKEN_LENGTH: int = 32
     CSRF_COOKIE_NAME: str = "csrf_token"
     CSRF_HEADER_NAME: str = "X-CSRF-Token"
-    CSRF_COOKIE_SAMESITE: str = "strict"
-    CSRF_COOKIE_SECURE: bool = False  # Set to True in production with HTTPS
+    CSRF_COOKIE_SAMESITE: Optional[str] = None
+    CSRF_COOKIE_SECURE: Optional[bool] = None
     
     # 세션 보안 설정
-    SESSION_SECRET_KEY: str = "session-secret-key-change-this-in-production"
+    SESSION_SECRET_KEY: Optional[str] = None
     SESSION_COOKIE_NAME: str = "maxlab_session"
-    SESSION_LIFETIME_SECONDS: int = 3600  # 1 hour
-    SESSION_REMEMBER_ME_LIFETIME_SECONDS: int = 86400 * 30  # 30 days
+    SESSION_LIFETIME_SECONDS: Optional[int] = None
+    SESSION_REMEMBER_ME_LIFETIME_SECONDS: Optional[int] = None
     SESSION_MAX_PER_USER: int = 5
     SESSION_RENEWAL_THRESHOLD_SECONDS: int = 300  # 5 minutes
-    SESSION_COOKIE_SECURE: bool = False  # Set to True in production with HTTPS
+    SESSION_COOKIE_SECURE: Optional[bool] = None
     SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SAMESITE: str = "strict"
+    SESSION_COOKIE_SAMESITE: Optional[str] = None
     
     # 레이트 리미팅 설정
     REDIS_URL: str = "redis://localhost:6379/0"
-    RATE_LIMITING_ENABLED: bool = True
-    RATE_LIMITING_FAIL_OPEN: bool = True  # Allow requests if Redis is down
+    RATE_LIMITING_ENABLED: Optional[bool] = None
+    RATE_LIMITING_FAIL_OPEN: Optional[bool] = None
     RATE_LIMITING_HEADERS_ENABLED: bool = True  # Include rate limit headers in responses
     
     # 외부 인증 서버 (localhost:8000의 MAXDP 인증 서버)
     AUTH_SERVER_URL: str = "http://localhost:8000"
     AUTH_SERVER_TIMEOUT: int = 10
     
-    # External Authentication Service Settings (UUID 매핑용)
-    SERVICE_TOKEN: str = ""  # Service-to-service authentication token
-    AUTH_CLIENT_ID: str = "maxlab-service"
-    AUTH_CLIENT_SECRET: str = ""
+    # External Authentication Service Settings
+    # Note: SERVICE_TOKEN, AUTH_CLIENT_ID, AUTH_CLIENT_SECRET are no longer needed
+    # User OAuth tokens are now used directly for API calls
+    
+    # Legacy get_service_token method removed
+    # OAuth user tokens are now used directly for API calls
+    
+    def validate_oauth_config(self) -> bool:
+        """
+        OAuth 설정 검증
+        
+        Returns:
+            bool: 설정이 유효한 경우 True
+            
+        Raises:
+            ValueError: 필수 설정이 누락된 경우
+        """
+        if not self.AUTH_SERVER_URL:
+            raise ValueError("AUTH_SERVER_URL is not configured")
+        
+        if not self.AUTH_SERVER_URL.startswith(('http://', 'https://')):
+            raise ValueError("AUTH_SERVER_URL must start with http:// or https://")
+        
+        return True
     
     # User/Group UUID Mapping Settings
     USER_MAPPING_CACHE_TTL: int = 3600  # User mapping cache TTL (seconds)
     GROUP_MAPPING_CACHE_TTL: int = 3600  # Group mapping cache TTL (seconds)
+    PERMISSION_CACHE_TTL: int = 300  # Permission cache TTL (seconds)
     
     # External API Endpoints for UUID mapping
     AUTH_USERS_SEARCH_URL: str = "/api/users/search"
@@ -107,19 +129,10 @@ class Settings(BaseSettings):
     
     # 환경 설정
     ENVIRONMENT: str = "development"
-    DEBUG: bool = True
+    DEBUG: Optional[bool] = None
     
     # CORS 설정
-    BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",  # React dev server
-        "http://localhost:3007",  # React dev server (alternative port)
-        "http://localhost:3008",  # React dev server (your current frontend)
-        "http://localhost:3010",  # React dev server (fixed port)
-        "http://localhost:5173",  # Vite dev server
-        "http://localhost:8000",  # Auth server
-        "http://localhost:8001",  # Self
-        "http://localhost:8010",  # Current server port
-    ]
+    BACKEND_CORS_ORIGINS: Optional[List[str]] = None
     
     # MVP 모듈 설정
     MVP_MODULES_DIR: str = "workspaces"  # MVP 모듈 디렉토리
@@ -161,9 +174,108 @@ class Settings(BaseSettings):
     @field_validator("DEBUG", mode="before")
     def set_debug_mode(cls, v: Any) -> bool:
         """디버그 모드 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.debug
         if isinstance(v, str):
             return v.lower() in ("true", "1", "yes", "on")
         return bool(v)
+    
+    @field_validator("SECRET_KEY")
+    def set_secret_key(cls, v: Optional[str]) -> str:
+        """비밀키 설정"""
+        if v is None:
+            return SecretManager.get_or_generate_secret("SECRET_KEY", 32)
+        return v
+    
+    @field_validator("JWT_SECRET_KEY")
+    def set_jwt_secret_key(cls, v: Optional[str]) -> str:
+        """JWT 비밀키 설정"""
+        if v is None:
+            return SecretManager.get_or_generate_secret("JWT_SECRET_KEY", 32)
+        return v
+    
+    @field_validator("CSRF_SECRET_KEY")
+    def set_csrf_secret_key(cls, v: Optional[str]) -> str:
+        """CSRF 비밀키 설정"""
+        if v is None:
+            return SecretManager.get_or_generate_secret("CSRF_SECRET_KEY", 32)
+        return v
+    
+    @field_validator("SESSION_SECRET_KEY")
+    def set_session_secret_key(cls, v: Optional[str]) -> str:
+        """세션 비밀키 설정"""
+        if v is None:
+            return SecretManager.get_or_generate_secret("SESSION_SECRET_KEY", 32)
+        return v
+    
+    @field_validator("CSRF_COOKIE_SECURE", "SESSION_COOKIE_SECURE")
+    def set_cookie_secure(cls, v: Optional[bool]) -> bool:
+        """쿠키 보안 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.cookie_secure
+        return v
+    
+    @field_validator("CSRF_COOKIE_SAMESITE", "SESSION_COOKIE_SAMESITE")
+    def set_cookie_samesite(cls, v: Optional[str]) -> str:
+        """쿠키 SameSite 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.cookie_samesite
+        return v
+    
+    @field_validator("SESSION_LIFETIME_SECONDS")
+    def set_session_lifetime(cls, v: Optional[int]) -> int:
+        """세션 유효 시간 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.session_lifetime
+        return v
+    
+    @field_validator("SESSION_REMEMBER_ME_LIFETIME_SECONDS")
+    def set_remember_me_lifetime(cls, v: Optional[int]) -> int:
+        """Remember Me 세션 유효 시간 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.session_remember_me_lifetime
+        return v
+    
+    @field_validator("BACKEND_CORS_ORIGINS")
+    def set_cors_origins(cls, v: Optional[List[str]]) -> List[str]:
+        """CORS origins 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.cors_allow_origins
+        return v
+    
+    @field_validator("RATE_LIMITING_ENABLED")
+    def set_rate_limiting(cls, v: Optional[bool]) -> bool:
+        """레이트 리미팅 활성화 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.rate_limit_enabled
+        return v
+    
+    @field_validator("RATE_LIMITING_FAIL_OPEN")
+    def set_rate_limiting_fail_open(cls, v: Optional[bool]) -> bool:
+        """레이트 리미팅 실패 시 동작 설정"""
+        if v is None:
+            env_config = get_environment_config()
+            return env_config.rate_limit_fail_open
+        return v
+    
+    @field_validator("LOG_LEVEL")
+    def set_log_level(cls, v: str) -> str:
+        """로그 레벨 설정"""
+        env_config = get_environment_config()
+        return env_config.log_level
+    
+    @field_validator("LOG_FORMAT")
+    def set_log_format(cls, v: str) -> str:
+        """로그 포맷 설정"""
+        env_config = get_environment_config()
+        return env_config.log_format
 
     def get_auth_server_url(self) -> str:
         """외부 인증 서버 URL 반환 (호환성을 위해 MAXPLATFORM_API_URL도 확인)"""
@@ -182,6 +294,20 @@ class Settings(BaseSettings):
     def get_user_groups_url(self, user_id: str) -> str:
         """Get full URL for user groups API"""
         return f"{self.get_auth_server_url().rstrip('/')}{self.AUTH_USER_GROUPS_URL.format(user_id=user_id)}"
+    
+    def model_post_init(self, __context) -> None:
+        """모델 초기화 후 검증"""
+        # 운영 환경 설정 검증
+        if self.ENVIRONMENT == "production":
+            try:
+                validate_production_settings()
+            except ValueError as e:
+                # 운영 환경에서는 엄격하게 검증
+                raise ValueError(f"Production configuration error: {e}")
+        
+        # 암호화 키 검증
+        if hasattr(self, 'ENCRYPTION_KEY') and self.ENCRYPTION_KEY:
+            self.ENCRYPTION_KEY = SecretManager.validate_encryption_key(self.ENCRYPTION_KEY)
 
 
 settings = Settings()

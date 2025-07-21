@@ -11,6 +11,11 @@ from typing import Optional, Dict, Any, List
 import logging
 from datetime import datetime, timedelta
 import uuid
+import time
+from enum import Enum
+import asyncio
+from functools import lru_cache
+import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from cryptography.fernet import Fernet
 import os
@@ -18,64 +23,261 @@ import base64
 
 from .config import settings
 from .database import get_db
+from .exceptions import (
+    MaxLabException, ErrorFactory, AuthenticationException,
+    AuthorizationException, ConnectionException, ConfigurationException,
+    ValidationException, SystemException
+)
+# Note: error_integrator is imported inside functions to avoid circular import
 
 logger = logging.getLogger(__name__)
 
 # HTTP Bearer 토큰 스키마
 security = HTTPBearer()
 
-def decode_jwt_token_locally(token: str) -> Dict[str, Any]:
-    """
-    JWT 토큰을 로컬에서 디코딩 (검증 없이 - fallback 용도)
-    인증 서버와 통신할 수 없을 때 사용
+
+class CircuitBreakerState(Enum):
+    """Circuit Breaker 상태"""
+    CLOSED = "closed"      # 정상 동작
+    OPEN = "open"          # 차단 상태 
+    HALF_OPEN = "half_open"  # 반개방 상태
+
+
+class OAuthCircuitBreaker:
+    """OAuth 서비스를 위한 Circuit Breaker"""
     
-    Args:
-        token: JWT 토큰 문자열
+    def __init__(self, failure_threshold: int = 5, timeout: int = 60):
+        self.failure_threshold = failure_threshold  # 실패 임계값
+        self.timeout = timeout  # 차단 시간 (초)
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = CircuitBreakerState.CLOSED
         
-    Returns:
-        dict: 사용자 정보 딕셔너리
+    def record_success(self):
+        """성공 기록"""
+        self.failure_count = 0
+        self.state = CircuitBreakerState.CLOSED
         
-    Raises:
-        AuthenticationError: 토큰 디코딩 실패시
-    """
-    try:
-        # JWT 토큰을 검증 없이 디코딩 (verify=False)
-        # 주의: 이는 fallback 용도로만 사용해야 함
-        payload = jwt.decode(token, options={"verify_signature": False})
+    def record_failure(self):
+        """실패 기록"""
+        self.failure_count += 1
+        self.last_failure_time = time.time()
         
-        logger.info(f"Local JWT decode successful for user: {payload.get('email', payload.get('sub', 'unknown'))}")
+        if self.failure_count >= self.failure_threshold:
+            self.state = CircuitBreakerState.OPEN
+            logger.warning(f"OAuth Circuit Breaker OPENED after {self.failure_count} failures")
+            
+    def can_execute(self) -> bool:
+        """실행 가능 여부 확인"""
+        if self.state == CircuitBreakerState.CLOSED:
+            return True
+            
+        if self.state == CircuitBreakerState.OPEN:
+            if time.time() - self.last_failure_time >= self.timeout:
+                self.state = CircuitBreakerState.HALF_OPEN
+                logger.info("OAuth Circuit Breaker moved to HALF_OPEN state")
+                return True
+            return False
+            
+        # HALF_OPEN state
+        return True
         
-        # payload에서 사용자 정보 추출
-        user_data = {
-            "user_id": payload.get("sub") or payload.get("user_id") or payload.get("email"),
-            "username": payload.get("email") or payload.get("sub"),
-            "email": payload.get("email"),
-            "full_name": payload.get("full_name") or payload.get("email"),
-            "is_active": True,
-            "is_admin": payload.get("is_admin", False),
-            "role": "admin" if payload.get("is_admin", False) else "user",
-            "groups": payload.get("groups", [payload.get("group_name", "")]) if payload.get("group_name") else [],
-            "auth_type": "jwt_local",
-            "permissions": [],
-            "scopes": []
+    def execute_with_breaker(self, func):
+        """Circuit Breaker를 적용한 함수 실행"""
+        async def wrapper(*args, **kwargs):
+            if not self.can_execute():
+                logger.error("OAuth Circuit Breaker is OPEN - failing fast")
+                # Extract request_id if available from args/kwargs
+                request_id = None
+                if args:
+                    if hasattr(args[0], '__dict__') and 'request_id' in args[0].__dict__:
+                        request_id = args[0].request_id
+                elif 'request_id' in kwargs:
+                    request_id = kwargs['request_id']
+                
+                raise ErrorFactory.create_connection_error(
+                    "CONN_002", request_id,
+                    additional_details={"circuit_breaker_state": self.state.value, "failure_count": self.failure_count}
+                )
+                
+            try:
+                result = await func(*args, **kwargs)
+                self.record_success()
+                return result
+            except (AuthenticationException, ConnectionException, SystemException, MaxLabException) as e:
+                self.record_failure()
+                raise
+            except AuthenticationError as e:
+                # Legacy error handling - convert to new system
+                self.record_failure()
+                from .error_integration import error_integrator
+                migrated_error = error_integrator.migrate_legacy_authentication_error(e)
+                raise migrated_error
+                
+        return wrapper
+
+
+# OAuth Circuit Breaker 인스턴스
+oauth_circuit_breaker = OAuthCircuitBreaker(failure_threshold=10, timeout=30)
+
+
+class PerformanceMetrics:
+    """성능 메트릭 수집 및 관리"""
+    
+    def __init__(self):
+        self.metrics = {
+            'oauth_verify_requests': 0,
+            'oauth_verify_total_time': 0,
+            'oauth_verify_success': 0,
+            'oauth_verify_failures': 0,
+            'oauth_groups_requests': 0,
+            'oauth_groups_total_time': 0,
+            'oauth_groups_success': 0,
+            'oauth_groups_failures': 0,
+            'response_times': []  # Keep last 100 response times for percentile calculation
         }
         
-        # 관리자 권한 체크 (role_name 필드 확인)
-        if payload.get("role_name") == "admin" or payload.get("is_admin"):
-            user_data["is_admin"] = True
-            user_data["role"] = "admin"
+    def record_oauth_verify(self, duration_ms: float, success: bool):
+        """OAuth 토큰 검증 메트릭 기록"""
+        self.metrics['oauth_verify_requests'] += 1
+        self.metrics['oauth_verify_total_time'] += duration_ms
         
-        return user_data
+        if success:
+            self.metrics['oauth_verify_success'] += 1
+        else:
+            self.metrics['oauth_verify_failures'] += 1
+            
+        # Keep only last 100 response times
+        self.metrics['response_times'].append(duration_ms)
+        if len(self.metrics['response_times']) > 100:
+            self.metrics['response_times'].pop(0)
+    
+    def record_oauth_groups(self, duration_ms: float, success: bool):
+        """OAuth 그룹 조회 메트릭 기록"""
+        self.metrics['oauth_groups_requests'] += 1
+        self.metrics['oauth_groups_total_time'] += duration_ms
         
-    except jwt.DecodeError as e:
-        logger.error(f"JWT decode error: {e}")
-        raise AuthenticationError("Invalid JWT token format")
-    except Exception as e:
-        logger.error(f"Unexpected error during JWT decode: {e}")
-        raise AuthenticationError("Token processing failed")
+        if success:
+            self.metrics['oauth_groups_success'] += 1
+        else:
+            self.metrics['oauth_groups_failures'] += 1
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """성능 통계 반환"""
+        stats = {}
+        
+        # OAuth verification stats
+        if self.metrics['oauth_verify_requests'] > 0:
+            stats['oauth_verify'] = {
+                'requests': self.metrics['oauth_verify_requests'],
+                'success_rate': self.metrics['oauth_verify_success'] / self.metrics['oauth_verify_requests'],
+                'avg_response_time_ms': self.metrics['oauth_verify_total_time'] / self.metrics['oauth_verify_requests']
+            }
+        
+        # OAuth groups stats  
+        if self.metrics['oauth_groups_requests'] > 0:
+            stats['oauth_groups'] = {
+                'requests': self.metrics['oauth_groups_requests'],
+                'success_rate': self.metrics['oauth_groups_success'] / self.metrics['oauth_groups_requests'],
+                'avg_response_time_ms': self.metrics['oauth_groups_total_time'] / self.metrics['oauth_groups_requests']
+            }
+        
+        # Response time percentiles
+        if self.metrics['response_times']:
+            sorted_times = sorted(self.metrics['response_times'])
+            count = len(sorted_times)
+            stats['response_times'] = {
+                'p50': sorted_times[int(count * 0.5)],
+                'p95': sorted_times[int(count * 0.95)],
+                'p99': sorted_times[int(count * 0.99)],
+                'count': count
+            }
+        
+        return stats
+
+
+# 성능 메트릭 인스턴스
+performance_metrics = PerformanceMetrics()
+
+def validate_bearer_token(token: str, request_id: Optional[str] = None) -> str:
+    """
+    Bearer 토큰 검증 및 정규화
+    
+    Args:
+        token: 검증할 토큰 문자열
+        request_id: 요청 ID (오류 추적용)
+        
+    Returns:
+        str: 검증된 토큰 문자열
+        
+    Raises:
+        AuthenticationException: 토큰이 유효하지 않은 경우
+    """
+    if not token:
+        raise ErrorFactory.create_auth_error(
+            "AUTH_004", request_id,
+            additional_details={"issue": "token_missing"}
+        )
+    
+    if not isinstance(token, str):
+        raise ErrorFactory.create_validation_error(
+            "VALID_001", request_id,
+            additional_details={"field": "token", "expected_type": "string", "actual_type": type(token).__name__}
+        )
+    
+    # Remove any extra whitespace
+    token = token.strip()
+    
+    if not token:
+        raise ErrorFactory.create_auth_error(
+            "AUTH_004", request_id,
+            additional_details={"issue": "token_empty_after_strip"}
+        )
+    
+    # Basic token format validation (should not be empty or too short)
+    if len(token) < 10:
+        raise ErrorFactory.create_auth_error(
+            "AUTH_001", request_id,
+            additional_details={"issue": "token_too_short", "length": len(token)}
+        )
+    
+    return token
+
+def create_oauth_headers(token: str, request_id: Optional[str] = None) -> Dict[str, str]:
+    """
+    OAuth API 호출용 HTTP 헤더 생성
+    
+    Args:
+        token: Bearer 토큰
+        request_id: 요청 ID (오류 추적용)
+        
+    Returns:
+        dict: 헤더 딕셔너리
+        
+    Raises:
+        AuthenticationException: 토큰이 유효하지 않은 경우
+    """
+    validated_token = validate_bearer_token(token, request_id)
+    
+    # Ensure we're creating a proper string header value
+    auth_header = f"Bearer {validated_token}"
+    
+    # Double-check the header value is a proper string
+    if isinstance(auth_header, bytes):
+        raise ErrorFactory.create_system_error(
+            "SYS_001", request_id,
+            additional_details={"issue": "header_encoding_error", "type": "bytes_instead_of_string"}
+        )
+    
+    return {
+        "Authorization": auth_header,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+
 
 class AuthenticationError(HTTPException):
-    """인증 관련 예외"""
+    """레거시 인증 관련 예외 (하위 호환성을 위해 유지)"""
     def __init__(self, detail: str = "Authentication failed"):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -91,39 +293,103 @@ class AuthorizationError(HTTPException):
             detail=detail,
         )
 
-async def verify_token_with_auth_server(token: str) -> Dict[str, Any]:
+async def _verify_token_with_auth_server_internal(token: str, request_id: Optional[str] = None) -> Dict[str, Any]:
     """
-    외부 인증 서버 (localhost:8000)에서 토큰 검증
-    OAuth 2.0 토큰을 우선적으로 지원하며, 전통적인 JWT 토큰도 지원
+    MAX Platform OAuth 서버에서 토큰 검증 (내부 구현)
     
     Args:
-        token: JWT 또는 OAuth 토큰 문자열
+        token: OAuth 토큰 문자열
+        request_id: 요청 ID (오류 추적용)
         
     Returns:
         dict: 사용자 정보 딕셔너리
         
     Raises:
-        AuthenticationError: 토큰 검증 실패시
+        AuthenticationException: 토큰 검증 실패시
     """
-    async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
+    # Optimized timeout for <200ms target (5 seconds max for auth calls)
+    timeout_config = httpx.Timeout(5.0, read=5.0, write=5.0, connect=2.0)
+    
+    # Connection pooling limits for performance
+    limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
+    
+    async with httpx.AsyncClient(
+        timeout=timeout_config,
+        limits=limits,
+        http2=True  # Enable HTTP/2 for better performance
+    ) as client:
         try:
-            # 우선 OAuth userinfo 엔드포인트 시도 (SSO 전용)
+            # Performance monitoring
+            start_time = time.time()
+            
+            # Create properly formatted headers
+            headers = create_oauth_headers(token, request_id)
+            
+            # OAuth userinfo 엔드포인트 호출 (단일 경로)
             oauth_response = await client.get(
                 f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
-                headers={"Authorization": f"Bearer {token}"}
+                headers=headers
             )
+            
+            # Log performance metrics
+            duration_ms = (time.time() - start_time) * 1000
+            if duration_ms > 200:
+                logger.warning(f"OAuth verification took {duration_ms:.1f}ms (target: <200ms)")
+            else:
+                logger.debug(f"OAuth verification completed in {duration_ms:.1f}ms")
+            
+            # Record metrics
+            performance_metrics.record_oauth_verify(duration_ms, True)
             
             if oauth_response.status_code == 200:
                 oauth_user_data = oauth_response.json()
-                logger.info(f"OAuth SSO user authenticated: {oauth_user_data.get('display_name', oauth_user_data.get('email', 'unknown'))}")
+                logger.info(f"OAuth user authenticated: {oauth_user_data.get('display_name', oauth_user_data.get('email', 'unknown'))}")
+                
+                # OAuth 응답 로깅 (디버깅용)
+                logger.debug(f"OAuth 응답 전체: {json.dumps(oauth_user_data, default=str)}")
                 
                 # Safe group processing
                 groups = []
-                for g in oauth_user_data.get("groups", []):
+                group_uuids = []
+                oauth_groups = oauth_user_data.get("groups", [])
+                logger.info(f"OAuth 응답의 그룹 정보 (원본): {oauth_groups}")
+                
+                # OAuth 응답에서 group_id, group_name 필드도 확인 (단일 그룹 정보)
+                single_group_id = oauth_user_data.get("group_id")
+                single_group_name = oauth_user_data.get("group_name")
+                
+                if single_group_id and single_group_name:
+                    logger.info(f"OAuth 응답에 단일 그룹 정보 발견: {single_group_name} ({single_group_id})")
+                    try:
+                        group_uuid = uuid.UUID(str(single_group_id))
+                        group_uuids.append(group_uuid)
+                        if single_group_name not in oauth_groups:
+                            groups.append(single_group_name)
+                        logger.info(f"단일 그룹 UUID 추출 성공: {single_group_name} -> {group_uuid}")
+                    except ValueError:
+                        logger.warning(f"단일 그룹 ID '{single_group_id}'는 유효한 UUID가 아님")
+                
+                for g in oauth_groups:
                     if isinstance(g, dict):
-                        groups.append(g.get("name", g.get("display_name", str(g))))
+                        # 그룹이 dict 형태인 경우 - name과 id/uuid 모두 추출
+                        group_name = g.get("name", g.get("display_name", str(g)))
+                        groups.append(group_name)
+                        
+                        # UUID 추출 시도
+                        group_id = g.get("id") or g.get("uuid") or g.get("group_id")
+                        if group_id:
+                            try:
+                                group_uuid = uuid.UUID(str(group_id))
+                                group_uuids.append(group_uuid)
+                                logger.debug(f"그룹 '{group_name}'의 UUID 추출 성공: {group_uuid}")
+                            except ValueError:
+                                logger.warning(f"그룹 '{group_name}'의 ID '{group_id}'는 유효한 UUID가 아님")
                     else:
                         groups.append(str(g))
+                
+                # OAuth 서버의 is_admin 값 확인
+                oauth_is_admin = oauth_user_data.get("is_admin", False)
+                logger.info(f"🔐 OAuth 서버의 is_admin 값: {oauth_is_admin} (타입: {type(oauth_is_admin).__name__})")
                 
                 # OAuth 사용자 정보를 내부 형식으로 변환
                 user_data = {
@@ -132,79 +398,147 @@ async def verify_token_with_auth_server(token: str) -> Dict[str, Any]:
                     "email": oauth_user_data.get("email"),
                     "full_name": oauth_user_data.get("real_name") or oauth_user_data.get("full_name"),
                     "is_active": True,
-                    "is_admin": oauth_user_data.get("is_admin", False),
-                    "role": "admin" if oauth_user_data.get("is_admin", False) else "user",
+                    "is_admin": oauth_is_admin,  # OAuth 서버의 값을 먼저 사용
+                    "role": "admin" if oauth_is_admin else "user",  # OAuth is_admin에 따라 role 설정
                     "groups": groups,
+                    "group_uuids": group_uuids,  # OAuth에서 직접 추출한 그룹 UUID
                     "auth_type": "oauth",
                     "permissions": oauth_user_data.get("permissions", []),
-                    "scopes": oauth_user_data.get("scopes", [])
+                    "scopes": oauth_user_data.get("scopes", []),
+                    "oauth_is_admin": oauth_is_admin  # Store OAuth server's value separately
                 }
                 
-                # 관리자 권한 향상된 체크 (localhost:8000에서 제공하는 정보 기준)
-                if oauth_user_data.get("is_admin") or oauth_user_data.get("role") == "admin":
+                logger.info(f"👤 사용자 정보 변환 완료:")
+                logger.info(f"  - email: {user_data.get('email')}")
+                logger.info(f"  - is_admin (OAuth): {oauth_is_admin}")
+                logger.info(f"  - groups: {groups}")
+                logger.info(f"  - group_uuids: {group_uuids}")
+                
+                # Use MaxLab's admin override configuration
+                from .admin_override import admin_override
+                admin_before = user_data["is_admin"]
+                if admin_override.is_admin(user_data):
                     user_data["is_admin"] = True
                     user_data["role"] = "admin"
+                    logger.info(f"✅ User {user_data.get('email')} granted admin privileges by MaxLab override")
+                else:
+                    logger.info(f"ℹ️ User {user_data.get('email')} - Admin override check: is_admin={admin_before} -> {user_data['is_admin']}")
                 
                 return user_data
             
-            elif oauth_response.status_code != 401:
-                # OAuth 엔드포인트에서 401이 아닌 다른 오류가 발생한 경우
-                logger.error(f"OAuth userinfo endpoint returned status {oauth_response.status_code}: {oauth_response.text}")
-                raise AuthenticationError("OAuth authentication service error")
-            
-            # OAuth 인증 실패 시 기존 인증 방식으로 fallback (하위 호환성)
-            logger.debug("OAuth authentication failed, trying traditional auth as fallback")
-            
-            # 기존 인증 서버의 /api/auth/me 엔드포인트 호출
-            response = await client.get(
-                f"{settings.AUTH_SERVER_URL}/api/auth/me",
-                headers={"Authorization": f"Bearer {token}"}
-            )
-            
-            if response.status_code == 200:
-                user_data = response.json()
-                user_data["auth_type"] = "traditional"
-                
-                # 관리자 권한 정규화
-                if user_data.get("is_admin") or user_data.get("role") == "admin":
-                    user_data["is_admin"] = True
-                    user_data["role"] = "admin"
-                
-                logger.info(f"Traditional user authenticated: {user_data.get('username', 'unknown')}")
-                return user_data
-            elif response.status_code == 401:
-                logger.warning("Auth server returned 401, trying local JWT decode as final fallback")
-                # JWT 토큰 로컬 디코딩 시도 (최종 fallback)
-                return decode_jwt_token_locally(token)
+            elif oauth_response.status_code == 401:
+                logger.error("OAuth authentication failed - Invalid or expired token")
+                from .error_integration import error_integrator
+                raise error_integrator.convert_oauth_server_error(
+                    401, oauth_response.text, request_id=request_id
+                )
             else:
-                logger.error(f"Traditional auth server returned status {response.status_code}: {response.text}")
-                # JWT 토큰 로컬 디코딩 시도 (최종 fallback)
-                return decode_jwt_token_locally(token)
+                logger.error(f"OAuth service returned status {oauth_response.status_code}: {oauth_response.text}")
+                from .error_integration import error_integrator
+                raise error_integrator.convert_oauth_server_error(
+                    oauth_response.status_code, oauth_response.text, request_id=request_id
+                )
                 
+        except httpx.TimeoutException as e:
+            duration_ms = (time.time() - start_time) * 1000
+            performance_metrics.record_oauth_verify(duration_ms, False)
+            logger.error(f"OAuth server timeout: {e}")
+            raise ErrorFactory.create_connection_error(
+                "CONN_002", request_id,
+                additional_details={"timeout_duration": duration_ms, "error_detail": str(e)}
+            )
+        except httpx.ConnectError as e:
+            duration_ms = (time.time() - start_time) * 1000
+            performance_metrics.record_oauth_verify(duration_ms, False)
+            logger.error(f"OAuth server connection failed: {e}")
+            raise ErrorFactory.create_connection_error(
+                "CONN_001", request_id,
+                additional_details={"connection_error": str(e), "duration_ms": duration_ms}
+            )
+        except httpx.HTTPStatusError as e:
+            duration_ms = (time.time() - start_time) * 1000
+            performance_metrics.record_oauth_verify(duration_ms, False)
+            logger.error(f"OAuth HTTP error: {e.response.status_code}")
+            from .error_integration import error_integrator
+            raise error_integrator.convert_oauth_server_error(
+                e.response.status_code, e.response.text, request_id=request_id
+            )
+        except httpx.InvalidURL as e:
+            duration_ms = (time.time() - start_time) * 1000
+            performance_metrics.record_oauth_verify(duration_ms, False)
+            logger.error(f"Invalid OAuth server URL: {e}")
+            raise ErrorFactory.create_config_error(
+                "CONFIG_002", request_id,
+                additional_details={"invalid_url": str(e), "duration_ms": duration_ms}
+            )
+        except (ValueError, KeyError) as e:
+            duration_ms = (time.time() - start_time) * 1000
+            performance_metrics.record_oauth_verify(duration_ms, False)
+            logger.error(f"Malformed OAuth response: {e}")
+            raise ErrorFactory.create_validation_error(
+                "VALID_002", request_id,
+                additional_details={"parse_error": str(e), "duration_ms": duration_ms}
+            )
         except httpx.RequestError as e:
-            logger.error(f"Failed to connect to auth server (localhost:8000): {e}")
-            # 네트워크 오류 시 JWT 토큰 로컬 디코딩 시도
-            logger.info("Attempting local JWT decode as fallback due to network error")
-            return decode_jwt_token_locally(token)
+            duration_ms = (time.time() - start_time) * 1000
+            performance_metrics.record_oauth_verify(duration_ms, False)
+            logger.error(f"OAuth request error: {e}")
+            raise ErrorFactory.create_connection_error(
+                "CONN_001", request_id,
+                additional_details={"request_error": str(e), "duration_ms": duration_ms}
+            )
 
-async def get_user_groups_from_auth_server(token: str) -> List[str]:
+
+# Circuit Breaker를 적용한 공개 함수
+verify_token_with_auth_server = oauth_circuit_breaker.execute_with_breaker(_verify_token_with_auth_server_internal)
+
+async def _get_user_groups_from_auth_server_internal(token: str, request_id: Optional[str] = None) -> List[str]:
     """
-    외부 인증 서버에서 사용자 그룹 정보 조회
-    OAuth와 기존 인증 방식 모두 지원
+    OAuth 서버에서 사용자 그룹 정보 조회 (내부 구현)
     
     Args:
-        token: JWT 또는 OAuth 토큰 문자열
+        token: OAuth 토큰 문자열
+        request_id: 요청 ID (오류 추적용)
         
     Returns:
         List[str]: 사용자가 속한 그룹 목록
+        
+    Raises:
+        AuthenticationException: 그룹 조회 실패시
     """
-    async with httpx.AsyncClient(timeout=settings.AUTH_SERVER_TIMEOUT) as client:
+    # Optimized timeout for <200ms target (5 seconds max for auth calls)
+    timeout_config = httpx.Timeout(5.0, read=5.0, write=5.0, connect=2.0)
+    
+    # Connection pooling limits for performance
+    limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
+    
+    async with httpx.AsyncClient(
+        timeout=timeout_config,
+        limits=limits,
+        http2=True  # Enable HTTP/2 for better performance
+    ) as client:
         try:
-            # 먼저 OAuth userinfo 시도
+            # Performance monitoring
+            start_time = time.time()
+            
+            # Create properly formatted headers
+            headers = create_oauth_headers(token, request_id)
+            
+            # OAuth userinfo 엔드포인트 호출
             oauth_response = await client.get(
                 f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
-                headers={"Authorization": f"Bearer {token}"}
+                headers=headers
             )
+            
+            # Log performance metrics
+            duration_ms = (time.time() - start_time) * 1000
+            if duration_ms > 200:
+                logger.warning(f"OAuth groups retrieval took {duration_ms:.1f}ms (target: <200ms)")
+            else:
+                logger.debug(f"OAuth groups retrieval completed in {duration_ms:.1f}ms")
+            
+            # Record metrics
+            performance_metrics.record_oauth_groups(duration_ms, True)
             
             if oauth_response.status_code == 200:
                 oauth_user_data = oauth_response.json()
@@ -220,30 +554,59 @@ async def get_user_groups_from_auth_server(token: str) -> List[str]:
                 logger.info(f"OAuth user groups retrieved: {groups}")
                 return groups
             
-            # OAuth 실패 시 기존 방식으로 fallback
-            response = await client.get(
-                f"{settings.AUTH_SERVER_URL}/api/auth/me",
-                headers={"Authorization": f"Bearer {token}"}
-            )
-            
-            if response.status_code == 200:
-                user_data = response.json()
-                # Extract groups from user data - could be in different formats
-                groups = user_data.get("groups", [])
-                if not groups:
-                    groups = user_data.get("group_names", [])
-                if not groups:
-                    groups = user_data.get("user_groups", [])
-                    
-                logger.info(f"Traditional user groups retrieved: {groups}")
-                return groups
+            elif oauth_response.status_code == 401:
+                logger.error("Failed to retrieve user groups - Invalid token")
+                from .error_integration import error_integrator
+                raise error_integrator.convert_oauth_server_error(
+                    401, "Group retrieval failed - invalid token", request_id=request_id
+                )
             else:
-                logger.warning(f"Failed to retrieve user info for groups: {response.status_code}")
-                return []
+                logger.error(f"Failed to retrieve user groups: {oauth_response.status_code}")
+                from .error_integration import error_integrator
+                raise error_integrator.convert_oauth_server_error(
+                    oauth_response.status_code, "Group information unavailable", request_id=request_id
+                )
                 
+        except httpx.TimeoutException as e:
+            logger.error(f"OAuth server timeout for groups: {e}")
+            raise ErrorFactory.create_connection_error(
+                "CONN_002", request_id,
+                additional_details={"service": "groups", "error_detail": str(e)}
+            )
+        except httpx.ConnectError as e:
+            logger.error(f"OAuth server connection failed for groups: {e}")
+            raise ErrorFactory.create_connection_error(
+                "CONN_001", request_id,
+                additional_details={"service": "groups", "connection_error": str(e)}
+            )
+        except httpx.HTTPStatusError as e:
+            logger.error(f"OAuth groups HTTP error: {e.response.status_code}")
+            from .error_integration import error_integrator
+            raise error_integrator.convert_oauth_server_error(
+                e.response.status_code, e.response.text, request_id=request_id
+            )
+        except httpx.InvalidURL as e:
+            logger.error(f"Invalid OAuth server URL for groups: {e}")
+            raise ErrorFactory.create_config_error(
+                "CONFIG_002", request_id,
+                additional_details={"service": "groups", "invalid_url": str(e)}
+            )
+        except (ValueError, KeyError) as e:
+            logger.error(f"Malformed OAuth groups response: {e}")
+            raise ErrorFactory.create_validation_error(
+                "VALID_002", request_id,
+                additional_details={"service": "groups", "parse_error": str(e)}
+            )
         except httpx.RequestError as e:
-            logger.error(f"Failed to get user groups: {e}")
-            return []
+            logger.error(f"OAuth groups request error: {e}")
+            raise ErrorFactory.create_connection_error(
+                "CONN_001", request_id,
+                additional_details={"service": "groups", "request_error": str(e)}
+            )
+
+
+# Circuit Breaker를 적용한 공개 함수
+get_user_groups_from_auth_server = oauth_circuit_breaker.execute_with_breaker(_get_user_groups_from_auth_server_internal)
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
@@ -261,7 +624,11 @@ async def get_current_user(
     Raises:
         AuthenticationError: 인증 실패시
     """
-    token = credentials.credentials
+    # Generate request ID for error tracking
+    request_id = str(uuid.uuid4())
+    
+    # Validate Bearer token format
+    token = validate_bearer_token(credentials.credentials, request_id)
     
     # Check token blacklist first
     try:
@@ -270,7 +637,10 @@ async def get_current_user(
         
         if blacklist_service and blacklist_service.is_token_blacklisted(token):
             logger.warning("Access attempted with blacklisted token")
-            raise AuthenticationError("Token has been revoked")
+            raise ErrorFactory.create_auth_error(
+                "AUTH_005", request_id,
+                additional_details={"issue": "token_blacklisted"}
+            )
     except ImportError:
         # Token blacklist service not available, continue
         pass
@@ -279,12 +649,10 @@ async def get_current_user(
         # Continue with normal verification if blacklist check fails
         pass
     
-    user_data = await verify_token_with_auth_server(token)
+    user_data = await verify_token_with_auth_server(token, request_id=request_id)
     
-    # 사용자 그룹 정보 추가 조회
-    groups = await get_user_groups_from_auth_server(token)
-    user_data["groups"] = groups
-    user_data["token"] = token  # 추후 API 호출시 사용
+    # 토큰 추가 (추후 API 호출시 사용)
+    user_data["token"] = token
     
     # UUID 기반 정보 추가
     user_data = await enrich_user_data_with_uuids(user_data)
@@ -305,44 +673,71 @@ async def enrich_user_data_with_uuids(user_data: Dict[str, Any]) -> Dict[str, An
     from ..services.user_mapping import user_mapping_service
     from ..services.group_mapping import group_mapping_service
     
+    logger.info(f"🔄 UUID 정보 추가 시작 - 사용자: {user_data.get('email')}")
+    logger.info(f"  - 입력 is_admin: {user_data.get('is_admin')}")
+    logger.info(f"  - 입력 groups: {user_data.get('groups')}")
+    logger.info(f"  - 입력 group_uuids: {user_data.get('group_uuids')}")
+    
     try:
         # 1. 사용자 UUID 확인/추가
         user_uuid = user_data.get("user_uuid")
         if not user_uuid:
-            # 이메일 또는 사용자 ID로 UUID 조회
+            # 이메일 또는 사용자 ID로 UUID 조회 (사용자 토큰 사용)
             user_identifier = user_data.get("email") or user_data.get("user_id") or user_data.get("username")
             if user_identifier:
-                user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier)
-                if user_uuid:
-                    user_data["user_uuid"] = user_uuid
-                    logger.debug(f"사용자 UUID 매핑: {user_identifier} -> {user_uuid}")
+                user_token = user_data.get("token")  # 사용자 토큰 사용
+                if user_token:
+                    user_uuid = await user_mapping_service.get_user_uuid_by_identifier(user_identifier, user_token)
+                    if user_uuid:
+                        user_data["user_uuid"] = user_uuid
+                        logger.debug(f"사용자 UUID 매핑: {user_identifier} -> {user_uuid}")
+                    else:
+                        logger.warning(f"사용자 UUID 매핑 실패: {user_identifier}")
                 else:
-                    logger.warning(f"사용자 UUID 매핑 실패: {user_identifier}")
+                    logger.warning(f"사용자 토큰이 없어 UUID 매핑 불가: {user_identifier}")
         
         # 2. 그룹 UUID 목록 추가
-        group_names = user_data.get("groups", [])
-        if group_names:
-            try:
-                # 그룹명을 UUID로 매핑
-                group_mapping = await group_mapping_service.map_legacy_groups_to_uuid(group_names)
-                group_uuids = [uuid for uuid in group_mapping.values() if uuid is not None]
-                user_data["group_uuids"] = group_uuids
-                
-                logger.debug(f"그룹 UUID 매핑: {group_names} -> {group_uuids}")
-                
-                # 매핑되지 않은 그룹 로그
-                unmapped_groups = [name for name, uuid in group_mapping.items() if uuid is None]
-                if unmapped_groups:
-                    logger.warning(f"UUID로 매핑되지 않은 그룹: {unmapped_groups}")
-                    
-            except Exception as e:
-                logger.error(f"그룹 UUID 매핑 실패: {e}")
-                user_data["group_uuids"] = []
+        # 이미 group_uuids가 있으면 (OAuth에서 직접 가져온 경우) 그대로 사용
+        if "group_uuids" in user_data and user_data["group_uuids"]:
+            logger.info(f"OAuth에서 직접 가져온 그룹 UUID 사용: {user_data['group_uuids']}")
         else:
-            user_data["group_uuids"] = []
+            # group_uuids가 없으면 그룹 이름을 UUID로 매핑 시도
+            group_names = user_data.get("groups", [])
+            if group_names:
+                try:
+                    user_token = user_data.get("token")  # 사용자 토큰 사용
+                    if user_token:
+                        logger.info(f"그룹 UUID 매핑 시작: {group_names}")
+                        # 그룹명을 UUID로 매핑 (사용자 토큰 사용)
+                        group_mapping = await group_mapping_service.map_legacy_groups_to_uuid(group_names, user_token)
+                        group_uuids = [uuid for uuid in group_mapping.values() if uuid is not None]
+                        user_data["group_uuids"] = group_uuids
+                        
+                        logger.info(f"그룹 UUID 매핑 완료: {group_names} -> {group_uuids}")
+                        
+                        # 매핑되지 않은 그룹 로그
+                        unmapped_groups = [name for name, uuid in group_mapping.items() if uuid is None]
+                        if unmapped_groups:
+                            logger.warning(f"UUID로 매핑되지 않은 그룹: {unmapped_groups}")
+                            # 매핑 실패한 그룹에 대한 상세 로그
+                            for group_name in unmapped_groups:
+                                logger.warning(f"그룹 '{group_name}' UUID 매핑 실패 - 외부 인증 서버에서 찾을 수 없음")
+                    else:
+                        logger.warning(f"사용자 토큰이 없어 그룹 UUID 매핑 불가: {group_names}")
+                        user_data["group_uuids"] = []
+                        
+                except Exception as e:
+                    logger.error(f"그룹 UUID 매핑 실패: {e}")
+                    user_data["group_uuids"] = []
+            else:
+                user_data["group_uuids"] = []
         
         # 3. 레거시 호환성을 위한 정보 유지
         # (기존 코드에서 사용하는 필드들 유지)
+        
+        logger.info(f"✅ UUID 정보 추가 완료 - 사용자: {user_data.get('email')}")
+        logger.info(f"  - 최종 is_admin: {user_data.get('is_admin')}")
+        logger.info(f"  - 최종 group_uuids: {user_data.get('group_uuids')}")
         
         return user_data
         
@@ -369,7 +764,11 @@ async def get_current_active_user(
         AuthenticationError: 비활성 사용자인 경우
     """
     if not current_user.get("is_active", True):
-        raise AuthenticationError("Inactive user")
+        request_id = str(uuid.uuid4())
+        raise ErrorFactory.create_auth_error(
+            "AUTH_006", request_id,
+            additional_details={"user_id": current_user.get("user_id"), "reason": "inactive_user"}
+        )
     return current_user
 
 def require_admin(current_user: Dict[str, Any] = Depends(get_current_active_user)) -> Dict[str, Any]:
@@ -403,7 +802,15 @@ def require_admin(current_user: Dict[str, Any] = Depends(get_current_active_user
         )
         auth_type = current_user.get("auth_type", "unknown")
         logger.warning(f"Non-admin user {user_identifier} (auth: {auth_type}) attempted admin action")
-        raise AuthorizationError("Admin privileges required")
+        request_id = str(uuid.uuid4())
+        raise ErrorFactory.create_permission_error(
+            "PERM_001", request_id,
+            additional_details={
+                "user_identifier": user_identifier,
+                "auth_type": auth_type,
+                "required_privilege": "admin"
+            }
+        )
     
     logger.info(f"Admin access granted to {current_user.get('username', current_user.get('email', 'unknown'))}")
     return current_user
@@ -428,7 +835,15 @@ def require_groups(required_groups: List[str]):
         # 필수 그룹 중 하나라도 포함되어 있는지 확인
         if not any(group in user_groups for group in required_groups):
             logger.warning(f"User {current_user.get('username')} lacks required groups: {required_groups}")
-            raise AuthorizationError(f"Must be member of one of these groups: {required_groups}")
+            request_id = str(uuid.uuid4())
+            raise ErrorFactory.create_permission_error(
+                "PERM_002", request_id,
+                additional_details={
+                    "user_groups": user_groups,
+                    "required_groups": required_groups,
+                    "username": current_user.get("username")
+                }
+            )
             
         return current_user
     
@@ -473,9 +888,17 @@ def verify_token(token: str) -> Dict[str, Any]:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
-        raise AuthenticationError("Token has expired")
+        request_id = str(uuid.uuid4())
+        raise ErrorFactory.create_auth_error(
+            "AUTH_002", request_id,
+            additional_details={"issue": "jwt_expired"}
+        )
     except jwt.JWTError:
-        raise AuthenticationError("Could not validate credentials")
+        request_id = str(uuid.uuid4())
+        raise ErrorFactory.create_auth_error(
+            "AUTH_001", request_id,
+            additional_details={"issue": "jwt_invalid"}
+        )
 
 
 # 워크스페이스 권한 체크
@@ -519,7 +942,11 @@ class WorkspacePermissionChecker:
         
         if not user_uuid and not user_id:
             logger.error("사용자 식별자가 없습니다.")
-            raise AuthorizationError("Invalid user identification")
+            request_id = str(uuid.uuid4())
+            raise ErrorFactory.create_validation_error(
+                "VALID_003", request_id,
+                additional_details={"issue": "missing_user_identifier"}
+            )
         
         # Check workspace permissions (UUID 우선, 레거시 fallback)
         permission_result = await workspace_group_crud.check_permission(
@@ -537,9 +964,16 @@ class WorkspacePermissionChecker:
             logger.warning(f"워크스페이스 {workspace_id} 접근 권한 부족: "
                           f"사용자 {user_uuid or user_id}, 필요 권한: {self.required_permission}, "
                           f"보유 권한: {permission_result.get('user_permission_level')}")
-            raise AuthorizationError(
-                f"Insufficient permission for workspace. Required: {self.required_permission}, "
-                f"Current: {permission_result.get('user_permission_level', 'none')}"
+            request_id = str(uuid.uuid4())
+            raise ErrorFactory.create_permission_error(
+                "PERM_003", request_id,
+                additional_details={
+                    "workspace_id": str(workspace_id),
+                    "user_uuid": str(user_uuid) if user_uuid else None,
+                    "user_id": user_id,
+                    "required_permission": self.required_permission,
+                    "current_permission": permission_result.get('user_permission_level', 'none')
+                }
             )
         
         # Add permission info to current_user

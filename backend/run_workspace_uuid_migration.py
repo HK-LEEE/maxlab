@@ -210,7 +210,13 @@ class WorkspaceUUIDMigration:
                 current_group_name = group.group_name
                 
                 # 그룹 UUID 매핑 시도
-                mapped_uuid = await group_mapping_service.get_group_uuid_by_name(current_group_name)
+                # For migration script, use a service token from environment
+                migration_token = os.getenv("MIGRATION_TOKEN") or os.getenv("SERVICE_TOKEN")
+                if not migration_token:
+                    logger.error("MIGRATION_TOKEN or SERVICE_TOKEN environment variable is required for migration")
+                    raise ValueError("Migration token not provided")
+                    
+                mapped_uuid = await group_mapping_service.get_group_uuid_by_name(current_group_name, migration_token)
                 
                 if mapped_uuid is None:
                     # 외부 시스템에서 찾을 수 없는 경우 결정적 UUID 생성

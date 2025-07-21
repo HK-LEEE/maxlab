@@ -2,9 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/common/Layout';
 import { Activity, Monitor, Factory, Globe } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { useAuthStore } from '../stores/authStore';
 
 export const PersonalTestWorkspace: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.is_admin || user?.role === 'admin';
 
   const features = [
     {
@@ -46,6 +50,21 @@ export const PersonalTestWorkspace: React.FC = () => {
       alert('게시된 공개 플로우에 접근하려면 편집기에서 플로우를 게시한 후 생성된 URL을 사용하세요.');
       return;
     }
+    
+    // Admin 권한 체크
+    if (feature.adminOnly && !isAdmin) {
+      toast.error('이 기능은 관리자만 사용할 수 있습니다.', {
+        duration: 4000,
+        icon: '🔒',
+        style: {
+          background: '#FEF2F2',
+          color: '#991B1B',
+          border: '1px solid #FCA5A5',
+        },
+      });
+      return;
+    }
+    
     navigate(feature.path);
   };
 
@@ -73,6 +92,8 @@ export const PersonalTestWorkspace: React.FC = () => {
                 onClick={() => handleFeatureClick(feature)}
                 className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 text-left border border-gray-200 hover:border-gray-300 ${
                   feature.isPlaceholder ? 'cursor-help' : ''
+                } ${
+                  feature.adminOnly && !isAdmin ? 'opacity-75 hover:opacity-90' : ''
                 }`}
               >
                 <div className="flex items-start space-x-4">
