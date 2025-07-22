@@ -210,31 +210,128 @@ export const usePublicFlowMonitor = (publishToken: string) => {
 
       // Check for spec violations and trigger alarms (only if alarm check is enabled)
       if (alarmCheck) {
-        // Get all measurement codes that are configured to be displayed on current screen nodes
-        const visibleMeasurementCodes = new Set<string>();
+        // Get monitored measurements from canvas nodes
+        const monitoredMeasurements = new Map<string, Set<string>>();
+        let totalMonitoredCount = 0;
         const currentNodes = isInitialLoad ? flowData.flow_data?.nodes || [] : nodes;
+        
         currentNodes.forEach(node => {
-          if (node.type === 'equipment' && node.data.displayMeasurements) {
-            node.data.displayMeasurements.forEach((code: string) => {
-              visibleMeasurementCodes.add(code);
-            });
+          if (node.type === 'equipment' && node.data.equipmentCode) {
+            // Only add if displayMeasurements is configured and not empty
+            if (node.data.displayMeasurements && node.data.displayMeasurements.length > 0) {
+              // Create set if doesn't exist for this equipment
+              if (!monitoredMeasurements.has(node.data.equipmentCode)) {
+                monitoredMeasurements.set(node.data.equipmentCode, new Set());
+              }
+              
+              // Add all measurements to the set (duplicates automatically handled)
+              const measurementSet = monitoredMeasurements.get(node.data.equipmentCode)!;
+              node.data.displayMeasurements.forEach(measurement => {
+                if (!measurementSet.has(measurement)) {
+                  measurementSet.add(measurement);
+                  totalMonitoredCount++;
+                }
+              });
+            }
           }
         });
+
+        // Debug logging for alarm check
+        console.log('🔍 [Public Monitor] Alarm Check Debug:', {
+          alarmCheckEnabled: alarmCheck,
+          canvasEquipmentCount: monitoredMeasurements.size,
+          totalMonitoredMeasurements: totalMonitoredCount,
+          monitoredEquipment: Array.from(monitoredMeasurements.keys()),
+          measurementsCount: validMeasurements.length,
+          measurementsWithSpec: validMeasurements.filter(m => m.spec_status !== undefined && m.spec_status !== null).length,
+          outOfSpecCount: validMeasurements.filter(m => m.spec_status === 1 || m.spec_status === 2).length,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Debug: Log monitored measurements configuration
+        console.log('📋 [Public Monitor] Monitored measurements configuration:', 
+          Array.from(monitoredMeasurements.entries()).map(([equipment, measurements]) => ({
+            equipment,
+            monitoredMeasurements: Array.from(measurements)
+          }))
+        );
+        
+        // Debug: Log all measurements by equipment
+        console.log('📊 [Public Monitor] All measurements by equipment:', 
+          validMeasurements.reduce((acc, m) => {
+            if (!acc[m.equipment_code]) acc[m.equipment_code] = [];
+            acc[m.equipment_code].push({
+              code: m.measurement_code,
+              value: m.measurement_value,
+              spec_status: m.spec_status,
+              desc: m.measurement_desc
+            });
+            return acc;
+          }, {})
+        );
+        
+        // Debug: Log spec violations in monitored measurements
+        const monitoredSpecViolations = validMeasurements.filter(m => {
+          const equipmentMeasurements = monitoredMeasurements.get(m.equipment_code);
+          return equipmentMeasurements && 
+                 equipmentMeasurements.has(m.measurement_code) &&
+                 (m.spec_status === 1 || m.spec_status === 2);
+        });
+        
+        if (monitoredSpecViolations.length > 0) {
+          console.log('🚨 [Public Monitor] Monitored measurements with SPEC violations:', 
+            monitoredSpecViolations.map(m => ({
+              equipment: m.equipment_code,
+              measurement: m.measurement_code,
+              desc: m.measurement_desc,
+              value: m.measurement_value,
+              spec_status: m.spec_status,
+              status_meaning: m.spec_status === 1 ? 'BELOW_SPEC' : 'ABOVE_SPEC',
+              usl: m.upper_spec_limit || m.usl,
+              lsl: m.lower_spec_limit || m.lsl
+            }))
+          );
+        }
         
         validMeasurements.forEach((measurement: MeasurementData) => {
-          // Only trigger alarms for measurements that are visible on current screen
-          if (!visibleMeasurementCodes.has(measurement.measurement_code)) {
+          // Check if this measurement is being monitored on canvas
+          const equipmentMeasurements = monitoredMeasurements.get(measurement.equipment_code);
+          if (!equipmentMeasurements || !equipmentMeasurements.has(measurement.measurement_code)) {
             return;
           }
           
+          // Check if spec_status is properly defined
+          if (measurement.spec_status === undefined || measurement.spec_status === null) {
+            console.warn('⚠️ [Public Monitor] spec_status missing for measurement:', {
+              equipment_code: measurement.equipment_code,
+              measurement_code: measurement.measurement_code,
+              measurement_desc: measurement.measurement_desc,
+              value: measurement.measurement_value
+            });
+            return;
+          }
+
           // Only trigger alarms for spec_status 1 (BELOW_SPEC) and 2 (ABOVE_SPEC)
           // Exclude spec_status 9 (NO_SPEC) and 0 (IN_SPEC) from alarms
           if (measurement.spec_status === 1 || measurement.spec_status === 2) {
+            console.log('⚠️ [Public Monitor] Out of spec detected:', {
+              equipment: measurement.equipment_code,
+              measurement: measurement.measurement_code,
+              desc: measurement.measurement_desc,
+              value: measurement.measurement_value,
+              spec_status: measurement.spec_status,
+              status_meaning: measurement.spec_status === 1 ? 'BELOW_SPEC' : 'ABOVE_SPEC',
+              usl: measurement.upper_spec_limit || measurement.usl,
+              lsl: measurement.lower_spec_limit || measurement.lsl
+            });
+
             // Check if this is a new alarm or status change
             const key = `${measurement.equipment_code}_${measurement.measurement_code}`;
             const prevMeasurement = previousData.measurements.get(key);
+            const isInitialCheck = previousData.measurements.size === 0;
             
-            if (!prevMeasurement || prevMeasurement.spec_status !== measurement.spec_status) {
+            // Trigger alarm on: initial load with violations, new measurement, or status change
+            if (isInitialCheck || !prevMeasurement || prevMeasurement.spec_status !== measurement.spec_status) {
               // Find equipment info
               const equipment = validStatuses.find((e: EquipmentStatus) => 
                 e.equipment_code === measurement.equipment_code
@@ -246,6 +343,16 @@ export const usePublicFlowMonitor = (publishToken: string) => {
                 : (measurement.lower_spec_limit != null || measurement.lsl != null);
               
               if (hasValidLimit) {
+                console.log('🚨 [Public Monitor] Triggering spec alarm for:', {
+                  equipment: measurement.equipment_code,
+                  measurement: measurement.measurement_code,
+                  previousStatus: prevMeasurement?.spec_status,
+                  currentStatus: measurement.spec_status,
+                  isInitialCheck: isInitialCheck,
+                  isNewAlarm: !prevMeasurement,
+                  isStatusChange: prevMeasurement && prevMeasurement.spec_status !== measurement.spec_status
+                });
+                
                 // Trigger spec alarm event
                 const alarmEvent = new CustomEvent('specAlarm', {
                   detail: {
@@ -269,6 +376,21 @@ export const usePublicFlowMonitor = (publishToken: string) => {
               }
             }
           }
+        });
+
+        // Summary of alarm check completion
+        const monitoredAlarmCount = validMeasurements.filter(m => {
+          const equipmentMeasurements = monitoredMeasurements.get(m.equipment_code);
+          return equipmentMeasurements && 
+                 equipmentMeasurements.has(m.measurement_code) &&
+                 (m.spec_status === 1 || m.spec_status === 2);
+        }).length;
+        
+        console.log('🚨 [Public Monitor] Alarm Check Complete:', {
+          monitoringEquipmentCount: monitoredMeasurements.size,
+          totalMonitoredMeasurements: totalMonitoredCount,
+          totalAlarmsDetected: monitoredAlarmCount,
+          message: 'Monitoring only measurements configured in displayMeasurements for each equipment'
         });
       }
 

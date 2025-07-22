@@ -257,10 +257,10 @@ const ProcessFlowMonitorContent: React.FC = () => {
         measurements={selectedEquipmentMeasurements}
       />
 
-      {/* Alarm Notification */}
+      {/* Alarm Notification - Hidden
       {showAlarms && alarmCheck && (
         <AlarmNotification onClose={() => setShowAlarms(false)} />
-      )}
+      )} */}
 
       {/* Remove Database Configuration Alert from monitoring */}
       {/* <DatabaseConfigAlert

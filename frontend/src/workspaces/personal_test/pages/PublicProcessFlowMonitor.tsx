@@ -340,7 +340,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
                   />
                   <span className="text-sm text-gray-600">Auto-Scroll</span>
                 </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-2 cursor-pointer" style={{ display: 'none' }}>
                   <input
                     type="checkbox"
                     checked={alarmCheck}
@@ -422,10 +422,10 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
           />
         )}
 
-        {/* Alarm Notification */}
+        {/* Alarm Notification - Hidden
         {showAlarms && alarmCheck && (
           <AlarmNotification onClose={() => setShowAlarms(false)} />
-        )}
+        )} */}
 
         {/* Remove Database Configuration Alert from public monitoring */}
         {/* <DatabaseConfigAlert

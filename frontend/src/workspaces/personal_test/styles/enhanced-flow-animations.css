@@ -1,0 +1,393 @@
+/* Enhanced Flow Visualization Animations */
+
+/* Keyframe Animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); }
+}
+
+@keyframes pulse-yellow {
+  0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(239, 68, 68, 0.7); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes flow-particle {
+  0% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.2; transform: scale(0.8); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+  50% { filter: drop-shadow(0 0 15px currentColor); }
+}
+
+@keyframes data-flow {
+  0% { 
+    stroke-dashoffset: 100;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    stroke-dashoffset: 0;
+    opacity: 0.3;
+  }
+}
+
+/* Enhanced Edge Styles */
+.enhanced-animated {
+  stroke-dasharray: 8 4;
+  animation: data-flow 2s linear infinite;
+}
+
+.edge-glow-effect {
+  pointer-events: none;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Particle System */
+.enhanced-particle-system {
+  pointer-events: none;
+  z-index: 10;
+}
+
+.enhanced-particle-system circle,
+.enhanced-particle-system polygon {
+  filter: drop-shadow(0 0 4px currentColor);
+  animation: flow-particle 1.5s ease-in-out infinite;
+}
+
+/* Flow Direction Indicators */
+.flow-direction-indicators polygon {
+  filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.6));
+}
+
+/* Enhanced Label Styles */
+.enhanced-edge-label {
+  pointer-events: none;
+  z-index: 15;
+}
+
+.enhanced-label-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.enhanced-label-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.enhanced-label-content:hover {
+  transform: scale(1.05);
+}
+
+.enhanced-label-content.critical-state {
+  animation: pulse-red 2s infinite;
+}
+
+.enhanced-label-content.warning-state {
+  animation: pulse-yellow 2s infinite;
+}
+
+.enhanced-label-content.normal-state:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* Status Indicator Animations */
+.status-indicator {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Enhanced Equipment Node Styles */
+.enhanced-equipment-node-container {
+  position: relative;
+}
+
+.enhanced-equipment-node {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.enhanced-equipment-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Node size specific styles */
+.enhanced-equipment-node[data-node-size="1"] {
+  font-size: 0.875rem;
+}
+
+.enhanced-equipment-node[data-node-size="1"] .measurement-item {
+  padding: 6px;
+  font-size: 0.75rem;
+}
+
+.enhanced-equipment-node[data-node-size="2"] {
+  font-size: 0.9375rem;
+}
+
+.enhanced-equipment-node[data-node-size="2"] .measurement-item {
+  padding: 8px;
+  font-size: 0.8125rem;
+}
+
+.enhanced-equipment-node[data-node-size="3"] {
+  font-size: 1rem;
+}
+
+.enhanced-equipment-node[data-node-size="3"] .measurement-item {
+  padding: 10px;
+  font-size: 0.875rem;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+/* Connection Status Indicators */
+.connection-status-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Performance Indicator Styles */
+.performance-indicator {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.performance-indicator > div:first-child {
+  background: linear-gradient(90deg, #f3f4f6, #e5e7eb);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.performance-indicator .bg-green-500 {
+  background: linear-gradient(90deg, #10b981, #059669);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.performance-indicator .bg-yellow-500 {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.performance-indicator .bg-red-500 {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+/* Measurement Item Styles */
+.measurement-item {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.measurement-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateX(2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.measurement-item.scrolling {
+  animation: measurement-scroll 0.5s ease-in-out;
+}
+
+/* Improved spec limit styling */
+.measurement-item .spec-limits {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  color: #6b7280;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+}
+
+.measurement-item .spec-limits span {
+  white-space: nowrap;
+}
+
+@keyframes measurement-scroll {
+  0% { transform: translateY(-10px); opacity: 0.7; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Spec Limits Tooltip */
+.spec-limits-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  z-index: 50;
+}
+
+.spec-limits-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #1f2937;
+}
+
+/* Heartbeat Indicator */
+.heartbeat-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heartbeat-indicator::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, transparent 70%);
+  animation: heartbeat-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat-pulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* ReactFlow Overrides */
+.react-flow__node-enhanced-equipment {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.react-flow__handle {
+  transition: all 0.2s ease;
+  width: 12px !important;
+  height: 12px !important;
+  background: #3b82f6 !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.react-flow__handle-top {
+  top: -6px !important;
+}
+
+.react-flow__handle-bottom {
+  bottom: -6px !important;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .enhanced-equipment-node {
+    font-size: 0.875rem;
+  }
+  
+  .enhanced-label-content {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+  
+  .performance-indicator {
+    font-size: 0.625rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .enhanced-equipment-node {
+    background: rgba(31, 41, 55, 0.95);
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+  
+  .measurement-item {
+    background: rgba(55, 65, 81, 0.8);
+    color: #f3f4f6;
+  }
+  
+  .spec-limits-tooltip {
+    background: #1f2937;
+    border-color: #374151;
+  }
+}
+
+/* High Performance Mode - Reduced animations */
+@media (prefers-reduced-motion: reduce) {
+  .enhanced-animated,
+  .animate-pulse-subtle,
+  .animate-shimmer,
+  .heartbeat-indicator::before {
+    animation: none;
+  }
+  
+  .enhanced-equipment-node:hover {
+    transform: none;
+  }
+  
+  .measurement-item.scrolling {
+    animation: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .enhanced-particle-system,
+  .flow-direction-indicators,
+  .heartbeat-indicator {
+    display: none;
+  }
+  
+  .enhanced-equipment-node {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}

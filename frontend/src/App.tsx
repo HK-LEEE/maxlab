@@ -17,7 +17,6 @@ import { ProcessFlowMonitor } from './workspaces/personal_test/pages/ProcessFlow
 import { ProcessFlowPublish } from './workspaces/personal_test/pages/ProcessFlowPublish';
 import { PublicProcessFlowMonitor } from './workspaces/personal_test/pages/PublicProcessFlowMonitor';
 import { Profile } from './pages/Profile';
-import { TokenExpiryNotification } from './components/TokenExpiryNotification';
 import { isDevelopment, devLog } from './utils/logger';
 import './styles/index.css';
 
@@ -99,28 +98,13 @@ function App() {
     // 토큰 만료 경고 이벤트 리스너
     const handleTokenExpiring = (event: CustomEvent) => {
       devLog.warn('⚠️ Token expiring soon:', event.detail);
-      
-      // 사용자에게 세션 만료 임박 알림
-      const timeToExpiry = event.detail.timeToExpiry;
-      const message = event.detail.message || 'Your session will expire soon. Please save your work.';
-      
-      // 커스텀 이벤트로 UI 컴포넌트에 알림 전달
-      window.dispatchEvent(new CustomEvent('ui:show_expiry_warning', {
-        detail: { timeToExpiry, message }
-      }));
+      // 알림 UI 제거 - 콘솔 로그만 유지
     };
 
     // Refresh Token 만료 임박 이벤트 리스너
     const handleRefreshTokenExpiring = (event: CustomEvent) => {
       console.log('⚠️ Refresh token expiring soon:', event.detail);
-      
-      const timeToExpiry = event.detail.timeToExpiry;
-      const message = event.detail.message || 'Your session will expire soon. Please log in again to maintain access.';
-      
-      // 중요한 경고이므로 더 강한 알림
-      window.dispatchEvent(new CustomEvent('ui:show_critical_warning', {
-        detail: { timeToExpiry, message, action: 'login' }
-      }));
+      // 알림 UI 제거 - 콘솔 로그만 유지
     };
 
     // 네트워크 오류로 인한 토큰 갱신 실패 이벤트 리스너
@@ -265,7 +249,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthRefreshProvider />
-        <TokenExpiryNotification />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />

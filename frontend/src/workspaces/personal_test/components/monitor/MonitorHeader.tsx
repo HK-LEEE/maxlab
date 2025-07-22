@@ -95,7 +95,7 @@ export const MonitorHeader: React.FC<MonitorHeaderProps> = ({
             />
             <span className="text-sm">Auto-scroll</span>
           </label>
-          <label className="flex items-center space-x-2">
+          <label className="flex items-center space-x-2" style={{ display: 'none' }}>
             <input
               type="checkbox"
               checked={alarmCheck}

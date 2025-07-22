@@ -36,6 +36,8 @@ export const AlarmNotification: React.FC<AlarmNotificationProps> = ({ onClose })
 
     // Listen for new alarms
     const handleNewAlarm = (event: CustomEvent<Alarm>) => {
+      console.log('📢 AlarmNotification received specAlarm event:', event.detail);
+      
       setAlarms(prev => {
         const newAlarms = [...prev];
         const existingIndex = newAlarms.findIndex(

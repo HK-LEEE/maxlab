@@ -13,7 +13,7 @@ interface MeasurementData {
   equipment_code: string;
   measurement_desc: string;
   measurement_value: number;
-  spec_status?: number | 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC';
+  spec_status?: number; // 0: IN_SPEC, 1: BELOW_SPEC, 2: ABOVE_SPEC, 9: NO_SPEC
   usl?: number;
   lsl?: number;
 }

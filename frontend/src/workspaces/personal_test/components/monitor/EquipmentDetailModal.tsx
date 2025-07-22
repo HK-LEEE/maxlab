@@ -20,7 +20,7 @@ interface MeasurementData {
   timestamp: string;
   usl?: number;
   lsl?: number;
-  spec_status?: number | 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC'; // 0: within spec, 1: below spec, 2: above spec, 9: no spec
+  spec_status?: number; // 0: IN_SPEC, 1: BELOW_SPEC, 2: ABOVE_SPEC, 9: NO_SPEC
 }
 
 interface EquipmentDetailModalProps {

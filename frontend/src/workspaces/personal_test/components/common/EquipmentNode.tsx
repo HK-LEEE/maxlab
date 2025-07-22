@@ -355,6 +355,26 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       const globalAutoScrollValue = (window as any).autoScrollMeasurements;
       const shouldScroll = isMonitorPage && globalAutoScrollValue;
       
+      // Debug logging for auto-scroll conditions
+      console.log('[Auto-scroll Debug]', {
+        nodeId: id,
+        pathname: window.location.pathname,
+        isMonitorPage,
+        globalAutoScrollValue,
+        shouldScroll,
+        hasMeasurements: !!data.measurements,
+        measurementCount: data.measurements?.length || 0,
+        hasScrollRef: !!scrollRef.current,
+        isResizing,
+        isScrollActive: isScrollActiveRef.current,
+        isGlobalScrollActive: isGlobalScrollActive(),
+        // Additional debug info
+        equipmentCode: data.equipmentCode,
+        equipmentName: data.equipmentName,
+        displayMeasurements: data.displayMeasurements,
+        rawMeasurements: data.measurements
+      });
+      
       // Only log if there's an issue or first time scroll starts
       if (shouldScroll && data.measurements && !isScrollActiveRef.current) {
         log.debug('Auto-scroll starting for equipment node', { 
@@ -375,6 +395,15 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         // Only scroll if we have more measurements than can fit
         const needsScroll = data.measurements.length > visibleMeasurements;
         
+        console.log('[Auto-scroll Calculation]', {
+          nodeId: id,
+          nodeHeight: actualNodeHeight,
+          visibleMeasurements,
+          actualMeasurements: data.measurements.length,
+          needsScroll,
+          isScrollActiveRef: isScrollActiveRef.current,
+          isGlobalScrollActive: isGlobalScrollActive()
+        });
         
         if (needsScroll && !isScrollActiveRef.current && !isGlobalScrollActive()) {
           log.info('Auto-scroll started for equipment node', { nodeId: id });
