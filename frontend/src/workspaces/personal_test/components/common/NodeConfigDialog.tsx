@@ -36,8 +36,6 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   const [measurementDetails, setMeasurementDetails] = useState<Record<string, any>>({});
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [expandedMeasurements, setExpandedMeasurements] = useState<Set<string>>(new Set());
-  const [equipmentTypeMeasurements, setEquipmentTypeMeasurements] = useState<any[]>([]);
-  const [measurementSearchTerm, setMeasurementSearchTerm] = useState('');
   const [availableMeasurementsSearchTerm, setAvailableMeasurementsSearchTerm] = useState('');
 
   // Check if this is a common equipment node
@@ -80,19 +78,6 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
       .catch((err) => console.error('Failed to load measurements:', err));
   }, []); // No dependencies - load all measurements once
 
-  // Load measurements for equipment type (for common equipment or measurement search)
-  useEffect(() => {
-    if (formData.equipmentType) {
-      apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=personal_test&equipment_type=${formData.equipmentType}&limit=100`)
-        .then((response) => {
-          const measurements = response.data || [];
-          setEquipmentTypeMeasurements(measurements);
-        })
-        .catch((err) => console.error('Failed to load equipment type measurements:', err));
-    } else {
-      setEquipmentTypeMeasurements([]);
-    }
-  }, [formData.equipmentType]);
 
   const filteredEquipment = availableEquipment.filter(
     (eq) => eq.equipment_type === formData.equipmentType
@@ -105,19 +90,6 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
     ).values()
   );
 
-  // Get unique measurements for equipment type (for search functionality)
-  const availableMeasurementsForType = Array.from(
-    new Map(
-      equipmentTypeMeasurements.map((m) => [m.measurement_code, m])
-    ).values()
-  );
-
-  // Filter measurements based on search term
-  const filteredMeasurements = availableMeasurementsForType.filter(
-    (m) =>
-      m.measurement_code?.toLowerCase().includes(measurementSearchTerm.toLowerCase()) ||
-      m.measurement_desc?.toLowerCase().includes(measurementSearchTerm.toLowerCase())
-  );
 
   // Generate dynamic equipment types from available equipment
   const dynamicEquipmentTypes = useMemo(() => {
@@ -342,72 +314,6 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                 />
               </div>
 
-              {/* Measurements Search for Equipment Type (without specific code) */}
-              {formData.equipmentType && !formData.equipmentCode && availableMeasurementsForType.length > 0 && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Search Measurements by Type
-                  </label>
-                  <p className="text-xs text-gray-600 mb-2">
-                    Search measurements available for {formData.equipmentType} equipment type
-                  </p>
-                  
-                  {/* Search input */}
-                  <input
-                    type="text"
-                    value={measurementSearchTerm}
-                    onChange={(e) => setMeasurementSearchTerm(e.target.value)}
-                    placeholder="Search by measurement code or name..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black mb-3"
-                  />
-                  
-                  {/* Filtered measurements list */}
-                  {filteredMeasurements.length > 0 && (
-                    <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-50">
-                      {filteredMeasurements.map((measurement) => (
-                        <div
-                          key={measurement.measurement_code}
-                          className="p-2 bg-white rounded border hover:bg-gray-50 cursor-pointer"
-                          onClick={() => {
-                            // Add to display measurements if not already selected
-                            if (!formData.displayMeasurements.includes(measurement.measurement_code)) {
-                              setFormData({
-                                ...formData,
-                                displayMeasurements: [
-                                  ...formData.displayMeasurements,
-                                  measurement.measurement_code,
-                                ],
-                              });
-                            }
-                          }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-sm font-medium">
-                                {measurement.measurement_desc}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                Code: {measurement.measurement_code}
-                              </div>
-                            </div>
-                            {formData.displayMeasurements.includes(measurement.measurement_code) && (
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                Selected
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {measurementSearchTerm && filteredMeasurements.length === 0 && (
-                    <div className="text-sm text-gray-500 text-center py-4">
-                      No measurements found matching "{measurementSearchTerm}"
-                    </div>
-                  )}
-                </div>
-              )}
 
               {/* Available Measurements Section with Search */}
               {availableMeasurements.length > 0 && (
@@ -499,7 +405,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                   <div className="space-y-2 max-h-60 overflow-y-auto border rounded p-2 bg-gray-50">
                     {formData.displayMeasurements.map((code, index) => {
                       const measurement = measurementDetails[code] || 
-                        availableMeasurementsForType.find(m => m.measurement_code === code);
+                        availableMeasurements.find(m => m.measurement_code === code);
                       if (!measurement) return null;
                       
                       return (
