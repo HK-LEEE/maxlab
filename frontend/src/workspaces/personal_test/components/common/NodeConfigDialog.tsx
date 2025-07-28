@@ -7,12 +7,14 @@ interface NodeConfigDialogProps {
   node: Node;
   onClose: () => void;
   onSave: (nodeId: string, data: any) => void;
+  isInstrumentNode?: boolean;
 }
 
 export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   node,
   onClose,
   onSave,
+  isInstrumentNode = false,
 }) => {
   const [formData, setFormData] = useState({
     label: node.data.label || '',
@@ -20,6 +22,10 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
     equipmentCode: node.data.equipmentCode || '',
     equipmentName: node.data.equipmentName || '',
     displayMeasurements: node.data.displayMeasurements || [],
+    // Instrument node specific
+    instrumentType: node.data.instrumentType || 'instrument',
+    instrumentName: node.data.instrumentName || '계측기',
+    instrumentColor: node.data.color || '#6b7280', // Gray default for instruments
     // Group node specific properties
     color: node.data.color || '#3b82f6',
     backgroundColor: node.data.backgroundColor || node.data.color || '#3b82f6',
@@ -124,6 +130,16 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
         zIndex: formData.zIndex,
         borderStyle: formData.borderStyle,
       });
+    } else if (isInstrumentNode) {
+      // For instrument nodes
+      onSave(node.id, {
+        ...node.data,
+        label: formData.label,
+        instrumentType: formData.instrumentType,
+        instrumentName: formData.instrumentName,
+        color: formData.instrumentColor,
+        displayMeasurements: formData.displayMeasurements,
+      });
     } else {
       // For common equipment without code, ensure we have equipment type
       if (isCommonEquipment && !formData.equipmentCode) {
@@ -203,7 +219,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
       <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0">
           <h2 className="text-lg font-semibold">
-            {node.type === 'group' ? 'Configure Group' : 'Configure Equipment Node'}
+            {node.type === 'group' ? 'Configure Group' : isInstrumentNode ? 'Configure Instrument Node' : 'Configure Equipment Node'}
           </h2>
           <button
             onClick={onClose}
@@ -233,41 +249,43 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
             </>
           ) : (
             <>
-              {/* Equipment Type */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Equipment Type {isCommonEquipment && <span className="text-red-500">*</span>}
-                </label>
-                {isCommonEquipment && (
-                  <p className="text-xs text-gray-500 mb-2">
-                    공통설비는 설비 타입을 반드시 선택해야 합니다.
-                  </p>
-                )}
-                <select
-                  value={formData.equipmentType}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      equipmentType: e.target.value,
-                      equipmentCode: '',
-                      displayMeasurements: [],
-                    });
-                  }}
-                  className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black ${
-                    isCommonEquipment && !formData.equipmentType ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select equipment type</option>
-                  {dynamicEquipmentTypes.map((type) => (
-                    <option key={type.code} value={type.code}>
-                      {type.name} ({type.code})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Equipment Type - Hide for instrument nodes */}
+              {!isInstrumentNode && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Equipment Type {isCommonEquipment && <span className="text-red-500">*</span>}
+                  </label>
+                  {isCommonEquipment && (
+                    <p className="text-xs text-gray-500 mb-2">
+                      공통설비는 설비 타입을 반드시 선택해야 합니다.
+                    </p>
+                  )}
+                  <select
+                    value={formData.equipmentType}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        equipmentType: e.target.value,
+                        equipmentCode: '',
+                        displayMeasurements: [],
+                      });
+                    }}
+                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black ${
+                      isCommonEquipment && !formData.equipmentType ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Select equipment type</option>
+                    {dynamicEquipmentTypes.map((type) => (
+                      <option key={type.code} value={type.code}>
+                        {type.name} ({type.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-              {/* Equipment Code */}
-              {formData.equipmentType && (
+              {/* Equipment Code - Hide for instrument nodes */}
+              {!isInstrumentNode && formData.equipmentType && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Equipment Code
@@ -298,21 +316,49 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                 </div>
               )}
 
-              {/* Equipment Name */}
+
+              {/* Display Name */}
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Display Name
                 </label>
                 <input
                   type="text"
-                  value={formData.equipmentName}
+                  value={isInstrumentNode ? formData.label : formData.equipmentName}
                   onChange={(e) =>
-                    setFormData({ ...formData, equipmentName: e.target.value })
+                    setFormData({ 
+                      ...formData, 
+                      ...(isInstrumentNode ? { label: e.target.value } : { equipmentName: e.target.value })
+                    })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   placeholder="Enter display name"
                 />
               </div>
+
+              {/* Instrument Node Color - Show only for instrument nodes */}
+              {isInstrumentNode && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Node Color
+                  </label>
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="color"
+                      value={formData.instrumentColor}
+                      onChange={(e) => setFormData({ ...formData, instrumentColor: e.target.value })}
+                      className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={formData.instrumentColor}
+                      onChange={(e) => setFormData({ ...formData, instrumentColor: e.target.value })}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm font-mono"
+                      placeholder="#6b7280"
+                    />
+                  </div>
+                </div>
+              )}
 
 
               {/* Available Measurements Section with Search */}

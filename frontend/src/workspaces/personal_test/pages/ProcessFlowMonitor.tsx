@@ -12,6 +12,7 @@ import 'reactflow/dist/style.css';
 import { ZoomIn } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
+import { InstrumentNode } from '../components/common/InstrumentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
@@ -30,6 +31,7 @@ import { Layout } from '../../../components/common/Layout';
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = Object.freeze({
   equipment: EquipmentNode,
+  instrument: InstrumentNode,
   group: GroupNode,
   text: TextNode,
 });
@@ -80,7 +82,20 @@ const FlowCanvas: React.FC<{
     >
       <Background color="#ffffff" />
       <Controls showInteractive={false} />
-      <MiniMap />
+      <MiniMap nodeColor={(node) => {
+        switch (node.type) {
+          case 'equipment':
+            return node.data.equipmentType ? '#3b82f6' : '#9ca3af';
+          case 'instrument':
+            return node.data.color || '#6b7280'; // Use instrument's color or gray default
+          case 'group':
+            return '#8b5cf6';
+          case 'text':
+            return '#10b981';
+          default:
+            return '#6b7280';
+        }
+      }} />
       <Panel position="bottom-right" className="bg-white p-2 rounded shadow">
         <div className="text-xs text-gray-600 mb-2">
           Equipment: {equipmentStatusCount} | Active: {activeCount}

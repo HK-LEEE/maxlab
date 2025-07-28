@@ -11,6 +11,7 @@ import 'reactflow/dist/style.css';
 import { Save, FolderOpen, Download, Database, Server, ChevronDown } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
+import { InstrumentNode } from '../components/common/InstrumentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
@@ -76,11 +77,21 @@ const WrappedTextNode = (props: any) => (
   </TextNodeErrorBoundary>
 );
 
+const WrappedInstrumentNode = (props: any) => (
+  <EquipmentNodeErrorBoundary 
+    nodeId={props.id} 
+    equipmentType={props.data?.instrumentType}
+  >
+    <InstrumentNode {...props} />
+  </EquipmentNodeErrorBoundary>
+);
+
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = Object.freeze({
   equipment: WrappedEquipmentNode,
   group: WrappedGroupNode,
   text: WrappedTextNode,
+  instrument: WrappedInstrumentNode,
 });
 
 const edgeTypes = Object.freeze({
@@ -92,6 +103,8 @@ const nodeColor = (node: Node) => {
   switch (node.type) {
     case 'equipment':
       return node.data.equipmentType ? '#3b82f6' : '#9ca3af'; // Blue for typed, gray for untyped
+    case 'instrument':
+      return node.data.color || '#6b7280'; // Use instrument's color or gray default
     case 'group':
       return '#8b5cf6'; // Purple
     case 'text':
@@ -442,6 +455,21 @@ const ProcessFlowEditorContent: React.FC = () => {
             borderStyle: 'dashed',
           },
         };
+      } else if (type === 'instrument') {
+        newNode = {
+          id: `instrument_${Date.now()}`,
+          type: 'instrument',
+          position,
+          style: { width: 200, height: getNodeHeight('1') }, // Same size as equipment node
+          data: {
+            label: data.label || '계측기',
+            instrumentType: data.instrumentType || 'instrument',
+            instrumentName: data.label || '계측기',
+            color: data.color || '#6b7280', // Gray default color
+            displayMeasurements: [],
+            nodeSize: '1',
+          },
+        };
       } else if (type === 'template') {
         // Create node from template
         const templateType = data.equipmentType ? 'equipment' : data.label !== undefined ? 'group' : 'text';
@@ -482,7 +510,7 @@ const ProcessFlowEditorContent: React.FC = () => {
   };
 
   const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-    if (node.type === 'equipment') {
+    if (node.type === 'equipment' || node.type === 'instrument') {
       setConfigNode(node);
     } else if (node.type === 'group') {
       setGroupConfigNode(node);
@@ -775,19 +803,15 @@ const ProcessFlowEditorContent: React.FC = () => {
         {configNode && (
           <NodeConfigDialog
             node={configNode}
-            isOpen={true}
             onClose={() => setConfigNode(null)}
             onSave={handleNodeConfigSave}
-            equipmentTypes={equipmentTypes}
-            availableEquipment={equipmentList}
-            availableMeasurements={measurementsList}
+            isInstrumentNode={configNode.type === 'instrument'}
           />
         )}
 
         {textConfigNode && (
           <TextConfigDialog
             node={textConfigNode}
-            isOpen={true}
             onClose={() => setTextConfigNode(null)}
             onSave={handleNodeConfigSave}
           />
@@ -796,11 +820,11 @@ const ProcessFlowEditorContent: React.FC = () => {
         {groupConfigNode && (
           <GroupConfigDialog
             node={groupConfigNode}
-            isOpen={true}
             onClose={() => setGroupConfigNode(null)}
             onSave={handleNodeConfigSave}
           />
         )}
+
 
         <DataSourceDialog
           isOpen={isDataSourceDialogOpen}

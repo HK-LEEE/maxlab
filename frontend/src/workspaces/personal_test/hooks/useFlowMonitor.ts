@@ -476,6 +476,62 @@ export const useFlowMonitor = (workspaceId: string) => {
                   },
                 };
               }
+            } else if (node.type === 'instrument' && node.data.displayMeasurements) {
+              // For instrument nodes, filter measurements based on displayMeasurements only
+              const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+                // Show measurements that are in displayMeasurements array
+                return node.data.displayMeasurements.includes(m.measurement_code);
+              });
+              
+              // Group measurements by code and take the latest
+              const measurementMap = new Map<string, MeasurementData>();
+              configuredMeasurements.forEach((m: MeasurementData) => {
+                const existing = measurementMap.get(m.measurement_code);
+                if (!existing || new Date(m.timestamp) > new Date(existing.timestamp)) {
+                  measurementMap.set(m.measurement_code, m);
+                }
+              });
+              
+              const latestMeasurements = Array.from(measurementMap.values()).map((m) => {
+                // Determine trend based on previous value
+                let trend = 'stable' as 'up' | 'down' | 'stable';
+                const prevMeasurement = node.data.measurements?.find((prev: any) => prev.code === m.measurement_code);
+                if (prevMeasurement && prevMeasurement.value !== undefined) {
+                  if (m.measurement_value > prevMeasurement.value) trend = 'up';
+                  else if (m.measurement_value < prevMeasurement.value) trend = 'down';
+                }
+                
+                return {
+                  code: m.measurement_code,
+                  desc: m.measurement_desc,
+                  value: m.measurement_value,
+                  unit: m.unit,
+                  spec_status: m.spec_status === 1 ? 'BELOW_SPEC' : 
+                             m.spec_status === 2 ? 'ABOVE_SPEC' : 
+                             m.spec_status === 9 ? 'NO_SPEC' : 'IN_SPEC',
+                  upper_spec_limit: m.upper_spec_limit || m.usl,
+                  lower_spec_limit: m.lower_spec_limit || m.lsl,
+                  target_value: m.target_value,
+                  trend: trend,
+                  history: [] // TODO: Maintain history for trend display
+                };
+              });
+              
+              // Check if measurements changed
+              const measurementsChanged = !node.data.measurements || 
+                JSON.stringify(node.data.measurements) !== JSON.stringify(latestMeasurements);
+              
+              if (measurementsChanged) {
+                hasAnyNodeChanged = true;
+                
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    measurements: latestMeasurements,
+                  },
+                };
+              }
             }
             return node;
           });
@@ -485,15 +541,43 @@ export const useFlowMonitor = (workspaceId: string) => {
             // Update edges based on the UPDATED node statuses (using updatedNodes, not stale nodes state)
             setEdges((currentEdges) => {
               const nodeStatusMap = new Map<string, string>();
+              const nodeTypeMap = new Map<string, string>();
               
-              // Use updatedNodes to get the current status information
+              // Use updatedNodes to get the current status information and node types
               updatedNodes.forEach(node => {
+                nodeTypeMap.set(node.id, node.type);
                 if (node.type === 'equipment' && node.data.status) {
                   nodeStatusMap.set(node.id, node.data.status);
                 }
               });
               
               return currentEdges.map(edge => {
+                // Check if either end is an instrument node
+                const sourceType = nodeTypeMap.get(edge.source);
+                const targetType = nodeTypeMap.get(edge.target);
+                const isInstrumentEdge = sourceType === 'instrument' || targetType === 'instrument';
+                
+                // If it's an instrument edge, use neutral styling without animation
+                if (isInstrumentEdge) {
+                  return {
+                    ...edge,
+                    type: 'custom',
+                    animated: false,
+                    style: {
+                      ...edge.style,
+                      stroke: '#6b7280', // Gray color for instrument connections
+                      strokeWidth: 1.5,
+                    },
+                    data: {
+                      ...edge.data,
+                      type: edge.type || edge.data?.type || 'smoothstep',
+                      label: null,
+                      animated: false,
+                    }
+                  };
+                }
+                
+                // For equipment nodes, use status-based styling
                 const sourceStatus = nodeStatusMap.get(edge.source) || 'STOP';
                 const targetStatus = nodeStatusMap.get(edge.target) || 'STOP';
                 

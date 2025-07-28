@@ -16,6 +16,7 @@ class WorkspaceType(str, enum.Enum):
     """워크스페이스 타입"""
     PERSONAL = "PERSONAL"
     GROUP = "GROUP"
+    PUBLIC = "PUBLIC"
 
 
 class OwnerType(str, enum.Enum):

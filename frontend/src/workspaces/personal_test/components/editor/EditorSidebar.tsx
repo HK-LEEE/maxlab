@@ -3,7 +3,7 @@ import {
   ChevronDown, ChevronRight, X, Menu,
   Gauge, Activity, Filter, Thermometer, Wind, Zap, 
   Database, Archive, GitMerge, Flame, Snowflake, Settings,
-  Square, Type, Minus, CornerDownRight, Spline
+  Square, Type, Minus, CornerDownRight, Spline, Waves
 } from 'lucide-react';
 
 interface Equipment {
@@ -45,7 +45,9 @@ const iconMap: { [key: string]: any } = {
   flame: Flame,
   snowflake: Snowflake,
   settings: Settings,
+  waves: Waves,
 };
+
 
 const edgeTypes = [
   { id: 'straight', name: 'Straight', icon: Minus },
@@ -151,7 +153,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
           
           {expandedSections.equipment && (
             <div className="px-2 pb-2">
-              {/* Common Equipment Only */}
+              {/* Common Equipment */}
               <div
                 draggable
                 onDragStart={(e) => onDragStart(e, { type: 'equipment', data: { code: 'COMMON', name: '공통설비', icon: 'settings' }})}
@@ -163,6 +165,31 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
                 <div className="flex-1 min-w-0">
                   <span className="text-gray-900 truncate">공통설비</span>
                   <span className="text-gray-500 ml-1">: Type later</span>
+                </div>
+              </div>
+              
+              {/* Instrument */}
+              <div
+                draggable
+                onDragStart={(e) => onDragStart(e, { 
+                  type: 'instrument', 
+                  data: { 
+                    instrumentType: 'instrument',
+                    label: '계측기',
+                    instrumentName: '계측기',
+                    color: '#6b7280', // Gray default color
+                    displayMeasurements: []
+                  }
+                })}
+                className="flex items-center space-x-2 px-2 py-1.5 rounded cursor-move hover:bg-gray-100 text-sm border border-dashed"
+                style={{ borderColor: '#6b728050' }}
+              >
+                <div style={{ color: '#6b7280' }}>
+                  {getIcon('activity')}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-gray-900 truncate">계측기</span>
+                  <span className="text-gray-500 ml-1">: Measurements</span>
                 </div>
               </div>
             </div>

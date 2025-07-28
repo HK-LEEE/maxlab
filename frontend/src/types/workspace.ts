@@ -1,6 +1,7 @@
 export enum WorkspaceType {
   PERSONAL = 'PERSONAL',
   GROUP = 'GROUP',
+  PUBLIC = 'PUBLIC',
 }
 
 export enum OwnerType {

@@ -24,6 +24,7 @@ from .routers.personal_test_process_flow import router as personal_test_process_
 from .routers.external import router as external_router
 from .routers.metrics import router as metrics_router
 from .routers.oauth import router as oauth_router
+from .routers.total_monitoring import router as total_monitoring_router
 from .api.v1.endpoints.csrf import router as csrf_router
 from .api.v1.endpoints.session import router as session_router
 from .api.v1.endpoints.rate_limit import router as rate_limit_router
@@ -194,6 +195,7 @@ app.include_router(personal_test_process_flow_router)
 app.include_router(external_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1/metrics", tags=["Performance Metrics"])
 app.include_router(oauth_router, prefix="/api")
+app.include_router(total_monitoring_router)
 
 # Debug router (development only)
 if settings.DEBUG:

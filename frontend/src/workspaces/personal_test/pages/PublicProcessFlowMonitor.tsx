@@ -14,6 +14,7 @@ import 'reactflow/dist/style.css';
 import { ZoomIn, Globe, Maximize2, Minimize2, RefreshCw } from 'lucide-react';
 
 import { EquipmentNode } from '../components/common/EquipmentNode';
+import { InstrumentNode } from '../components/common/InstrumentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
@@ -28,6 +29,7 @@ import { useDataSources } from '../hooks/useDataSources';
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = Object.freeze({
   equipment: EquipmentNode,
+  instrument: InstrumentNode,
   group: GroupNode,
   text: TextNode,
 });
@@ -41,6 +43,8 @@ const nodeColor = (node: Node) => {
   switch (node.type) {
     case 'equipment':
       return node.data.equipmentType ? '#3b82f6' : '#9ca3af';
+    case 'instrument':
+      return node.data.color || '#6b7280'; // Use instrument's color or gray default
     case 'group':
       return '#8b5cf6';
     case 'text':
