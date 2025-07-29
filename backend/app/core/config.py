@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     APP_DESCRIPTION: str = "MAX Lab 동적 MVP 페이지 관리 플랫폼"
     
     # 데이터베이스 (PostgreSQL 17)
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/max_lab"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:2300@172.28.32.1:5432/max_lab"
     
     # 데이터베이스 SSL/TLS 보안 설정 (환경별 기본값)
     DB_SSL_MODE: Optional[str] = None  # 환경별 자동 설정
@@ -79,6 +79,9 @@ class Settings(BaseSettings):
     # 외부 인증 서버 (localhost:8000의 MAXDP 인증 서버)
     AUTH_SERVER_URL: str = "http://localhost:8000"
     AUTH_SERVER_TIMEOUT: int = 10
+    
+    # OAuth/OIDC Client Configuration
+    CLIENT_ID: str = "maxlab"  # OAuth client ID for this application
     
     # External Authentication Service Settings
     # Note: SERVICE_TOKEN, AUTH_CLIENT_ID, AUTH_CLIENT_SECRET are no longer needed

@@ -51,11 +51,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
 
     // Log error to console
-    console.group(`🚨 Error Boundary Caught Error [${this.props.name || 'Unknown'}]`);
-    console.error('Error:', error);
-    console.error('Error Info:', errorInfo);
-    console.error('Component Stack:', errorInfo.componentStack);
-    console.groupEnd();
+    // Error caught by Error Boundary
 
     // Report error to external service
     this.reportError(error, errorInfo);
@@ -103,7 +99,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     
     localStorage.setItem('errorReports', JSON.stringify(existingReports));
 
-    console.log('📋 Error Report Generated:', errorReport);
+    // Error report generated
   };
 
   private handleRetry = () => {

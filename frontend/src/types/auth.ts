@@ -1,11 +1,44 @@
+// OIDC Standard Claims interface
+export interface OIDCClaims {
+  // Core claims
+  sub: string;              // Subject identifier
+  name?: string;            // Full name
+  given_name?: string;      // Given name
+  family_name?: string;     // Family name
+  email?: string;           // Email address
+  email_verified?: boolean; // Email verification status
+  locale?: string;          // User's locale
+  zoneinfo?: string;        // User's timezone
+  updated_at?: number;      // Last update timestamp
+  
+  // Custom claims
+  groups?: string[];        // User groups
+  role?: string;            // User role
+  is_admin?: boolean;       // Admin status
+}
+
 export interface User {
+  // Primary identifiers
   id?: string;
   user_id?: string; // Some APIs might use user_id
+  
+  // OIDC standard fields
+  sub?: string;              // OIDC subject identifier
+  name?: string;             // OIDC name claim
+  given_name?: string;       // OIDC given name
+  family_name?: string;      // OIDC family name
   email: string;
+  email_verified?: boolean;  // OIDC email verification
+  locale?: string;           // OIDC locale
+  zoneinfo?: string;         // OIDC timezone
+  
+  // Legacy fields for compatibility
   username?: string;
   full_name?: string;
   real_name?: string;
   display_name?: string;
+  
+  // Authorization fields
   is_admin: boolean;
   is_active?: boolean;
   role?: string; // 'admin' or 'user'
@@ -22,8 +55,10 @@ export interface LoginCredentials {
 export interface LoginResponse {
   access_token: string;
   refresh_token?: string;
+  id_token?: string;        // OIDC ID Token
   token_type: string;
   expires_in?: number;
+  scope?: string;           // OAuth scopes
   user: User;
 }
 
@@ -34,6 +69,7 @@ export interface RefreshTokenResponse {
   scope: string;
   refresh_token: string;
   refresh_expires_in: number;
+  id_token?: string;        // New ID Token on refresh
 }
 
 export enum TokenRefreshError {
@@ -42,5 +78,7 @@ export enum TokenRefreshError {
   NETWORK_ERROR = 'network_error',
   SILENT_AUTH_FAILED = 'silent_auth_failed',
   SERVER_ERROR = 'server_error',
-  OAUTH_CALLBACK_ERROR = 'oauth_callback_error'
+  OAUTH_CALLBACK_ERROR = 'oauth_callback_error',
+  ID_TOKEN_INVALID = 'id_token_invalid',
+  NONCE_MISMATCH = 'nonce_mismatch'
 }

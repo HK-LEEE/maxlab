@@ -483,15 +483,38 @@ class RefreshTokenService {
   }
 
   /**
-   * Enhanced logout with refresh token revocation
+   * Enhanced logout with access and refresh token revocation
    */
   async secureLogout(): Promise<void> {
     const refreshToken = await this.getStoredRefreshToken();
+    const accessToken = localStorage.getItem('accessToken');
     
-    // Attempt to revoke refresh token on server
+    // Revoke both tokens on server (parallel for efficiency)
+    const revocationPromises: Promise<void>[] = [];
+    
+    // Revoke access token
+    if (accessToken) {
+      revocationPromises.push(
+        fetch('/api/oauth/revoke', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            token: accessToken,
+            token_type_hint: 'access_token',
+            client_id: this.clientId
+          })
+        })
+        .then(() => console.log('✅ Access token revoked on server'))
+        .catch(error => console.warn('⚠️ Failed to revoke access token:', error))
+      );
+    }
+    
+    // Revoke refresh token
     if (refreshToken) {
-      try {
-        await fetch('/api/oauth/revoke', {
+      revocationPromises.push(
+        fetch('/api/oauth/revoke', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -501,13 +524,15 @@ class RefreshTokenService {
             token_type_hint: 'refresh_token',
             client_id: this.clientId
           })
-        });
-        
-        console.log('✅ Refresh token revoked on server');
-      } catch (error) {
-        console.warn('⚠️ Failed to revoke refresh token on server:', error);
-        // Continue with local cleanup even if server revocation fails
-      }
+        })
+        .then(() => console.log('✅ Refresh token revoked on server'))
+        .catch(error => console.warn('⚠️ Failed to revoke refresh token:', error))
+      );
+    }
+    
+    // Wait for both revocations to complete (but don't fail if they error)
+    if (revocationPromises.length > 0) {
+      await Promise.allSettled(revocationPromises);
     }
 
     // Clear all stored tokens

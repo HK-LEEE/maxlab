@@ -15,6 +15,10 @@ import os
 
 from app.core.database import get_db
 from app.core.security import get_current_active_user, require_admin, encrypt_connection_string, decrypt_connection_string
+from app.core.flow_permissions import (
+    FlowPermissionChecker, ScopeType, VisibilityScope, PermissionLevel,
+    check_flow_permission, get_flow_list_filter, can_create_with_scope
+)
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -30,11 +34,15 @@ class ProcessFlowCreate(BaseModel):
     name: str
     flow_data: Dict[str, Any]
     data_source_id: Optional[str] = None
+    scope_type: ScopeType = ScopeType.USER
+    visibility_scope: VisibilityScope = VisibilityScope.PRIVATE
 
 class ProcessFlowUpdate(BaseModel):
     name: Optional[str] = None
     flow_data: Optional[Dict[str, Any]] = None
     data_source_id: Optional[str] = None
+    scope_type: Optional[ScopeType] = None
+    visibility_scope: Optional[VisibilityScope] = None
 
 class ProcessFlow(BaseModel):
     id: uuid.UUID
@@ -49,6 +57,9 @@ class ProcessFlow(BaseModel):
     publish_token: Optional[str] = None
     current_version: Optional[int] = None
     data_source_id: Optional[str] = None
+    scope_type: Optional[str] = "USER"
+    visibility_scope: Optional[str] = "PRIVATE"
+    shared_with_workspace: Optional[bool] = False
 
 class PublishResponse(BaseModel):
     message: str
@@ -110,23 +121,38 @@ async def list_process_flows(
     workspace_id: uuid.UUID = Query(...),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
+    scope_filter: Optional[ScopeType] = Query(None, description="Filter by scope type"),
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """워크스페이스의 공정도 목록 조회"""
-    query = """
+    """워크스페이스의 공정도 목록 조회 - 스코프별 권한 필터링 적용"""
+    
+    # 권한 기반 필터 조건 생성
+    filter_conditions = await get_flow_list_filter(
+        workspace_id, current_user, db, scope_filter
+    )
+    
+    query = f"""
         SELECT id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at,
-               is_published, published_at, publish_token, current_version
+               is_published, published_at, publish_token, current_version,
+               scope_type, visibility_scope, shared_with_workspace
         FROM personal_test_process_flows
         WHERE workspace_id = :workspace_id
-        ORDER BY updated_at DESC
+        {filter_conditions['filter_clause']}
+        ORDER BY 
+            CASE WHEN scope_type = 'WORKSPACE' THEN 0 ELSE 1 END,
+            updated_at DESC
         LIMIT :limit OFFSET :skip
     """
     
-    result = await db.execute(
-        text(query),
-        {"workspace_id": str(workspace_id), "limit": limit, "skip": skip}
-    )
+    params = {
+        "workspace_id": str(workspace_id), 
+        "limit": limit, 
+        "skip": skip,
+        **filter_conditions['params']
+    }
+    
+    result = await db.execute(text(query), params)
     
     flows = []
     for row in result:
@@ -142,7 +168,10 @@ async def list_process_flows(
             is_published=row.is_published if hasattr(row, 'is_published') else False,
             published_at=row.published_at if hasattr(row, 'published_at') else None,
             publish_token=row.publish_token if hasattr(row, 'publish_token') else None,
-            current_version=row.current_version if hasattr(row, 'current_version') else None
+            current_version=row.current_version if hasattr(row, 'current_version') else None,
+            scope_type=getattr(row, 'scope_type', 'USER'),
+            visibility_scope=getattr(row, 'visibility_scope', 'PRIVATE'),
+            shared_with_workspace=getattr(row, 'shared_with_workspace', False)
         ))
     
     return flows
@@ -154,15 +183,40 @@ async def create_process_flow(
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """새 공정도 생성 (관리자 전용)"""
+    """새 공정도 생성 - 스코프별 권한 확인"""
+    
+    # 스코프별 생성 권한 확인
+    can_create, error_msg = await can_create_with_scope(
+        flow_data.workspace_id, 
+        flow_data.scope_type, 
+        current_user, 
+        db
+    )
+    
+    if not can_create:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=error_msg
+        )
+    
     flow_id = uuid.uuid4()
     user_id = current_user.get("user_id", current_user.get("id", "unknown"))
     
+    # 스코프에 따른 설정
+    shared_with_workspace = (flow_data.scope_type == ScopeType.WORKSPACE)
+    visibility_scope = (
+        VisibilityScope.WORKSPACE if flow_data.scope_type == ScopeType.WORKSPACE 
+        else VisibilityScope.PRIVATE
+    )
+    
     query = """
         INSERT INTO personal_test_process_flows 
-        (id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at)
-        VALUES (:id, :workspace_id, :name, CAST(:flow_data AS jsonb), :data_source_id, :created_by, NOW(), NOW())
-        RETURNING id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at, is_published, published_at, publish_token
+        (id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at,
+         scope_type, visibility_scope, shared_with_workspace)
+        VALUES (:id, :workspace_id, :name, CAST(:flow_data AS jsonb), :data_source_id, :created_by, NOW(), NOW(),
+                :scope_type, :visibility_scope, :shared_with_workspace)
+        RETURNING id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at, 
+                  is_published, published_at, publish_token, scope_type, visibility_scope, shared_with_workspace
     """
     
     result = await db.execute(
@@ -173,7 +227,10 @@ async def create_process_flow(
             "name": flow_data.name,
             "flow_data": json.dumps(flow_data.flow_data),
             "data_source_id": flow_data.data_source_id,
-            "created_by": user_id
+            "created_by": user_id,
+            "scope_type": flow_data.scope_type.value,
+            "visibility_scope": visibility_scope.value,
+            "shared_with_workspace": shared_with_workspace
         }
     )
     await db.commit()
@@ -190,7 +247,10 @@ async def create_process_flow(
         updated_at=row.updated_at,
         is_published=False,
         published_at=None,
-        publish_token=None
+        publish_token=None,
+        scope_type=row.scope_type,
+        visibility_scope=row.visibility_scope,
+        shared_with_workspace=row.shared_with_workspace
     )
 
 
@@ -200,10 +260,22 @@ async def get_process_flow(
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """공정도 상세 조회"""
+    """공정도 상세 조회 - 권한 확인"""
+    
+    # 접근 권한 확인
+    can_access, error_msg = await check_flow_permission(
+        flow_id, current_user, db, PermissionLevel.READ
+    )
+    
+    if not can_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=error_msg
+        )
+    
     query = """
         SELECT id, workspace_id, name, flow_data, data_source_id, created_by, created_at, updated_at,
-               is_published, published_at, publish_token
+               is_published, published_at, publish_token, scope_type, visibility_scope, shared_with_workspace
         FROM personal_test_process_flows
         WHERE id = :flow_id
     """
@@ -228,7 +300,10 @@ async def get_process_flow(
         updated_at=row.updated_at,
         is_published=row.is_published if hasattr(row, 'is_published') else False,
         published_at=row.published_at if hasattr(row, 'published_at') else None,
-        publish_token=row.publish_token if hasattr(row, 'publish_token') else None
+        publish_token=row.publish_token if hasattr(row, 'publish_token') else None,
+        scope_type=getattr(row, 'scope_type', 'USER'),
+        visibility_scope=getattr(row, 'visibility_scope', 'PRIVATE'),
+        shared_with_workspace=getattr(row, 'shared_with_workspace', False)
     )
 
 
@@ -1345,7 +1420,8 @@ async def get_equipment_types(db: AsyncSession = Depends(get_db)):
             {"code": "E1", "name": "탱크", "icon": "database"},
             {"code": "E2", "name": "저장탱크", "icon": "archive"},
             {"code": "F1", "name": "밸브", "icon": "git-merge"},
-            {"code": "G1", "name": "히터", "icon": "flame"}
+            {"code": "G1", "name": "히터", "icon": "flame"},
+            {"code": "I1", "name": "계측기", "icon": "activity"}
         ]
     }
 

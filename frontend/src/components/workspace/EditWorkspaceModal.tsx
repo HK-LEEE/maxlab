@@ -80,12 +80,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
     queryKey: ['available-groups'],
     queryFn: async () => {
       const response = await apiClient.get('/api/v1/external/groups');
-      console.log('Available groups from API:', response.data);
-      if (response.data && response.data.length > 0) {
-        console.log('First group structure:', response.data[0]);
-        console.log('First group ID:', response.data[0].id);
-        console.log('First group name:', response.data[0].name);
-      }
+      // Groups data loaded
       return response.data;
     },
     enabled: isOpen,
@@ -101,7 +96,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
           setUserSuggestions(results);
           setShowUserDropdown(true);
         } catch (error) {
-          console.error('Failed to search users:', error);
+          // Failed to search users
         } finally {
           setIsLoadingUserSearch(false);
         }
@@ -242,9 +237,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
       toast.error('Please select a group');
       return;
     }
-    console.log('Adding group with ID:', selectedGroup);
-    console.log('Selected group value type:', typeof selectedGroup);
-    console.log('Selected group value length:', selectedGroup.length);
+    // Adding group
     
     addGroupMutation.mutate({
       group_id: selectedGroup,
@@ -264,16 +257,12 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   ) || [];
 
   const assignedGroupIds = workspaceGroups?.map((g: WorkspaceGroup) => g.group_id) || [];
-  console.log('Assigned group IDs:', assignedGroupIds);
+  // Filter assigned groups
   
   const unassignedGroups = filteredAvailableGroups.filter((g: Group) => 
     !assignedGroupIds.includes(g.id)
   );
-  console.log('Unassigned groups:', unassignedGroups);
-  console.log('Unassigned groups count:', unassignedGroups.length);
-  if (unassignedGroups.length > 0) {
-    console.log('First unassigned group:', unassignedGroups[0]);
-  }
+  // Filter unassigned groups
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -518,15 +507,14 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
                   <select
                     value={selectedGroup}
                     onChange={(e) => {
-                      console.log('Selected option value:', e.target.value);
-                      console.log('Selected option text:', e.target.options[e.target.selectedIndex].text);
+                      // Group selected
                       setSelectedGroup(e.target.value);
                     }}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   >
                     <option value="">Select a group</option>
                     {unassignedGroups.map((group: Group) => {
-                      console.log(`Rendering option for group: ${group.name}, ID: ${group.id}`);
+                      // Render group option
                       return (
                         <option key={group.id} value={group.id}>
                           {group.display_name || group.name}

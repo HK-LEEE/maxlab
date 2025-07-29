@@ -52,9 +52,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     queryKey: ['workspace-groups', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      console.log(`Fetching groups for workspace: ${workspace.id}`);
       const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/groups/`);
-      console.log('Workspace groups response:', response.data);
       return response.data;
     },
     enabled: !!workspace && isOpen,
@@ -65,9 +63,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     queryKey: ['workspace-users', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      console.log(`Fetching users for workspace: ${workspace.id}`);
       const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/users/`);
-      console.log('Workspace users response:', response.data);
       return response.data;
     },
     enabled: !!workspace && isOpen,
@@ -77,9 +73,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   const { data: availableGroups } = useQuery({
     queryKey: ['available-groups'],
     queryFn: async () => {
-      console.log('Fetching available groups from external API');
       const response = await apiClient.get('/api/v1/external/groups');
-      console.log('Available groups response:', response.data);
       return response.data;
     },
     enabled: isOpen,
@@ -95,7 +89,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
           setUserSuggestions(results);
           setShowUserDropdown(true);
         } catch (error) {
-          console.error('Failed to search users:', error);
+          // Failed to search users
         } finally {
           setIsLoadingUserSearch(false);
         }
@@ -161,7 +155,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
         group_id: data.group_id,
         permission_level: data.permission_level
       };
-      console.log('Sending group creation request:', requestData);
+      // Group creation request
       const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, requestData);
       return response.data;
     },

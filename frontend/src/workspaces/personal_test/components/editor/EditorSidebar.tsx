@@ -68,7 +68,9 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
   onNodeSizeChange,
   onAutoScrollChange,
 }) => {
+  console.log('EditorSidebar rendered with equipmentTypes:', equipmentTypes);
   const [isOpen, setIsOpen] = useState(true);
+  console.log('EditorSidebar isOpen:', isOpen);
   const [expandedSections, setExpandedSections] = useState({
     equipment: true,
     draw: true,
@@ -76,6 +78,8 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
     settings: true,
     templates: false,
   });
+  
+  console.log('Current expandedSections:', expandedSections);
   
   const [templates, setTemplates] = useState<Array<{id: string; name: string; data: any}>>([]);
 
@@ -151,8 +155,10 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
             {expandedSections.equipment ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           
-          {expandedSections.equipment && (
-            <div className="px-2 pb-2">
+          {console.log('expandedSections.equipment:', expandedSections.equipment)}
+          {/* Force Equipment Types to always show for debugging */}
+          {true && (
+            <div className="px-2 pb-2 space-y-1">
               {/* Common Equipment */}
               <div
                 draggable
@@ -167,31 +173,36 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
                   <span className="text-gray-500 ml-1">: Type later</span>
                 </div>
               </div>
-              
-              {/* Instrument */}
-              <div
-                draggable
-                onDragStart={(e) => onDragStart(e, { 
-                  type: 'instrument', 
-                  data: { 
-                    instrumentType: 'instrument',
-                    label: '계측기',
-                    instrumentName: '계측기',
-                    color: '#6b7280', // Gray default color
-                    displayMeasurements: []
-                  }
-                })}
-                className="flex items-center space-x-2 px-2 py-1.5 rounded cursor-move hover:bg-gray-100 text-sm border border-dashed"
-                style={{ borderColor: '#6b728050' }}
-              >
-                <div style={{ color: '#6b7280' }}>
-                  {getIcon('activity')}
+
+              {/* Equipment Types */}
+              {console.log('equipmentTypes in sidebar:', equipmentTypes)}
+              {equipmentTypes && equipmentTypes.length > 0 ? equipmentTypes.map((equipment) => (
+                <div
+                  key={equipment.code}
+                  draggable
+                  onDragStart={(e) => onDragStart(e, { 
+                    type: 'equipment', 
+                    data: { 
+                      code: equipment.code, 
+                      name: equipment.name, 
+                      icon: equipment.icon 
+                    }
+                  })}
+                  className="flex items-center space-x-2 px-2 py-1.5 rounded cursor-move hover:bg-gray-100 text-sm border border-dashed border-gray-300"
+                >
+                  <div className="text-gray-600">
+                    {getIcon(equipment.icon)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-gray-900 truncate">{equipment.name}</span>
+                    <span className="text-gray-500 ml-1">({equipment.code})</span>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-gray-900 truncate">계측기</span>
-                  <span className="text-gray-500 ml-1">: Measurements</span>
+              )) : (
+                <div className="px-2 py-1 text-xs text-gray-500">
+                  No equipment types available
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>

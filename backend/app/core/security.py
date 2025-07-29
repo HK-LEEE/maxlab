@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from cryptography.fernet import Fernet
 import os
 import base64
+from pydantic import BaseModel
 
 from .config import settings
 from .database import get_db
@@ -391,12 +392,23 @@ async def _verify_token_with_auth_server_internal(token: str, request_id: Option
                 oauth_is_admin = oauth_user_data.get("is_admin", False)
                 logger.info(f"🔐 OAuth 서버의 is_admin 값: {oauth_is_admin} (타입: {type(oauth_is_admin).__name__})")
                 
-                # OAuth 사용자 정보를 내부 형식으로 변환
+                # OAuth 사용자 정보를 내부 형식으로 변환 (OIDC 표준 claims 매핑)
                 user_data = {
-                    "user_id": oauth_user_data.get("sub") or oauth_user_data.get("id") or oauth_user_data.get("user_id"),
-                    "username": oauth_user_data.get("display_name") or oauth_user_data.get("username"),
+                    # OIDC 표준 claims
+                    "sub": oauth_user_data.get("sub") or oauth_user_data.get("id") or oauth_user_data.get("user_id"),
+                    "name": oauth_user_data.get("name") or oauth_user_data.get("display_name") or oauth_user_data.get("real_name"),
+                    "given_name": oauth_user_data.get("given_name"),
+                    "family_name": oauth_user_data.get("family_name"),
                     "email": oauth_user_data.get("email"),
-                    "full_name": oauth_user_data.get("real_name") or oauth_user_data.get("full_name"),
+                    "email_verified": oauth_user_data.get("email_verified", True),
+                    "locale": oauth_user_data.get("locale", "ko-KR"),
+                    "zoneinfo": oauth_user_data.get("zoneinfo", "Asia/Seoul"),
+                    "updated_at": oauth_user_data.get("updated_at"),
+                    
+                    # 레거시 호환성을 위한 기존 필드
+                    "user_id": oauth_user_data.get("sub") or oauth_user_data.get("id") or oauth_user_data.get("user_id"),
+                    "username": oauth_user_data.get("name") or oauth_user_data.get("display_name") or oauth_user_data.get("username"),
+                    "full_name": oauth_user_data.get("name") or oauth_user_data.get("real_name") or oauth_user_data.get("full_name"),
                     "is_active": True,
                     "is_admin": oauth_is_admin,  # OAuth 서버의 값을 먼저 사용
                     "role": "admin" if oauth_is_admin else "user",  # OAuth is_admin에 따라 role 설정
@@ -408,11 +420,16 @@ async def _verify_token_with_auth_server_internal(token: str, request_id: Option
                     "oauth_is_admin": oauth_is_admin  # Store OAuth server's value separately
                 }
                 
-                logger.info(f"👤 사용자 정보 변환 완료:")
+                logger.info(f"👤 사용자 정보 변환 완료 (OIDC 표준 claims 포함):")
+                logger.info(f"  - sub: {user_data.get('sub')}")
+                logger.info(f"  - name: {user_data.get('name')}")
                 logger.info(f"  - email: {user_data.get('email')}")
+                logger.info(f"  - email_verified: {user_data.get('email_verified')}")
                 logger.info(f"  - is_admin (OAuth): {oauth_is_admin}")
                 logger.info(f"  - groups: {groups}")
                 logger.info(f"  - group_uuids: {group_uuids}")
+                logger.info(f"  - locale: {user_data.get('locale')}")
+                logger.info(f"  - zoneinfo: {user_data.get('zoneinfo')}")
                 
                 # Use MaxLab's admin override configuration
                 from .admin_override import admin_override

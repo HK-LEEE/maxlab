@@ -52,7 +52,7 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           setUserSuggestions(results);
           setShowUserDropdown(true);
         } catch (error) {
-          console.error('Failed to search users:', error);
+          // Failed to search users
         } finally {
           setIsLoadingUsers(false);
         }
@@ -75,7 +75,7 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           setGroupSuggestions(results);
           setShowGroupDropdown(true);
         } catch (error) {
-          console.error('Failed to search groups:', error);
+          // Failed to search groups
         } finally {
           setIsLoadingGroups(false);
         }

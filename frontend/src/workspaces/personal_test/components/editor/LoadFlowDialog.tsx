@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { X, FileText, Calendar, Clock, Globe, RotateCcw, Check, ChevronRight, User, Upload, Download, FolderOpen, History } from 'lucide-react';
 import { apiClient } from '../../../../api/client';
 import { toast } from 'react-hot-toast';
+import { FlowScopeBadge } from '../common/FlowScopeIndicator';
+
+// 로컬 타입 정의 (import 이슈 해결용)  
+type ScopeType = 'WORKSPACE' | 'USER';
+type VisibilityScope = 'WORKSPACE' | 'PRIVATE';
 
 interface ProcessFlow {
   id: string;
@@ -13,6 +18,9 @@ interface ProcessFlow {
   publish_token?: string;
   current_version?: number;
   created_by?: string;
+  scope_type?: ScopeType;
+  visibility_scope?: VisibilityScope;
+  shared_with_workspace?: boolean;
 }
 
 interface FlowVersion {
@@ -295,6 +303,11 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
                             </span>
                           </div>
                           <div className="flex items-center space-x-2 mt-2">
+                            <FlowScopeBadge
+                              scopeType={flow.scope_type || 'USER'}
+                              visibilityScope={flow.visibility_scope}
+                              sharedWithWorkspace={flow.shared_with_workspace}
+                            />
                             {flow.is_published && (
                               <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded flex items-center space-x-1">
                                 <Globe size={12} />

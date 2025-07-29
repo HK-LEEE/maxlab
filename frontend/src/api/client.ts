@@ -40,7 +40,7 @@ apiClient.interceptors.request.use((config) => {
       csrfProtection.addToFormData(config.data);
     }
     
-    console.log(`🛡️ CSRF protection applied to ${method} ${config.url}`);
+    // CSRF protection applied
   }
   
   return config;
@@ -67,7 +67,7 @@ authClient.interceptors.request.use((config) => {
       csrfProtection.addToFormData(config.data);
     }
     
-    console.log(`🛡️ CSRF protection applied to ${method} ${config.url}`);
+    // CSRF protection applied
   }
   
   return config;
@@ -130,7 +130,7 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
       }
     } else if (status === 403) {
-      console.log(`🚫 Authorization error (403):`, originalRequest?.url);
+      // Authorization error (403)
       
       // 403은 권한 문제이므로 토큰 갱신으로 해결되지 않음
       const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
@@ -146,7 +146,7 @@ apiClient.interceptors.response.use(
       }
     } else if (status === 419 || (status === 400 && error.response?.data?.detail?.includes('CSRF'))) {
       // CSRF 토큰 에러 처리
-      console.warn('🚫 CSRF token error, regenerating token...');
+      // CSRF token error, regenerating token
       csrfProtection.forceRegenerate();
       
       // 자동 재시도 (한 번만)

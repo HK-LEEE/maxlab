@@ -295,9 +295,9 @@ function App() {
           <Route
             path="/workspaces/personal_test/process-flow/editor"
             element={
-              <AdminRoute>
+              <PrivateRoute>
                 <ProcessFlowEditor />
-              </AdminRoute>
+              </PrivateRoute>
             }
           />
           <Route

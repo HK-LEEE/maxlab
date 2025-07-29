@@ -104,6 +104,7 @@ export const OAuthCallback: React.FC = () => {
             sessionStorage.removeItem('oauth_popup_mode');
             sessionStorage.removeItem('silent_oauth_state');
             sessionStorage.removeItem('silent_oauth_code_verifier');
+            sessionStorage.removeItem('oauth_nonce'); // OIDC nonce 정리
             sessionStorage.removeItem('oauth_flow_in_progress');
             sessionStorage.removeItem('oauth_callback_processing');
             
@@ -155,6 +156,7 @@ export const OAuthCallback: React.FC = () => {
             // 세션 정리
             sessionStorage.removeItem('oauth_state');
             sessionStorage.removeItem('oauth_code_verifier');
+            sessionStorage.removeItem('oauth_nonce'); // OIDC nonce 정리
             sessionStorage.removeItem('oauth_popup_mode');
             
             setState({

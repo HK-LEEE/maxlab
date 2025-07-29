@@ -99,7 +99,7 @@ class BrowserLogger {
       }
     } catch (error) {
       // Silently fail if localStorage is not available
-      console.warn('Failed to store log entry:', error);
+      // Failed to store log entry
     }
   }
 

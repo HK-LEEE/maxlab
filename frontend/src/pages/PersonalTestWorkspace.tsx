@@ -19,7 +19,7 @@ export const PersonalTestWorkspace: React.FC = () => {
       path: '/workspaces/personal_test/process-flow/editor',
       bgColor: 'bg-blue-100',
       iconColor: 'text-blue-600',
-      adminOnly: true,
+      adminOnly: false,
     },
     {
       id: 'process-monitor',

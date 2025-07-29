@@ -9,6 +9,28 @@ import { tokenRefreshManager } from './tokenRefreshManager';
 import { tokenBlacklistService } from './tokenBlacklistService';
 import { refreshTokenService, type TokenResponse } from './refreshTokenService';
 import type { User } from '../types/auth';
+import { jwtDecode } from 'jwt-decode';
+
+// ID Token Claims interface
+interface IDTokenClaims {
+  iss: string;       // Issuer
+  sub: string;       // Subject (user ID)
+  aud: string;       // Audience (client ID)
+  exp: number;       // Expiration time
+  iat: number;       // Issued at
+  auth_time?: number; // Authentication time
+  nonce?: string;     // Nonce for replay attack prevention
+  email?: string;
+  email_verified?: boolean;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  locale?: string;
+  zoneinfo?: string;
+  groups?: string[];
+  role?: string;
+  is_admin?: boolean;
+}
 
 export interface AuthServiceResult {
   success: boolean;
@@ -31,6 +53,22 @@ export const authService = {
       
       const userInfo = await getUserInfo(tokenResponse.access_token);
       
+      // ID Token 처리 (있는 경우)
+      let idTokenClaims: IDTokenClaims | null = null;
+      if (tokenResponse.id_token) {
+        try {
+          // ID Token 디코드 및 검증
+          idTokenClaims = await authService.validateIDToken(tokenResponse.id_token);
+          console.log('✅ ID Token validated:', idTokenClaims);
+          
+          // ID Token 저장
+          sessionStorage.setItem('id_token', tokenResponse.id_token);
+        } catch (error) {
+          console.error('ID Token validation failed:', error);
+          // ID Token 검증 실패는 경고만 하고 계속 진행 (하위 호환성)
+        }
+      }
+      
       // 토큰 저장 (RefreshTokenService 사용)
       await refreshTokenService.storeTokens({
         access_token: tokenResponse.access_token,
@@ -43,18 +81,18 @@ export const authService = {
       
       console.log('📋 User info received:', userInfo);
       
-      // 사용자 정보 매핑 (안전한 기본값 처리)
+      // 사용자 정보 매핑 (ID Token claims 우선, UserInfo 폴백)
       const user: User = {
-        id: userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
-        email: userInfo.email || '',
-        username: userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
-        full_name: userInfo.real_name || userInfo.full_name || userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+        id: idTokenClaims?.sub || userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
+        email: idTokenClaims?.email || userInfo.email || '',
+        username: idTokenClaims?.name || userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
+        full_name: idTokenClaims?.name || userInfo.real_name || userInfo.full_name || userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
         is_active: userInfo.is_active !== undefined ? userInfo.is_active : true,
-        is_admin: Boolean(userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
-        role: (userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
-        groups: Array.isArray(userInfo.groups) 
+        is_admin: Boolean(idTokenClaims?.is_admin || userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
+        role: (idTokenClaims?.is_admin || userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
+        groups: idTokenClaims?.groups || (Array.isArray(userInfo.groups) 
           ? userInfo.groups.map((g: any) => typeof g === 'string' ? g : (g.name || g.display_name || g)).filter(Boolean)
-          : []
+          : [])
       };
       
       console.log('👤 Mapped user:', user);
@@ -275,6 +313,7 @@ export const authService = {
       'silent_oauth_state',
       'silent_oauth_code_verifier',
       'oauth_nonce',
+      'id_token', // ID Token 정리
       'csrf_token'
     ];
 
@@ -709,5 +748,54 @@ export const authService = {
       },
       tokenRefreshManager: tokenRefreshManager.getRefreshStatus()
     };
+  },
+
+  /**
+   * ID Token 검증 (OIDC)
+   */
+  validateIDToken: async (idToken: string): Promise<IDTokenClaims> => {
+    try {
+      // 토큰 디코드 (서명 검증은 백엔드에서)
+      const claims = jwtDecode<IDTokenClaims>(idToken);
+      
+      // 기본 검증
+      const now = Math.floor(Date.now() / 1000);
+      
+      // 만료 시간 검증
+      if (claims.exp && claims.exp < now) {
+        throw new Error('ID Token has expired');
+      }
+      
+      // 발급 시간 검증 (너무 오래된 토큰 거부)
+      if (claims.iat && claims.iat > now + 60) { // 1분 이상 미래
+        throw new Error('ID Token issued in the future');
+      }
+      
+      // Nonce 검증
+      const storedNonce = sessionStorage.getItem('oauth_nonce');
+      if (storedNonce && claims.nonce !== storedNonce) {
+        throw new Error('Invalid nonce in ID Token');
+      }
+      
+      // Audience 검증
+      const clientId = import.meta.env.VITE_CLIENT_ID || 'maxlab';
+      if (claims.aud !== clientId) {
+        throw new Error('Invalid audience in ID Token');
+      }
+      
+      // Issuer 검증
+      const expectedIssuer = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+      if (!claims.iss.startsWith(expectedIssuer)) {
+        throw new Error('Invalid issuer in ID Token');
+      }
+      
+      // 검증 성공 후 nonce 정리
+      sessionStorage.removeItem('oauth_nonce');
+      
+      return claims;
+    } catch (error: any) {
+      console.error('ID Token validation error:', error);
+      throw new Error(`ID Token validation failed: ${error.message}`);
+    }
   }
 };

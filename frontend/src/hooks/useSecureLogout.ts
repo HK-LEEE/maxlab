@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/authService';
 import { tokenBlacklistService } from '../services/tokenBlacklistService';
 import { apiClient } from '../api/client';
@@ -29,6 +30,7 @@ interface LogoutState {
 
 export const useSecureLogout = () => {
   const { logout: clearAuthStore } = useAuthStore();
+  const queryClient = useQueryClient();
   const [state, setState] = useState<LogoutState>({
     isLoading: false,
     showConfirmation: false,
@@ -97,10 +99,47 @@ export const useSecureLogout = () => {
         // Continue to ensure user is logged out
       }
 
-      // Step 3: Clear auth store
+      // Step 3: Clear auth store and ensure complete user state reset
       clearAuthStore();
+      
+      // Additional verification that auth store is cleared
+      setTimeout(() => {
+        const authState = useAuthStore.getState();
+        if (authState.user || authState.isAuthenticated) {
+          console.warn('⚠️ Auth store not properly cleared, forcing reset');
+          useAuthStore.setState({ user: null, isAuthenticated: false });
+        }
+      }, 100);
 
-      // Step 4: Additional security cleanup
+      // Step 4: Comprehensive React Query cache clearing to prevent stale data from previous user
+      try {
+        // Clear all queries and mutations
+        await queryClient.clear();
+        
+        // Additional targeted invalidation for user/permission specific queries
+        await queryClient.invalidateQueries();
+        
+        // Force remove any cached data that might persist
+        queryClient.removeQueries();
+        
+        // Reset query client to initial state
+        queryClient.resetQueries();
+        
+        console.log('✅ React Query cache completely cleared and reset');
+      } catch (error) {
+        console.warn('⚠️ Failed to clear React Query cache:', error);
+        
+        // Fallback: Create completely new QueryClient instance if needed
+        try {
+          queryClient.getQueryCache().clear();
+          queryClient.getMutationCache().clear();
+          console.log('✅ Fallback cache clearing completed');
+        } catch (fallbackError) {
+          console.error('❌ Fallback cache clearing also failed:', fallbackError);
+        }
+      }
+
+      // Step 5: Additional security cleanup
       try {
         // Clear any remaining sensitive data
         sessionStorage.clear();
@@ -137,6 +176,17 @@ export const useSecureLogout = () => {
       // Emergency cleanup - ensure user is logged out even if there are errors
       try {
         clearAuthStore();
+        
+        // Comprehensive emergency cache clearing
+        try {
+          await queryClient.clear();
+          queryClient.removeQueries();
+          queryClient.getQueryCache().clear();
+          queryClient.getMutationCache().clear();
+        } catch (cacheError) {
+          console.warn('Emergency cache clearing failed:', cacheError);
+        }
+        
         localStorage.clear();
         sessionStorage.clear();
         console.log('🆘 Emergency cleanup performed');
@@ -151,7 +201,7 @@ export const useSecureLogout = () => {
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [clearAuthStore, performServerLogout]);
+  }, [clearAuthStore, performServerLogout, queryClient]);
 
   /**
    * Handle logout confirmation

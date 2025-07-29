@@ -51,5 +51,5 @@ aioodbc==0.5.0
 pyodbc==5.2.0
 
 # Additional MSSQL optimization dependencies
-sqlalchemy-pyodbc-mssql==1.3.7
-pymssql==2.3.1
+sqlalchemy-pyodbc-mssql
+pymssql

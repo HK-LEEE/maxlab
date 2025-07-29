@@ -10,6 +10,7 @@ export interface TokenResponse {
   scope: string;
   refresh_token?: string;
   refresh_expires_in?: number;
+  id_token?: string; // OIDC ID Token
 }
 
 export interface OAuthMessage {
@@ -29,7 +30,7 @@ export class PopupOAuthLogin {
   private readonly clientId: string;
   private readonly redirectUri: string;
   private readonly authUrl: string;
-  private readonly scopes = ['read:profile', 'read:groups', 'manage:workflows'];
+  private readonly scopes = ['openid', 'profile', 'email', 'read:profile', 'read:groups', 'manage:workflows'];
 
   constructor() {
     this.clientId = import.meta.env.VITE_CLIENT_ID || 'maxlab';
@@ -58,6 +59,13 @@ export class PopupOAuthLogin {
       .replace(/=/g, '');
   }
 
+  // OIDC nonce 생성
+  private generateNonce(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return this.base64URLEncode(array);
+  }
+
   // OAuth 시작
   async startAuth(): Promise<TokenResponse> {
     // 이미 진행 중인 인증이 있는지 확인
@@ -73,10 +81,12 @@ export class PopupOAuthLogin {
         const state = this.generateCodeVerifier();
         const codeVerifier = this.generateCodeVerifier();
         const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+        const nonce = this.generateNonce(); // OIDC nonce
 
         // 세션 스토리지에 저장
         sessionStorage.setItem('oauth_state', state);
         sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+        sessionStorage.setItem('oauth_nonce', nonce); // nonce 저장
         sessionStorage.setItem('oauth_popup_mode', 'true');
 
         // OAuth URL 생성
@@ -87,7 +97,8 @@ export class PopupOAuthLogin {
           scope: this.scopes.join(' '),
           state: state,
           code_challenge: codeChallenge,
-          code_challenge_method: 'S256'
+          code_challenge_method: 'S256',
+          nonce: nonce // OIDC nonce 추가
         });
 
         const authUrl = `${this.authUrl}/api/oauth/authorize?${params}`;
@@ -191,6 +202,7 @@ export class PopupOAuthLogin {
     sessionStorage.removeItem('oauth_popup_mode');
     sessionStorage.removeItem('oauth_state');
     sessionStorage.removeItem('oauth_code_verifier');
+    sessionStorage.removeItem('oauth_nonce'); // nonce 정리
   }
 
   public forceCleanup(): void {
@@ -255,6 +267,7 @@ export async function exchangeCodeForToken(code: string): Promise<TokenResponse>
       // 성공 후 코드 verifier 즉시 정리
       sessionStorage.removeItem('oauth_code_verifier');
       sessionStorage.removeItem('silent_oauth_code_verifier');
+      // nonce는 ID Token 검증 후에 제거됨
       
       return tokenResponse;
     } finally {

@@ -27,6 +27,7 @@ import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LoadFlowDialog } from '../components/editor/LoadFlowDialog';
 import { AlignmentMenu } from '../components/editor/AlignmentMenu';
 import { DataSourceDialog } from '../components/editor/DataSourceDialog';
+import { ScopeSelectionDialog } from '../components/common/ScopeSelectionDialog';
 
 import { useFlowEditor } from '../hooks/useFlowEditor';
 import { useDataSources } from '../hooks/useDataSources';
@@ -39,17 +40,7 @@ import { errorReportingService } from '../../../services/errorReportingService';
 
 
 const equipmentTypes = [
-  { code: 'A1', name: '감압기', icon: 'gauge' },
-  { code: 'B1', name: '차압기', icon: 'activity' },
-  { code: 'C1', name: '흡착기', icon: 'filter' },
-  { code: 'C2', name: '측정기', icon: 'thermometer' },
-  { code: 'D1', name: '압축기', icon: 'wind' },
-  { code: 'D2', name: '펌프', icon: 'zap' },
-  { code: 'E1', name: '탱크', icon: 'database' },
-  { code: 'E2', name: '저장탱크', icon: 'archive' },
-  { code: 'F1', name: '밸브', icon: 'git-merge' },
-  { code: 'G1', name: '히터', icon: 'flame' },
-  { code: 'H1', name: '냉각기', icon: 'snowflake' },
+  { code: 'I1', name: '계측기', icon: 'activity' },
 ];
 
 // Create wrapped node components with error boundaries
@@ -166,8 +157,7 @@ const ProcessFlowEditorContent: React.FC = () => {
     if (!isLoadingDataSources && selectedDataSourceId && dataSources.length > 0) {
       const isValidDataSource = dataSources.some(ds => ds.id === selectedDataSourceId);
       if (!isValidDataSource) {
-        console.warn('Selected data source ID is not valid:', selectedDataSourceId);
-        console.warn('Available data sources:', dataSources.map(ds => ds.id));
+        // Selected data source ID is not valid
       }
     }
   }, [isLoadingDataSources, selectedDataSourceId, dataSources]);
@@ -185,6 +175,8 @@ const ProcessFlowEditorContent: React.FC = () => {
   const [showBackupRecovery, setShowBackupRecovery] = useState(false);
   const [backupData, setBackupData] = useState<FlowBackupData | null>(null);
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
+  const [showScopeDialog, setShowScopeDialog] = useState(false);
+  const [pendingSaveAction, setPendingSaveAction] = useState<'save' | 'saveAsNew' | null>(null);
 
   // 컴포넌트 마운트 시 백업 확인 및 정리
   useEffect(() => {
@@ -206,12 +198,12 @@ const ProcessFlowEditorContent: React.FC = () => {
       );
       
       if (hasChanges) {
-        console.log('📋 Significant changes detected, showing backup recovery modal');
+        // Significant changes detected, showing backup recovery modal
         setBackupData(existingBackup);
         setShowBackupRecovery(true);
       } else {
         // 실질적인 차이가 없으면 백업 삭제
-        console.log('🗑️ No significant changes, deleting backup');
+        // No significant changes, deleting backup
         deleteFlowBackup(workspaceId, currentFlow?.id || null);
       }
     }
@@ -223,14 +215,14 @@ const ProcessFlowEditorContent: React.FC = () => {
       // 최근 저장 후 30초 이내에는 백업하지 않음 (불필요한 백업 방지)
       const now = new Date();
       if (lastSaveTime && (now.getTime() - lastSaveTime.getTime()) < 30000) {
-        console.log('⏳ Skipping backup - recent save detected');
+        // Skipping backup - recent save detected
         return;
       }
 
       // 의미있는 내용이 있을 때만 백업
       const hasContent = nodes.length > 0 || edges.length > 0 || flowName !== 'New Process Flow';
       if (hasContent) {
-        console.log('💾 Auto-saving backup');
+        // Auto-saving backup
         saveFlowBackup(workspaceId, currentFlow?.id || null, {
           nodes,
           edges,
@@ -283,16 +275,23 @@ const ProcessFlowEditorContent: React.FC = () => {
 
   // 수동 저장 래퍼 (저장 시간 추적)
   const handleManualSave = useCallback(async () => {
+    // For new flows, show scope selection dialog
+    if (!currentFlow) {
+      setPendingSaveAction('save');
+      setShowScopeDialog(true);
+      return;
+    }
+    // For existing flows, save with current scope
     await saveFlow(false);
     setLastSaveTime(new Date());
-  }, [saveFlow]);
+  }, [saveFlow, currentFlow]);
 
   // 새 버전으로 저장
   const handleSaveAsNewVersion = useCallback(async () => {
     if (!currentFlow) {
-      // If no current flow, create new one first
-      await saveFlow(false);
-      setLastSaveTime(new Date());
+      // If no current flow, show scope dialog first
+      setPendingSaveAction('saveAsNew');
+      setShowScopeDialog(true);
       return;
     }
 
@@ -305,7 +304,7 @@ const ProcessFlowEditorContent: React.FC = () => {
         icon: '✅'
       });
     } catch (saveError) {
-      console.error('Failed to save flow:', saveError);
+      // Failed to save flow
       toast.error('Failed to save flow');
       return; // Don't proceed with versioning if save failed
     }
@@ -315,7 +314,7 @@ const ProcessFlowEditorContent: React.FC = () => {
     const description = `Saved from editor at ${new Date().toLocaleString()}`;
     
     try {
-      console.log('🔄 Attempting to create new version...');
+      // Attempting to create new version
       const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/versions`, {
         name: versionName,
         description,
@@ -342,7 +341,7 @@ const ProcessFlowEditorContent: React.FC = () => {
         icon: '🆕'
       });
     } catch (error: any) {
-      console.error('Failed to create new version (but flow was saved):', error);
+      // Failed to create new version (but flow was saved)
       
       // More detailed error handling
       if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
@@ -368,6 +367,38 @@ const ProcessFlowEditorContent: React.FC = () => {
       }
     }
   }, [currentFlow, flowName, nodes, edges, nodeSize, saveFlow, setFlows, setCurrentFlow]);
+
+  // Handle scope selection from dialog
+  const handleScopeSelection = useCallback(async (data: {
+    name: string;
+    scopeType: 'WORKSPACE' | 'USER';
+    description?: string;
+  }) => {
+    setShowScopeDialog(false);
+    
+    // Update flow name if changed
+    if (data.name !== flowName) {
+      setFlowName(data.name);
+    }
+    
+    // Convert scope type to the format expected by saveFlow
+    const scopeData = {
+      scopeType: data.scopeType,
+      visibilityScope: data.scopeType === 'WORKSPACE' ? 'WORKSPACE' : 'PRIVATE' as 'WORKSPACE' | 'PRIVATE',
+      sharedWithWorkspace: data.scopeType === 'WORKSPACE'
+    };
+    
+    // Save with selected scope
+    await saveFlow(false, scopeData);
+    setLastSaveTime(new Date());
+    
+    // If this was save as new version, proceed with version creation
+    if (pendingSaveAction === 'saveAsNew' && currentFlow) {
+      await handleSaveAsNewVersion();
+    }
+    
+    setPendingSaveAction(null);
+  }, [saveFlow, pendingSaveAction, currentFlow, handleSaveAsNewVersion, flowName, setFlowName]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -407,22 +438,42 @@ const ProcessFlowEditorContent: React.FC = () => {
       let newNode: Node;
 
       if (type === 'equipment') {
-        newNode = {
-          id: `${data.code}_${Date.now()}`,
-          type: 'equipment',
-          position,
-          style: { width: 200, height: getNodeHeight('1') },
-          data: {
-            label: data.name,
-            equipmentType: data.code,
-            equipmentCode: '',
-            equipmentName: data.name,
-            status: 'STOP',
-            icon: data.icon,
-            displayMeasurements: [],
-            nodeSize: '1',
-          },
-        };
+        // I1 계측기 타입은 InstrumentNode로 생성
+        if (data.code === 'I1') {
+          newNode = {
+            id: `instrument_${Date.now()}`,
+            type: 'instrument',
+            position,
+            style: { width: 200, height: getNodeHeight('1') },
+            data: {
+              label: data.name, // "계측기"
+              instrumentType: data.code, // "I1"
+              instrumentName: data.name, // "계측기"
+              color: '#6b7280', // Gray default color
+              displayMeasurements: [],
+              measurements: [],
+              nodeSize: '1',
+            },
+          };
+        } else {
+          // 다른 설비 타입은 일반 EquipmentNode로 생성
+          newNode = {
+            id: `${data.code}_${Date.now()}`,
+            type: 'equipment',
+            position,
+            style: { width: 200, height: getNodeHeight('1') },
+            data: {
+              label: data.name,
+              equipmentType: data.code,
+              equipmentCode: '',
+              equipmentName: data.name,
+              status: 'STOP',
+              icon: data.icon,
+              displayMeasurements: [],
+              nodeSize: '1',
+            },
+          };
+        }
       } else if (type === 'text') {
         newNode = {
           id: `text_${Date.now()}`,
@@ -570,8 +621,9 @@ const ProcessFlowEditorContent: React.FC = () => {
                 type="text"
                 value={flowName}
                 onChange={(e) => setFlowName(e.target.value)}
-                className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black bg-gray-100"
                 placeholder="Flow name"
+                disabled={true}
               />
               {currentFlow && (
                 <span className="text-sm text-gray-500">
@@ -579,66 +631,7 @@ const ProcessFlowEditorContent: React.FC = () => {
                 </span>
               )}
             </div>
-            {/* Save Dropdown */}
-            <div ref={dropdownRef} className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={isSaving}
-                className="flex items-center space-x-1 px-3 py-1.5 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 text-sm"
-              >
-                <Save size={16} />
-                <span>{isSaving ? 'Saving...' : 'Save'}</span>
-                <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {/* Dropdown Menu */}
-              {isDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg z-50 min-w-[180px]">
-                  <button
-                    onClick={() => {
-                      handleSaveAsNewVersion();
-                      setIsDropdownOpen(false);
-                    }}
-                    disabled={isSaving}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50 border-b border-gray-100"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Save size={14} />
-                      <span>Save & Create Version</span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Saves flow and attempts to create version</div>
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleManualSave();
-                      setIsDropdownOpen(false);
-                    }}
-                    disabled={isSaving}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Save size={14} />
-                      <span>Update Current Version</span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Overwrites existing flow</div>
-                  </button>
-                </div>
-              )}
-            </div>
-            <button
-              onClick={() => setIsLoadDialogOpen(true)}
-              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-            >
-              <FolderOpen size={16} />
-              <span>Load</span>
-            </button>
-            <button
-              onClick={handleExportFlow}
-              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-            >
-              <Download size={16} />
-              <span>Export</span>
-            </button>
+            
             <div className="w-px h-6 bg-gray-300" />
             
             {/* Data Source Selection */}
@@ -673,7 +666,9 @@ const ProcessFlowEditorContent: React.FC = () => {
               <span>Data Sources</span>
             </button>
           </div>
+          
           <div className="flex items-center space-x-4">
+            {/* Status information */}
             {lastAutoSaveTime && (
               <span className="text-xs text-gray-500">
                 Auto-saved {lastAutoSaveTime.toLocaleTimeString()}
@@ -682,6 +677,70 @@ const ProcessFlowEditorContent: React.FC = () => {
             {error && (
               <div className="text-red-600 text-sm">{error}</div>
             )}
+            
+            {/* Right-aligned buttons */}
+            <div className="flex items-center space-x-3 ml-auto">
+              {/* Save Dropdown */}
+              <div ref={dropdownRef} className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  disabled={isSaving}
+                  className="flex items-center space-x-1 px-3 py-1.5 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 text-sm"
+                >
+                  <Save size={16} />
+                  <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                  <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded shadow-lg z-50 min-w-[180px]">
+                    <button
+                      onClick={() => {
+                        handleSaveAsNewVersion();
+                        setIsDropdownOpen(false);
+                      }}
+                      disabled={isSaving}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50 border-b border-gray-100"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Save size={14} />
+                        <span>Save & Create Version</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">Saves flow and attempts to create version</div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleManualSave();
+                        setIsDropdownOpen(false);
+                      }}
+                      disabled={isSaving}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Save size={14} />
+                        <span>Update Current Version</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">Overwrites existing flow</div>
+                    </button>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => setIsLoadDialogOpen(true)}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+              >
+                <FolderOpen size={16} />
+                <span>Load</span>
+              </button>
+              <button
+                onClick={handleExportFlow}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+              >
+                <Download size={16} />
+                <span>Export</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -832,7 +891,17 @@ const ProcessFlowEditorContent: React.FC = () => {
           workspaceId={workspaceId}
         />
 
-
+        {/* Scope Selection Dialog */}
+        <ScopeSelectionDialog
+          isOpen={showScopeDialog}
+          onClose={() => {
+            setShowScopeDialog(false);
+            setPendingSaveAction(null);
+          }}
+          onSave={handleScopeSelection}
+          currentFlowName={flowName}
+          isLoading={isSaving}
+        />
 
         {/* Backup Recovery Modal */}
         <BackupRecoveryModal

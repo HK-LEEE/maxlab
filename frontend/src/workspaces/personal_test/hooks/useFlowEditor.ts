@@ -19,6 +19,9 @@ interface ProcessFlow {
   published_at?: string;
   publish_token?: string;
   data_source_id?: string;
+  scope_type?: 'WORKSPACE' | 'USER';
+  visibility_scope?: 'WORKSPACE' | 'PRIVATE';
+  shared_with_workspace?: boolean;
 }
 
 interface Equipment {
@@ -97,7 +100,7 @@ export const useFlowEditor = (workspaceId: string) => {
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes]);
 
-  const saveFlow = async (isAutoSave = false) => {
+  const saveFlow = async (isAutoSave = false, scopeData?: { scopeType: 'WORKSPACE' | 'USER', visibilityScope: 'WORKSPACE' | 'PRIVATE', sharedWithWorkspace: boolean }) => {
     if (!workspaceId) return;
     
     if (!isAutoSave) {
@@ -108,15 +111,26 @@ export const useFlowEditor = (workspaceId: string) => {
     log.debug('Flow save initiated', {
       totalNodes: nodes.length,
       flowName,
-      nodeSize: nodeSize
+      nodeSize: nodeSize,
+      scopeData
     });
     
     try {
+      // Use provided scope data or default to USER/PRIVATE
+      const scope = scopeData || {
+        scopeType: currentFlow?.scope_type || 'USER',
+        visibilityScope: currentFlow?.visibility_scope || 'PRIVATE',
+        sharedWithWorkspace: currentFlow?.shared_with_workspace || false
+      };
+      
       const flowData = {
         workspace_id: workspaceUuid,
         name: flowName,
         flow_data: { nodes, edges, nodeSize },
         data_source_id: selectedDataSourceId,
+        scope_type: scope.scopeType,
+        visibility_scope: scope.visibilityScope,
+        shared_with_workspace: scope.sharedWithWorkspace,
       };
 
       if (currentFlow) {
@@ -124,6 +138,9 @@ export const useFlowEditor = (workspaceId: string) => {
           name: flowName,
           flow_data: { nodes, edges, nodeSize },
           data_source_id: selectedDataSourceId,
+          scope_type: scope.scopeType,
+          visibility_scope: scope.visibilityScope,
+          shared_with_workspace: scope.sharedWithWorkspace,
         });
         // Update currentFlow with the response to ensure we have the latest data
         log.debug('Flow update response received', { flowId: response.data.id });
