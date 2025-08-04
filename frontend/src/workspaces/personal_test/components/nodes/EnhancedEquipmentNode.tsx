@@ -22,6 +22,19 @@ import {
   Minus
 } from 'lucide-react';
 
+type Measurement = {
+  code: string;
+  desc: string;
+  value: number;
+  unit?: string;
+  spec_status?: 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC';
+  upper_spec_limit?: number;
+  lower_spec_limit?: number;
+  target_value?: number;
+  trend?: 'up' | 'down' | 'stable';
+  efficiency?: number; // 0-100%
+};
+
 interface EnhancedEquipmentNodeData {
   label: string;
   equipmentType: string;
@@ -29,18 +42,7 @@ interface EnhancedEquipmentNodeData {
   equipmentName: string;
   status: 'ACTIVE' | 'PAUSE' | 'STOP';
   icon?: string;
-  measurements?: Array<{
-    code: string;
-    desc: string;
-    value: number;
-    unit?: string;
-    spec_status?: 'IN_SPEC' | 'ABOVE_SPEC' | 'BELOW_SPEC';
-    upper_spec_limit?: number;
-    lower_spec_limit?: number;
-    target_value?: number;
-    trend?: 'up' | 'down' | 'stable';
-    efficiency?: number; // 0-100%
-  }>;
+  measurements?: Measurement[];
   displayMeasurements?: string[];
   hasSpecOut?: boolean;
   nodeSize?: '1' | '2' | '3';
@@ -152,7 +154,7 @@ const PerformanceIndicator: React.FC<{
 
 // Enhanced measurement display with trends
 const EnhancedMeasurementItem: React.FC<{
-  measurement: EnhancedEquipmentNodeData['measurements'][0];
+  measurement: Measurement;
   isScrolling?: boolean;
 }> = ({ measurement, isScrolling = false }) => {
   const getSpecStatusStyle = (status?: string) => {
@@ -238,7 +240,7 @@ const HeartbeatIndicator: React.FC<{
 };
 
 export const EnhancedEquipmentNode = memo((props: NodeProps<EnhancedEquipmentNodeData>) => {
-  const { data, selected, style, id } = props;
+  const { data, selected, id } = props;
   const [currentTime, setCurrentTime] = useState(new Date());
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
@@ -313,8 +315,7 @@ export const EnhancedEquipmentNode = memo((props: NodeProps<EnhancedEquipmentNod
         style={{
           width: nodeWidth,
           minHeight: 120,
-          boxShadow: data.status === 'ACTIVE' ? statusConfig.glowEffect : '0 4px 6px rgba(0, 0, 0, 0.1)',
-          ...style
+          boxShadow: data.status === 'ACTIVE' ? statusConfig.glowEffect : '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}
       >
         {/* Enhanced Header with gradients and animations */}

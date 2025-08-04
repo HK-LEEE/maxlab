@@ -292,7 +292,7 @@ export const withAuthErrorHandler = <P extends object>(
 ) => {
   const WrappedComponent = React.forwardRef<any, P>((props, ref) => (
     <AuthErrorHandler config={config}>
-      <Component {...props} ref={ref} />
+      <Component {...(props as P)} ref={ref} />
     </AuthErrorHandler>
   ));
 

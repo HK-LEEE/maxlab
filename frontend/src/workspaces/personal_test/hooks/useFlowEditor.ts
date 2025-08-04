@@ -12,6 +12,7 @@ interface ProcessFlow {
   flow_data: {
     nodes: Node[];
     edges: Edge[];
+    nodeSize?: string;
   };
   created_at: string;
   updated_at: string;
@@ -243,8 +244,13 @@ export const useFlowEditor = (workspaceId: string) => {
     
     // Restore nodeSize from flow data
     if (flow.flow_data?.nodeSize) {
-      setNodeSize(flow.flow_data.nodeSize);
-      log.debug('Node size restored', { nodeSize: flow.flow_data.nodeSize });
+      const nodeSize = flow.flow_data.nodeSize as '1' | '2' | '3';
+      if (['1', '2', '3'].includes(nodeSize)) {
+        setNodeSize(nodeSize);
+        log.debug('Node size restored', { nodeSize });
+      } else {
+        setNodeSize('1'); // Default size if invalid
+      }
     } else {
       setNodeSize('1'); // Default size if not saved
     }
@@ -268,8 +274,16 @@ export const useFlowEditor = (workspaceId: string) => {
         
         // CRITICAL: Prioritize stored resized dimensions over nodeSize defaults
         // This ensures user-resized nodes maintain their custom sizes
-        const finalWidth = baseNode.style?.width || defaultWidth;
-        const finalHeight = baseNode.style?.height || defaultHeight;
+        const finalWidth = typeof baseNode.style?.width === 'number' 
+          ? baseNode.style.width 
+          : (typeof baseNode.style?.width === 'string' 
+              ? parseFloat(baseNode.style.width.replace('px', '')) 
+              : defaultWidth);
+        const finalHeight = typeof baseNode.style?.height === 'number' 
+          ? baseNode.style.height 
+          : (typeof baseNode.style?.height === 'string' 
+              ? parseFloat(baseNode.style.height.replace('px', '')) 
+              : defaultHeight);
         
         
         return {
@@ -478,8 +492,8 @@ export const useFlowEditor = (workspaceId: string) => {
             return {
               ...node,
               position: {
-                x: centerX - ((node.style?.width || 200) / 2),
-                y: centerY - ((node.style?.height || 150) / 2)
+                x: centerX - ((typeof node.style?.width === 'number' ? node.style.width : 200) / 2),
+                y: centerY - ((typeof node.style?.height === 'number' ? node.style.height : 150) / 2)
               }
             };
           }
@@ -490,8 +504,8 @@ export const useFlowEditor = (workspaceId: string) => {
         const bounds = selectedNodes.reduce((acc, node) => ({
           minX: Math.min(acc.minX, node.position.x),
           minY: Math.min(acc.minY, node.position.y),
-          maxX: Math.max(acc.maxX, node.position.x + (node.style?.width || 200)),
-          maxY: Math.max(acc.maxY, node.position.y + (node.style?.height || 150))
+          maxX: Math.max(acc.maxX, node.position.x + (typeof node.style?.width === 'number' ? node.style.width : 200)),
+          maxY: Math.max(acc.maxY, node.position.y + (typeof node.style?.height === 'number' ? node.style.height : 150))
         }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
         
         const groupWidth = bounds.maxX - bounds.minX;
@@ -535,8 +549,8 @@ export const useFlowEditor = (workspaceId: string) => {
     if (alignment === 'circular') {
       // Arrange nodes in a circle
       const centerNode = selectedNodes[Math.floor(selectedNodes.length / 2)];
-      const centerX = centerNode.position.x + ((centerNode.style?.width || 200) / 2);
-      const centerY = centerNode.position.y + ((centerNode.style?.height || 150) / 2);
+      const centerX = centerNode.position.x + ((typeof centerNode.style?.width === 'number' ? centerNode.style.width : 200) / 2);
+      const centerY = centerNode.position.y + ((typeof centerNode.style?.height === 'number' ? centerNode.style.height : 150) / 2);
       const radius = Math.max(150, selectedNodes.length * 30);
       
       setNodes((nds) => nds.map((node, index) => {
@@ -546,8 +560,8 @@ export const useFlowEditor = (workspaceId: string) => {
           return {
             ...node,
             position: {
-              x: centerX + radius * Math.cos(angle) - ((node.style?.width || 200) / 2),
-              y: centerY + radius * Math.sin(angle) - ((node.style?.height || 150) / 2)
+              x: centerX + radius * Math.cos(angle) - ((typeof node.style?.width === 'number' ? node.style.width : 200) / 2),
+              y: centerY + radius * Math.sin(angle) - ((typeof node.style?.height === 'number' ? node.style.height : 150) / 2)
             }
           };
         }
@@ -559,11 +573,11 @@ export const useFlowEditor = (workspaceId: string) => {
     const firstNode = selectedNodes[0];
     const firstNodeBounds = {
       left: firstNode.position.x,
-      right: firstNode.position.x + (firstNode.style?.width || 200),
+      right: firstNode.position.x + (typeof firstNode.style?.width === 'number' ? firstNode.style.width : 200),
       top: firstNode.position.y,
-      bottom: firstNode.position.y + (firstNode.style?.height || 150),
-      centerX: firstNode.position.x + ((firstNode.style?.width || 200) / 2),
-      centerY: firstNode.position.y + ((firstNode.style?.height || 150) / 2)
+      bottom: firstNode.position.y + (typeof firstNode.style?.height === 'number' ? firstNode.style.height : 150),
+      centerX: firstNode.position.x + ((typeof firstNode.style?.width === 'number' ? firstNode.style.width : 200) / 2),
+      centerY: firstNode.position.y + ((typeof firstNode.style?.height === 'number' ? firstNode.style.height : 150) / 2)
     };
 
     if (alignment === 'distribute-h' || alignment === 'distribute-v') {
@@ -602,19 +616,19 @@ export const useFlowEditor = (workspaceId: string) => {
               newPosition.y = firstNodeBounds.top;
               break;
             case 'bottom':
-              newPosition.y = firstNodeBounds.bottom - (node.style?.height || 150);
+              newPosition.y = firstNodeBounds.bottom - (typeof node.style?.height === 'number' ? node.style.height : 150);
               break;
             case 'left':
               newPosition.x = firstNodeBounds.left;
               break;
             case 'right':
-              newPosition.x = firstNodeBounds.right - (node.style?.width || 200);
+              newPosition.x = firstNodeBounds.right - (typeof node.style?.width === 'number' ? node.style.width : 200);
               break;
             case 'center-h':
-              newPosition.x = firstNodeBounds.centerX - ((node.style?.width || 200) / 2);
+              newPosition.x = firstNodeBounds.centerX - ((typeof node.style?.width === 'number' ? node.style.width : 200) / 2);
               break;
             case 'center-v':
-              newPosition.y = firstNodeBounds.centerY - ((node.style?.height || 150) / 2);
+              newPosition.y = firstNodeBounds.centerY - ((typeof node.style?.height === 'number' ? node.style.height : 150) / 2);
               break;
           }
           
@@ -629,8 +643,16 @@ export const useFlowEditor = (workspaceId: string) => {
   useEffect(() => {
     setNodes((nds) => nds.map((node) => {
       if (node.type === 'equipment' && node.selected) {
-        const currentHeight = node.style?.height || getNodeHeight('1');
-        const currentWidth = node.style?.width || 200;
+        const currentHeight = typeof node.style?.height === 'number' 
+          ? node.style.height 
+          : (typeof node.style?.height === 'string' 
+              ? parseFloat(node.style.height.replace('px', '')) 
+              : getNodeHeight('1'));
+        const currentWidth = typeof node.style?.width === 'number' 
+          ? node.style.width 
+          : (typeof node.style?.width === 'string' 
+              ? parseFloat(node.style.width.replace('px', '')) 
+              : 200);
         const newMinHeight = getNodeHeight(nodeSize);
         const newMinWidth = 200;
         

@@ -40,6 +40,7 @@ interface MeasurementData {
   target_value?: number;
   usl?: number; // Alternative field name for upper_spec_limit
   lsl?: number; // Alternative field name for lower_spec_limit
+  unit?: string; // Added for compatibility
 }
 
 export const usePublicFlowMonitor = (publishToken: string) => {
@@ -189,7 +190,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         let totalMonitoredCount = 0;
         const currentNodes = isInitialLoad ? flowData.flow_data?.nodes || [] : nodes;
         
-        currentNodes.forEach(node => {
+        currentNodes.forEach((node: any) => {
           if (node.type === 'equipment' && node.data.equipmentCode) {
             // Only add if displayMeasurements is configured and not empty
             if (node.data.displayMeasurements && node.data.displayMeasurements.length > 0) {
@@ -200,7 +201,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
               
               // Add all measurements to the set (duplicates automatically handled)
               const measurementSet = monitoredMeasurements.get(node.data.equipmentCode)!;
-              node.data.displayMeasurements.forEach(measurement => {
+              node.data.displayMeasurements.forEach((measurement: string) => {
                 if (!measurementSet.has(measurement)) {
                   measurementSet.add(measurement);
                   totalMonitoredCount++;
@@ -217,8 +218,8 @@ export const usePublicFlowMonitor = (publishToken: string) => {
           totalMonitoredMeasurements: totalMonitoredCount,
           monitoredEquipment: Array.from(monitoredMeasurements.keys()),
           measurementsCount: validMeasurements.length,
-          measurementsWithSpec: validMeasurements.filter(m => m.spec_status !== undefined && m.spec_status !== null).length,
-          outOfSpecCount: validMeasurements.filter(m => m.spec_status === 1 || m.spec_status === 2).length,
+          measurementsWithSpec: validMeasurements.filter((m: MeasurementData) => m.spec_status !== undefined && m.spec_status !== null).length,
+          outOfSpecCount: validMeasurements.filter((m: MeasurementData) => m.spec_status === 1 || m.spec_status === 2).length,
           timestamp: new Date().toISOString()
         });
         
@@ -232,7 +233,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         
         // Debug: Log all measurements by equipment
         console.log('📊 [Public Monitor] All measurements by equipment:', 
-          validMeasurements.reduce((acc, m) => {
+          validMeasurements.reduce((acc: any, m: MeasurementData) => {
             if (!acc[m.equipment_code]) acc[m.equipment_code] = [];
             acc[m.equipment_code].push({
               code: m.measurement_code,
@@ -245,7 +246,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         );
         
         // Debug: Log spec violations in monitored measurements
-        const monitoredSpecViolations = validMeasurements.filter(m => {
+        const monitoredSpecViolations = validMeasurements.filter((m: MeasurementData) => {
           const equipmentMeasurements = monitoredMeasurements.get(m.equipment_code);
           return equipmentMeasurements && 
                  equipmentMeasurements.has(m.measurement_code) &&
@@ -254,7 +255,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         
         if (monitoredSpecViolations.length > 0) {
           console.log('🚨 [Public Monitor] Monitored measurements with SPEC violations:', 
-            monitoredSpecViolations.map(m => ({
+            monitoredSpecViolations.map((m: MeasurementData) => ({
               equipment: m.equipment_code,
               measurement: m.measurement_code,
               desc: m.measurement_desc,
@@ -353,7 +354,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         });
 
         // Summary of alarm check completion
-        const monitoredAlarmCount = validMeasurements.filter(m => {
+        const monitoredAlarmCount = validMeasurements.filter((m: MeasurementData) => {
           const equipmentMeasurements = monitoredMeasurements.get(m.equipment_code);
           return equipmentMeasurements && 
                  equipmentMeasurements.has(m.measurement_code) &&
@@ -546,7 +547,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       
       // Build maps for node status and types
       finalNodes.forEach((node: Node) => {
-        nodeTypeMap.set(node.id, node.type);
+        nodeTypeMap.set(node.id, node.type || 'unknown');
         if (node.type === 'equipment' && node.data.status) {
           nodeStatusMap.set(node.id, node.data.status);
         }

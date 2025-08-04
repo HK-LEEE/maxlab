@@ -160,7 +160,7 @@ export const useAuthStore = create<AuthState>()(
       
       isAdmin: () => {
         const user = get().user;
-        return user?.is_admin || user?.role === 'admin' || false;
+        return (user?.is_admin === true) || user?.role === 'admin' || false;
       },
       
       hasPermission: (requiredRole = 'user') => {
@@ -184,7 +184,7 @@ export const useAuthStore = create<AuthState>()(
       
       canRetry: () => {
         const state = get();
-        return state.error?.recoverable && state.retryCount < 3;
+        return (state.error?.recoverable === true) && state.retryCount < 3;
       },
       
       shouldShowError: () => {

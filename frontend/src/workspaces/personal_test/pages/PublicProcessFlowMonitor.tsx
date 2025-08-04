@@ -7,6 +7,7 @@ import ReactFlow, {
   ReactFlowProvider,
   Panel,
   useReactFlow,
+  ConnectionMode,
 } from 'reactflow';
 import type { Viewport, Edge } from 'reactflow';
 import type { Node } from 'reactflow';
@@ -92,7 +93,7 @@ const FlowCanvas: React.FC<{
       minZoom={0.1}
       maxZoom={4}
       connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
-      connectionMode="loose"
+      connectionMode={ConnectionMode.Loose}
       defaultEdgeOptions={{
         type: 'custom',
         style: { strokeWidth: 2, stroke: '#374151' },

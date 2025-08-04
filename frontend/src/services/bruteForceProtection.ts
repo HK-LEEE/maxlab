@@ -81,18 +81,18 @@ export class BruteForceProtection {
     }
 
     // Log security event
-    securityEventLogger.logEvent({
-      type: 'failed_login_attempt',
-      severity: newCount >= this.config.suspiciousThreshold ? 'high' : 'medium',
-      details: {
+    securityEventLogger.logSecurityEvent(
+      'failed_login_attempt',
+      newCount >= this.config.suspiciousThreshold ? 'high' : 'medium',
+      {
         email,
         ip,
         attemptCount: newCount,
         userAgent,
         timestamp: now
       },
-      userId: email
-    });
+      { userId: email }
+    );
 
     console.log(`🚨 Failed login attempt recorded for ${email} (${newCount}/${this.config.maxAttempts})`);
   }
@@ -176,18 +176,18 @@ export class BruteForceProtection {
     );
 
     // Log security event
-    securityEventLogger.logEvent({
-      type: 'account_locked',
-      severity: 'high',
-      details: {
+    securityEventLogger.logSecurityEvent(
+      'account_locked',
+      'high',
+      {
         email,
         reason,
         duration: this.config.lockoutDuration,
         unlockAt: lockout.unlockAt,
         attemptCount: lockout.attemptCount
       },
-      userId: email
-    });
+      { userId: email }
+    );
 
     console.log(`🔒 Account locked: ${email} (reason: ${reason})`);
   }

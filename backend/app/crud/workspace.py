@@ -83,10 +83,16 @@ class WorkspaceCRUD:
             if obj_in.selected_users and len(obj_in.selected_users) > 0:
                 for user_uuid in obj_in.selected_users:
                     if user_uuid:
+                        # Ensure user_uuid is a UUID object
+                        if isinstance(user_uuid, str):
+                            user_uuid_obj = uuid.UUID(user_uuid)
+                        else:
+                            user_uuid_obj = user_uuid
+                            
                         workspace_user = WorkspaceUser(
                             workspace_id=db_obj.id,
-                            user_id=str(user_uuid),  # 레거시 호환성
-                            user_id_uuid=user_uuid,  # 새로운 UUID 필드
+                            user_id=str(user_uuid_obj),  # 레거시 호환성
+                            user_id_uuid=user_uuid_obj,  # 새로운 UUID 필드
                             permission_level='read',
                             user_info_updated_at=datetime.now(),
                             created_by=creator_id
@@ -98,10 +104,16 @@ class WorkspaceCRUD:
             if obj_in.selected_groups and len(obj_in.selected_groups) > 0:
                 for group_uuid in obj_in.selected_groups:
                     if group_uuid:
+                        # Ensure group_uuid is a UUID object
+                        if isinstance(group_uuid, str):
+                            group_uuid_obj = uuid.UUID(group_uuid)
+                        else:
+                            group_uuid_obj = group_uuid
+                            
                         workspace_group = WorkspaceGroup(
                             workspace_id=db_obj.id,
-                            group_name=str(group_uuid),  # 레거시 호환성 (임시)
-                            group_id_uuid=group_uuid,    # 새로운 UUID 필드
+                            group_name=str(group_uuid_obj),  # 레거시 호환성 (임시)
+                            group_id_uuid=group_uuid_obj,    # 새로운 UUID 필드
                             permission_level='read',
                             group_info_updated_at=datetime.now(),
                             created_by=creator_id

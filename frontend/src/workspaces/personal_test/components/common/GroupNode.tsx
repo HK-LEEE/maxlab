@@ -14,7 +14,7 @@ interface GroupNodeData {
   borderStyle?: 'solid' | 'dashed' | 'dotted';
 }
 
-export const GroupNode = memo(({ data, selected, style, id }: NodeProps<GroupNodeData>) => {
+export const GroupNode = memo(({ data, selected, id }: NodeProps<GroupNodeData>) => {
   const {
     label = 'Group',
     color = '#3b82f6',
@@ -60,8 +60,8 @@ export const GroupNode = memo(({ data, selected, style, id }: NodeProps<GroupNod
   const minHeight = 150;
 
   // Calculate actual dimensions
-  const propsStyleHeight = parseStyleValue(style?.height);
-  const propsStyleWidth = parseStyleValue(style?.width);
+  const propsStyleHeight = parseStyleValue(currentNode?.style?.height);
+  const propsStyleWidth = parseStyleValue(currentNode?.style?.width);
   const resizedHeight = resizedDimensions.height;
   const resizedWidth = resizedDimensions.width;
 
@@ -82,7 +82,7 @@ export const GroupNode = memo(({ data, selected, style, id }: NodeProps<GroupNod
         height: reactFlowHeight !== undefined ? reactFlowHeight : prev.height,
       }));
     }
-  }, [currentNode?.style?.height, currentNode?.style?.width, style?.height, style?.width, id]);
+  }, [currentNode?.style?.height, currentNode?.style?.width, id]);
 
   // Convert opacity from 0-100 to 0-1
   const opacity = backgroundOpacity / 100;

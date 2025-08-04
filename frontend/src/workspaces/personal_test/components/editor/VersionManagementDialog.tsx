@@ -77,7 +77,7 @@ export const VersionManagementDialog: React.FC<VersionManagementDialogProps> = (
             name: flow.name + ' - Version 1',
             description: 'Initial version (Version management not available)',
             flow_data: {},
-            created_by: flow.created_by || 'unknown',
+            created_by: 'unknown',
             created_at: flow.created_at,
             is_published: flow.is_published || false,
             published_at: flow.published_at,
@@ -171,7 +171,7 @@ export const VersionManagementDialog: React.FC<VersionManagementDialogProps> = (
                             <span>{new Date(flow.created_at).toLocaleDateString()}</span>
                           </span>
                           {flow.is_published && (
-                            <Globe size={12} className="text-green-600" title="Published" />
+                            <Globe size={12} className="text-green-600" />
                           )}
                         </div>
                       </div>

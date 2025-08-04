@@ -122,7 +122,11 @@ function App() {
       },
       onAuthError: (error) => {
         console.log('📨 Received auth error from other tab:', error);
-        setAuthError(error);
+        setAuthError({
+          type: 'unknown',
+          message: error,
+          recoverable: true
+        });
       }
     });
     
@@ -330,9 +334,21 @@ function App() {
           
           // Check if token is actually valid
           if (cachedToken && tokenExpiry && currentTime < parseInt(tokenExpiry)) {
-            devLog.info('✅ User has valid cached token, setting ready state');
-            setAuthState('ready');
-            return;
+            devLog.info('✅ User has valid cached token, fetching fresh user info...');
+            
+            // Fetch fresh user info to restore admin status (stripped by partialize for security)
+            try {
+              setAuthState('syncing');
+              const freshUser = await authService.getCurrentUser();
+              setUser(freshUser);
+              devLog.info('✅ Admin status restored from server:', { is_admin: freshUser.is_admin });
+              setAuthState('ready');
+              return;
+            } catch (error) {
+              devLog.warn('Failed to fetch fresh user info, continuing with cached data:', error);
+              setAuthState('ready');
+              return;
+            }
           } else {
             devLog.warn('❌ Cached token invalid or expired, clearing auth');
             logout();  // Use the logout function from useAuthStore

@@ -36,7 +36,17 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
   const [fieldDialogSource, setFieldDialogSource] = useState<{ id: string; type: string } | null>(null);
   
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    source_type: string;
+    connection_string: string;
+    api_key: string;
+    headers: string;
+    custom_queries: {
+      equipment_status: { query: string; description: string };
+      measurement_data: { query: string; description: string };
+    };
+    is_active: boolean;
+  }>({
     source_type: 'postgresql',
     connection_string: '',
     api_key: '',
@@ -98,10 +108,23 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
       connection_string: '',  // Empty - user must re-enter
       api_key: '',  // Empty - user must re-enter
       headers: source.headers ? JSON.stringify(source.headers, null, 2) : '',
-      custom_queries: source.custom_queries || {
-        equipment_status: { query: '', description: '' },
-        measurement_data: { query: '', description: '' }
-      },
+      custom_queries: (source.custom_queries && 
+        source.custom_queries.equipment_status && 
+        source.custom_queries.measurement_data) 
+        ? {
+            equipment_status: { 
+              query: source.custom_queries.equipment_status.query || '', 
+              description: source.custom_queries.equipment_status.description || '' 
+            },
+            measurement_data: { 
+              query: source.custom_queries.measurement_data.query || '', 
+              description: source.custom_queries.measurement_data.description || '' 
+            }
+          }
+        : {
+            equipment_status: { query: '', description: '' },
+            measurement_data: { query: '', description: '' }
+          },
       is_active: source.is_active,
     });
     setActiveTab('config');
@@ -220,7 +243,7 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
     }
   };
 
-  const handleExecuteQuery = async (queryType: string) => {
+  const handleExecuteQuery = async (queryType: 'equipment_status' | 'measurement_data') => {
     if (!editingSource) return;
     
     try {

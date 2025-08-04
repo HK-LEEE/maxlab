@@ -85,7 +85,7 @@ interface InstrumentNodeData {
 
 
 export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
-  const { data, selected, style, id, ...nodeProps } = props;
+  const { data, selected, id, ...nodeProps } = props;
   
   const icon = instrumentConfig.icon;
   const nodeColor = data.color || '#6b7280'; // Use dynamic color with gray default
@@ -183,15 +183,15 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
   };
 
   // Calculate actual node dimensions
-  const propsStyleHeight = parseStyleValue(style?.height, 'props');
-  const propsStyleWidth = parseStyleValue(style?.width, 'props');
+  const propsStyleHeight = parseStyleValue(currentNode?.style?.height, 'props');
+  const propsStyleWidth = parseStyleValue(currentNode?.style?.width, 'props');
   const reactFlowStyleHeight = parseStyleValue(currentNode?.style?.height, 'reactFlow');
   const reactFlowStyleWidth = parseStyleValue(currentNode?.style?.width, 'reactFlow');
   
   const directReactFlowHeight = currentNode?.style?.height;
   const directReactFlowWidth = currentNode?.style?.width;
-  const directPropsHeight = style?.height;
-  const directPropsWidth = style?.width;
+  const directPropsHeight = currentNode?.style?.height;
+  const directPropsWidth = currentNode?.style?.width;
   
   const defaultHeight = getNodeHeight(nodeSize);
   
@@ -219,8 +219,8 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
   useEffect(() => {
     const reactFlowHeight = parseStyleValue(currentNode?.style?.height);
     const reactFlowWidth = parseStyleValue(currentNode?.style?.width);
-    const propsHeight = parseStyleValue(style?.height);
-    const propsWidth = parseStyleValue(style?.width);
+    const propsHeight = parseStyleValue(currentNode?.style?.height);
+    const propsWidth = parseStyleValue(currentNode?.style?.width);
     
     const sourceHeight = reactFlowHeight || propsHeight;
     const sourceWidth = reactFlowWidth || propsWidth;
@@ -258,12 +258,12 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
       
       setResizedDimensions(defaultDimensions);
     }
-  }, [currentNode?.style?.height, currentNode?.style?.width, style?.height, style?.width, nodeSize, id]);
+  }, [currentNode?.style?.height, currentNode?.style?.width, nodeSize, id]);
 
   // Force re-render when style changes
   useEffect(() => {
     // This effect ensures the component re-renders when ReactFlow style changes
-  }, [style?.height, style?.width, actualNodeHeight, actualNodeWidth]);
+  }, [currentNode?.style?.height, currentNode?.style?.width, actualNodeHeight, actualNodeWidth]);
 
   // Update resized dimensions when nodeSize changes
   useEffect(() => {
@@ -478,7 +478,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         className={`
           rounded-lg border-2 shadow-sm overflow-hidden
           ${selected ? 'shadow-lg' : ''}
-          min-w-[200px] ${style?.width ? '' : 'w-full'} flex flex-col
+          min-w-[200px] ${currentNode?.style?.width ? '' : 'w-full'} flex flex-col
         `}
         style={{ 
           height: `${actualNodeHeight}px`,

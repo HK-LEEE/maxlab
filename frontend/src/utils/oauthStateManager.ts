@@ -26,6 +26,9 @@ export interface OAuthFlowState {
   // Flow status
   status: 'created' | 'in_progress' | 'token_exchange' | 'completed' | 'failed' | 'expired';
   lastUpdated: number;
+  
+  // Storage keys for change detection
+  initialStorageKeys?: string[];
 }
 
 export interface StateValidationResult {

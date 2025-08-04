@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Users, User, Loader2 } from 'lucide-react';
+import { Search, Users, User as UserIcon, Loader2 } from 'lucide-react';
 import { Layout } from '../../components/common/Layout';
 import { authApi } from '../../api/auth';
+import type { User } from '../../types/auth';
 import { toast } from 'react-hot-toast';
 
-interface ExternalUser {
-  id: string;
-  username: string;
-  email: string;
-  name: string;
-  groups: string[];
-  is_active: boolean;
-  last_login?: string;
-}
+// Remove ExternalUser interface and use User from auth.ts instead
 
 interface ExternalGroup {
   id: string;
@@ -57,7 +50,7 @@ export const UserManagement: React.FC = () => {
     enabled: activeTab === 'groups',
   });
 
-  const users = usersData || [];
+  const users: User[] = usersData || [];
   const groups = groupsData || [];
 
   // Filter groups based on search term
@@ -66,12 +59,12 @@ export const UserManagement: React.FC = () => {
     (group.description && group.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const renderUserCard = (user: ExternalUser) => (
+  const renderUserCard = (user: User) => (
     <div key={user.id} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-            <User size={20} className="text-gray-600" />
+            <UserIcon size={20} className="text-gray-600" />
           </div>
           <div>
             <h3 className="font-medium text-gray-900">{user.name || user.username}</h3>
@@ -151,7 +144,7 @@ export const UserManagement: React.FC = () => {
             }`}
           >
             <div className="flex items-center space-x-2">
-              <User size={16} />
+              <UserIcon size={16} />
               <span>Users</span>
             </div>
           </button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Folder, Users } from 'lucide-react';
-import type { Workspace, WorkspaceType } from '../../types/workspace';
+import type { Workspace } from '../../types/workspace';
+import { WorkspaceType } from '../../types/workspace';
 
 interface WorkspaceItemProps {
   workspace: Workspace;
@@ -23,7 +24,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
       }`}
     >
       <div className="flex items-center space-x-3">
-        {workspace.type === WorkspaceType.PERSONAL ? (
+        {workspace.workspace_type === WorkspaceType.PERSONAL ? (
           <Folder size={20} />
         ) : (
           <Users size={20} />
@@ -31,7 +32,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         <div className="flex-1">
           <h3 className="font-medium">{workspace.name}</h3>
           <p className={`text-sm ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
-            {workspace.query_count} queries
+            {(workspace as any).query_count || 0} queries
           </p>
         </div>
       </div>

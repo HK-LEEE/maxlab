@@ -214,7 +214,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   };
 
   const addTableColumn = () => {
-    const existingTypes = formData.tableConfig.columns.map(col => col.type);
+    const existingTypes = formData.tableConfig.columns.map((col: any) => col.type);
     const columnCount = formData.tableConfig.columns.length;
     
     // Suggest appropriate default based on what's missing
@@ -253,7 +253,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
     const newColumn = {
       field: suggestedField,
       header: suggestedHeader,
-      type: suggestedType as const,
+      type: suggestedType as 'text' | 'number' | 'status' | 'action' | 'temperature' | 'pressure' | 'datetime',
       width: suggestedWidth
     };
     
@@ -273,7 +273,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   };
 
   const removeTableColumn = (index: number) => {
-    const updatedColumns = formData.tableConfig.columns.filter((_, i) => i !== index);
+    const updatedColumns = formData.tableConfig.columns.filter((_: any, i: number) => i !== index);
     setFormData({
       ...formData,
       tableConfig: {
@@ -309,10 +309,10 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
     }
     
     // Find columns by type and extract their field names
-    const valueColumn = workingColumns.find(col => col.type === 'value');
-    const uslColumn = workingColumns.find(col => col.type === 'usl');
-    const lslColumn = workingColumns.find(col => col.type === 'lsl');
-    const idColumn = workingColumns.find(col => col.type === 'id');
+    const valueColumn = workingColumns.find((col: any) => col.type === 'value');
+    const uslColumn = workingColumns.find((col: any) => col.type === 'usl');
+    const lslColumn = workingColumns.find((col: any) => col.type === 'lsl');
+    const idColumn = workingColumns.find((col: any) => col.type === 'id');
     
     // Update status rules automatically
     setFormData(prev => ({
@@ -361,14 +361,14 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
       }
       
       // Validate required column types for status calculation
-      const hasValueColumn = formData.tableConfig.columns.some(col => col.type === 'value');
-      const hasUslColumn = formData.tableConfig.columns.some(col => col.type === 'usl');
-      const hasLslColumn = formData.tableConfig.columns.some(col => col.type === 'lsl');
-      const hasIdColumn = formData.tableConfig.columns.some(col => col.type === 'id');
+      const hasValueColumn = formData.tableConfig.columns.some((col: any) => col.type === 'value');
+      const hasUslColumn = formData.tableConfig.columns.some((col: any) => col.type === 'usl');
+      const hasLslColumn = formData.tableConfig.columns.some((col: any) => col.type === 'lsl');
+      const hasIdColumn = formData.tableConfig.columns.some((col: any) => col.type === 'id');
       
       if (!hasValueColumn && !hasUslColumn && !hasLslColumn && !hasIdColumn) {
         // At least some column types should be configured for meaningful table
-        const hasStatusColumn = formData.tableConfig.columns.some(col => col.type === 'status');
+        const hasStatusColumn = formData.tableConfig.columns.some((col: any) => col.type === 'status');
         if (hasStatusColumn) {
           alert('⚠️ Status column requires Value, USL, and LSL columns to function properly.\n\nPlease add columns with appropriate types for status calculation.');
           return;
@@ -376,7 +376,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
       }
       
       // Validate field names are not empty
-      const emptyFields = formData.tableConfig.columns.filter(col => !col.field || !col.header);
+      const emptyFields = formData.tableConfig.columns.filter((col: any) => !col.field || !col.header);
       if (emptyFields.length > 0) {
         alert('❌ Please fill in both Field Name and Display Header for all columns');
         return;
@@ -592,7 +592,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                               <tr>
                                 {queryResults.columns?.map((dbColumn: string, index: number) => {
                                   // Find matching configured column
-                                  const configuredColumn = formData.tableConfig.columns.find(col => col.field === dbColumn);
+                                  const configuredColumn = formData.tableConfig.columns.find((col: any) => col.field === dbColumn);
                                   const columnType = configuredColumn?.type || 'unmapped';
                                   const columnHeader = configuredColumn?.header || dbColumn;
                                   
@@ -629,7 +629,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                               {queryResults.data.slice(0, 5).map((row: any, rowIndex: number) => (
                                 <tr key={rowIndex} className="border-b hover:bg-gray-50">
                                   {queryResults.columns?.map((dbColumn: string, colIndex: number) => {
-                                    const configuredColumn = formData.tableConfig.columns.find(col => col.field === dbColumn);
+                                    const configuredColumn = formData.tableConfig.columns.find((col: any) => col.field === dbColumn);
                                     const cellValue = row[dbColumn];
                                     const columnType = configuredColumn?.type || 'text';
                                     
@@ -673,13 +673,13 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                             <div className="text-gray-600">
                               <span className="font-medium">Mapping Status:</span>
                               <span className="ml-2 text-green-600">
-                                ✓ {formData.tableConfig.columns.filter(col => 
+                                ✓ {formData.tableConfig.columns.filter((col: any) => 
                                   queryResults.columns?.includes(col.field)
                                 ).length} mapped
                               </span>
                               <span className="ml-2 text-orange-600">
                                 ⚠️ {(queryResults.columns?.length || 0) - 
-                                    formData.tableConfig.columns.filter(col => 
+                                    formData.tableConfig.columns.filter((col: any) => 
                                       queryResults.columns?.includes(col.field)
                                     ).length} unmapped
                               </span>
@@ -707,7 +707,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                         </div>
                         <div className="flex flex-wrap gap-1">
                           {queryResults.columns.map((column: string) => {
-                            const isMapped = formData.tableConfig.columns.some(col => col.field === column);
+                            const isMapped = formData.tableConfig.columns.some((col: any) => col.field === column);
                             return (
                               <span
                                 key={column}
@@ -777,7 +777,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                 </div>
                 
                 <div className="space-y-3 border rounded p-3 bg-gray-50">
-                  {formData.tableConfig.columns.map((column, index) => (
+                  {formData.tableConfig.columns.map((column: any, index: number) => (
                     <div key={index} className="bg-white p-3 rounded border">
                       {/* Column Header */}
                       <div className="flex items-center justify-between mb-2">
@@ -1186,7 +1186,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                                 } else {
                                   setFormData({
                                     ...formData,
-                                    displayMeasurements: formData.displayMeasurements.filter(code => code !== measurement.measurement_code)
+                                    displayMeasurements: formData.displayMeasurements.filter((code: string) => code !== measurement.measurement_code)
                                   });
                                 }
                               }}
@@ -1225,7 +1225,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                   </label>
                   <p className="text-xs text-gray-600 mb-2">Drag to reorder selected measurements:</p>
                   <div className="space-y-2 max-h-60 overflow-y-auto border rounded p-2 bg-gray-50">
-                    {formData.displayMeasurements.map((code, index) => {
+                    {formData.displayMeasurements.map((code: string, index: number) => {
                       const measurement = measurementDetails[code] || 
                         availableMeasurements.find(m => m.measurement_code === code);
                       if (!measurement) return null;
@@ -1262,7 +1262,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
                                 onClick={() => {
                                   setFormData({
                                     ...formData,
-                                    displayMeasurements: formData.displayMeasurements.filter(m => m !== code)
+                                    displayMeasurements: formData.displayMeasurements.filter((m: string) => m !== code)
                                   });
                                 }}
                                 className="text-red-400 hover:text-red-600"

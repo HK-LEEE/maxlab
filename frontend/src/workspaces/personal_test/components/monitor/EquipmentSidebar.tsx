@@ -84,7 +84,7 @@ export const EquipmentSidebar: React.FC<EquipmentSidebarProps> = ({
                         <div className="flex items-center gap-2">
                           <div className="font-medium">{equipment.equipment_name}</div>
                           {hasAlarm && (
-                            <AlertCircle className="w-4 h-4 text-red-500" title="Out of Spec" />
+                            <AlertCircle className="w-4 h-4 text-red-500" />
                           )}
                         </div>
                         <span

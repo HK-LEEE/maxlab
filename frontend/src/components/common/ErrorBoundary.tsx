@@ -3,7 +3,8 @@
  * Provides comprehensive error handling and recovery for React components
  */
 
-import React, { Component, ReactNode, ErrorInfo } from 'react';
+import React, { Component } from 'react';
+import type { ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 
 export interface ErrorBoundaryState {

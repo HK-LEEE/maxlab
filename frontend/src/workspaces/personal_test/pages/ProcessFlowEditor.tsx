@@ -5,6 +5,8 @@ import ReactFlow, {
   MiniMap,
   ReactFlowProvider,
   useReactFlow,
+  ConnectionMode,
+  BackgroundVariant,
 } from 'reactflow';
 import type { Node } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -204,7 +206,6 @@ const ProcessFlowEditorContent: React.FC = () => {
           edges,
           flowName,
           dataSourceId: selectedDataSourceId,
-          nodeSize,
         },
         existingBackup
       );
@@ -873,7 +874,7 @@ const ProcessFlowEditorContent: React.FC = () => {
             edgeTypes={edgeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
             connectionLineStyle={{ strokeWidth: 2, stroke: '#374151' }}
-            connectionMode="loose"
+            connectionMode={ConnectionMode.Loose}
             nodesDraggable={true}
             nodesConnectable={true}
             elementsSelectable={true}
@@ -881,7 +882,7 @@ const ProcessFlowEditorContent: React.FC = () => {
             snapGrid={[15, 15]}
             fitView
           >
-            <Background variant="dots" gap={20} size={1} color="#e5e7eb" />
+            <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#e5e7eb" />
             <Controls />
             <MiniMap nodeColor={nodeColor} />
           </ReactFlow>
@@ -944,6 +945,7 @@ const ProcessFlowEditorContent: React.FC = () => {
         {textConfigNode && (
           <TextConfigDialog
             node={textConfigNode}
+            isOpen={!!textConfigNode}
             onClose={() => setTextConfigNode(null)}
             onSave={handleNodeConfigSave}
           />
@@ -952,6 +954,7 @@ const ProcessFlowEditorContent: React.FC = () => {
         {groupConfigNode && (
           <GroupConfigDialog
             node={groupConfigNode}
+            isOpen={!!groupConfigNode}
             onClose={() => setGroupConfigNode(null)}
             onSave={handleNodeConfigSave}
           />

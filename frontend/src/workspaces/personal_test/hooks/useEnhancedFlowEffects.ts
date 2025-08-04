@@ -32,7 +32,7 @@ export const useEnhancedFlowEffects = (
 ) => {
   const [equipmentStatuses, setEquipmentStatuses] = useState<Map<string, EquipmentStatus>>(new Map());
   const [effectsEnabled, setEffectsEnabled] = useState(true);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const performanceMonitorRef = useRef<{ fps: number; lastTime: number; frameCount: number }>({
     fps: 60,
     lastTime: Date.now(),

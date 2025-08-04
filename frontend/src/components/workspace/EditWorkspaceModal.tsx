@@ -79,7 +79,8 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   const { data: availableGroups } = useQuery({
     queryKey: ['available-groups'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/external/groups');
+      //const response = await apiClient.get('/api/v1/external/groups');
+      const response = await apiClient.get('/api/groups');
       // Groups data loaded
       return response.data;
     },

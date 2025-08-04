@@ -11,6 +11,7 @@ interface ProcessFlow {
     nodes: Node[];
     edges: Edge[];
   };
+  data_source_id?: string;
 }
 
 interface EquipmentStatus {
@@ -35,6 +36,7 @@ interface MeasurementData {
   target_value?: number;
   usl?: number; // Alternative field name for upper_spec_limit
   lsl?: number; // Alternative field name for lower_spec_limit
+  unit?: string; // Added for compatibility
 }
 
 export const useFlowMonitor = (workspaceId: string) => {
@@ -218,7 +220,7 @@ export const useFlowMonitor = (workspaceId: string) => {
                 
                 // Add all measurements to the set (duplicates automatically handled)
                 const measurementSet = monitoredMeasurements.get(node.data.equipmentCode)!;
-                node.data.displayMeasurements.forEach(measurement => {
+                node.data.displayMeasurements.forEach((measurement: string) => {
                   if (!measurementSet.has(measurement)) {
                     measurementSet.add(measurement);
                     totalMonitoredCount++;
@@ -235,8 +237,8 @@ export const useFlowMonitor = (workspaceId: string) => {
             totalMonitoredMeasurements: totalMonitoredCount,
             monitoredEquipment: Array.from(monitoredMeasurements.keys()),
             measurementsCount: newMeasurements.length,
-            measurementsWithSpec: newMeasurements.filter(m => m.spec_status !== undefined && m.spec_status !== null).length,
-            outOfSpecCount: newMeasurements.filter(m => m.spec_status === 1 || m.spec_status === 2).length,
+            measurementsWithSpec: newMeasurements.filter((m: MeasurementData) => m.spec_status !== undefined && m.spec_status !== null).length,
+            outOfSpecCount: newMeasurements.filter((m: MeasurementData) => m.spec_status === 1 || m.spec_status === 2).length,
             timestamp: new Date().toISOString()
           });
           
@@ -250,7 +252,7 @@ export const useFlowMonitor = (workspaceId: string) => {
           
           // Debug: Log all measurements with their equipment codes
           console.log('📊 All measurements by equipment:', 
-            newMeasurements.reduce((acc, m) => {
+            newMeasurements.reduce((acc: any, m: MeasurementData) => {
               if (!acc[m.equipment_code]) acc[m.equipment_code] = [];
               acc[m.equipment_code].push({
                 code: m.measurement_code,
@@ -263,7 +265,7 @@ export const useFlowMonitor = (workspaceId: string) => {
           );
           
           // Debug: Log spec violations in monitored measurements
-          const monitoredSpecViolations = newMeasurements.filter(m => {
+          const monitoredSpecViolations = newMeasurements.filter((m: MeasurementData) => {
             const equipmentMeasurements = monitoredMeasurements.get(m.equipment_code);
             return equipmentMeasurements && 
                    equipmentMeasurements.has(m.measurement_code) &&
@@ -272,7 +274,7 @@ export const useFlowMonitor = (workspaceId: string) => {
           
           if (monitoredSpecViolations.length > 0) {
             console.log('🚨 Monitored measurements with SPEC violations:', 
-              monitoredSpecViolations.map(m => ({
+              monitoredSpecViolations.map((m: MeasurementData) => ({
                 equipment: m.equipment_code,
                 measurement: m.measurement_code,
                 desc: m.measurement_desc,
@@ -371,7 +373,7 @@ export const useFlowMonitor = (workspaceId: string) => {
           });
 
           // Summary of alarm check completion
-          const monitoredAlarmCount = newMeasurements.filter(m => {
+          const monitoredAlarmCount = newMeasurements.filter((m: MeasurementData) => {
             const equipmentMeasurements = monitoredMeasurements.get(m.equipment_code);
             return equipmentMeasurements && 
                    equipmentMeasurements.has(m.measurement_code) &&
@@ -523,7 +525,7 @@ export const useFlowMonitor = (workspaceId: string) => {
               
               // Use updatedNodes to get the current status information and node types
               updatedNodes.forEach(node => {
-                nodeTypeMap.set(node.id, node.type);
+                nodeTypeMap.set(node.id, node.type || 'unknown');
                 if (node.type === 'equipment' && node.data.status) {
                   nodeStatusMap.set(node.id, node.data.status);
                 }
@@ -711,7 +713,7 @@ export const useFlowMonitor = (workspaceId: string) => {
       setMeasurements([]);
       
       // Set new nodes and edges with saved nodeSize applied
-      const savedNodeSize = selectedFlow.flow_data.nodeSize || '1';
+      const savedNodeSize = (selectedFlow.flow_data as any).nodeSize || '1';
       const getNodeHeight = (size: '1' | '2' | '3') => {
         switch (size) {
           case '1': return 170;
@@ -724,7 +726,7 @@ export const useFlowMonitor = (workspaceId: string) => {
       const nodesWithSavedSize = (selectedFlow.flow_data.nodes || []).map((node: any) => {
         if (node.type === 'equipment') {
           // Use saved nodeSize from flow data, fallback to node data, then default
-          const nodeSize = selectedFlow.flow_data?.nodeSize || node.data?.nodeSize || '1';
+          const nodeSize = (selectedFlow.flow_data as any)?.nodeSize || node.data?.nodeSize || '1';
           const defaultHeight = getNodeHeight(nodeSize);
           const defaultWidth = 200;
           

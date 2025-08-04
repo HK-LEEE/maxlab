@@ -14,9 +14,9 @@ interface PermissionManagementModalProps {
 }
 
 interface WorkspaceGroup {
-  id: string;
-  group_name: string;
-  group_display_name?: string;
+  id: string; // Workspace-Group relationship ID
+  group_name: string; // Group UUID (stored as string for legacy compatibility)
+  group_display_name?: string; // Human-readable group name
   permission_level: 'read' | 'write' | 'admin';
   created_at: string;
   created_by: string;
@@ -41,6 +41,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   const [selectedGroup, setSelectedGroup] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedPermission, setSelectedPermission] = useState<'read' | 'write' | 'admin'>('read');
+  const [quickAddPermission, setQuickAddPermission] = useState<'read' | 'write' | 'admin'>('read');
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [userSuggestions, setUserSuggestions] = useState<User[]>([]);
   const [isLoadingUserSearch, setIsLoadingUserSearch] = useState(false);
@@ -69,14 +70,13 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     enabled: !!workspace && isOpen,
   });
 
-  // Fetch available groups
-  const { data: availableGroups } = useQuery({
-    queryKey: ['available-groups'],
+  // Fetch all groups once when modal opens - no search parameter
+  const { data: adminGroupsData, isLoading: isLoadingAdminGroups } = useQuery({
+    queryKey: ['admin-groups'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/external/groups');
-      return response.data;
+      return await authApi.getAdminGroups(0, 100); // Get all groups without search
     },
-    enabled: isOpen,
+    enabled: isOpen, // Fetch once when modal opens
   });
 
   // Search users with debounce
@@ -184,6 +184,23 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     },
   });
 
+  // Update group permission mutation
+  const updateGroupPermissionMutation = useMutation({
+    mutationFn: async ({ groupId, permissionLevel }: { groupId: string; permissionLevel: string }) => {
+      const response = await apiClient.patch(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`, {
+        permission_level: permissionLevel,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });
+      toast.success('Permission updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update permission');
+    },
+  });
+
   if (!isOpen || !workspace) return null;
 
   const handleAddUser = () => {
@@ -197,16 +214,6 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     });
   };
 
-  const handleAddGroup = () => {
-    if (!selectedGroup) {
-      toast.error('Please select a group');
-      return;
-    }
-    addGroupMutation.mutate({
-      group_id: selectedGroup,
-      permission_level: selectedPermission,
-    });
-  };
 
   const handleSelectUser = (user: User) => {
     setSelectedUser(user.email || user.id);
@@ -214,19 +221,30 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     setShowUserDropdown(false);
   };
 
-  const filteredAvailableGroups = availableGroups?.filter((group: Group) => 
-    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (group.display_name && group.display_name.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
-
-  const assignedGroupNames = workspaceGroups?.map((g: WorkspaceGroup) => g.group_name) || [];
-  const unassignedGroups = filteredAvailableGroups.filter((g: Group) => 
-    !assignedGroupNames.includes(g.name)
-  );
+  const allGroups = adminGroupsData || [];
+  
+  // Filter groups based on search term (client-side filtering)
+  const availableGroups = searchTerm
+    ? allGroups.filter((group: Group) => 
+        (group.name && group.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (group.display_name && group.display_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (group.id && group.id.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    : allGroups;
+    
+  const assignedGroupIds = workspaceGroups?.map((g: WorkspaceGroup) => g.id) || [];
+  
+  // Helper function to handle group assignment
+  const handleAssignGroup = (group: Group, permissionLevel: 'read' | 'write' | 'admin' = 'read') => {
+    addGroupMutation.mutate({
+      group_id: group.id,
+      permission_level: permissionLevel,
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[80vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div>
             <h2 className="text-lg font-semibold">Manage Permissions</h2>
@@ -377,99 +395,190 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
                 </div>
               </>
             ) : (
-              <>
-                {/* Add Group Section */}
-                <div className="mb-6">
-                  <h3 className="text-md font-medium mb-3">Add Group Permission</h3>
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                <input
-                  type="text"
-                  placeholder="Search groups..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-                />
-              </div>
-              <select
-                value={selectedGroup}
-                onChange={(e) => setSelectedGroup(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-              >
-                <option value="">Select a group</option>
-                {unassignedGroups.map((group: Group) => (
-                  <option key={group.id} value={group.id}>
-                    {group.display_name || group.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={selectedPermission}
-                onChange={(e) => setSelectedPermission(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-              >
-                <option value="read">Read</option>
-                <option value="write">Write</option>
-                <option value="admin">Admin</option>
-              </select>
-              <button
-                onClick={handleAddGroup}
-                disabled={!selectedGroup || addGroupMutation.isPending}
-                className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <Plus size={16} />
-                Add
-              </button>
-            </div>
-          </div>
-
-          {/* Current Permissions */}
-          <div>
-            <h3 className="text-md font-medium mb-3">Current Permissions</h3>
-            {isLoadingGroups ? (
-              <div className="text-center py-4 text-gray-500">Loading permissions...</div>
-            ) : workspaceGroups?.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">No groups assigned yet</div>
-            ) : (
-              <div className="space-y-2">
-                {workspaceGroups?.map((group: WorkspaceGroup) => (
-                  <div
-                    key={group.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        {group.group_display_name || group.group_name}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Group: {group.group_name}
-                      </div>
+              <div className="flex gap-4 h-[500px]">
+                {/* Left Sidebar - Available Groups */}
+                <div className="w-1/2 flex flex-col border-r pr-4">
+                  <div className="mb-4">
+                    <h3 className="text-md font-medium mb-3">Available Groups</h3>
+                    <div className="relative mb-3">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                      <input
+                        type="text"
+                        placeholder="Search by name or UUID..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                      />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`px-3 py-1 text-sm rounded-full ${
-                        group.permission_level === 'admin'
-                          ? 'bg-purple-100 text-purple-800'
-                          : group.permission_level === 'write'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {group.permission_level}
-                      </span>
-                      <button
-                        onClick={() => removeGroupMutation.mutate(group.id)}
-                        disabled={removeGroupMutation.isPending}
-                        className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                    
+                    {/* Quick Permission Selector */}
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-600">Default permission:</span>
+                      <div className="flex gap-1">
+                        {(['read', 'write', 'admin'] as const).map((level) => (
+                          <button
+                            key={level}
+                            onClick={() => setQuickAddPermission(level)}
+                            className={`px-2 py-1 rounded capitalize ${
+                              quickAddPermission === level
+                                ? 'bg-black text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {level}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+
+                  {/* Groups List */}
+                  <div className="flex-1 overflow-y-auto">
+                    {isLoadingAdminGroups ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <Loader2 size={20} className="animate-spin mx-auto mb-2" />
+                        Loading groups...
+                      </div>
+                    ) : availableGroups.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500">
+                        {searchTerm ? 'No groups found matching your search' : 'No groups available'}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {availableGroups.map((group: Group) => {
+                          const isAssigned = workspaceGroups?.some((wg: WorkspaceGroup) => 
+                            wg.group_name === group.id // group_name stores the UUID
+                          );
+                          
+                          return (
+                            <div
+                              key={group.id}
+                              className={`p-3 rounded-md border transition-all cursor-pointer ${
+                                isAssigned 
+                                  ? 'bg-gray-100 border-gray-300 opacity-50 cursor-not-allowed' 
+                                  : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-sm'
+                              }`}
+                              onClick={() => !isAssigned && setSelectedGroup(group.id)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">
+                                    {group.display_name || group.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    <span className="text-gray-400">UUID:</span> <span className="font-mono">{group.id}</span>
+                                  </div>
+                                  {group.description && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {group.description}
+                                    </div>
+                                  )}
+                                  {(group.members_count !== undefined || group.users_count !== undefined) && (
+                                    <div className="text-xs text-gray-400 mt-1">
+                                      {group.members_count || group.users_count} members
+                                    </div>
+                                  )}
+                                </div>
+                                {!isAssigned && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAssignGroup(group, quickAddPermission);
+                                    }}
+                                    className="px-3 py-1 text-xs bg-black text-white rounded hover:bg-gray-800 transition-colors"
+                                  >
+                                    Add →
+                                  </button>
+                                )}
+                                {isAssigned && (
+                                  <span className="text-xs text-gray-500">Already assigned</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </>
+
+                {/* Right Panel - Assigned Groups */}
+                <div className="w-1/2 flex flex-col pl-4">
+                  <div className="mb-4">
+                    <h3 className="text-md font-medium mb-3">Assigned Groups</h3>
+                    <p className="text-sm text-gray-600">Groups with access to this workspace</p>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto">
+                    {isLoadingGroups ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <Loader2 size={20} className="animate-spin mx-auto mb-2" />
+                        Loading permissions...
+                      </div>
+                    ) : workspaceGroups?.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <Users size={40} className="mx-auto mb-2 text-gray-300" />
+                        <p>No groups assigned yet</p>
+                        <p className="text-xs mt-1">Add groups from the left panel</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {workspaceGroups?.map((group: WorkspaceGroup) => (
+                          <div
+                            key={group.id}
+                            className="p-3 bg-gray-50 rounded-md border border-gray-200"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">
+                                  {group.group_display_name || 'Group'}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  <span className="text-gray-400">UUID:</span> <span className="font-mono">{group.group_name}</span>
+                                </div>
+                                <div className="text-xs text-gray-400 mt-1">
+                                  Added on {new Date(group.created_at).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <select
+                                  value={group.permission_level}
+                                  onChange={(e) => {
+                                    updateGroupPermissionMutation.mutate({
+                                      groupId: group.id,
+                                      permissionLevel: e.target.value,
+                                    });
+                                  }}
+                                  disabled={updateGroupPermissionMutation.isPending}
+                                  className={`px-2 py-1 text-xs rounded border ${
+                                    group.permission_level === 'admin'
+                                      ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                      : group.permission_level === 'write'
+                                      ? 'bg-blue-100 text-blue-800 border-blue-200'
+                                      : 'bg-gray-100 text-gray-800 border-gray-200'
+                                  } disabled:opacity-50`}
+                                >
+                                  <option value="read">Read</option>
+                                  <option value="write">Write</option>
+                                  <option value="admin">Admin</option>
+                                </select>
+                                <button
+                                  onClick={() => removeGroupMutation.mutate(group.id)}
+                                  disabled={removeGroupMutation.isPending}
+                                  className="text-red-600 hover:text-red-800 disabled:opacity-50 p-1"
+                                  title="Remove group"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

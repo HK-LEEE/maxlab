@@ -27,14 +27,14 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
   //   measurementsCount: measurements.length
   // });
 
-  const statusConfig = {
+  const statusConfig: Record<string, { text: string; bgColor: string; textColor: string }> = {
     ACTIVE: { text: '운행중', bgColor: 'bg-green-100', textColor: 'text-green-800' },
     PAUSE: { text: '일시정지', bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
     STOP: { text: '정지', bgColor: 'bg-red-100', textColor: 'text-red-800' },
   };
 
   const status = equipmentStatus?.status || 'STOP';
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.STOP;
 
   // 외부시스템 연동 - 상세 보기 버튼 클릭 처리
   const handleDetailView = (measurementCode: string) => {

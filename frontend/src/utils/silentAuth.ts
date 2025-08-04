@@ -15,6 +15,7 @@ interface SilentAuthResult {
     scope: string;
     refresh_token?: string;
     refresh_expires_in?: number;
+    id_token?: string;
   };
   error?: string;
 }

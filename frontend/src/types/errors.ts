@@ -16,8 +16,8 @@ export interface AuthErrorData {
   error_title: string;
   user_message: string;
   user_action: string;
-  severity: string;
-  category: string;
+  severity: ErrorSeverity;
+  category: ErrorCategory;
   request_id?: string;
   additional_details?: Record<string, any>;
 }

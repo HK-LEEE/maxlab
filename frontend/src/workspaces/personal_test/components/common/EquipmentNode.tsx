@@ -97,7 +97,7 @@ const getStatusConfig = (status: string) => {
 };
 
 export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
-  const { data, selected, style, id, ...nodeProps } = props;
+  const { data, selected, id, ...nodeProps } = props;
   
   const status = getStatusConfig(data.status);
   const icon = data.icon ? iconMap[data.icon] : <Gauge size={20} />;
@@ -190,16 +190,16 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
   };
 
   // Calculate actual node dimensions with multiple fallback strategies
-  const propsStyleHeight = parseStyleValue(style?.height, 'props');
-  const propsStyleWidth = parseStyleValue(style?.width, 'props');
+  const propsStyleHeight = parseStyleValue(currentNode?.style?.height, 'props');
+  const propsStyleWidth = parseStyleValue(currentNode?.style?.width, 'props');
   const reactFlowStyleHeight = parseStyleValue(currentNode?.style?.height, 'reactFlow');
   const reactFlowStyleWidth = parseStyleValue(currentNode?.style?.width, 'reactFlow');
   
   // Direct access as fallback (bypass parseStyleValue)
   const directReactFlowHeight = currentNode?.style?.height;
   const directReactFlowWidth = currentNode?.style?.width;
-  const directPropsHeight = style?.height;
-  const directPropsWidth = style?.width;
+  const directPropsHeight = currentNode?.style?.height;
+  const directPropsWidth = currentNode?.style?.width;
   
   const defaultHeight = getNodeHeight(nodeSize);
   
@@ -234,8 +234,8 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
   useEffect(() => {
     const reactFlowHeight = parseStyleValue(currentNode?.style?.height);
     const reactFlowWidth = parseStyleValue(currentNode?.style?.width);
-    const propsHeight = parseStyleValue(style?.height);
-    const propsWidth = parseStyleValue(style?.width);
+    const propsHeight = parseStyleValue(currentNode?.style?.height);
+    const propsWidth = parseStyleValue(currentNode?.style?.width);
     
     
     // Use ReactFlow style as primary source, but preserve larger existing values
@@ -280,14 +280,14 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       
       setResizedDimensions(defaultDimensions);
     }
-  }, [currentNode?.style?.height, currentNode?.style?.width, style?.height, style?.width, nodeSize, id]); // Sync when ReactFlow or props style changes, but NOT on selection changes
+  }, [currentNode?.style?.height, currentNode?.style?.width, nodeSize, id]); // Sync when ReactFlow style changes, but NOT on selection changes
 
 
   // Force re-render when style changes (reduced logging)
   useEffect(() => {
     // This effect ensures the component re-renders when ReactFlow style changes
     // Logging removed to reduce console noise
-  }, [style?.height, style?.width, actualNodeHeight, actualNodeWidth]);
+  }, [currentNode?.style?.height, currentNode?.style?.width, actualNodeHeight, actualNodeWidth]);
 
   // Update resized dimensions when nodeSize changes from settings - PRESERVE larger user-resized dimensions
   useEffect(() => {
@@ -552,7 +552,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
         className={`
           rounded-lg border-2 bg-white shadow-sm overflow-hidden
           ${selected ? 'border-blue-500 shadow-lg' : data.equipmentType ? 'border-gray-300' : 'border-gray-300 border-dashed'}
-          min-w-[200px] ${style?.width ? '' : 'w-full'} flex flex-col
+          min-w-[200px] ${currentNode?.style?.width ? '' : 'w-full'} flex flex-col
         `}
         style={{ 
           height: `${actualNodeHeight}px`,

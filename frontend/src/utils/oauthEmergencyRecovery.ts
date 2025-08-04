@@ -111,7 +111,7 @@ export async function performEmergencyOAuthRecovery(
 
   } catch (error) {
     console.error('❌ OAuth emergency recovery failed:', error);
-    actionsPerformed.push(`Recovery failed: ${error.message}`);
+    actionsPerformed.push(`Recovery failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 
   // Generate user message

@@ -28,8 +28,8 @@ export const PopupDiagnostic: React.FC<PopupDiagnosticProps> = ({ onClose }) => 
   });
 
   const logRef = useRef<HTMLDivElement>(null);
-  const messageListenerRef = useRef<(event: MessageEvent) => void>();
-  const broadcastListenerRef = useRef<BroadcastChannel>();
+  const messageListenerRef = useRef<((event: MessageEvent) => void) | null>(null);
+  const broadcastListenerRef = useRef<BroadcastChannel | null>(null);
 
   const addLog = (level: DiagnosticLog['level'], message: string, data?: any) => {
     const newLog: DiagnosticLog = {
@@ -258,13 +258,13 @@ export const PopupDiagnostic: React.FC<PopupDiagnosticProps> = ({ onClose }) => 
             }, '*');
             addLog('debug', '📤 Sent PARENT_READY message to popup');
           } catch (e) {
-            addLog('warn', `⚠️ Failed to send PARENT_READY: ${e.message}`);
+            addLog('warn', `⚠️ Failed to send PARENT_READY: ${e instanceof Error ? e.message : String(e)}`);
           }
         }
       }, 2000);
 
     } catch (error) {
-      addLog('error', `❌ Failed to open popup: ${error.message}`);
+      addLog('error', `❌ Failed to open popup: ${error instanceof Error ? error.message : String(error)}`);
       setIsTestingPopup(false);
     }
   };

@@ -60,7 +60,7 @@ const DatabaseSetup: React.FC = () => {
   // Get user's group ID (in real implementation, this would come from auth context)
   useEffect(() => {
     if (!isAdmin && user?.group_id) {
-      setFormData(prev => ({ ...prev, groupid: user.group_id }));
+      setFormData(prev => ({ ...prev, groupid: user.group_id || '' }));
     }
   }, [user, isAdmin]);
 

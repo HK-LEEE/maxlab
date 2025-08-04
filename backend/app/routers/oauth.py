@@ -259,6 +259,15 @@ async def oauth_userinfo(
                     userinfo_response = response.json()
                     logger.info(f"UserInfo request successful for user: {userinfo_response.get('sub', 'unknown')}")
                     
+                    # OAuth 서버 응답 전체를 로깅 (is_admin 포함 여부 확인)
+                    logger.info(f"OAuth server userinfo response: {userinfo_response}")
+                    
+                    # is_admin 필드 존재 여부 명시적 로깅
+                    if 'is_admin' in userinfo_response:
+                        logger.info(f"is_admin field found in OAuth response: {userinfo_response['is_admin']}")
+                    else:
+                        logger.info("is_admin field NOT found in OAuth response")
+                    
                     return JSONResponse(
                         status_code=status.HTTP_200_OK,
                         content=userinfo_response,

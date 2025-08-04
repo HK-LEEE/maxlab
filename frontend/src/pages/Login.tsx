@@ -105,7 +105,7 @@ export const Login: React.FC = () => {
     if (oauthReturnInfo.isOAuthReturn) {
       console.log('🔄 OAuth return flow detected');
       if (oauthReturnInfo.message) {
-        toast.info(oauthReturnInfo.message, { duration: 5000 });
+        toast(oauthReturnInfo.message, { duration: 5000 });
       }
     }
   }, []);
@@ -346,9 +346,11 @@ export const Login: React.FC = () => {
           
         } catch (cleanupError) {
           console.error('❌ Security cleanup error:', cleanupError);
-          console.error('❌ Error stack:', cleanupError.stack);
-          console.error('❌ Error name:', cleanupError.name);
-          console.error('❌ Error message:', cleanupError.message);
+          if (cleanupError instanceof Error) {
+            console.error('❌ Error stack:', cleanupError.stack);
+            console.error('❌ Error name:', cleanupError.name);
+            console.error('❌ Error message:', cleanupError.message);
+          }
           
           toast.dismiss(cleanupToast);
           toast.error('보안 정리 실패. 계속 진행합니다.', {
@@ -404,7 +406,9 @@ export const Login: React.FC = () => {
         devLog.debug('✅ Login.tsx: OAuth login successful, user:', user);
       } catch (authError) {
         console.error('🔥 authService.loginWithPopupOAuth error:', authError);
-        console.error('🔥 Error stack:', authError.stack);
+        if (authError instanceof Error) {
+          console.error('🔥 Error stack:', authError.stack);
+        }
         
         // Dismiss the loading toast and re-throw the error
         if (authToast) {

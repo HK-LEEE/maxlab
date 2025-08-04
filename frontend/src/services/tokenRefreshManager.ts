@@ -480,8 +480,8 @@ export class TokenRefreshManager {
   /**
    * 갱신 상태 정보 반환 - Refresh Token 정보 포함
    */
-  public getRefreshStatus() {
-    const refreshTokenDebug = refreshTokenService.getDebugInfo();
+  public async getRefreshStatus() {
+    const refreshTokenDebug = await refreshTokenService.getDebugInfo();
     
     return {
       refreshInProgress: this.refreshInProgress,

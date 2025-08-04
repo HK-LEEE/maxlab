@@ -252,7 +252,7 @@ export function createBasicTokenFlowTestSuite(): TokenFlowTestSuite {
         execute: async (): Promise<TokenFlowStepResult> => {
           const startTime = Date.now();
           try {
-            const refreshStatus = tokenRefreshManager.getRefreshStatus();
+            const refreshStatus = await tokenRefreshManager.getRefreshStatus();
             const debugInfo = await refreshTokenService.getDebugInfo();
             
             return {

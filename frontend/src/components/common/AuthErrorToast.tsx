@@ -16,6 +16,7 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react';
+import type { ErrorCategory } from '../../types/errors';
 
 export interface AuthErrorToastProps {
   isVisible: boolean;
@@ -290,7 +291,7 @@ export const useAuthErrorToast = () => {
   };
 
   const showAuthError = (errorCode: string, message: string, severity: ToastData['error']['severity'] = 'medium') => {
-    const category = errorCode.startsWith('AUTH') ? 'AUTH' :
+    const category: ErrorCategory = errorCode.startsWith('AUTH') ? 'AUTH' :
                    errorCode.startsWith('PERM') ? 'PERM' :
                    errorCode.startsWith('CONN') ? 'CONN' :
                    errorCode.startsWith('CONFIG') ? 'CONFIG' :

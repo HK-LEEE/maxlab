@@ -21,6 +21,7 @@ export interface OAuthMessage {
   token?: string;
   tokenData?: TokenResponse;
   error?: string;
+  error_description?: string;
   acknowledged?: boolean;
 }
 
@@ -852,7 +853,7 @@ export class PopupOAuthLogin {
       if (event.source && typeof event.source.postMessage === 'function') {
         try {
           console.log('📤 Sending acknowledgment to popup...');
-          event.source.postMessage({ type: 'OAUTH_ACK' }, event.origin === 'null' ? '*' : event.origin);
+          (event.source as Window).postMessage({ type: 'OAUTH_ACK' }, event.origin === 'null' ? '*' : event.origin);
           console.log('✅ Acknowledgment sent to popup');
         } catch (e) {
           console.error('Failed to send acknowledgment to popup:', e);
@@ -886,7 +887,7 @@ export class PopupOAuthLogin {
       // Send acknowledgment for error case too
       if (event.source && typeof event.source.postMessage === 'function') {
         try {
-          event.source.postMessage({ type: 'OAUTH_ACK' }, event.origin === 'null' ? '*' : event.origin);
+          (event.source as Window).postMessage({ type: 'OAUTH_ACK' }, event.origin === 'null' ? '*' : event.origin);
         } catch (e) {
           console.error('Failed to send error acknowledgment:', e);
         }
@@ -1471,7 +1472,7 @@ export async function exchangeCodeForToken(code: string, state?: string): Promis
                   codeVerifier = parsedFlow.codeVerifier;
                   console.log('✅ Found code verifier via direct sessionStorage search:', {
                     flowId: parsedFlow.flowId,
-                    codeVerifierLength: codeVerifier.length
+                    codeVerifierLength: codeVerifier?.length || 0
                   });
                   break;
                 }

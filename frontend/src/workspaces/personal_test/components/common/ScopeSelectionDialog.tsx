@@ -158,7 +158,7 @@ export const ScopeSelectionDialog: React.FC<ScopeSelectionDialogProps> = ({
                       w-5 h-5 mt-0.5 flex-shrink-0
                       ${isSelected ? `text-${option.color}-600` : 'text-gray-400'}
                     `}>
-                      <IconComponent size={20} />
+                      <IconComponent className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-gray-900">

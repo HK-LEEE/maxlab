@@ -19,6 +19,13 @@ export interface OIDCClaims {
 
 // MAX Platform Enhanced Claims
 export interface MAXPlatformClaims extends OIDCClaims {
+  // Standard JWT claims
+  iss?: string;             // Issuer
+  aud?: string | string[];  // Audience
+  exp?: number;             // Expiration time
+  iat?: number;             // Issued at
+  nonce?: string;           // Nonce for OIDC
+  
   // Group information
   group_id?: string;        // Primary group ID
   group_name?: string;      // Primary group name
@@ -69,6 +76,10 @@ export interface User {
   is_verified?: boolean;
   approval_status?: string;
   groups?: string[];
+  group_id?: string; // Primary group ID
+  
+  // Additional fields
+  last_login?: string;
 }
 
 export interface LoginCredentials {

@@ -4,7 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { rateLimitMonitor, RateLimitInfo, RateLimitWarning, RateLimitRule } from '../services/rateLimitMonitor';
+import { rateLimitMonitor } from '../services/rateLimitMonitor';
+import type { RateLimitInfo, RateLimitWarning, RateLimitRule } from '../services/rateLimitMonitor';
 
 export interface RateLimitHookState {
   status: RateLimitInfo | null;

@@ -3,7 +3,8 @@
  * Specialized error handling for ReactFlow components and operations
  */
 
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Download, Upload } from 'lucide-react';
 import { ErrorBoundary } from '../../../../components/common/ErrorBoundary';
 import { toast } from 'react-hot-toast';

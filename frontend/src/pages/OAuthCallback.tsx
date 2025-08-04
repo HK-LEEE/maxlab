@@ -324,8 +324,8 @@ export const OAuthCallback: React.FC = () => {
             console.log('🎯 OAuth Callback - Popup Mode Processing Started');
             
             // 🔒 SECURITY: Enhanced state validation using new state manager
-            let validation = validateOAuthFlow(state);
-            let flowState = getOAuthFlow(state);
+            let validation = validateOAuthFlow(state || '');
+            let flowState = getOAuthFlow(state || '');
             
             // 🔧 CRITICAL FIX: Handle _force_ state patterns for different user login
             if ((!validation.isValid || !flowState) && state?.includes('_force_')) {
@@ -593,7 +593,7 @@ export const OAuthCallback: React.FC = () => {
 
             // 토큰 교환 with state parameter for new state manager
             console.log('💱 Starting token exchange for code:', code.substring(0, 8) + '...');
-            const tokenResponse = await exchangeCodeForToken(code, state);
+            const tokenResponse = await exchangeCodeForToken(code, state || undefined);
             console.log('✅ Token exchange successful:', {
               hasAccessToken: !!tokenResponse.access_token,
               hasRefreshToken: !!tokenResponse.refresh_token,
@@ -947,7 +947,7 @@ export const OAuthCallback: React.FC = () => {
                         window.close();
                       }
                     },
-                    () => window.open('', '_self', '').close()
+                    () => window.open('', '_self', '')?.close()
                   ];
                   
                   // Try all close methods
@@ -1016,7 +1016,7 @@ export const OAuthCallback: React.FC = () => {
         } else {
           // 일반 모드 (direct navigation to callback URL)
           try {
-            const tokenResponse = await exchangeCodeForToken(code, state);
+            const tokenResponse = await exchangeCodeForToken(code, state || undefined);
             
             // 성공 표시
             hasProcessedRef.current = true;

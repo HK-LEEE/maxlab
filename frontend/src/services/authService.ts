@@ -756,7 +756,7 @@ export const authService = {
           clearInterval(refreshInterval);
           await authService.logout();
           window.dispatchEvent(new CustomEvent('auth:logout', { 
-            detail: { reason: 'critical_error', error: error.message } 
+            detail: { reason: 'critical_error', error: error instanceof Error ? error.message : String(error) } 
           }));
         }
       }
@@ -946,7 +946,7 @@ export const authService = {
       
       // Issuer 검증
       const expectedIssuer = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
-      if (!claims.iss.startsWith(expectedIssuer)) {
+      if (!claims.iss || !claims.iss.startsWith(expectedIssuer)) {
         throw new Error('Invalid issuer in ID Token');
       }
       

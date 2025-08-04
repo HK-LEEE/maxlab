@@ -8,6 +8,7 @@ import ReactFlow, {
   useEdgesState,
   Panel,
   ReactFlowProvider,
+  ConnectionLineType,
 } from 'reactflow';
 import type { Node, Edge, Connection } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -58,6 +59,8 @@ interface ProcessFlow {
     nodes: Node[];
     edges: Edge[];
   };
+  updated_at: string;
+  created_at: string;
 }
 
 export const ProcessFlowEditor: React.FC = () => {
@@ -182,11 +185,11 @@ export const ProcessFlowEditor: React.FC = () => {
     const firstNode = selected[0];
     const firstNodeBounds = {
       left: firstNode.position.x,
-      right: firstNode.position.x + (firstNode.style?.width || 200),
+      right: firstNode.position.x + (typeof firstNode.style?.width === 'number' ? firstNode.style.width : 200),
       top: firstNode.position.y,
-      bottom: firstNode.position.y + (firstNode.style?.height || 150),
-      centerX: firstNode.position.x + ((firstNode.style?.width || 200) / 2),
-      centerY: firstNode.position.y + ((firstNode.style?.height || 150) / 2)
+      bottom: firstNode.position.y + (typeof firstNode.style?.height === 'number' ? firstNode.style.height : 150),
+      centerX: firstNode.position.x + ((typeof firstNode.style?.width === 'number' ? firstNode.style.width : 200) / 2),
+      centerY: firstNode.position.y + ((typeof firstNode.style?.height === 'number' ? firstNode.style.height : 150) / 2)
     };
 
     if (alignment === 'distribute-h' || alignment === 'distribute-v') {
@@ -230,19 +233,19 @@ export const ProcessFlowEditor: React.FC = () => {
               newPosition.y = firstNodeBounds.top;
               break;
             case 'bottom':
-              newPosition.y = firstNodeBounds.bottom - (node.style?.height || 150);
+              newPosition.y = firstNodeBounds.bottom - (typeof node.style?.height === 'number' ? node.style.height : 150);
               break;
             case 'left':
               newPosition.x = firstNodeBounds.left;
               break;
             case 'right':
-              newPosition.x = firstNodeBounds.right - (node.style?.width || 200);
+              newPosition.x = firstNodeBounds.right - (typeof node.style?.width === 'number' ? node.style.width : 200);
               break;
             case 'center-h':
-              newPosition.x = firstNodeBounds.centerX - ((node.style?.width || 200) / 2);
+              newPosition.x = firstNodeBounds.centerX - ((typeof node.style?.width === 'number' ? node.style.width : 200) / 2);
               break;
             case 'center-v':
-              newPosition.y = firstNodeBounds.centerY - ((node.style?.height || 150) / 2);
+              newPosition.y = firstNodeBounds.centerY - ((typeof node.style?.height === 'number' ? node.style.height : 150) / 2);
               break;
           }
           
@@ -676,7 +679,7 @@ export const ProcessFlowEditor: React.FC = () => {
               onDragOver={onDragOver}
               nodeTypes={nodeTypes}
               defaultEdgeOptions={defaultEdgeOptions}
-              connectionLineType="step"
+              connectionLineType={ConnectionLineType.Step}
               connectionLineStyle={connectionLineStyle}
               fitView
               minZoom={0.1}
@@ -718,18 +721,16 @@ export const ProcessFlowEditor: React.FC = () => {
       </div>
 
       {/* Node Configuration Dialog */}
-      <NodeConfigDialog
-        node={selectedNode}
-        isOpen={isConfigDialogOpen}
-        onClose={() => {
-          setIsConfigDialogOpen(false);
-          setSelectedNode(null);
-        }}
-        onSave={handleNodeConfigSave}
-        equipmentTypes={equipmentTypes}
-        availableEquipment={equipmentList}
-        availableMeasurements={measurementsList}
-      />
+      {selectedNode && (
+        <NodeConfigDialog
+          node={selectedNode}
+          onClose={() => {
+            setIsConfigDialogOpen(false);
+            setSelectedNode(null);
+          }}
+          onSave={handleNodeConfigSave}
+        />
+      )}
 
       {/* Context Menu for Node Alignment */}
       {contextMenu && (

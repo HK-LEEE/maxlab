@@ -170,9 +170,9 @@ export class OAuthCrossOriginRecovery {
       return pollingResult;
     }
     
-    const finalResult = {
+    const finalResult: RecoveryResult = {
       success: false,
-      method: 'polling',
+      method: 'polling' as const,
       error: 'All cross-origin recovery methods failed'
     };
     

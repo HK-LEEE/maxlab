@@ -5,10 +5,10 @@
 
 import React from 'react';
 import { SessionLogoutModal } from './SessionLogoutModal';
-import { useSecureLogout } from '../../hooks/useSecureLogout';
+import { useSessionLogout } from '../../hooks/useSessionLogout';
 
 export const SessionLogoutModalWrapper: React.FC = () => {
-  const { sessionLogout } = useSecureLogout();
+  const sessionLogout = useSessionLogout();
   
   console.log('🔓 SessionLogoutModalWrapper: Rendered with modal state:', sessionLogout.isModalOpen);
 
@@ -17,7 +17,7 @@ export const SessionLogoutModalWrapper: React.FC = () => {
       isOpen={sessionLogout.isModalOpen}
       onClose={sessionLogout.closeModal}
       sessionsData={sessionLogout.sessionsData}
-      isLoading={false} // Loading state is handled in the hook
+      isLoading={sessionLogout.isLoading}
       onLogout={sessionLogout.executeLogout}
       fetchActiveSessions={sessionLogout.fetchActiveSessions}
     />

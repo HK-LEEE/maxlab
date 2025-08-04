@@ -3,7 +3,8 @@
  * Specialized error handling for individual node components
  */
 
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { AlertTriangle, Zap } from 'lucide-react';
 import { ErrorBoundary } from '../../../../components/common/ErrorBoundary';
 

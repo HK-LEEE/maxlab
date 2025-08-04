@@ -27,7 +27,7 @@ export function DataSourceConfigDialog({
   onClose,
   workspaceId,
 }: DataSourceConfigDialogProps) {
-  const { token } = useAuthStore();
+  const token = localStorage.getItem('accessToken');
   const [dataSources, setDataSources] = useState<DataSourceConfig[]>([]);
   const [selectedSource, setSelectedSource] = useState<DataSourceConfig | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,13 +83,13 @@ export function DataSourceConfigDialog({
       }
       
       // Check for valid source type
-      if (!selectedSource.source_type || selectedSource.source_type === 'default') {
+      if (!selectedSource.source_type) {
         alert('❌ 올바른 데이터 소스 타입을 선택해주세요.\n\n지원되는 타입: MSSQL, PostgreSQL, API');
         return;
       }
       
       // Additional validation for MSSQL
-      if (selectedSource.source_type === 'mssql' || selectedSource.source_type === 'MSSQL') {
+      if (selectedSource.source_type === 'mssql') {
         if (!connectionString.toLowerCase().includes('server=') && 
             !connectionString.toLowerCase().includes('data source=')) {
           alert('❌ MSSQL 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nServer=서버주소;Database=데이터베이스명;User=사용자명;Password=비밀번호;');
@@ -98,7 +98,7 @@ export function DataSourceConfigDialog({
       }
       
       // Additional validation for PostgreSQL
-      if (selectedSource.source_type === 'postgresql' || selectedSource.source_type === 'POSTGRESQL') {
+      if (selectedSource.source_type === 'postgresql') {
         if (!connectionString.toLowerCase().includes('host=') && 
             !connectionString.toLowerCase().includes('postgresql://')) {
           alert('❌ PostgreSQL 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nHost=호스트;Database=데이터베이스명;Username=사용자명;Password=비밀번호;\n또는\npostgresql://username:password@host:port/database');
@@ -107,7 +107,7 @@ export function DataSourceConfigDialog({
       }
       
       // Additional validation for API
-      if (selectedSource.source_type === 'api' || selectedSource.source_type === 'API') {
+      if (selectedSource.source_type === 'api') {
         if (!connectionString.toLowerCase().startsWith('http://') && 
             !connectionString.toLowerCase().startsWith('https://')) {
           alert('❌ API 연결 문자열이 올바르지 않습니다.\n\n올바른 형식:\nhttps://api.example.com/endpoint');

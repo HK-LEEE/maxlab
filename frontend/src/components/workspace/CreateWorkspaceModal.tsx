@@ -29,6 +29,9 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   const [permissionMode, setPermissionMode] = useState<'user' | 'group'>('user');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const [selectedUserData, setSelectedUserData] = useState<Map<string, User>>(new Map());
+  const [selectedGroupData, setSelectedGroupData] = useState<Map<string, Group>>(new Map());
+  const [availableGroups, setAvailableGroups] = useState<Group[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [groupSearch, setGroupSearch] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +44,27 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   const [isLoadingGroups, setIsLoadingGroups] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showGroupDropdown, setShowGroupDropdown] = useState(false);
+
+  // Fetch available groups when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      authApi.searchGroups('').then((groups) => {
+        setAvailableGroups(groups);
+        // If user has groups, try to match them with fetched groups
+        if (currentUser.groups && currentUser.groups.length > 0 && groups.length > 0) {
+          const firstGroup = groups.find(g => 
+            currentUser.groups?.includes(g.name) || 
+            currentUser.groups?.includes(g.id)
+          );
+          if (firstGroup && formData.workspace_type === WorkspaceType.GROUP) {
+            setFormData(prev => ({ ...prev, owner_id: firstGroup.id }));
+          }
+        }
+      }).catch(() => {
+        // Failed to fetch groups
+      });
+    }
+  }, [isOpen, currentUser.groups, formData.workspace_type]);
 
   // Search users with debounce
   useEffect(() => {
@@ -89,17 +113,20 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   }, [groupSearch]);
 
   const handleSelectUser = (user: User) => {
-    const userId = user.email || user.id;
+    const userId = user.id;
     if (!selectedUsers.includes(userId)) {
       setSelectedUsers([...selectedUsers, userId]);
+      setSelectedUserData(new Map(selectedUserData).set(userId, user));
     }
     setUserSearch('');
     setShowUserDropdown(false);
   };
 
   const handleSelectGroup = (group: Group) => {
-    if (!selectedGroups.includes(group.name)) {
-      setSelectedGroups([...selectedGroups, group.name]);
+    const groupId = group.id;
+    if (!selectedGroups.includes(groupId)) {
+      setSelectedGroups([...selectedGroups, groupId]);
+      setSelectedGroupData(new Map(selectedGroupData).set(groupId, group));
     }
     setGroupSearch('');
     setShowGroupDropdown(false);
@@ -148,6 +175,8 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
       });
       setSelectedUsers([]);
       setSelectedGroups([]);
+      setSelectedUserData(new Map());
+      setSelectedGroupData(new Map());
       setPermissionMode('user');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create workspace');
@@ -157,13 +186,22 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   };
 
   const handleWorkspaceTypeChange = (type: WorkspaceType) => {
+    let ownerId = currentUser.user_id || '';
+    
+    if (type === WorkspaceType.GROUP && availableGroups.length > 0) {
+      // Try to find a matching group
+      const matchingGroup = availableGroups.find(g => 
+        currentUser.groups?.includes(g.name) || 
+        currentUser.groups?.includes(g.id)
+      );
+      ownerId = matchingGroup?.id || availableGroups[0].id;
+    }
+    
     setFormData({
       ...formData,
       workspace_type: type,
       owner_type: type === WorkspaceType.GROUP ? OwnerType.GROUP : OwnerType.USER,
-      owner_id: type === WorkspaceType.GROUP && currentUser.groups?.[0] 
-        ? currentUser.groups[0] 
-        : currentUser.user_id || '',
+      owner_id: ownerId,
     });
   };
 
@@ -257,7 +295,7 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
             </div>
           </div>
 
-          {formData.workspace_type === WorkspaceType.GROUP && currentUser.groups && currentUser.groups.length > 0 && (
+          {formData.workspace_type === WorkspaceType.GROUP && availableGroups.length > 0 && (
             <div>
               <label className="block text-sm font-medium mb-2">
                 Select Group
@@ -267,9 +305,9 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, owner_id: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
               >
-                {currentUser.groups.map((group) => (
-                  <option key={group} value={group}>
-                    {group}
+                {availableGroups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.display_name || group.name}
                   </option>
                 ))}
               </select>
@@ -313,7 +351,7 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
                           <div className="text-sm font-medium">{user.full_name || user.username || user.email}</div>
                           <div className="text-xs text-gray-500">{user.email}</div>
                         </div>
-                        {selectedUsers.includes(user.email || user.id) && (
+                        {selectedUsers.includes(user.id) && (
                           <Check size={16} className="text-green-600" />
                         )}
                       </button>
@@ -324,18 +362,26 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
 
               {selectedUsers.length > 0 && (
                 <div className="space-y-1 mt-2">
-                  {selectedUsers.map((user) => (
-                    <div key={user} className="flex items-center justify-between px-2 py-1 bg-gray-50 rounded text-sm">
-                      <span>{user}</span>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedUsers(selectedUsers.filter(u => u !== user))}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
+                  {selectedUsers.map((userId) => {
+                    const userData = selectedUserData.get(userId);
+                    return (
+                      <div key={userId} className="flex items-center justify-between px-2 py-1 bg-gray-50 rounded text-sm">
+                        <span>{userData?.full_name || userData?.username || userData?.email || userId}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedUsers(selectedUsers.filter(u => u !== userId));
+                            const newMap = new Map(selectedUserData);
+                            newMap.delete(userId);
+                            setSelectedUserData(newMap);
+                          }}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -378,7 +424,7 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
                           <div className="text-sm font-medium">{group.display_name || group.name}</div>
                           <div className="text-xs text-gray-500">{group.description}</div>
                         </div>
-                        {selectedGroups.includes(group.name) && (
+                        {selectedGroups.includes(group.id) && (
                           <Check size={16} className="text-green-600" />
                         )}
                       </button>
@@ -389,18 +435,26 @@ export const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
 
               {selectedGroups.length > 0 && (
                 <div className="space-y-1 mt-2">
-                  {selectedGroups.map((group) => (
-                    <div key={group} className="flex items-center justify-between px-2 py-1 bg-gray-50 rounded text-sm">
-                      <span>{group}</span>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedGroups(selectedGroups.filter(g => g !== group))}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
+                  {selectedGroups.map((groupId) => {
+                    const groupData = selectedGroupData.get(groupId);
+                    return (
+                      <div key={groupId} className="flex items-center justify-between px-2 py-1 bg-gray-50 rounded text-sm">
+                        <span>{groupData?.display_name || groupData?.name || groupId}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedGroups(selectedGroups.filter(g => g !== groupId));
+                            const newMap = new Map(selectedGroupData);
+                            newMap.delete(groupId);
+                            setSelectedGroupData(newMap);
+                          }}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

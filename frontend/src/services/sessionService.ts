@@ -210,13 +210,13 @@ class SessionService {
         reason: reason || 'User selected specific sessions'
       });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+      if (response.status !== 200) {
+        const errorData = response.data || {};
         console.error('❌ Specific sessions logout failed:', errorData);
         throw new Error(errorData.detail || `Logout failed: ${response.status}`);
       }
 
-      const data: LogoutSessionsResponse = await response.json();
+      const data: LogoutSessionsResponse = response.data;
       
       console.log('✅ Specific sessions logout successful:', {
         sessionsTerminated: data.sessions_terminated,

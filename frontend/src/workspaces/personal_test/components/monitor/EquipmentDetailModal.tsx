@@ -1,5 +1,5 @@
 import React from 'react';
-import { Node } from 'reactflow';
+import type { Node } from 'reactflow';
 import { AlertCircle, CheckCircle, PauseCircle, TrendingUp, TrendingDown, Minus, X } from 'lucide-react';
 
 interface EquipmentStatus {
@@ -65,16 +65,16 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
     if (measurement.spec_status === 1) {
       // Out of spec
       if (measurement.usl !== undefined && measurement.measurement_value > measurement.usl) {
-        return <TrendingUp className="w-4 h-4 text-red-500" title="Above USL" />;
+        return <TrendingUp className="w-4 h-4 text-red-500" />;
       } else if (measurement.lsl !== undefined && measurement.measurement_value < measurement.lsl) {
-        return <TrendingDown className="w-4 h-4 text-red-500" title="Below LSL" />;
+        return <TrendingDown className="w-4 h-4 text-red-500" />;
       } else {
-        return <AlertCircle className="w-4 h-4 text-red-500" title="Out of Spec" />;
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
       }
     } else if (measurement.spec_status === 0) {
-      return <CheckCircle className="w-4 h-4 text-green-500" title="Within Spec" />;
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
     } else {
-      return <Minus className="w-4 h-4 text-gray-400" title="No Spec Defined" />;
+      return <Minus className="w-4 h-4 text-gray-400" />;
     }
   };
 

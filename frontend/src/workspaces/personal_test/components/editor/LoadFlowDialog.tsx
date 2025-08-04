@@ -387,7 +387,7 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
                               <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500">
                                 <span>v{flow.current_version || 1}</span>
                                 {flow.is_published && (
-                                  <Globe size={12} className="text-green-600" title="Published" />
+                                  <Globe size={12} className="text-green-600" />
                                 )}
                               </div>
                             </div>

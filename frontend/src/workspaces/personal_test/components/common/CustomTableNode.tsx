@@ -108,11 +108,11 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
   const defaultWidth = getNodeWidth();
   
   const actualNodeHeight = Math.max(
-    currentNode?.style?.height || defaultHeight, 
+    typeof currentNode?.style?.height === 'number' ? currentNode.style.height : defaultHeight, 
     defaultHeight
   );
   const actualNodeWidth = Math.max(
-    currentNode?.style?.width || defaultWidth, 
+    typeof currentNode?.style?.width === 'number' ? currentNode.style.width : defaultWidth, 
     defaultWidth
   );
 
@@ -217,19 +217,21 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
       // Handle response based on monitoring type
       let result;
       if (isPublicMonitoring) {
-        if (!response.ok) {
-          const errorText = await response.text();
+        const fetchResponse = response as Response;
+        if (!fetchResponse.ok) {
+          const errorText = await fetchResponse.text();
           console.error('[CustomTableNode Public Error]', {
-            status: response.status,
-            statusText: response.statusText,
+            status: fetchResponse.status,
+            statusText: fetchResponse.statusText,
             errorText,
             nodeId: id
           });
-          throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+          throw new Error(`HTTP ${fetchResponse.status}: ${errorText || fetchResponse.statusText}`);
         }
-        result = await response.json();
+        result = await fetchResponse.json();
       } else {
-        result = response.data;
+        const axiosResponse = response as any;
+        result = axiosResponse.data;
       }
       
       console.log('[CustomTableNode Result]', {

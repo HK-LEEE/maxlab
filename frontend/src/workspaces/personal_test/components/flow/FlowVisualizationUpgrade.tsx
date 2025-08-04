@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
-  Node,
-  Edge,
   Controls,
   MiniMap,
   Background,
+  BackgroundVariant,
   useNodesState,
   useEdgesState,
   ReactFlowProvider,
   Panel
 } from 'reactflow';
+import type { Node, Edge } from 'reactflow';
 
 // Enhanced components
 import { EnhancedCustomEdge } from './EnhancedCustomEdge';
@@ -172,7 +172,7 @@ export const FlowVisualizationUpgrade: React.FC<FlowVisualizationUpgradeProps> =
         elementsSelectable={true}
         selectNodesOnDrag={false}
       >
-        <Background variant="dots" gap={20} size={1} color="#e5e7eb" />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#e5e7eb" />
         
         <Controls 
           position="top-left"
