@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Server Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+        .test-case { margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 5px; }
+        .test-case h3 { margin-top: 0; color: #333; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f5f5f5; padding: 15px; overflow-x: auto; border-radius: 4px; }
+        .note { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>OAuth Server Flow 문제 진단</h1>
+    
+    <div class="note">
+        <strong>문제:</strong> OAuth 서버가 로그인 후 callback URL로 리다이렉트하지 않음
+    </div>
+    
+    <div class="test-case">
+        <h3>테스트 1: 일반 OAuth 플로우 (prompt 없음)</h3>
+        <p>로그인된 상태에서 OAuth 요청 시 바로 authorization code를 발급해야 함</p>
+        <button onclick="testNormalFlow()">테스트 실행</button>
+        <pre id="normal-url"></pre>
+    </div>
+    
+    <div class="test-case">
+        <h3>테스트 2: 강제 재로그인 플로우 (prompt=login)</h3>
+        <p>로그인 페이지 → 로그인 → authorization code 발급 → callback 리다이렉트</p>
+        <button onclick="testForceLoginFlow()">테스트 실행</button>
+        <pre id="force-url"></pre>
+    </div>
+    
+    <div class="test-case">
+        <h3>예상되는 OAuth 서버 동작</h3>
+        <pre>
+1. OAuth 요청 받음 (/api/oauth/authorize)
+2. prompt=login 확인
+3. 현재 세션 삭제 및 로그인 페이지로 리다이렉트
+4. 사용자 로그인
+5. <span class="error">원래 OAuth 요청으로 돌아가서 처리 (이 부분이 누락된 것으로 보임)</span>
+6. Authorization code 생성
+7. Callback URL로 리다이렉트:
+   http://localhost:3010/oauth/callback?code=xxx&state=xxx
+        </pre>
+    </div>
+    
+    <div class="test-case">
+        <h3>OAuth 서버 구현 확인 사항</h3>
+        <pre>
+로그인 페이지에서 로그인 성공 후:
+
+1. redirect_to 파라미터 확인
+   - OAuth 요청 URL이 포함되어 있어야 함
+   - 예: /login?redirect_to=/api/oauth/authorize?...
+
+2. 로그인 성공 후 처리
+   - redirect_to로 리다이렉트해야 함
+   - OAuth authorize 엔드포인트가 다시 호출되어야 함
+
+3. OAuth authorize 재호출 시
+   - 이제 로그인된 상태이므로 authorization code 생성
+   - callback URL로 최종 리다이렉트
+        </pre>
+    </div>
+
+    <script>
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function testNormalFlow() {
+            const state = 'normal_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256'
+            });
+            
+            const url = `http://localhost:8000/api/oauth/authorize?${params}`;
+            document.getElementById('normal-url').textContent = url;
+            
+            window.open(url, '_blank');
+        }
+        
+        function testForceLoginFlow() {
+            const state = 'force_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                prompt: 'login',
+                max_age: '0'
+            });
+            
+            const url = `http://localhost:8000/api/oauth/authorize?${params}`;
+            document.getElementById('force-url').textContent = url;
+            
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

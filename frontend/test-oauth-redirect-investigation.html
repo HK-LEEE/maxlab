@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕵️ OAuth Redirect Investigation</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .critical { background: #fecaca; border: 2px solid #ef4444; }
+        .success { background: #dcfce7; border: 2px solid #22c55e; }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .investigate-button { background: #dc2626; }
+        .investigate-button:hover { background: #b91c1c; }
+    </style>
+</head>
+<body>
+    <div class="container critical">
+        <h1>🕵️ OAuth Redirect Investigation</h1>
+        <p><strong>목적:</strong> OAuth 서버가 실제로 어디로 리다이렉트하는지 확인하고, 그 페이지에서 토큰을 찾을 수 있는지 조사</p>
+        <p><strong>방법:</strong> 실제 OAuth 플로우를 시작하고 팝업의 모든 URL 변화를 추적</p>
+    </div>
+
+    <div class="container success">
+        <h2>🎯 조사 계획</h2>
+        <ol>
+            <li>OAuth 팝업 열기 (실제 "다른 사용자로 로그인" 플로우)</li>
+            <li>팝업의 URL 변화를 주기적으로 기록</li>
+            <li>각 URL에서 사용 가능한 데이터 확인</li>
+            <li>최종 리다이렉트 URL과 포트 확인</li>
+            <li>해당 페이지의 storage와 DOM 분석</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <button onclick="startInvestigation()" class="investigate-button" id="investigateBtn">
+            🕵️ OAuth 리다이렉트 조사 시작
+        </button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 조사 결과</h2>
+        <div class="log" id="debug-log"></div>
+    </div>
+
+    <script>
+        let investigationInterval = null;
+        let investigationPopup = null;
+        let urlHistory = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88',
+                'debug': '#88ff88',
+                'critical': '#ff4444'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function clearLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            urlHistory = [];
+            log('🧹 로그 및 URL 히스토리 삭제됨', 'info');
+        }
+
+        function generateOAuthParams() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function startInvestigation() {
+            log('🕵️ OAuth 리다이렉트 조사 시작...', 'critical');
+            
+            const investigateBtn = document.getElementById('investigateBtn');
+            investigateBtn.disabled = true;
+            investigateBtn.textContent = '🔄 조사 중...';
+
+            try {
+                // Clear existing OAuth state
+                const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                oauthKeys.forEach(key => sessionStorage.removeItem(key));
+                log(`🧹 기존 OAuth 키 ${oauthKeys.length}개 삭제`, 'debug');
+
+                // Generate OAuth parameters (same as real implementation)
+                const state = generateOAuthParams() + '_force_' + Date.now();
+                const codeVerifier = generateOAuthParams();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateOAuthParams();
+
+                log('✅ OAuth 파라미터 생성 완료', 'success');
+
+                // Store OAuth state (same as real implementation)
+                const flowId = 'investigation_' + Date.now();
+                const flowState = {
+                    state: state,
+                    codeVerifier: codeVerifier,
+                    nonce: nonce,
+                    flowId: flowId,
+                    flowType: 'popup',
+                    clientId: 'maxlab',
+                    redirectUri: `${window.location.origin}/oauth/callback`,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (15 * 60 * 1000),
+                    parentOrigin: window.location.origin,
+                    forceAccountSelection: true,
+                    status: 'in_progress',
+                    lastUpdated: Date.now()
+                };
+
+                sessionStorage.setItem(`oauth_flow_${flowId}`, JSON.stringify(flowState));
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_parent_origin', window.location.origin);
+                sessionStorage.setItem('oauth_force_account_selection', 'true');
+
+                log(`✅ OAuth 플로우 상태 생성됨: ${flowId}`, 'success');
+
+                // Build OAuth URL (identical to real implementation)
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'select_account',
+                    max_age: '0'
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`🔗 OAuth URL: ${authUrl.substring(0, 100)}...`, 'debug');
+
+                // Open investigation popup
+                investigationPopup = window.open(
+                    authUrl,
+                    'oauth-investigation',
+                    'width=600,height=700,scrollbars=yes,resizable=yes'
+                );
+
+                if (!investigationPopup) {
+                    throw new Error('팝업이 차단되었습니다!');
+                }
+
+                log('✅ 조사 팝업 열림 - 로그인 진행해주세요', 'success');
+                log('🎯 팝업의 URL 변화를 추적합니다...', 'info');
+
+                // Start URL tracking
+                let checkCount = 0;
+                let lastUrl = '';
+                let urlChangeCount = 0;
+                
+                investigationInterval = setInterval(() => {
+                    checkCount++;
+                    
+                    if (investigationPopup.closed) {
+                        log('🚪 조사 팝업이 닫혔습니다', 'warn');
+                        clearInterval(investigationInterval);
+                        
+                        // Final analysis
+                        log('📊 URL 변화 히스토리 분석:', 'success');
+                        urlHistory.forEach((entry, index) => {
+                            log(`   ${index + 1}. [${entry.timestamp}] ${entry.url}`, 'debug');
+                            log(`      Port: ${entry.port}, Path: ${entry.path}`, 'debug');
+                        });
+                        
+                        if (urlHistory.length > 0) {
+                            const finalUrl = urlHistory[urlHistory.length - 1];
+                            log(`🎯 최종 URL: ${finalUrl.url}`, 'critical');
+                            log(`🎯 최종 Port: ${finalUrl.port}`, 'critical');
+                            
+                            if (finalUrl.port === '3000') {
+                                log('🚨 CONFIRMED: OAuth 서버가 port 3000으로 리다이렉트함!', 'error');
+                                log('💡 이것이 cross-origin 통신 문제의 원인입니다.', 'warn');
+                            } else if (finalUrl.port === '3010') {
+                                log('✅ OAuth 서버가 올바른 port 3010으로 리다이렉트함', 'success');
+                            } else {
+                                log(`⚠️ 예상치 못한 port: ${finalUrl.port}`, 'warn');
+                            }
+                        }
+                        
+                        investigateBtn.disabled = false;
+                        investigateBtn.textContent = '🕵️ OAuth 리다이렉트 조사 시작';
+                        return;
+                    }
+
+                    // Try to access popup URL (will fail on cross-origin)
+                    try {
+                        const currentUrl = investigationPopup.location.href;
+                        
+                        if (currentUrl !== lastUrl) {
+                            urlChangeCount++;
+                            lastUrl = currentUrl;
+                            
+                            const urlObj = new URL(currentUrl);
+                            const urlInfo = {
+                                url: currentUrl,
+                                timestamp: new Date().toISOString().split('.')[0],
+                                port: urlObj.port,
+                                host: urlObj.host,
+                                path: urlObj.pathname,
+                                search: urlObj.search,
+                                hash: urlObj.hash
+                            };
+                            
+                            urlHistory.push(urlInfo);
+                            
+                            log(`🔄 URL 변화 ${urlChangeCount}: ${currentUrl}`, 'success');
+                            log(`   Host: ${urlObj.host}, Port: ${urlObj.port}`, 'debug');
+                            log(`   Path: ${urlObj.pathname}`, 'debug');
+                            
+                            if (urlObj.search) {
+                                log(`   Query: ${urlObj.search}`, 'debug');
+                            }
+                            
+                            // Check if this looks like the final callback
+                            if (urlObj.pathname.includes('/login') || urlObj.pathname.includes('/oauth') || urlObj.pathname.includes('/callback')) {
+                                log(`🎯 OAuth 관련 페이지 감지: ${urlObj.pathname}`, 'warn');
+                                
+                                if (urlObj.port === '3000') {
+                                    log('🚨 Port 3000 확인됨 - 이것이 문제의 원인!', 'error');
+                                } else if (urlObj.port === '3010') {
+                                    log('✅ 올바른 port 3010 확인됨', 'success');
+                                }
+                            }
+                        }
+                        
+                    } catch (crossOriginError) {
+                        // Cross-origin error indicates popup navigated to different origin
+                        if (checkCount % 10 === 0) { // Log every 5 seconds
+                            log(`🚨 Cross-origin 에러 발생 (${checkCount * 0.5}초 경과) - 팝업이 다른 origin으로 이동`, 'warn');
+                            log('   이는 OAuth 서버가 다른 포트로 리다이렉트했음을 의미합니다', 'debug');
+                        }
+                    }
+
+                    // Safety timeout after 10 minutes
+                    if (checkCount > 1200) { // 10 minutes at 500ms intervals
+                        log('⏰ 조사 타임아웃 (10분)', 'warn');
+                        clearInterval(investigationInterval);
+                        
+                        if (investigationPopup && !investigationPopup.closed) {
+                            investigationPopup.close();
+                        }
+                        
+                        investigateBtn.disabled = false;
+                        investigateBtn.textContent = '🕵️ OAuth 리다이렉트 조사 시작';
+                    }
+                }, 500);
+
+            } catch (error) {
+                log(`❌ 조사 실패: ${error.message}`, 'error');
+                
+                investigateBtn.disabled = false;
+                investigateBtn.textContent = '🕵️ OAuth 리다이렉트 조사 시작';
+            }
+        }
+
+        // Initialize
+        log('🕵️ OAuth 리다이렉트 조사 도구 초기화됨', 'critical');
+        log('📋 이 도구는 실제 OAuth 플로우에서 리다이렉트 URL을 추적합니다', 'info');
+        log('🎯 "다른 사용자로 로그인"과 동일한 파라미터를 사용합니다', 'info');
+        log('🔍 팝업에서 로그인을 완료하면 모든 URL 변화가 기록됩니다', 'info');
+    </script>
+</body>
+</html>

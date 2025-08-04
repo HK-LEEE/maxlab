@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regular OAuth Test - Should Work!</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .success { background: #dcfce7; border: 2px solid #22c55e; }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover { background: #16a34a; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container success">
+        <h1>✅ Regular OAuth Test - This Should Work!</h1>
+        <p>이제 OAuth 팝업 통신이 완전히 수정되었으므로, 일반 로그인이 정상적으로 작동해야 합니다.</p>
+        
+        <h3>🎯 예상 결과:</h3>
+        <ul>
+            <li>✅ 팝업이 열림</li>
+            <li>✅ MAX Platform 로그인 페이지 표시</li>
+            <li>✅ 로그인 완료 후 성공 메시지 수신</li>
+            <li>✅ 팝업 자동 닫힘</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <button onclick="testRegularLogin()" id="loginBtn">🔑 일반 OAuth 로그인 테스트</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 테스트 로그</h2>
+        <div class="log" id="debug-log"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88',
+                'debug': '#88ff88'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function generateCodeVerifier() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        function setupListeners() {
+            window.addEventListener('message', (event) => {
+                log(`📨 PostMessage: ${event.data?.type} from ${event.origin}`, 'info');
+                
+                if (event.data?.type === 'OAUTH_SUCCESS') {
+                    log('🎉 OAuth 성공! 팝업 통신이 완벽하게 작동합니다!', 'success');
+                    if (event.data.token) {
+                        log(`   받은 토큰: ${event.data.token.substring(0, 20)}...`, 'success');
+                    }
+                    if (event.data.tokenData) {
+                        log(`   토큰 타입: ${event.data.tokenData.token_type}`, 'debug');
+                        log(`   만료 시간: ${event.data.tokenData.expires_in}초`, 'debug');
+                    }
+                } else if (event.data?.type === 'OAUTH_ERROR') {
+                    log('❌ OAuth 에러 (하지만 통신은 작동함):', 'warn');
+                    log(`   에러: ${event.data.error}`, 'error');
+                    if (event.data.error_description) {
+                        log(`   설명: ${event.data.error_description}`, 'error');
+                    }
+                } else if (event.data?.type === 'POPUP_LOADED') {
+                    log('✅ 콜백 페이지 로드됨 (진단 모드)', 'success');
+                }
+            });
+
+            try {
+                const channel = new BroadcastChannel('oauth_channel');
+                channel.onmessage = (event) => {
+                    log(`📡 BroadcastChannel: ${event.data?.type}`, 'info');
+                    
+                    if (event.data?.type === 'OAUTH_SUCCESS') {
+                        log('🎉 OAuth 성공 (BroadcastChannel)!', 'success');
+                    } else if (event.data?.type === 'OAUTH_ERROR') {
+                        log('❌ OAuth 에러 (BroadcastChannel)', 'warn');
+                    }
+                };
+            } catch (e) {
+                log('⚠️ BroadcastChannel 지원 안됨', 'warn');
+            }
+        }
+
+        async function testRegularLogin() {
+            log('🚀 일반 OAuth 로그인 테스트 시작...', 'info');
+            
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = '🔄 테스트 중...';
+
+            try {
+                // Clear existing OAuth state
+                const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                oauthKeys.forEach(key => sessionStorage.removeItem(key));
+                log(`🧹 기존 OAuth 키 ${oauthKeys.length}개 삭제`, 'debug');
+
+                // Generate OAuth parameters
+                const state = generateCodeVerifier();
+                const codeVerifier = generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateCodeVerifier();
+
+                log(`✅ OAuth 파라미터 생성 완료`, 'success');
+                log(`   State: ${state.substring(0, 8)}...`, 'debug');
+                log(`   Code Verifier: ${codeVerifier.substring(0, 8)}...`, 'debug');
+
+                // Create React app compatible OAuth state
+                const flowId = 'regular_test_' + Date.now();
+                const flowState = {
+                    state: state,
+                    codeVerifier: codeVerifier,
+                    nonce: nonce,
+                    flowId: flowId,
+                    flowType: 'popup',
+                    clientId: 'maxlab',
+                    redirectUri: `${window.location.origin}/oauth/callback`,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (15 * 60 * 1000),
+                    parentOrigin: window.location.origin,
+                    forceAccountSelection: false, // 일반 로그인
+                    status: 'in_progress',
+                    lastUpdated: Date.now()
+                };
+
+                // Store OAuth state
+                sessionStorage.setItem(`oauth_flow_${flowId}`, JSON.stringify(flowState));
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_parent_origin', window.location.origin);
+
+                log(`✅ OAuth 플로우 상태 생성됨: ${flowId}`, 'success');
+
+                // Setup listeners
+                setupListeners();
+
+                // Build OAuth URL (WITHOUT force parameters)
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state, // 일반 state (force 패턴 없음)
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    // NO prompt parameter for regular login
+                    diagnostic: 'true' // 진단 모드 활성화
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`🔗 일반 OAuth URL: ${authUrl}`, 'debug');
+
+                // Open popup
+                const popup = window.open(
+                    authUrl,
+                    'regular-oauth-test',
+                    'width=500,height=600,scrollbars=yes,resizable=yes'
+                );
+
+                if (!popup) {
+                    throw new Error('팝업이 차단되었습니다!');
+                }
+
+                log('✅ 팝업 열림 - 로그인을 완료해주세요', 'success');
+
+                // Monitor popup
+                const checkInterval = setInterval(() => {
+                    if (popup.closed) {
+                        log('🚪 팝업 닫힘', 'info');
+                        clearInterval(checkInterval);
+                        
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = '🔑 일반 OAuth 로그인 테스트';
+                    }
+                }, 1000);
+
+                // Send ping to popup after 3 seconds
+                setTimeout(() => {
+                    if (!popup.closed) {
+                        try {
+                            popup.postMessage({ type: 'PARENT_PING', message: 'Parent ready' }, '*');
+                            log('📤 부모 윈도우에서 팝업으로 핑 전송', 'debug');
+                        } catch (e) {
+                            log(`❌ 팝업 핑 전송 실패: ${e.message}`, 'warn');
+                        }
+                    }
+                }, 3000);
+
+                // Timeout after 5 minutes
+                setTimeout(() => {
+                    if (!popup.closed) {
+                        log('⏰ 5분 후 자동 닫기', 'warn');
+                        popup.close();
+                    }
+                    clearInterval(checkInterval);
+                    
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '🔑 일반 OAuth 로그인 테스트';
+                }, 300000);
+
+            } catch (error) {
+                log(`❌ 테스트 실패: ${error.message}`, 'error');
+                
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔑 일반 OAuth 로그인 테스트';
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            log('🧹 로그 삭제됨', 'info');
+        }
+
+        // Initialize
+        log('🚀 일반 OAuth 로그인 테스트 초기화됨', 'success');
+        log('📋 이 테스트는 force 파라미터 없이 일반 OAuth 로그인을 테스트합니다', 'info');
+        log('🎯 팝업 통신이 수정되었으므로 정상 작동할 것으로 예상됩니다', 'success');
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -15,6 +15,7 @@ import { EquipmentNode } from '../components/common/EquipmentNode';
 import { InstrumentNode } from '../components/common/InstrumentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
+import { CustomTableNode } from '../components/common/CustomTableNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { DatabaseConfigAlert } from '../components/common/DatabaseConfigAlert';
@@ -28,13 +29,8 @@ import { useFlowMonitor } from '../hooks/useFlowMonitor';
 import { useDataSources } from '../hooks/useDataSources';
 import { Layout } from '../../../components/common/Layout';
 
-// Define nodeTypes and edgeTypes outside component to avoid re-creation
-const nodeTypes = Object.freeze({
-  equipment: EquipmentNode,
-  instrument: InstrumentNode,
-  group: GroupNode,
-  text: TextNode,
-});
+// Define edgeTypes outside component to avoid re-creation
+// nodeTypes will be defined inside component to access tableData
 
 const edgeTypes = Object.freeze({
   custom: CustomEdgeWithLabel,
@@ -92,6 +88,8 @@ const FlowCanvas: React.FC<{
             return '#8b5cf6';
           case 'text':
             return '#10b981';
+          case 'table':
+            return node.data.color || '#f59e0b'; // Use table's color or orange default
           default:
             return '#6b7280';
         }
@@ -160,6 +158,15 @@ const ProcessFlowMonitorContent: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showAlarms, setShowAlarms] = useState(true);
+
+  // Define nodeTypes outside component since Custom Table nodes handle their own data
+  const nodeTypes = useMemo(() => ({
+    equipment: EquipmentNode,
+    instrument: InstrumentNode,
+    group: GroupNode,
+    text: TextNode,
+    table: CustomTableNode,
+  }), []);
   // Remove database alert from monitoring
   // const [showDBAlert, setShowDBAlert] = useState(false);
 

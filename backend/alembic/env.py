@@ -19,6 +19,7 @@ from app.core.database import Base
 
 # MAX Lab 모델들을 명시적으로 import (Alembic이 테이블 정의를 찾을 수 있도록)
 from app.models.workspace import Workspace, WorkspaceGroup, MVPModule, MVPModuleLog
+from app.models.session import UserSession
 
 # Alembic Config 객체
 config = context.config

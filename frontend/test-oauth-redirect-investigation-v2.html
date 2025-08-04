@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕵️ OAuth Redirect Investigation V2 - Enhanced</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .critical { background: #fecaca; border: 2px solid #ef4444; }
+        .success { background: #dcfce7; border: 2px solid #22c55e; }
+        .warning { background: #fef3c7; border: 2px solid #f59e0b; }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .investigate-button { background: #dc2626; }
+        .investigate-button:hover { background: #b91c1c; }
+        .manual-button { background: #f59e0b; }
+        .manual-button:hover { background: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="container critical">
+        <h1>🕵️ OAuth Redirect Investigation V2 - Enhanced</h1>
+        <p><strong>개선사항:</strong> 더 빠른 URL 추적 (100ms 간격), 수동 OAuth 테스트 추가</p>
+        <p><strong>목적:</strong> OAuth 서버가 실제로 port 3000으로 리다이렉트하는지 확인</p>
+    </div>
+
+    <div class="container warning">
+        <h2>🎯 예상 시나리오</h2>
+        <p>로그인 후 OAuth 서버가 다음 중 하나로 리다이렉트할 것으로 예상:</p>
+        <ul>
+            <li><strong>http://localhost:3000/login</strong> - MAX Platform Frontend (문제의 원인)</li>
+            <li><strong>http://localhost:3010/oauth/callback</strong> - 올바른 콜백 URL</li>
+            <li><strong>http://localhost:3000/oauth/callback</strong> - 잘못된 콜백 URL</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <button onclick="startInvestigation()" class="investigate-button" id="investigateBtn">
+            🕵️ OAuth 리다이렉트 조사 시작 (빠른 추적)
+        </button>
+        <button onclick="startManualOAuth()" class="manual-button" id="manualBtn">
+            🔧 수동 OAuth URL 열기 (새 탭)
+        </button>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <button onclick="showStorageData()">📊 Storage 데이터 확인</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 조사 결과</h2>
+        <div class="log" id="debug-log"></div>
+    </div>
+
+    <script>
+        let investigationInterval = null;
+        let investigationPopup = null;
+        let urlHistory = [];
+        let startTime = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88',
+                'debug': '#88ff88',
+                'critical': '#ff4444'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function clearLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            urlHistory = [];
+            log('🧹 로그 및 URL 히스토리 삭제됨', 'info');
+        }
+
+        function showStorageData() {
+            log('📊 현재 Storage 데이터:', 'info');
+            
+            // SessionStorage OAuth keys
+            const sessionOAuthKeys = Object.keys(sessionStorage).filter(key => 
+                key.includes('oauth') || key.includes('token') || key.includes('auth')
+            );
+            
+            log(`📦 SessionStorage OAuth 관련 키 (${sessionOAuthKeys.length}개):`, 'debug');
+            sessionOAuthKeys.forEach(key => {
+                const value = sessionStorage.getItem(key);
+                log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+            });
+            
+            // LocalStorage OAuth keys
+            const localOAuthKeys = Object.keys(localStorage).filter(key => 
+                key.includes('oauth') || key.includes('token') || key.includes('auth') || key.includes('user')
+            );
+            
+            log(`💾 LocalStorage OAuth 관련 키 (${localOAuthKeys.length}개):`, 'debug');
+            localOAuthKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+            });
+        }
+
+        function generateOAuthParams() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function startManualOAuth() {
+            log('🔧 수동 OAuth URL 생성...', 'warn');
+            
+            try {
+                // Generate OAuth parameters
+                const state = generateOAuthParams() + '_force_' + Date.now();
+                const codeVerifier = generateOAuthParams();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateOAuthParams();
+
+                // Build OAuth URL
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'select_account',
+                    max_age: '0'
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                
+                log('📋 OAuth URL 생성됨:', 'success');
+                log(authUrl, 'debug');
+                
+                // Open in new tab
+                window.open(authUrl, '_blank');
+                
+                log('✅ 새 탭에서 OAuth URL 열림', 'success');
+                log('🔍 새 탭에서 최종 리다이렉트 URL을 확인하세요', 'warn');
+                log('🎯 예상: http://localhost:3000/login?oauth_return=...', 'warn');
+                
+            } catch (error) {
+                log(`❌ 수동 OAuth 실패: ${error.message}`, 'error');
+            }
+        }
+
+        async function startInvestigation() {
+            log('🕵️ OAuth 리다이렉트 조사 시작 (개선된 버전)...', 'critical');
+            
+            const investigateBtn = document.getElementById('investigateBtn');
+            investigateBtn.disabled = true;
+            investigateBtn.textContent = '🔄 조사 중...';
+            
+            startTime = Date.now();
+            urlHistory = [];
+
+            try {
+                // Setup OAuth state storage monitoring
+                const storageHandler = (e) => {
+                    if (e.key && (e.key.includes('oauth') || e.key.includes('token'))) {
+                        log(`💾 Storage 변화 감지: ${e.key} = ${e.newValue?.substring(0, 50)}...`, 'warn');
+                    }
+                };
+                window.addEventListener('storage', storageHandler);
+
+                // Generate OAuth parameters
+                const state = generateOAuthParams() + '_force_' + Date.now();
+                const codeVerifier = generateOAuthParams();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateOAuthParams();
+
+                // Store OAuth state
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+
+                log('✅ OAuth 파라미터 생성 및 저장', 'success');
+
+                // Build OAuth URL
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'select_account',
+                    max_age: '0'
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`🔗 OAuth URL: ${authUrl}`, 'debug');
+
+                // Open investigation popup
+                investigationPopup = window.open(
+                    authUrl,
+                    'oauth-investigation-v2',
+                    'width=600,height=700,scrollbars=yes,resizable=yes'
+                );
+
+                if (!investigationPopup) {
+                    throw new Error('팝업이 차단되었습니다!');
+                }
+
+                log('✅ 조사 팝업 열림 - 빠른 URL 추적 시작 (100ms 간격)', 'success');
+
+                // Fast URL tracking
+                let checkCount = 0;
+                let lastUrl = '';
+                let crossOriginDetected = false;
+                let popupClosedTime = null;
+                
+                investigationInterval = setInterval(() => {
+                    checkCount++;
+                    const elapsed = Date.now() - startTime;
+                    
+                    // Check if popup is closed
+                    if (investigationPopup.closed) {
+                        if (!popupClosedTime) {
+                            popupClosedTime = Date.now();
+                            log(`🚪 팝업이 ${elapsed}ms 후에 닫혔습니다`, 'warn');
+                            
+                            // Continue monitoring for a bit after close
+                            setTimeout(() => {
+                                clearInterval(investigationInterval);
+                                window.removeEventListener('storage', storageHandler);
+                                
+                                // Final analysis
+                                analyzeResults();
+                                
+                                investigateBtn.disabled = false;
+                                investigateBtn.textContent = '🕵️ OAuth 리다이렉트 조사 시작 (빠른 추적)';
+                            }, 2000); // Wait 2 more seconds
+                        }
+                        return;
+                    }
+
+                    // Try to access popup URL
+                    try {
+                        const currentUrl = investigationPopup.location.href;
+                        
+                        if (currentUrl !== lastUrl) {
+                            lastUrl = currentUrl;
+                            
+                            const urlObj = new URL(currentUrl);
+                            const urlInfo = {
+                                url: currentUrl,
+                                timestamp: elapsed,
+                                port: urlObj.port || (urlObj.protocol === 'https:' ? '443' : '80'),
+                                host: urlObj.host,
+                                path: urlObj.pathname,
+                                search: urlObj.search,
+                                hash: urlObj.hash
+                            };
+                            
+                            urlHistory.push(urlInfo);
+                            
+                            log(`🔄 URL 변화 (${elapsed}ms): ${currentUrl}`, 'success');
+                            log(`   Port: ${urlInfo.port}, Path: ${urlObj.pathname}`, 'debug');
+                            
+                            // Check for critical paths
+                            if (urlObj.pathname.includes('/login') && urlInfo.port === '3000') {
+                                log('🚨 CONFIRMED: Port 3000 /login 리다이렉트 확인!', 'error');
+                                log('🚨 이것이 cross-origin 통신 문제의 원인입니다!', 'error');
+                            }
+                        }
+                        
+                    } catch (crossOriginError) {
+                        if (!crossOriginDetected) {
+                            crossOriginDetected = true;
+                            log(`🚨 Cross-origin 감지 (${elapsed}ms) - 팝업이 다른 origin으로 이동`, 'error');
+                            log('📍 마지막 접근 가능했던 URL:', 'warn');
+                            if (urlHistory.length > 0) {
+                                const lastAccessibleUrl = urlHistory[urlHistory.length - 1];
+                                log(`   ${lastAccessibleUrl.url}`, 'warn');
+                            }
+                        }
+                    }
+
+                    // Log every second
+                    if (checkCount % 10 === 0 && !investigationPopup.closed) {
+                        log(`⏱️ ${elapsed / 1000}초 경과... (cross-origin: ${crossOriginDetected})`, 'debug');
+                    }
+
+                    // Safety timeout
+                    if (elapsed > 300000) { // 5 minutes
+                        log('⏰ 조사 타임아웃 (5분)', 'warn');
+                        clearInterval(investigationInterval);
+                        window.removeEventListener('storage', storageHandler);
+                        
+                        if (investigationPopup && !investigationPopup.closed) {
+                            investigationPopup.close();
+                        }
+                        
+                        analyzeResults();
+                        
+                        investigateBtn.disabled = false;
+                        investigateBtn.textContent = '🕵️ OAuth 리다이렉트 조사 시작 (빠른 추적)';
+                    }
+                }, 100); // 100ms interval for faster tracking
+
+            } catch (error) {
+                log(`❌ 조사 실패: ${error.message}`, 'error');
+                
+                investigateBtn.disabled = false;
+                investigateBtn.textContent = '🕵️ OAuth 리다이렉트 조사 시작 (빠른 추적)';
+            }
+        }
+
+        function analyzeResults() {
+            log('📊 === 최종 분석 결과 ===', 'critical');
+            
+            if (urlHistory.length === 0) {
+                log('❌ URL 변화를 추적하지 못했습니다', 'error');
+                log('💡 팝업이 즉시 cross-origin으로 이동했을 가능성이 높습니다', 'warn');
+                log('💡 수동 OAuth URL 열기를 시도해보세요', 'warn');
+            } else {
+                log(`📊 총 ${urlHistory.length}개의 URL 변화 감지:`, 'success');
+                
+                urlHistory.forEach((entry, index) => {
+                    const marker = index === urlHistory.length - 1 ? '🎯' : '  ';
+                    log(`${marker} ${index + 1}. [+${entry.timestamp}ms] ${entry.url}`, 'debug');
+                    log(`      Port: ${entry.port}, Path: ${entry.path}`, 'debug');
+                });
+                
+                // Check final URL
+                const finalUrl = urlHistory[urlHistory.length - 1];
+                if (finalUrl.port === '3000') {
+                    log('🚨 === 문제 확인됨 ===', 'error');
+                    log('🚨 OAuth 서버가 port 3000으로 리다이렉트합니다!', 'error');
+                    log(`🚨 최종 URL: ${finalUrl.url}`, 'error');
+                    log('💡 해결 방법: OAuth 서버 설정에서 redirect_uri를 확인하세요', 'warn');
+                } else if (finalUrl.port === '3010') {
+                    log('✅ OAuth 서버가 올바른 port 3010으로 리다이렉트합니다', 'success');
+                }
+            }
+            
+            // Check storage for OAuth data
+            showStorageData();
+        }
+
+        // Initialize
+        log('🕵️ OAuth 리다이렉트 조사 도구 V2 초기화됨', 'critical');
+        log('📋 개선사항: 100ms 간격 추적, storage 모니터링, 수동 테스트', 'info');
+        log('🎯 목표: OAuth 서버가 실제로 port 3000으로 리다이렉트하는지 확인', 'info');
+    </script>
+</body>
+</html>

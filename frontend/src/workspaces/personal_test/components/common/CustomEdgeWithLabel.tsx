@@ -90,10 +90,11 @@ const ParticleShape: React.FC<{
 };
 
 // 상태별 파티클 설정
-const getParticleConfig = (style: any, animated: boolean): ParticleConfig | null => {
+const getParticleConfig = (style: any, animated: boolean, showStatus: boolean): ParticleConfig | null => {
   const stroke = style?.stroke;
   
-  if (!animated) return null; // 애니메이션이 없는 경우 파티클 없음
+  // 상태 표시가 비활성화된 경우 파티클 없음 (설비-기타 노드 연결)
+  if (!showStatus || !animated) return null;
   
   switch (stroke) {
     case '#10b981': // ACTIVE (녹색)
@@ -203,7 +204,8 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
 
   const label = data?.label;
   const animated = data?.animated;
-  const particleConfig = getParticleConfig(style, animated);
+  const showStatus = data?.showStatus !== false; // Default to true for backward compatibility
+  const particleConfig = getParticleConfig(style, animated, showStatus);
   const pathId = `edge-path-${id}`;
 
   return (
@@ -212,13 +214,13 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
       <path
         id={pathId}
         style={style}
-        className={`react-flow__edge-path ${animated ? 'animated' : ''}`}
+        className={`react-flow__edge-path ${animated && showStatus ? 'animated' : ''}`}
         d={edgePath}
         markerEnd={markerEnd}
       />
       
-      {/* 파티클 시스템 (오버레이 레이어) - 신규 추가 */}
-      {particleConfig && (
+      {/* 파티클 시스템 (오버레이 레이어) - 상태 표시가 활성화된 경우에만 */}
+      {particleConfig && showStatus && (
         <g className="particle-flow-system" style={{ pointerEvents: 'none' }}>
           {Array.from({ length: particleConfig.count }, (_, index) => (
             <ParticleShape
@@ -232,14 +234,14 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
         </g>
       )}
       
-      {/* 기존 라벨 시스템 - 완전 유지 */}
+      {/* 라벨 시스템 - 상태 표시 여부에 따라 스타일 조정 */}
       {label && (
         <foreignObject
           width={140}
           height={36}
           x={labelX - 70}
           y={labelY - 18}
-          className={`edgebutton-foreignobject ${(style?.stroke === '#ef4444' || style?.stroke === '#eab308') ? 'warning' : ''}`}
+          className={`edgebutton-foreignobject ${showStatus && (style?.stroke === '#ef4444' || style?.stroke === '#eab308') ? 'warning' : ''}`}
           requiredExtensions="http://www.w3.org/1999/xhtml"
           style={{ zIndex: 10 }} // 파티클 위에 표시
         >
@@ -253,23 +255,30 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
           >
             <div
               style={{
-                background: style.stroke === '#ef4444' 
+                // 상태 표시가 비활성화된 경우 단순한 스타일 적용
+                background: !showStatus 
+                  ? 'rgba(255, 255, 255, 0.9)' // 흰색 반투명 배경
+                  : style.stroke === '#ef4444' 
                   ? 'rgba(254, 242, 242, 0.9)' // 반투명 빨간 배경 
                   : style.stroke === '#eab308' 
                   ? 'rgba(254, 252, 232, 0.9)' // 반투명 노란 배경
                   : '#f0fdf4', // 기존 녹색 배경 유지
-                color: style.stroke === '#ef4444' ? '#7f1d1d' : style.stroke === '#eab308' ? '#92400e' : '#16a34a', // 더 진한 색상
-                border: `2px solid ${style.stroke}`,
+                color: !showStatus 
+                  ? '#374151' // 회색 텍스트
+                  : style.stroke === '#ef4444' ? '#7f1d1d' : style.stroke === '#eab308' ? '#92400e' : '#16a34a', // 더 진한 색상
+                border: !showStatus 
+                  ? '2px solid #6b7280' // 회색 테두리
+                  : `2px solid ${style.stroke}`,
                 borderRadius: '8px',
                 fontSize: '12px',
                 fontWeight: 800, // 더 두꺼운 폰트
                 padding: '6px 12px',
                 whiteSpace: 'nowrap',
-                boxShadow: style.stroke === '#ef4444' || style.stroke === '#eab308' ? 'none' : '0 2px 4px rgba(0,0,0,0.1)',
-                textShadow: style.stroke === '#ef4444' || style.stroke === '#eab308' 
+                boxShadow: !showStatus || style.stroke === '#ef4444' || style.stroke === '#eab308' ? 'none' : '0 2px 4px rgba(0,0,0,0.1)',
+                textShadow: showStatus && (style.stroke === '#ef4444' || style.stroke === '#eab308') 
                   ? '0 0 4px rgba(255, 255, 255, 0.8), 0 1px 2px rgba(0, 0, 0, 0.3)' // 텍스트 외곽선 효과
                   : 'none',
-                backdropFilter: style.stroke === '#ef4444' || style.stroke === '#eab308' 
+                backdropFilter: showStatus && (style.stroke === '#ef4444' || style.stroke === '#eab308') 
                   ? 'blur(2px)' // 배경 블러 효과
                   : 'none',
               }}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Callback Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>OAuth Callback 디버그</h1>
+    
+    <div class="section">
+        <h2>1. 수동 OAuth 플로우 테스트</h2>
+        <p>아래 단계를 따라 수동으로 테스트해보세요:</p>
+        <ol>
+            <li>아래 "OAuth URL 생성" 버튼 클릭</li>
+            <li>생성된 URL을 복사하여 새 탭에서 열기</li>
+            <li>로그인 진행</li>
+            <li>리다이렉트된 URL 확인</li>
+        </ol>
+        <button onclick="generateOAuthUrl()">OAuth URL 생성</button>
+        <pre id="oauth-url"></pre>
+    </div>
+    
+    <div class="section">
+        <h2>2. Callback URL 시뮬레이션</h2>
+        <p>OAuth 서버가 리다이렉트하는 callback URL을 시뮬레이션합니다:</p>
+        <button onclick="simulateCallback()">Callback 시뮬레이션 (성공)</button>
+        <button onclick="simulateErrorCallback()">Callback 시뮬레이션 (에러)</button>
+    </div>
+    
+    <div class="section">
+        <h2>3. 현재 페이지 정보</h2>
+        <button onclick="checkCurrentPage()">페이지 정보 확인</button>
+        <pre id="page-info"></pre>
+    </div>
+
+    <script>
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function generateOAuthUrl() {
+            const state = 'manual_test_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            const nonce = generateRandomString(32);
+            
+            // SessionStorage에 저장
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_nonce', nonce);
+            sessionStorage.setItem('oauth_popup_mode', 'true');
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                nonce: nonce,
+                prompt: 'login',
+                max_age: '0'
+            });
+            
+            const url = `http://localhost:8000/api/oauth/authorize?${params}`;
+            
+            document.getElementById('oauth-url').textContent = url;
+            
+            // URL을 클립보드에 복사
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URL이 클립보드에 복사되었습니다!');
+            });
+        }
+        
+        function simulateCallback() {
+            const state = sessionStorage.getItem('oauth_state') || 'test_state';
+            const code = 'test_authorization_code_' + Date.now();
+            
+            const callbackUrl = `http://localhost:3010/oauth/callback?code=${code}&state=${state}`;
+            
+            console.log('Simulating callback to:', callbackUrl);
+            window.location.href = callbackUrl;
+        }
+        
+        function simulateErrorCallback() {
+            const state = sessionStorage.getItem('oauth_state') || 'test_state';
+            
+            const callbackUrl = `http://localhost:3010/oauth/callback?error=login_required&error_description=Force+re-authentication+required&state=${state}`;
+            
+            console.log('Simulating error callback to:', callbackUrl);
+            window.location.href = callbackUrl;
+        }
+        
+        function checkCurrentPage() {
+            const info = {
+                currentURL: window.location.href,
+                pathname: window.location.pathname,
+                search: window.location.search,
+                origin: window.location.origin,
+                isPopup: window.opener !== null,
+                sessionStorageKeys: Object.keys(sessionStorage).filter(k => k.includes('oauth')),
+                localStorageAuth: Object.keys(localStorage).filter(k => k.includes('token') || k.includes('user'))
+            };
+            
+            document.getElementById('page-info').textContent = JSON.stringify(info, null, 2);
+        }
+        
+        // 페이지 로드 시 자동으로 정보 표시
+        window.addEventListener('load', () => {
+            checkCurrentPage();
+            
+            // URL 파라미터 확인
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('code') || urlParams.has('error')) {
+                alert('이 페이지는 OAuth callback URL로 접근되었습니다!\n\n' + 
+                      'URL: ' + window.location.href);
+            }
+        });
+    </script>
+</body>
+</html>

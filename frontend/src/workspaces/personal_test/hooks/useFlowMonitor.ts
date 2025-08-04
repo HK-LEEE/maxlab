@@ -3,7 +3,6 @@ import log from '../../../utils/logger';
 import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { apiClient } from '../../../api/client';
-import { useWebSocket } from './useWebSocket';
 
 interface ProcessFlow {
   id: string;
@@ -67,28 +66,6 @@ export const useFlowMonitor = (workspaceId: string) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isDataLoadingRef = useRef(false);
-  
-  // WebSocket connection (optional)
-  const { isConnected: wsConnected } = useWebSocket({
-    workspace_id: workspaceUuid,
-    onMessage: (data) => {
-      // Handle real-time updates from WebSocket
-      if (data.type === 'equipment_update') {
-        setEquipmentStatuses(prev => {
-          const updated = [...prev];
-          const index = updated.findIndex(e => e.equipment_code === data.equipment_code);
-          if (index >= 0) {
-            updated[index] = { ...updated[index], ...data.data };
-          }
-          return updated;
-        });
-        setLastUpdate(new Date());
-      } else if (data.type === 'measurement_update') {
-        setMeasurements(data.measurements);
-        setLastUpdate(new Date());
-      }
-    }
-  });
 
   // Set global auto-scroll state
   useEffect(() => {
@@ -174,13 +151,14 @@ export const useFlowMonitor = (workspaceId: string) => {
         }
       }
       
-      const [statusResponse, measurementResponse] = await Promise.all([
-        apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}&limit=100${dataSourceParam}&_t=${Date.now()}`),
-        apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}&limit=500${dataSourceParam}&_t=${Date.now()}`),
+      // Fetch equipment status and measurement data individually
+      const [equipmentResponse, measurementResponse] = await Promise.all([
+        apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}${dataSourceParam}&_t=${Date.now()}`),
+        apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}${dataSourceParam}&_t=${Date.now()}`)
       ]);
       
-      const equipmentStatusList = statusResponse.data.items || statusResponse.data;
-      const newMeasurements = measurementResponse.data;
+      const equipmentStatusList = equipmentResponse.data.items || [];
+      const newMeasurements = measurementResponse.data || [];
       
       // Debug logging (commented out for production)
       // console.log('Equipment Status Response:', equipmentStatusList);
@@ -214,19 +192,20 @@ export const useFlowMonitor = (workspaceId: string) => {
         }
       });
       
+      
       // Only update state if data has changed
       if (hasStatusChanged) {
         setEquipmentStatuses(equipmentStatusList);
       }
       if (hasMeasurementChanged) {
         setMeasurements(newMeasurements);
-        
-        // Check for spec violations and trigger alarms (only if alarm check is enabled)
-        // Trigger alarms only for measurements that are being monitored on canvas
-        if (alarmCheck) {
-          // Get monitored measurements from canvas nodes
-          const monitoredMeasurements = new Map<string, Set<string>>();
-          let totalMonitoredCount = 0;
+      }
+      
+      // Check for spec violations and trigger alarms (only if alarm check is enabled and data changed)
+      if (alarmCheck && (hasStatusChanged || hasMeasurementChanged)) {
+        // Get monitored measurements from canvas nodes
+        const monitoredMeasurements = new Map<string, Set<string>>();
+        let totalMonitoredCount = 0;
           
           nodes.forEach(node => {
             if (node.type === 'equipment' && node.data.equipmentCode) {
@@ -405,7 +384,6 @@ export const useFlowMonitor = (workspaceId: string) => {
             totalAlarmsDetected: monitoredAlarmCount,
             message: 'Monitoring only measurements configured in displayMeasurements for each equipment'
           });
-        }
       }
       
       if (hasStatusChanged || hasMeasurementChanged) {
@@ -426,7 +404,7 @@ export const useFlowMonitor = (workspaceId: string) => {
               );
               
               // Filter measurements based on displayMeasurements configuration only
-              const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+              const configuredMeasurements = newMeasurements.filter((m: MeasurementData) => {
                 // If displayMeasurements is not set or empty, show no measurements
                 if (!node.data.displayMeasurements || node.data.displayMeasurements.length === 0) {
                   return false;
@@ -478,7 +456,7 @@ export const useFlowMonitor = (workspaceId: string) => {
               }
             } else if (node.type === 'instrument' && node.data.displayMeasurements) {
               // For instrument nodes, filter measurements based on displayMeasurements only
-              const configuredMeasurements = measurementResponse.data.filter((m: MeasurementData) => {
+              const configuredMeasurements = newMeasurements.filter((m: MeasurementData) => {
                 // Show measurements that are in displayMeasurements array
                 return node.data.displayMeasurements.includes(m.measurement_code);
               });
@@ -555,24 +533,28 @@ export const useFlowMonitor = (workspaceId: string) => {
                 // Check if either end is an instrument node
                 const sourceType = nodeTypeMap.get(edge.source);
                 const targetType = nodeTypeMap.get(edge.target);
-                const isInstrumentEdge = sourceType === 'instrument' || targetType === 'instrument';
+                const shouldShowStatus = sourceType === 'equipment' && targetType === 'equipment';
                 
-                // If it's an instrument edge, use neutral styling without animation
-                if (isInstrumentEdge) {
+                // If it's not equipment-to-equipment edge, use black dashed styling without animation or status labels
+                if (!shouldShowStatus) {
                   return {
                     ...edge,
                     type: 'custom',
                     animated: false,
                     style: {
                       ...edge.style,
-                      stroke: '#6b7280', // Gray color for instrument connections
-                      strokeWidth: 1.5,
+                      stroke: '#000000', // Black color for non-equipment connections
+                      strokeWidth: 1,
+                      strokeDasharray: '3,2', // Dashed line
                     },
                     data: {
                       ...edge.data,
                       type: edge.type || edge.data?.type || 'smoothstep',
                       label: null,
                       animated: false,
+                      showStatus: false, // Explicitly disable status representation
+                      sourceNodeType: sourceType,
+                      targetNodeType: targetType,
                     }
                   };
                 }
@@ -650,6 +632,9 @@ export const useFlowMonitor = (workspaceId: string) => {
                     type: edge.type || edge.data?.type || 'smoothstep', // Preserve original edge type
                     label: label,
                     animated: animated,
+                    showStatus: true, // Explicitly enable status representation for equipment-to-equipment
+                    sourceNodeType: sourceType,
+                    targetNodeType: targetType,
                   }
                 };
               });

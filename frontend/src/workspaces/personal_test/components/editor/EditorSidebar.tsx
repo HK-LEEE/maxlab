@@ -3,7 +3,7 @@ import {
   ChevronDown, ChevronRight, X, Menu,
   Gauge, Activity, Filter, Thermometer, Wind, Zap, 
   Database, Archive, GitMerge, Flame, Snowflake, Settings,
-  Square, Type, Minus, CornerDownRight, Spline, Waves
+  Square, Type, Minus, CornerDownRight, Spline, Waves, Table
 } from 'lucide-react';
 
 interface Equipment {
@@ -68,9 +68,8 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
   onNodeSizeChange,
   onAutoScrollChange,
 }) => {
-  console.log('EditorSidebar rendered with equipmentTypes:', equipmentTypes);
+  // Debug log removed
   const [isOpen, setIsOpen] = useState(true);
-  console.log('EditorSidebar isOpen:', isOpen);
   const [expandedSections, setExpandedSections] = useState({
     equipment: true,
     draw: true,
@@ -78,8 +77,6 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
     settings: true,
     templates: false,
   });
-  
-  console.log('Current expandedSections:', expandedSections);
   
   const [templates, setTemplates] = useState<Array<{id: string; name: string; data: any}>>([]);
 
@@ -155,7 +152,6 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
             {expandedSections.equipment ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           
-          {console.log('expandedSections.equipment:', expandedSections.equipment)}
           {/* Force Equipment Types to always show for debugging */}
           {true && (
             <div className="px-2 pb-2 space-y-1">
@@ -175,7 +171,6 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
               </div>
 
               {/* Equipment Types */}
-              {console.log('equipmentTypes in sidebar:', equipmentTypes)}
               {equipmentTypes && equipmentTypes.length > 0 ? equipmentTypes.map((equipment) => (
                 <div
                   key={equipment.code}
@@ -237,6 +232,44 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
               >
                 <Type size={18} className="text-gray-600" />
                 <span>Text</span>
+              </div>
+              
+              {/* Table */}
+              <div
+                draggable
+                onDragStart={(e) => onDragStart(e, { 
+                  type: 'table', 
+                  data: { 
+                    label: 'Custom Table',
+                    queryConfig: {
+                      sql: '',
+                      refreshInterval: 30,
+                      dataSourceId: ''
+                    },
+                    tableConfig: {
+                      columns: [
+                        { field: 'id', header: 'ID', type: 'id', width: 60 },
+                        { field: 'value', header: 'Value', type: 'value', width: 80 },
+                        { field: 'usl', header: 'USL', type: 'usl', width: 60 },
+                        { field: 'lsl', header: 'LSL', type: 'lsl', width: 60 },
+                        { field: 'status', header: 'Status', type: 'status', width: 80 }
+                      ],
+                      displayMode: 'table',
+                      maxRows: 50
+                    },
+                    statusRules: {
+                      valueField: 'value',
+                      uslField: 'usl',
+                      lslField: 'lsl',
+                      idField: 'id'
+                    },
+                    color: '#3b82f6'
+                  }
+                })}
+                className="flex items-center space-x-2 px-2 py-1.5 rounded cursor-move hover:bg-gray-100 text-sm"
+              >
+                <Table size={18} className="text-gray-600" />
+                <span>Table</span>
               </div>
             </div>
           )}

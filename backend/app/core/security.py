@@ -3,7 +3,7 @@
 외부 인증 서버(localhost:8000)에서 발급된 JWT 토큰을 검증하고,
 사용자 정보 및 권한을 관리합니다.
 """
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import httpx
 import jwt
@@ -671,6 +671,9 @@ async def get_current_user(
     # 토큰 추가 (추후 API 호출시 사용)
     user_data["token"] = token
     
+    # Session management integration - skipped in base function
+    # Use get_current_user_with_session for endpoints that need session management
+    
     # UUID 기반 정보 추가
     user_data = await enrich_user_data_with_uuids(user_data)
     
@@ -764,6 +767,44 @@ async def enrich_user_data_with_uuids(user_data: Dict[str, Any]) -> Dict[str, An
         user_data["user_uuid"] = None
         user_data["group_uuids"] = []
         return user_data
+
+async def get_current_user_with_session(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request = None
+) -> Dict[str, Any]:
+    """
+    현재 사용자 정보 획득 with session management
+    This version includes session management for endpoints that need it.
+    
+    Args:
+        credentials: HTTP Bearer 토큰
+        request: FastAPI Request object for session management
+        
+    Returns:
+        dict: 사용자 정보 딕셔너리 with session_id
+    """
+    # Get base user data
+    user_data = await get_current_user(credentials)
+    
+    # Session management integration - create/sync session with JWT
+    if request:
+        try:
+            from ..services.async_session_manager import async_session_manager
+            token = user_data.get("token")
+            session_data = await async_session_manager.sync_session_with_jwt(
+                token, user_data, request
+            )
+            if session_data:
+                user_data["session_id"] = session_data.session_id
+                logger.debug(f"Session synced with JWT for user {user_data.get('email')}: {session_data.session_id[:8]}...")
+            else:
+                logger.warning(f"Failed to sync session with JWT for user {user_data.get('email')}")
+        except Exception as e:
+            logger.error(f"Session management error (non-critical): {e}")
+            # Continue without session - this is not critical for JWT authentication
+    
+    return user_data
+
 
 async def get_current_active_user(
     current_user: Dict[str, Any] = Depends(get_current_user)

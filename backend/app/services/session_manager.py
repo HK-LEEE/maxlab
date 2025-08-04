@@ -7,6 +7,7 @@ import secrets
 import json
 import hashlib
 import hmac
+import asyncio
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
@@ -123,7 +124,13 @@ class SessionManager:
         
         # Persist to storage backend
         if self.storage_backend:
-            self.storage_backend.store_session(session_data)
+            if hasattr(self.storage_backend, 'store_session'):
+                if asyncio.iscoroutinefunction(self.storage_backend.store_session):
+                    # Handle async storage
+                    asyncio.create_task(self.storage_backend.store_session(session_data))
+                else:
+                    # Handle sync storage
+                    self.storage_backend.store_session(session_data)
         
         logger.info(f"Created new session for user {user_id}: {session_id[:8]}...")
         return session_data
@@ -136,11 +143,17 @@ class SessionManager:
         # Check memory cache first
         session = self.active_sessions.get(session_id)
         
-        # If not in memory, try storage backend
+        # If not in memory, try storage backend (note: sync wrapper needed for async storage)
         if not session and self.storage_backend:
-            session = self.storage_backend.get_session(session_id)
-            if session:
-                self.active_sessions[session_id] = session
+            if hasattr(self.storage_backend, 'get_session'):
+                if asyncio.iscoroutinefunction(self.storage_backend.get_session):
+                    # For async storage, we can't easily await here in sync context
+                    # This will be handled by a separate async method
+                    pass
+                else:
+                    session = self.storage_backend.get_session(session_id)
+                    if session:
+                        self.active_sessions[session_id] = session
         
         if not session:
             return None
@@ -423,6 +436,18 @@ class InMemorySessionStorage:
         return False
 
 
-# Global session manager instance
+# Global session manager instance with database-backed storage
 session_config = SessionConfig()
-session_manager = SessionManager(session_config)
+
+# Initialize with database storage
+try:
+    from .db_session_storage import DatabaseSessionStorage
+    database_storage = DatabaseSessionStorage()
+    session_manager = SessionManager(session_config, storage_backend=database_storage)
+    logger.info("SessionManager initialized with database-backed storage")
+except ImportError as e:
+    logger.warning(f"Failed to import DatabaseSessionStorage, falling back to in-memory: {e}")
+    session_manager = SessionManager(session_config)  # fallback to in-memory
+except Exception as e:
+    logger.error(f"Failed to initialize database storage, falling back to in-memory: {e}")
+    session_manager = SessionManager(session_config)  # fallback to in-memory

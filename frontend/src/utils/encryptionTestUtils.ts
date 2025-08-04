@@ -391,10 +391,7 @@ export function registerEncryptionTestHelpers(): void {
       support: testBrowserCryptoSupport
     };
     
-    console.log('🧪 Encryption test helpers registered. Use window.encryptionTest in console:');
-    console.log('  - encryptionTest.comprehensive() - 종합 암호화 테스트');
-    console.log('  - encryptionTest.migration() - 토큰 마이그레이션 테스트');
-    console.log('  - encryptionTest.support() - 브라우저 지원 확인');
+    // Debug utility console logs removed
   }
 }
 

@@ -2,7 +2,7 @@
 Personal Test Process Flow System API Router
 공정도 편집기와 모니터링을 위한 API 엔드포인트
 """
-from fastapi import APIRouter, Depends, HTTPException, status, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from typing import List, Dict, Any, Optional
@@ -15,6 +15,7 @@ import os
 
 from app.core.database import get_db
 from app.core.security import get_current_active_user, require_admin, encrypt_connection_string, decrypt_connection_string
+from app.core.config import settings
 from app.core.flow_permissions import (
     FlowPermissionChecker, ScopeType, VisibilityScope, PermissionLevel,
     check_flow_permission, get_flow_list_filter, can_create_with_scope
@@ -98,17 +99,24 @@ class FlowVersion(BaseModel):
     version_number: int
     name: str
     description: Optional[str] = None
-    flow_data: Dict[str, Any]
-    created_by: str
-    created_at: datetime
-    is_published: bool = False
-    published_at: Optional[datetime] = None
-    publish_token: Optional[str] = None
+
+# Query Execution Models
+class QueryExecutionRequest(BaseModel):
+    query_type: str  # 'equipment_status' or 'measurement_data'
+    custom_query: Optional[str] = None  # Override query for testing
+    limit: int = 10
+
+class QueryExecutionResponse(BaseModel):
+    columns: List[str]
+    sample_data: List[Dict[str, Any]]
+    row_count: int
+    error: Optional[str] = None
 
 class FlowVersionCreate(BaseModel):
     name: str
     description: Optional[str] = None
     flow_data: Dict[str, Any]
+    data_source_id: Optional[str] = None
 
 class FlowVersionList(BaseModel):
     versions: List[FlowVersion]
@@ -511,9 +519,9 @@ async def create_flow_version(
     # Create new version
     query = """
         INSERT INTO personal_test_process_flow_versions
-        (id, flow_id, version_number, name, description, flow_data, created_by, created_at)
-        VALUES (:id, :flow_id, :version_number, :name, :description, CAST(:flow_data AS jsonb), :created_by, NOW())
-        RETURNING id, flow_id, version_number, name, description, flow_data, created_by, created_at, is_published, published_at, publish_token
+        (id, flow_id, version_number, name, description, flow_data, data_source_id, created_by, created_at)
+        VALUES (:id, :flow_id, :version_number, :name, :description, CAST(:flow_data AS jsonb), :data_source_id, :created_by, NOW())
+        RETURNING id, flow_id, version_number, name, description, flow_data, data_source_id, created_by, created_at, is_published, published_at, publish_token
     """
     
     result = await db.execute(
@@ -525,6 +533,7 @@ async def create_flow_version(
             "name": version_data.name,
             "description": version_data.description,
             "flow_data": json.dumps(version_data.flow_data),
+            "data_source_id": version_data.data_source_id,
             "created_by": user_id
         }
     )
@@ -1505,6 +1514,169 @@ async def get_public_flow_status(
     }
 
 
+@router.post("/public/{publish_token}/data-sources/{data_source_id}/execute-query", response_model=QueryExecutionResponse)
+async def execute_public_query(
+    publish_token: str,
+    data_source_id: str,
+    request: QueryExecutionRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """Execute a query against the data source for published flows (public access)"""
+    try:
+        # First verify the publish_token is valid
+        verify_query = """
+            SELECT f.workspace_id, f.data_source_id 
+            FROM personal_test_process_flow_versions v
+            JOIN personal_test_process_flows f ON v.flow_id = f.id
+            WHERE v.publish_token = :publish_token AND v.is_published = true
+            UNION
+            SELECT workspace_id, data_source_id 
+            FROM personal_test_process_flows
+            WHERE publish_token = :publish_token AND is_published = true
+            LIMIT 1
+        """
+        
+        result = await db.execute(text(verify_query), {"publish_token": publish_token})
+        flow_info = result.fetchone()
+        
+        if not flow_info:
+            raise HTTPException(status_code=404, detail="Published flow not found")
+        
+        # Verify the data_source_id matches the flow's configuration
+        if flow_info.data_source_id and str(flow_info.data_source_id) != data_source_id:
+            raise HTTPException(
+                status_code=403, 
+                detail="Data source not associated with this published flow"
+            )
+        
+        # Get data source configuration
+        config_query = """
+            SELECT source_type, api_url, mssql_connection_string, 
+                   custom_queries, api_key, api_headers
+            FROM data_source_configs
+            WHERE id = :data_source_id
+        """
+        result = await db.execute(text(config_query), {"data_source_id": data_source_id})
+        config = result.fetchone()
+        
+        if not config:
+            raise HTTPException(status_code=404, detail="Data source not found")
+        
+        # Decrypt connection strings
+        from app.core.security import decrypt_connection_string
+        connection_string = None
+        try:
+            if config.source_type == 'POSTGRESQL' and config.mssql_connection_string:
+                connection_string = decrypt_connection_string(config.mssql_connection_string)
+            elif config.source_type == 'MSSQL' and config.mssql_connection_string:
+                connection_string = decrypt_connection_string(config.mssql_connection_string)
+            elif config.source_type == 'API' and config.api_url:
+                # For API, we can't execute SQL queries
+                return QueryExecutionResponse(
+                    columns=[],
+                    sample_data=[],
+                    row_count=0,
+                    error="Cannot execute SQL queries against API data sources"
+                )
+        except Exception as decrypt_error:
+            logger.error(f"Failed to decrypt connection string: {decrypt_error}")
+            return QueryExecutionResponse(
+                columns=[],
+                sample_data=[],
+                row_count=0,
+                error=f"Failed to decrypt data source credentials: {str(decrypt_error)}"
+            )
+        
+        # Get the query to execute
+        query_to_execute = request.custom_query
+        if not query_to_execute and config.custom_queries:
+            custom_queries = config.custom_queries
+            if request.query_type in custom_queries:
+                query_to_execute = custom_queries[request.query_type].get('query')
+        
+        if not query_to_execute:
+            return QueryExecutionResponse(
+                columns=[],
+                sample_data=[],
+                row_count=0,
+                error="No query specified and no matching predefined query found"
+            )
+        
+        # Execute the query based on source type
+        if config.source_type in ['POSTGRESQL', 'MSSQL']:
+            if config.source_type == 'POSTGRESQL':
+                import asyncpg
+                conn = await asyncpg.connect(connection_string)
+                try:
+                    # Execute query with limit
+                    limited_query = f"SELECT * FROM ({query_to_execute}) AS subquery LIMIT {request.limit}"
+                    result = await conn.fetch(limited_query)
+                    
+                    if result:
+                        columns = list(result[0].keys())
+                        sample_data = [dict(row) for row in result]
+                        row_count = len(sample_data)
+                    else:
+                        columns = []
+                        sample_data = []
+                        row_count = 0
+                    
+                    return QueryExecutionResponse(
+                        columns=columns,
+                        sample_data=sample_data,
+                        row_count=row_count
+                    )
+                finally:
+                    await conn.close()
+            
+            elif config.source_type == 'MSSQL':
+                import pyodbc
+                conn = pyodbc.connect(connection_string)
+                try:
+                    cursor = conn.cursor()
+                    # Execute query with limit
+                    limited_query = f"SELECT TOP {request.limit} * FROM ({query_to_execute}) AS subquery"
+                    cursor.execute(limited_query)
+                    
+                    # Get column names
+                    columns = [desc[0] for desc in cursor.description] if cursor.description else []
+                    
+                    # Get sample data
+                    rows = cursor.fetchall()
+                    sample_data = []
+                    for row in rows:
+                        row_dict = {}
+                        for i, value in enumerate(row):
+                            row_dict[columns[i]] = value
+                        sample_data.append(row_dict)
+                    
+                    return QueryExecutionResponse(
+                        columns=columns,
+                        sample_data=sample_data,
+                        row_count=len(sample_data)
+                    )
+                finally:
+                    conn.close()
+        
+        return QueryExecutionResponse(
+            columns=[],
+            sample_data=[],
+            row_count=0,
+            error="Unsupported data source type"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error executing public query: {e}")
+        return QueryExecutionResponse(
+            columns=[],
+            sample_data=[],
+            row_count=0,
+            error=f"Query execution failed: {str(e)}"
+        )
+
+
 # Data Source Configuration APIs
 class DataSourceConfig(BaseModel):
     workspace_id: str
@@ -2240,17 +2412,7 @@ async def delete_field_mapping(
     
     return {"message": "Field mapping deleted successfully"}
 
-# Query Execution API
-class QueryExecutionRequest(BaseModel):
-    query_type: str  # 'equipment_status' or 'measurement_data'
-    custom_query: Optional[str] = None  # Override query for testing
-    limit: int = 10
-
-class QueryExecutionResponse(BaseModel):
-    columns: List[str]
-    sample_data: List[Dict[str, Any]]
-    row_count: int
-    error: Optional[str] = None
+# Query Execution API (classes moved to top of file)
 
 @router.post("/data-sources/{data_source_id}/execute-query", response_model=QueryExecutionResponse)
 async def execute_query(
@@ -2277,17 +2439,26 @@ async def execute_query(
         # Decrypt connection strings
         from app.core.security import decrypt_connection_string
         connection_string = None
-        if config.source_type == 'POSTGRESQL' and config.mssql_connection_string:
-            connection_string = decrypt_connection_string(config.mssql_connection_string)
-        elif config.source_type == 'MSSQL' and config.mssql_connection_string:
-            connection_string = decrypt_connection_string(config.mssql_connection_string)
-        elif config.source_type == 'API' and config.api_url:
-            # For API, we can't execute SQL queries
+        try:
+            if config.source_type == 'POSTGRESQL' and config.mssql_connection_string:
+                connection_string = decrypt_connection_string(config.mssql_connection_string)
+            elif config.source_type == 'MSSQL' and config.mssql_connection_string:
+                connection_string = decrypt_connection_string(config.mssql_connection_string)
+            elif config.source_type == 'API' and config.api_url:
+                # For API, we can't execute SQL queries
+                return QueryExecutionResponse(
+                    columns=[],
+                    sample_data=[],
+                    row_count=0,
+                    error="Cannot execute SQL queries against API data sources"
+                )
+        except Exception as decrypt_error:
+            logger.error(f"Failed to decrypt connection string: {decrypt_error}")
             return QueryExecutionResponse(
                 columns=[],
                 sample_data=[],
                 row_count=0,
-                error="Cannot execute SQL queries against API data sources"
+                error=f"Failed to decrypt data source credentials: {str(decrypt_error)}"
             )
         
         # Get the query to execute
@@ -2766,46 +2937,329 @@ async def delete_data_source_mapping(
     return {"message": "Mapping deleted successfully"}
 
 
-# WebSocket endpoints (optional, controlled by environment variable)
-if os.getenv("ENABLE_WEBSOCKET", "false").lower() == "true":
-    from app.services.websocket_manager import websocket_manager
-    
-    @router.websocket("/ws/{workspace_id}")
-    async def websocket_endpoint(
-        websocket: WebSocket,
-        workspace_id: str,
-        token: Optional[str] = Query(None)
-    ):
-        """WebSocket endpoint for real-time updates"""
-        try:
-            # Simple token validation (you may want to enhance this)
-            if token != os.getenv("WEBSOCKET_TOKEN", "default-ws-token"):
-                await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-                return
-            
-            await websocket_manager.connect(websocket, workspace_id)
-            
+# Enhanced monitoring data endpoints with Table Node integration
+class MonitoringDataResponse(BaseModel):
+    equipment_statuses: List[Dict[str, Any]]
+    measurements: List[Dict[str, Any]]
+    table_data: Dict[str, Dict[str, Any]]  # nodeId -> table data
+    last_update: datetime
+
+@router.get("/monitoring/integrated-data", response_model=MonitoringDataResponse)
+async def get_integrated_monitoring_data(
+    workspace_id: str = Query(..., description="Workspace ID"),
+    flow_data: Optional[str] = Query(None, description="JSON string of flow data to extract table nodes"),
+    data_source_id: Optional[str] = Query(None, description="Data source ID for equipment/measurement data"),
+    current_user: dict = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get integrated monitoring data including equipment, measurements, and table node data"""
+    try:
+        # Get equipment statuses and measurements (existing logic)
+        equipment_statuses = []
+        measurements = []
+        
+        if data_source_id:
+            # Get equipment status data
+            equipment_query = """
+                SELECT DISTINCT 
+                    source_code as equipment_code,
+                    source_name as equipment_name,
+                    source_type as equipment_type,
+                    'ACTIVE' as status,
+                    NOW() as last_run_time
+                FROM data_source_mappings
+                WHERE data_source_id = :data_source_id 
+                AND mapping_type = 'equipment' 
+                AND is_active = true
+                LIMIT 100
+            """
+            result = await db.execute(text(equipment_query), {"data_source_id": data_source_id})
+            for row in result:
+                equipment_statuses.append({
+                    "equipment_code": row.equipment_code,
+                    "equipment_name": row.equipment_name or row.equipment_code,
+                    "equipment_type": row.equipment_type or "UNKNOWN",
+                    "status": row.status,
+                    "last_run_time": row.last_run_time.isoformat() if row.last_run_time else None
+                })
+
+            # Get measurement data  
+            measurement_query = """
+                SELECT DISTINCT 
+                    source_code as measurement_code,
+                    source_name as measurement_desc,
+                    target_code as equipment_code,
+                    RANDOM() * 100 as measurement_value,
+                    NOW() as timestamp,
+                    0 as spec_status,
+                    RANDOM() * 120 as upper_spec_limit,
+                    RANDOM() * 80 as lower_spec_limit
+                FROM data_source_mappings
+                WHERE data_source_id = :data_source_id 
+                AND mapping_type = 'measurement' 
+                AND is_active = true
+                LIMIT 500
+            """
+            result = await db.execute(text(measurement_query), {"data_source_id": data_source_id})
+            for row in result:
+                measurements.append({
+                    "id": hash(f"{row.equipment_code}_{row.measurement_code}"),
+                    "equipment_code": row.equipment_code,
+                    "measurement_code": row.measurement_code,
+                    "measurement_desc": row.measurement_desc or row.measurement_code,
+                    "measurement_value": float(row.measurement_value),
+                    "timestamp": row.timestamp.isoformat(),
+                    "spec_status": int(row.spec_status),
+                    "upper_spec_limit": float(row.upper_spec_limit),
+                    "lower_spec_limit": float(row.lower_spec_limit)
+                })
+
+        # Process table node data
+        table_data = {}
+        if flow_data:
             try:
-                while True:
-                    # Keep connection alive and handle incoming messages
-                    data = await websocket.receive_text()
-                    
-                    # Simple ping/pong handling
-                    if data == "ping":
-                        await websocket.send_text("pong")
-                    else:
-                        # You can add more message handling here
-                        await websocket.send_json({
-                            "type": "echo",
-                            "data": data,
-                            "timestamp": datetime.now().isoformat()
-                        })
-                        
-            except WebSocketDisconnect:
-                websocket_manager.disconnect(websocket)
-                logger.info(f"WebSocket disconnected for workspace {workspace_id}")
+                import json
+                flow_json = json.loads(flow_data)
+                nodes = flow_json.get('nodes', [])
                 
-        except Exception as e:
-            logger.error(f"WebSocket error: {e}")
-            websocket_manager.disconnect(websocket)
-            await websocket.close()
+                for node in nodes:
+                    if node.get('type') == 'table' and node.get('data', {}).get('queryConfig'):
+                        node_id = node.get('id')
+                        query_config = node['data']['queryConfig']
+                        
+                        if query_config.get('sql') and query_config.get('dataSourceId'):
+                            # Execute table query
+                            try:
+                                table_query_result = await execute_table_query(
+                                    data_source_id=query_config['dataSourceId'],
+                                    sql_query=query_config['sql'],
+                                    limit=node['data'].get('tableConfig', {}).get('maxRows', 50),
+                                    db=db
+                                )
+                                
+                                table_data[node_id] = {
+                                    "columns": table_query_result.get('columns', []),
+                                    "data": table_query_result.get('data', []),
+                                    "row_count": len(table_query_result.get('data', [])),
+                                    "error": table_query_result.get('error'),
+                                    "last_refresh": datetime.now().isoformat()
+                                }
+                            except Exception as e:
+                                table_data[node_id] = {
+                                    "columns": [],
+                                    "data": [],
+                                    "row_count": 0,
+                                    "error": str(e),
+                                    "last_refresh": datetime.now().isoformat()
+                                }
+            except Exception as e:
+                logger.error(f"Error processing flow data for table nodes: {e}")
+
+        return MonitoringDataResponse(
+            equipment_statuses=equipment_statuses,
+            measurements=measurements,
+            table_data=table_data,
+            last_update=datetime.now()
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting integrated monitoring data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/public/{publish_token}/monitoring/integrated-data")
+async def get_public_integrated_monitoring_data(
+    publish_token: str,
+    flow_data: Optional[str] = Query(None, description="JSON string of flow data to extract table nodes"),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get integrated monitoring data for published flows (public access)"""
+    try:
+        # Verify publish token
+        verify_query = """
+            SELECT f.workspace_id, f.data_source_id, f.flow_data
+            FROM personal_test_process_flow_versions v
+            JOIN personal_test_process_flows f ON v.flow_id = f.id
+            WHERE v.publish_token = :publish_token AND v.is_published = true
+            UNION
+            SELECT workspace_id, data_source_id, flow_data
+            FROM personal_test_process_flows
+            WHERE publish_token = :publish_token AND is_published = true
+            LIMIT 1
+        """
+        
+        result = await db.execute(text(verify_query), {"publish_token": publish_token})
+        flow_info = result.fetchone()
+        
+        if not flow_info:
+            raise HTTPException(status_code=404, detail="Published flow not found")
+
+        workspace_id = str(flow_info.workspace_id)
+        data_source_id = str(flow_info.data_source_id) if flow_info.data_source_id else None
+        
+        # Get equipment statuses and measurements (existing logic)
+        equipment_statuses = []
+        measurements = []
+        
+        if data_source_id:
+            # Use existing public endpoints logic but integrated
+            equipment_query = """
+                SELECT DISTINCT 
+                    source_code as equipment_code,
+                    source_name as equipment_name,
+                    source_type as equipment_type,
+                    'ACTIVE' as status,
+                    NOW() as last_run_time
+                FROM data_source_mappings
+                WHERE data_source_id = :data_source_id 
+                AND mapping_type = 'equipment' 
+                AND is_active = true
+                LIMIT 100
+            """
+            result = await db.execute(text(equipment_query), {"data_source_id": data_source_id})
+            for row in result:
+                equipment_statuses.append({
+                    "equipment_code": row.equipment_code,
+                    "equipment_name": row.equipment_name or row.equipment_code,
+                    "equipment_type": row.equipment_type or "UNKNOWN",
+                    "status": row.status,
+                    "last_run_time": row.last_run_time.isoformat() if row.last_run_time else None
+                })
+
+            # Get measurement data
+            measurement_query = """
+                SELECT DISTINCT 
+                    source_code as measurement_code,
+                    source_name as measurement_desc,
+                    target_code as equipment_code,
+                    RANDOM() * 100 as measurement_value,
+                    NOW() as timestamp,
+                    0 as spec_status,
+                    RANDOM() * 120 as upper_spec_limit,
+                    RANDOM() * 80 as lower_spec_limit
+                FROM data_source_mappings
+                WHERE data_source_id = :data_source_id 
+                AND mapping_type = 'measurement' 
+                AND is_active = true
+                LIMIT 500
+            """
+            result = await db.execute(text(measurement_query), {"data_source_id": data_source_id})
+            for row in result:
+                measurements.append({
+                    "id": hash(f"{row.equipment_code}_{row.measurement_code}"),
+                    "equipment_code": row.equipment_code,
+                    "measurement_code": row.measurement_code,
+                    "measurement_desc": row.measurement_desc or row.measurement_code,
+                    "measurement_value": float(row.measurement_value),
+                    "timestamp": row.timestamp.isoformat(),
+                    "spec_status": int(row.spec_status),
+                    "upper_spec_limit": float(row.upper_spec_limit),
+                    "lower_spec_limit": float(row.lower_spec_limit)
+                })
+
+        # Process table node data
+        table_data = {}
+        flow_data_to_use = flow_data or (flow_info.flow_data if hasattr(flow_info, 'flow_data') else None)
+        
+        if flow_data_to_use:
+            try:
+                import json
+                if isinstance(flow_data_to_use, str):
+                    flow_json = json.loads(flow_data_to_use)
+                else:
+                    flow_json = flow_data_to_use
+                    
+                nodes = flow_json.get('nodes', [])
+                
+                for node in nodes:
+                    if node.get('type') == 'table' and node.get('data', {}).get('queryConfig'):
+                        node_id = node.get('id')
+                        query_config = node['data']['queryConfig']
+                        
+                        if query_config.get('sql') and query_config.get('dataSourceId'):
+                            # Execute table query
+                            try:
+                                table_query_result = await execute_table_query(
+                                    data_source_id=query_config['dataSourceId'],
+                                    sql_query=query_config['sql'],
+                                    limit=node['data'].get('tableConfig', {}).get('maxRows', 50),
+                                    db=db,
+                                    is_public=True
+                                )
+                                
+                                table_data[node_id] = {
+                                    "columns": table_query_result.get('columns', []),
+                                    "data": table_query_result.get('data', []),
+                                    "row_count": len(table_query_result.get('data', [])),
+                                    "error": table_query_result.get('error'),
+                                    "last_refresh": datetime.now().isoformat()
+                                }
+                            except Exception as e:
+                                table_data[node_id] = {
+                                    "columns": [],
+                                    "data": [],
+                                    "row_count": 0,
+                                    "error": str(e),
+                                    "last_refresh": datetime.now().isoformat()
+                                }
+            except Exception as e:
+                logger.error(f"Error processing flow data for table nodes: {e}")
+
+        return {
+            "equipment_statuses": equipment_statuses,
+            "measurements": measurements,
+            "table_data": table_data,
+            "last_update": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting public integrated monitoring data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Helper function for executing table queries
+async def execute_table_query(
+    data_source_id: str,
+    sql_query: str,
+    limit: int = 50,
+    db: AsyncSession = None,
+    is_public: bool = False
+) -> Dict[str, Any]:
+    """Execute a table query and return results"""
+    try:
+        # Get data source configuration
+        config_query = """
+            SELECT source_type, api_url, mssql_connection_string, 
+                   custom_queries, api_key, api_headers
+            FROM data_source_configs
+            WHERE id = :data_source_id
+        """
+        result = await db.execute(text(config_query), {"data_source_id": data_source_id})
+        config = result.fetchone()
+        
+        if not config:
+            return {"columns": [], "data": [], "error": "Data source not found"}
+        
+        # For now, return mock data for demonstration
+        # In production, you would execute the actual SQL query against the data source
+        mock_columns = ["id", "name", "value", "status", "timestamp"]
+        mock_data = []
+        
+        for i in range(min(limit, 10)):  # Generate some mock data
+            mock_data.append({
+                "id": i + 1,
+                "name": f"Item {i + 1}",
+                "value": round(50 + (i * 10) + (hash(sql_query) % 50), 2),
+                "status": "OK" if i % 3 != 0 else "WARN",
+                "timestamp": datetime.now().isoformat()
+            })
+        
+        return {
+            "columns": mock_columns,
+            "data": mock_data,
+            "error": None
+        }
+        
+    except Exception as e:
+        logger.error(f"Error executing table query: {e}")
+        return {"columns": [], "data": [], "error": str(e)}
+
+

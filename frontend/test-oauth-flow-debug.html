@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Flow Debug</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .success { background: #d4edda; border: 1px solid #28a745; }
+        .error { background: #f8d7da; border: 1px solid #dc3545; }
+        .warning { background: #fff3cd; border: 1px solid #ffc107; }
+        .info { background: #d1ecf1; border: 1px solid #17a2b8; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 OAuth Flow Debug Tool</h1>
+    
+    <div class="container">
+        <h2>1. Current OAuth State</h2>
+        <div id="oauth-state"></div>
+    </div>
+    
+    <div class="container">
+        <h2>2. Test OAuth Flow</h2>
+        <button onclick="clearAllOAuthData()">🗑️ Clear All OAuth Data</button>
+        <button onclick="testNormalLogin()">🔐 Test Normal Login</button>
+        <button onclick="testForceLogin()">👥 Test Force Login (Different User)</button>
+        <button onclick="testDirectOAuthUrl()">🔗 Test Direct OAuth URL</button>
+    </div>
+    
+    <div class="container">
+        <h2>3. Debug Log</h2>
+        <div class="log" id="debug-log"></div>
+    </div>
+    
+    <script>
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const logDiv = document.getElementById('debug-log');
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateOAuthState() {
+            const stateDiv = document.getElementById('oauth-state');
+            const state = {
+                sessionStorage: {},
+                localStorage: {},
+                cookies: document.cookie
+            };
+            
+            // Get OAuth-related sessionStorage
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key && (key.includes('oauth') || key.includes('auth'))) {
+                    state.sessionStorage[key] = sessionStorage.getItem(key);
+                }
+            }
+            
+            // Get auth-related localStorage
+            const authKeys = ['accessToken', 'refreshToken', 'user', 'tokenExpiryTime'];
+            authKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    state.localStorage[key] = value.substring(0, 50) + '...';
+                }
+            });
+            
+            stateDiv.innerHTML = `<pre>${JSON.stringify(state, null, 2)}</pre>`;
+        }
+        
+        function clearAllOAuthData() {
+            log('🗑️ Clearing all OAuth data...');
+            
+            // Clear sessionStorage OAuth keys
+            const sessionKeys = Object.keys(sessionStorage);
+            sessionKeys.forEach(key => {
+                if (key.includes('oauth') || key.includes('auth')) {
+                    sessionStorage.removeItem(key);
+                    log(`  Removed sessionStorage: ${key}`);
+                }
+            });
+            
+            // Clear localStorage auth keys
+            const authKeys = ['accessToken', 'refreshToken', 'user', 'tokenExpiryTime', 'tokenCreatedAt'];
+            authKeys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    log(`  Removed localStorage: ${key}`);
+                }
+            });
+            
+            // Clear cookies
+            document.cookie.split(";").forEach(c => {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            
+            log('✅ All OAuth data cleared');
+            updateOAuthState();
+        }
+        
+        function generateOAuthParams() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+        
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+        
+        async function testNormalLogin() {
+            log('🔐 Testing normal OAuth login...');
+            
+            try {
+                const state = generateOAuthParams();
+                const codeVerifier = generateOAuthParams();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateOAuthParams();
+                
+                // Store OAuth state
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce
+                });
+                
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`📋 OAuth URL: ${authUrl}`);
+                
+                const popup = window.open(authUrl, 'oauth_test', 'width=600,height=700');
+                
+                if (!popup) {
+                    log('❌ Popup was blocked!');
+                } else {
+                    log('✅ Popup opened successfully');
+                    
+                    // Monitor popup
+                    const checkInterval = setInterval(() => {
+                        if (popup.closed) {
+                            clearInterval(checkInterval);
+                            log('🚪 Popup closed');
+                            updateOAuthState();
+                        }
+                    }, 500);
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testForceLogin() {
+            log('👥 Testing force login (different user)...');
+            
+            try {
+                const state = generateOAuthParams() + '_force_' + Date.now();
+                const codeVerifier = generateOAuthParams();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateOAuthParams();
+                
+                // Store OAuth state
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_force_account_selection', 'true');
+                
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'select_account',
+                    max_age: '0'
+                });
+                
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`📋 OAuth URL (force): ${authUrl}`);
+                
+                const popup = window.open(authUrl, 'oauth_test_force', 'width=600,height=700');
+                
+                if (!popup) {
+                    log('❌ Popup was blocked!');
+                } else {
+                    log('✅ Force login popup opened');
+                    
+                    // Monitor popup
+                    const checkInterval = setInterval(() => {
+                        if (popup.closed) {
+                            clearInterval(checkInterval);
+                            log('🚪 Force login popup closed');
+                            updateOAuthState();
+                        }
+                    }, 500);
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDirectOAuthUrl() {
+            log('🔗 Testing direct OAuth URL navigation...');
+            
+            const state = generateOAuthParams();
+            const codeVerifier = generateOAuthParams();
+            const codeChallenge = await generateCodeChallenge(codeVerifier);
+            const nonce = generateOAuthParams();
+            
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_nonce', nonce);
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: `${window.location.origin}/oauth/callback`,
+                scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: 'S256',
+                nonce: nonce
+            });
+            
+            const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+            
+            // Copy URL to clipboard
+            try {
+                await navigator.clipboard.writeText(authUrl);
+                log('✅ OAuth URL copied to clipboard!');
+                log('📋 Paste this URL in a new tab to test direct navigation');
+            } catch (e) {
+                log(`📋 OAuth URL: ${authUrl}`);
+                log('👆 Copy this URL and open in a new tab');
+            }
+        }
+        
+        // Listen for OAuth messages
+        window.addEventListener('message', (event) => {
+            log(`📨 Received message: ${JSON.stringify(event.data)}`);
+            updateOAuthState();
+        });
+        
+        const channel = new BroadcastChannel('oauth_channel');
+        channel.onmessage = (event) => {
+            log(`📡 BroadcastChannel: ${JSON.stringify(event.data)}`);
+            updateOAuthState();
+        };
+        
+        // Initial state update
+        updateOAuthState();
+        log('🔍 OAuth Flow Debug Tool ready');
+    </script>
+</body>
+</html>

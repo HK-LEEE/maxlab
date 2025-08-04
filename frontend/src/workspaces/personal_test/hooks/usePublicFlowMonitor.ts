@@ -3,7 +3,6 @@ import log from '../../../utils/logger';
 import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { apiClient } from '../../../api/client';
-import { useWebSocket } from './useWebSocket';
 import axios from 'axios';
 
 interface ProcessFlow {
@@ -89,26 +88,6 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     },
   });
 
-  // WebSocket connection for real-time updates
-  const { isConnected: wsConnected } = useWebSocket({
-    workspace_id: '21ee03db-90c4-4592-b00f-c44801e0b164', // TODO: Get actual workspace UUID
-    onMessage: (data) => {
-      if (data.type === 'equipment_update') {
-        setEquipmentStatuses(prev => {
-          const updated = [...prev];
-          const index = updated.findIndex(e => e.equipment_code === data.equipment_code);
-          if (index >= 0) {
-            updated[index] = { ...updated[index], ...data.data };
-          }
-          return updated;
-        });
-        setLastUpdate(new Date());
-      } else if (data.type === 'measurement_update') {
-        setMeasurements(data.measurements);
-        setLastUpdate(new Date());
-      }
-    }
-  });
 
   // Load flow data
   const loadFlow = useCallback(async (forceRefresh: boolean = false) => {
@@ -191,21 +170,16 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         setEdges(flowData.flow_data.edges || []);
       }
 
-      // Get equipment statuses with cache-busting
-      const statusResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}/equipment/status?limit=100&_t=${Date.now()}`
-      );
-      const statuses = statusResponse.data.items || statusResponse.data;
-      // Ensure statuses is always an array
-      const validStatuses = Array.isArray(statuses) ? statuses : [];
+      // Fetch equipment status and measurement data individually for published flows
+      const [equipmentResponse, measurementResponse] = await Promise.all([
+        publicClient.get(`/api/v1/personal-test/process-flow/public/${publishToken}/equipment/status?_t=${Date.now()}`),
+        publicClient.get(`/api/v1/personal-test/process-flow/public/${publishToken}/measurements?_t=${Date.now()}`)
+      ]);
+      
+      const validStatuses = equipmentResponse.data.items || [];
+      const validMeasurements = measurementResponse.data || [];
+      
       setEquipmentStatuses(validStatuses);
-
-      // Get measurements using the public endpoint with cache-busting
-      const measurementResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}/measurements?limit=100&_t=${Date.now()}`
-      );
-      // Ensure measurements is always an array
-      const validMeasurements = Array.isArray(measurementResponse.data) ? measurementResponse.data : [];
       setMeasurements(validMeasurements);
 
       // Check for spec violations and trigger alarms (only if alarm check is enabled)
@@ -579,27 +553,31 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       });
       
       const updatedEdges = edgesToUpdate.map((edge: Edge) => {
-        // Check if either end is an instrument node
+        // Check node types to determine edge styling
         const sourceType = nodeTypeMap.get(edge.source);
         const targetType = nodeTypeMap.get(edge.target);
-        const isInstrumentEdge = sourceType === 'instrument' || targetType === 'instrument';
+        const shouldShowStatus = sourceType === 'equipment' && targetType === 'equipment';
         
-        // If it's an instrument edge, use neutral styling without animation
-        if (isInstrumentEdge) {
+        // If it's not equipment-to-equipment edge, use black dashed styling without animation or status labels
+        if (!shouldShowStatus) {
           return {
             ...edge,
             type: 'custom',
             animated: false,
             style: {
               ...edge.style,
-              stroke: '#6b7280', // Gray color for instrument connections
-              strokeWidth: 1.5,
+              stroke: '#000000', // Black color for non-equipment connections
+              strokeWidth: 1,
+              strokeDasharray: '3,2', // Dashed line
             },
             data: {
               ...edge.data,
               type: edge.type || edge.data?.type || 'smoothstep',
               label: null,
               animated: false,
+              showStatus: false, // Explicitly disable status representation
+              sourceNodeType: sourceType,
+              targetNodeType: targetType,
             }
           };
         }
@@ -676,6 +654,9 @@ export const usePublicFlowMonitor = (publishToken: string) => {
             type: edge.type || edge.data?.type || 'smoothstep', // Preserve original edge type
             label: label,
             animated: animated,
+            showStatus: true, // Explicitly enable status representation for equipment-to-equipment
+            sourceNodeType: sourceType,
+            targetNodeType: targetType,
           }
         };
       });

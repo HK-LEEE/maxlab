@@ -2,6 +2,9 @@
 
 ## Essential Commands
 
+절대 Mockdata는 만들지 말 것
+Fallback Logic 만들지 말 것.
+
 ### Core Workflow Commands
 
 ```bash

@@ -304,3 +304,7 @@ def logout_session(request: Request, response: Response) -> bool:
 def logout_all_user_sessions(user_id: str) -> int:
     """Logout all sessions for a user"""
     return session_manager.invalidate_all_user_sessions(user_id)
+
+def get_session_manager():
+    """Get session manager instance for dependency injection"""
+    return session_manager

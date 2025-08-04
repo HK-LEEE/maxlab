@@ -245,11 +245,7 @@ export function registerGlobalTokenTestHelpers(): void {
       getManagerStatus: () => tokenRefreshManager.getRefreshStatus()
     };
     
-    console.log('🧪 Token test helpers registered. Use window.tokenTest in console:');
-    console.log('  - tokenTest.analyze() - 현재 토큰 상태 분석');
-    console.log('  - tokenTest.refresh() - 수동 토큰 갱신 테스트');
-    console.log('  - tokenTest.comprehensive() - 종합 테스트');
-    console.log('  - tokenTest.scenarios() - 시나리오 테스트');
+    // Debug utility console logs removed
     console.log('  - tokenTest.simulateExpiry(seconds) - 만료 시뮬레이션');
   }
 }

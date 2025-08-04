@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Server Direct Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>OAuth Server Direct Test</h1>
+    
+    <div class="section">
+        <h2>1. OAuth Server Health Check</h2>
+        <button onclick="checkHealth()">Check Health</button>
+        <div id="health-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Current Session Check</h2>
+        <button onclick="checkSession()">Check Session</button>
+        <div id="session-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Direct OAuth Request (New Window)</h2>
+        <button onclick="directOAuthRequest()">Test OAuth with prompt=login</button>
+        <p class="info">이 버튼을 클릭하면 새 창에서 OAuth URL이 열립니다. 실제 동작을 확인할 수 있습니다.</p>
+    </div>
+    
+    <div class="section">
+        <h2>4. Manual URL Test</h2>
+        <p>아래 URL을 복사해서 새 탭에서 직접 열어보세요:</p>
+        <pre id="manual-url"></pre>
+    </div>
+
+    <script>
+        async function checkHealth() {
+            const result = document.getElementById('health-result');
+            try {
+                const response = await fetch('http://localhost:8000/api/health');
+                if (response.ok) {
+                    result.innerHTML = '<p class="success">✅ OAuth Server is running</p>';
+                } else {
+                    result.innerHTML = `<p class="error">❌ Server returned: ${response.status}</p>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ Cannot connect to server: ${error.message}</p>`;
+            }
+        }
+        
+        async function checkSession() {
+            const result = document.getElementById('session-result');
+            try {
+                const response = await fetch('http://localhost:8000/api/auth/me', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const user = await response.json();
+                    result.innerHTML = `<p class="success">✅ Logged in as: ${user.email || user.username}</p>`;
+                } else if (response.status === 401) {
+                    result.innerHTML = '<p class="info">ℹ️ Not logged in</p>';
+                } else {
+                    result.innerHTML = `<p class="error">❌ Server returned: ${response.status}</p>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function directOAuthRequest() {
+            const state = 'test_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                prompt: 'login',
+                max_age: '0'
+            });
+            
+            const url = `http://localhost:8000/api/oauth/authorize?${params}`;
+            
+            console.log('Opening OAuth URL:', url);
+            window.open(url, '_blank');
+        }
+        
+        // Generate manual test URL
+        window.onload = function() {
+            const state = 'manual_test_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                prompt: 'login',
+                max_age: '0'
+            });
+            
+            const url = `http://localhost:8000/api/oauth/authorize?${params}`;
+            document.getElementById('manual-url').textContent = url;
+        };
+    </script>
+</body>
+</html>

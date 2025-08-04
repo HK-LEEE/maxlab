@@ -334,10 +334,7 @@ export function registerTokenRotationTestHelpers(): void {
       shouldRefresh: shouldRefreshToken
     };
     
-    console.log('🧪 Token rotation test helpers registered. Use window.rotationTest in console:');
-    console.log('  - rotationTest.single(forceRefresh=false) - 단일 토큰 회전 테스트');
-    console.log('  - rotationTest.multiple(rounds=3, forceRefresh=false) - 연속 토큰 회전 테스트');
-    console.log('  - rotationTest.shouldRefresh() - 토큰 갱신 필요성 확인');
+    // Debug utility console logs removed
   }
 }
 

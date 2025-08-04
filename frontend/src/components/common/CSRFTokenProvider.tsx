@@ -69,7 +69,7 @@ export const CSRFTokenProvider: React.FC<CSRFTokenProviderProps> = ({ children }
         validate: (token: string) => csrfProtection.validateToken(token)
       };
       
-      console.log('🔧 CSRF debugging utilities available at window.csrf');
+      // Debug utility console logs removed
     }
   }, [csrfStatus.initialized]);
 

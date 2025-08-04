@@ -53,7 +53,10 @@ export const ScopeSelectionDialog: React.FC<ScopeSelectionDialogProps> = ({
   currentFlowName = '',
   isLoading = false
 }) => {
-  const [flowName, setFlowName] = useState(currentFlowName);
+  // Clear the flow name for imported flows or new flows
+  const [flowName, setFlowName] = useState(
+    currentFlowName === 'New Process Flow' || currentFlowName === 'Imported Flow' ? '' : currentFlowName
+  );
   const [scopeType, setScopeType] = useState<ScopeType>('USER');
   const [description, setDescription] = useState('');
 
@@ -75,7 +78,7 @@ export const ScopeSelectionDialog: React.FC<ScopeSelectionDialogProps> = ({
   };
 
   const handleClose = () => {
-    setFlowName(currentFlowName);
+    setFlowName(currentFlowName === 'New Process Flow' || currentFlowName === 'Imported Flow' ? '' : currentFlowName);
     setScopeType('USER');
     setDescription('');
     onClose();

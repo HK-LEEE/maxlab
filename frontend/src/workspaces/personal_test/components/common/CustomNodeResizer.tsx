@@ -78,12 +78,12 @@ export const CustomNodeResizer: React.FC<CustomNodeResizerProps> = ({
 
   // 리사이즈 시작
   const handleMouseDown = useCallback((e: React.MouseEvent, direction: ResizeDirection) => {
-    console.log('🎯 CustomNodeResizer handleMouseDown triggered', { direction });
+    // Debug console log removed
     e.preventDefault();
     e.stopPropagation();
 
     const nodeElement = findNodeElement(e.currentTarget as HTMLElement);
-    console.log('🔍 Found node element:', nodeElement);
+    // Debug console log removed
     
     if (!nodeElement) {
       console.error('❌ Could not find ReactFlow node element');

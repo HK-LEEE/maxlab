@@ -8,29 +8,16 @@ import { attemptSilentLogin, isSafePageForTokenRefresh } from '../utils/silentAu
 import { tokenRefreshManager } from './tokenRefreshManager';
 import { tokenBlacklistService } from './tokenBlacklistService';
 import { refreshTokenService, type TokenResponse } from './refreshTokenService';
-import type { User } from '../types/auth';
+import { browserSecurityCleanup } from '../utils/browserSecurityCleanup';
+import { userIsolatedTokenStorage } from './userIsolatedTokenStorage';
+import { securityHeaders } from './securityHeaders';
+import type { User, MAXPlatformClaims } from '../types/auth';
 import { jwtDecode } from 'jwt-decode';
+import { oidcService } from './oidcService';
+import { authSyncService } from './authSyncService';
 
-// ID Token Claims interface
-interface IDTokenClaims {
-  iss: string;       // Issuer
-  sub: string;       // Subject (user ID)
-  aud: string;       // Audience (client ID)
-  exp: number;       // Expiration time
-  iat: number;       // Issued at
-  auth_time?: number; // Authentication time
-  nonce?: string;     // Nonce for replay attack prevention
-  email?: string;
-  email_verified?: boolean;
-  name?: string;
-  given_name?: string;
-  family_name?: string;
-  locale?: string;
-  zoneinfo?: string;
-  groups?: string[];
-  role?: string;
-  is_admin?: boolean;
-}
+// Re-export for backward compatibility
+export type IDTokenClaims = MAXPlatformClaims;
 
 export interface AuthServiceResult {
   success: boolean;
@@ -42,27 +29,79 @@ export const authService = {
   /**
    * 팝업 OAuth 로그인
    */
-  loginWithPopupOAuth: async (): Promise<User> => {
+  loginWithPopupOAuth: async (forceAccountSelection = false): Promise<User> => {
     const oauthInstance = new PopupOAuthLogin();
     
     try {
-      console.log('🔐 Starting popup OAuth login...');
+      console.log(`🔐 Starting popup OAuth login (force account selection: ${forceAccountSelection})...`);
       
-      const tokenResponse = await oauthInstance.startAuth();
+      // 🚨 CRITICAL: Complete session cleanup for different user login
+      if (forceAccountSelection) {
+        console.log('🧹 Performing complete session cleanup for different user login...');
+        
+        // 1. Clear all existing tokens and auth state
+        try {
+          await refreshTokenService.clearAllTokens();
+          console.log('✅ Cleared refresh tokens');
+        } catch (e) {
+          console.warn('⚠️ Failed to clear refresh tokens:', e);
+        }
+        
+        try {
+          await userIsolatedTokenStorage.clearAllTokens();
+          console.log('✅ Cleared user isolated tokens');
+        } catch (e) {
+          console.warn('⚠️ Failed to clear user isolated tokens:', e);
+        }
+        
+        // 2. Clear existing user data
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('hasLoggedOut');
+        localStorage.removeItem('logoutTimestamp');
+        console.log('✅ Cleared localStorage user data');
+        
+        // 3. Force logout in auth store
+        try {
+          const { useAuthStore } = await import('../stores/authStore');
+          useAuthStore.getState().logout();
+          console.log('✅ Forced auth store logout');
+        } catch (e) {
+          console.warn('⚠️ Failed to force auth store logout:', e);
+        }
+        
+        // 4. Broadcast logout to other tabs before new login
+        try {
+          authSyncService.broadcastLogout();
+          console.log('✅ Broadcasted logout to other tabs');
+        } catch (e) {
+          console.warn('⚠️ Failed to broadcast logout:', e);
+        }
+        
+        console.log('✅ Complete session cleanup finished for different user login');
+      }
+      
+      const tokenResponse = await oauthInstance.startAuth(forceAccountSelection);
       console.log('✅ Popup OAuth successful, getting user info...');
       
       const userInfo = await getUserInfo(tokenResponse.access_token);
       
       // ID Token 처리 (있는 경우)
-      let idTokenClaims: IDTokenClaims | null = null;
+      let idTokenClaims: MAXPlatformClaims | null = null;
       if (tokenResponse.id_token) {
         try {
-          // ID Token 디코드 및 검증
-          idTokenClaims = await authService.validateIDToken(tokenResponse.id_token);
+          // ID Token 디코드 및 검증 (OIDC service 사용)
+          const storedNonce = sessionStorage.getItem('oauth_nonce');
+          idTokenClaims = await oidcService.verifyIDToken(tokenResponse.id_token, storedNonce || undefined);
           console.log('✅ ID Token validated:', idTokenClaims);
           
           // ID Token 저장
           sessionStorage.setItem('id_token', tokenResponse.id_token);
+          
+          // Nonce 정리
+          if (storedNonce) {
+            sessionStorage.removeItem('oauth_nonce');
+          }
         } catch (error) {
           console.error('ID Token validation failed:', error);
           // ID Token 검증 실패는 경고만 하고 계속 진행 (하위 호환성)
@@ -79,6 +118,14 @@ export const authService = {
         refresh_expires_in: tokenResponse.refresh_expires_in
       });
       
+      // User-isolated token storage에도 저장 (추가 보안)
+      await userIsolatedTokenStorage.saveTokens({
+        accessToken: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token,
+        idToken: tokenResponse.id_token,
+        expiresAt: Date.now() + (tokenResponse.expires_in || 3600) * 1000
+      }, idTokenClaims?.sub || userInfo.sub || userInfo.id || userInfo.email);
+      
       console.log('📋 User info received:', userInfo);
       
       // 사용자 정보 매핑 (ID Token claims 우선, UserInfo 폴백)
@@ -89,11 +136,14 @@ export const authService = {
         full_name: idTokenClaims?.name || userInfo.real_name || userInfo.full_name || userInfo.name || userInfo.display_name || userInfo.username || userInfo.email || 'Unknown User',
         is_active: userInfo.is_active !== undefined ? userInfo.is_active : true,
         is_admin: Boolean(idTokenClaims?.is_admin || userInfo.is_admin || userInfo.is_superuser || userInfo.admin),
-        role: (idTokenClaims?.is_admin || userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user',
+        role: idTokenClaims?.role_name || idTokenClaims?.role || ((idTokenClaims?.is_admin || userInfo.is_admin || userInfo.is_superuser || userInfo.admin) ? 'admin' : 'user'),
         groups: idTokenClaims?.groups || (Array.isArray(userInfo.groups) 
           ? userInfo.groups.map((g: any) => typeof g === 'string' ? g : (g.name || g.display_name || g)).filter(Boolean)
           : [])
       };
+      
+      // Broadcast login event to other tabs
+      authSyncService.broadcastLogin(user, tokenResponse.access_token);
       
       console.log('👤 Mapped user:', user);
       
@@ -106,6 +156,13 @@ export const authService = {
       };
       
       localStorage.setItem('user', JSON.stringify(userWithMetadata));
+      
+      // 🔒 CLEAR: Remove logout flags on successful login
+      localStorage.removeItem('hasLoggedOut');
+      localStorage.removeItem('logoutTimestamp');
+      sessionStorage.removeItem('preventSilentAuth');
+      console.log('🔓 Cleared logout flags after successful login');
+      
       return user;
       
     } catch (error: any) {
@@ -160,6 +217,14 @@ export const authService = {
           });
         }
         
+        // User-isolated token storage에도 저장 (추가 보안)
+        await userIsolatedTokenStorage.saveTokens({
+          accessToken: result.token,
+          refreshToken: result.tokenData?.refresh_token,
+          idToken: result.tokenData?.id_token,
+          expiresAt: Date.now() + ((result.tokenData?.expires_in || 3600) * 1000)
+        }, userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email);
+        
         // 사용자 정보 매핑 (안전한 기본값 처리)
         const user: User = {
           id: userInfo.sub || userInfo.id || userInfo.user_id || userInfo.email,
@@ -183,6 +248,12 @@ export const authService = {
         };
         
         localStorage.setItem('user', JSON.stringify(userWithMetadata));
+        
+        // 🔒 CLEAR: Remove logout flags on successful silent login
+        localStorage.removeItem('hasLoggedOut');
+        localStorage.removeItem('logoutTimestamp');
+        sessionStorage.removeItem('preventSilentAuth');
+        console.log('🔓 Cleared logout flags after successful silent login');
         
         return { success: true, user };
       } else {
@@ -263,13 +334,14 @@ export const authService = {
   },
 
   /**
-   * 로그아웃 - 보안 강화 (Refresh Token 포함)
+   * 로그아웃 - 로컬 세션만 정리 (SSO 세션 유지)
+   * @param options - 로그아웃 옵션 (useProviderLogout: OAuth 서버 로그아웃 여부)
    */
-  logout: async (): Promise<void> => {
+  logout: async (options: { useProviderLogout?: boolean } = {}): Promise<void> => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       
-      // First, blacklist the token on our backend
+      // Step 1: Blacklist token on our backend
       if (accessToken) {
         try {
           await tokenBlacklistService.blacklistCurrentToken('user_logout');
@@ -280,7 +352,83 @@ export const authService = {
         }
       }
       
-      // Enhanced logout with refresh token revocation
+      // Step 2: 🔒 OAuth Provider Token Revocation (조건부)
+      // OAuth 서버에 /api/oauth/logout 엔드포인트가 없으므로 토큰 revocation만 수행
+      if (options.useProviderLogout !== false) { // 기본값은 true (하위 호환성)
+        try {
+          const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+          const clientId = import.meta.env.VITE_CLIENT_ID || 'maxlab';
+          
+          // 토큰 revocation만 수행 (logout 엔드포인트 사용하지 않음)
+          const accessToken = localStorage.getItem('accessToken');
+          const refreshToken = localStorage.getItem('refreshToken');
+          
+          if (accessToken || refreshToken) {
+            console.log('🔑 Attempting token revocation...');
+            
+            // Access token revocation
+            if (accessToken) {
+              try {
+                const response = await fetch(`${authUrl}/api/oauth/revoke`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  body: new URLSearchParams({
+                    token: accessToken,
+                    token_type_hint: 'access_token',
+                    client_id: clientId
+                  })
+                });
+                
+                if (response.ok) {
+                  console.log('✅ Access token revoked');
+                } else if (response.status === 404) {
+                  console.log('⚠️ Token revocation endpoint not implemented (404) - continuing');
+                }
+              } catch (error) {
+                console.warn('⚠️ Access token revocation failed:', error);
+              }
+            }
+            
+            // Refresh token revocation
+            if (refreshToken) {
+              try {
+                const response = await fetch(`${authUrl}/api/oauth/revoke`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  body: new URLSearchParams({
+                    token: refreshToken,
+                    token_type_hint: 'refresh_token',
+                    client_id: clientId
+                  })
+                });
+                
+                if (response.ok) {
+                  console.log('✅ Refresh token revoked');
+                } else if (response.status === 404) {
+                  console.log('⚠️ Token revocation endpoint not implemented (404) - continuing');
+                }
+              } catch (error) {
+                console.warn('⚠️ Refresh token revocation failed:', error);
+              }
+            }
+          }
+          
+          // Clear OAuth provider cookies
+          const { clearOAuthProviderCookies } = await import('../utils/oauthProviderLogout');
+          clearOAuthProviderCookies();
+          console.log('🍪 OAuth provider cookies cleared');
+          
+        } catch (error) {
+          console.error('❌ OAuth provider cleanup error:', error);
+          // Continue with local logout even if OAuth provider cleanup fails
+        }
+      }
+      
+      // Step 3: Enhanced logout with refresh token revocation
       await refreshTokenService.secureLogout();
       
     } catch (error) {
@@ -293,9 +441,11 @@ export const authService = {
   },
 
   /**
-   * 보안 강화된 데이터 정리 - Refresh Token 포함
+   * 보안 강화된 데이터 정리 - Comprehensive Browser Cleanup
    */
   _secureCleanup: async (): Promise<void> => {
+    console.log('🔒 Starting comprehensive security cleanup...');
+    
     // 현재 토큰을 블랙리스트에 추가
     const currentToken = localStorage.getItem('accessToken');
     if (currentToken) {
@@ -305,27 +455,51 @@ export const authService = {
     // RefreshTokenService를 통한 완전한 토큰 정리
     await refreshTokenService.clearAllTokens();
     
-    // 세션 스토리지 정리 (모든 OAuth 관련 데이터)
-    const sessionKeysToRemove = [
-      'oauth_state',
-      'oauth_code_verifier',
-      'oauth_popup_mode',
-      'silent_oauth_state',
-      'silent_oauth_code_verifier',
-      'oauth_nonce',
-      'id_token', // ID Token 정리
-      'csrf_token'
-    ];
-
-    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
-
-    // 쿠키 정리 (있다면)
-    document.cookie.split(';').forEach(cookie => {
-      const name = cookie.split('=')[0].trim();
-      if (name.includes('auth') || name.includes('token') || name.includes('session')) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; secure; samesite=strict`;
-      }
+    // User-isolated token storage 정리
+    await userIsolatedTokenStorage.clearAllTokens();
+    
+    // 보안 헤더 서비스 세션 토큰 리셋
+    securityHeaders.resetSessionToken();
+    
+    // Comprehensive browser security cleanup
+    const cleanupResult = await browserSecurityCleanup.performSecurityCleanup({
+      clearLocalStorage: true,
+      clearSessionStorage: true,
+      clearCookies: true,
+      clearIndexedDB: true,
+      clearCacheStorage: true,
+      clearWebSQL: true,
+      preserveKeys: ['theme', 'language', 'preferences'], // 사용자 설정은 유지
+      cookieDomains: [window.location.hostname, '.localhost', 'localhost']
     });
+    
+    // 🔒 CRITICAL: Force clear all OAuth-related sessionStorage items
+    const oauthKeys = [
+      'oauth_state', 'oauth_code_verifier', 'oauth_nonce', 
+      'oauth_popup_mode', 'oauth_window_type', 'oauth_parent_origin',
+      'oauth_result', 'oauth_error', 'oauth_force_account_selection',
+      'silent_oauth_state', 'silent_oauth_code_verifier',
+      'oauth_flow_in_progress', 'oauth_callback_processing'
+    ];
+    oauthKeys.forEach(key => sessionStorage.removeItem(key));
+    
+    if (cleanupResult.success) {
+      console.log('✅ Security cleanup completed:', {
+        localStorage: cleanupResult.cleared.localStorage,
+        sessionStorage: cleanupResult.cleared.sessionStorage,
+        cookies: cleanupResult.cleared.cookies,
+        indexedDB: cleanupResult.cleared.indexedDB.length,
+        cacheStorage: cleanupResult.cleared.cacheStorage.length,
+        duration: `${cleanupResult.duration.toFixed(2)}ms`
+      });
+    } else {
+      console.error('❌ Security cleanup encountered errors:', cleanupResult.errors);
+    }
+    
+    // 추가 보안 조치: 모든 이벤트 리스너 정리
+    window.dispatchEvent(new CustomEvent('auth:cleanup_complete', { 
+      detail: { cleanupResult } 
+    }));
     
     console.log('🧹 Complete secure cleanup finished');
   },
@@ -353,27 +527,14 @@ export const authService = {
       const expiryTime = parseInt(tokenExpiryTime, 10);
       const now = Date.now();
       
-      // 만료 5분 전부터 토큰 갱신 필요로 표시
-      const bufferTime = 5 * 60 * 1000; // 5 minutes
-      
+      // 🔒 CRITICAL FIX: Only return true if access token is ACTUALLY valid
       if (now >= expiryTime) {
         console.log('Access token expired');
         tokenRefreshManager.blacklistToken(accessToken, 'expired');
         
-        // Access token이 만료되었지만 refresh token이 유효하면 갱신 가능
-        if (refreshTokenService.isRefreshTokenValid()) {
-          console.log('Access token expired but refresh token is valid, authentication can be renewed');
-          return true; // 갱신 가능하므로 인증된 상태로 간주
-        }
-        
-        // 둘 다 만료된 경우 로그아웃
-        console.log('Both access and refresh tokens expired, logging out');
-        authService.logout();
+        // 🔒 SECURITY: Do NOT return true for expired tokens
+        // The token refresh logic should handle renewal separately
         return false;
-      } else if (now >= (expiryTime - bufferTime)) {
-        console.log('Token expires soon, consider refreshing');
-        // 토큰이 곧 만료되지만 아직 유효
-        return true;
       }
     }
     

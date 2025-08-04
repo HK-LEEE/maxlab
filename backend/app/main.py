@@ -25,6 +25,7 @@ from .routers.external import router as external_router
 from .routers.metrics import router as metrics_router
 from .routers.oauth import router as oauth_router
 from .routers.total_monitoring import router as total_monitoring_router
+from .routers.user_sessions import router as user_sessions_router
 from .api.v1.endpoints.csrf import router as csrf_router
 from .api.v1.endpoints.session import router as session_router
 from .api.v1.endpoints.rate_limit import router as rate_limit_router
@@ -178,7 +179,39 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# Custom exception handler to ensure CORS headers are always present
+from fastapi.responses import JSONResponse
+from starlette.requests import Request
+
+@app.exception_handler(Exception)
+async def custom_exception_handler(request: Request, exc: Exception):
+    """Custom exception handler that ensures CORS headers are present on all error responses"""
+    logger.error(f"Unhandled exception: {exc}")
+    
+    # Create the error response
+    content = {
+        "detail": str(exc) if settings.DEBUG else "Internal server error"
+    }
+    
+    # Create response with proper headers
+    headers = {}
+    origin = request.headers.get("origin")
+    
+    # Add CORS headers if origin is in allowed list
+    if origin and settings.BACKEND_CORS_ORIGINS:
+        if origin in settings.BACKEND_CORS_ORIGINS:
+            headers["Access-Control-Allow-Origin"] = origin
+            headers["Access-Control-Allow-Credentials"] = "true"
+            headers["Vary"] = "Origin"
+    
+    return JSONResponse(
+        status_code=500,
+        content=content,
+        headers=headers
+    )
 
 # 기본 API 라우터 포함
 app.include_router(health_router, prefix="/api/v1", tags=["Health"])
@@ -195,6 +228,7 @@ app.include_router(personal_test_process_flow_router)
 app.include_router(external_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1/metrics", tags=["Performance Metrics"])
 app.include_router(oauth_router, prefix="/api")
+app.include_router(user_sessions_router, prefix="/api")
 app.include_router(total_monitoring_router)
 
 # Debug router (development only)

@@ -7,6 +7,7 @@
 import { apiClient } from '../api/client';
 import { secureTokenStorage } from './secureTokenStorage';
 import { securityEventLogger } from './securityEventLogger';
+import { userIsolatedTokenStorage } from './userIsolatedTokenStorage';
 
 // 로컬 인터페이스 정의 (import 문제 해결)
 export interface TokenResponse {
@@ -235,6 +236,24 @@ class RefreshTokenService {
       console.log('💾 Tokens stored successfully (including refresh token)');
     } else {
       console.log('💾 Access token stored (no refresh token provided)');
+    }
+    
+    // Store in user-isolated token storage if user ID is available
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        if (user.id) {
+          await userIsolatedTokenStorage.saveTokens({
+            accessToken: tokenResponse.access_token,
+            refreshToken: tokenResponse.refresh_token,
+            expiresAt: accessExpiryTime
+          }, user.id);
+          console.log('🔐 Tokens also stored in user-isolated storage');
+        }
+      } catch (error) {
+        console.warn('Failed to store tokens in user-isolated storage:', error);
+      }
     }
   }
 
@@ -560,6 +579,14 @@ class RefreshTokenService {
     // Clear refresh token data
     await this.clearRefreshToken();
     
+    // Clear user-isolated token storage
+    try {
+      await userIsolatedTokenStorage.clearAllTokens();
+      console.log('🔐 User-isolated tokens cleared');
+    } catch (error) {
+      console.warn('Failed to clear user-isolated tokens:', error);
+    }
+    
     console.log('🧹 All tokens cleared');
   }
 
@@ -747,8 +774,8 @@ class RefreshTokenService {
     try {
       console.log('🌐 Checking OAuth server connectivity...');
       
-      // 간단한 health check 요청
-      const response = await fetch(`${authUrl}/api/oauth/.well-known`, {
+      // OIDC discovery endpoint로 health check
+      const response = await fetch(`${authUrl}/api/oauth/.well-known/openid-configuration`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json'

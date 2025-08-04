@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Popup Communication Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .log { background: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>OAuth 팝업 통신 테스트</h1>
+    
+    <div class="section">
+        <h2>1. 통신 채널 모니터링</h2>
+        <button onclick="startMonitoring()">모니터링 시작</button>
+        <button onclick="stopMonitoring()">모니터링 중지</button>
+        <button onclick="clearLogs()">로그 삭제</button>
+        <div id="monitor-log" class="log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. OAuth 팝업 테스트</h2>
+        <button onclick="testOAuthPopup()">OAuth 팝업 열기 (다른 사용자로 로그인)</button>
+        <div id="oauth-log" class="log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>3. SessionStorage 상태</h2>
+        <button onclick="checkSessionStorage()">SessionStorage 확인</button>
+        <div id="storage-log" class="log"></div>
+    </div>
+
+    <script>
+        let monitoringActive = false;
+        let messageHandler = null;
+        let broadcastChannel = null;
+        let storageInterval = null;
+        let popup = null;
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const typeClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<span class="${typeClass}">${timestamp} - ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('monitor-log').innerHTML = '';
+            document.getElementById('oauth-log').innerHTML = '';
+            document.getElementById('storage-log').innerHTML = '';
+        }
+
+        function startMonitoring() {
+            if (monitoringActive) {
+                log('monitor-log', '이미 모니터링 중입니다', 'info');
+                return;
+            }
+            
+            monitoringActive = true;
+            log('monitor-log', '=== 모니터링 시작 ===', 'success');
+            
+            // 1. PostMessage 리스너
+            messageHandler = (event) => {
+                log('monitor-log', `PostMessage 수신 - Origin: ${event.origin}`, 'success');
+                log('monitor-log', `데이터: ${JSON.stringify(event.data)}`, 'info');
+                
+                // OAuth 관련 메시지인 경우 특별 처리
+                if (event.data?.type?.includes('OAUTH')) {
+                    log('monitor-log', `🔐 OAuth 메시지 감지: ${event.data.type}`, 'success');
+                }
+            };
+            window.addEventListener('message', messageHandler);
+            log('monitor-log', 'PostMessage 리스너 활성화', 'info');
+            
+            // 2. BroadcastChannel 리스너
+            try {
+                broadcastChannel = new BroadcastChannel('oauth_channel');
+                broadcastChannel.onmessage = (event) => {
+                    log('monitor-log', `BroadcastChannel 메시지 수신`, 'success');
+                    log('monitor-log', `채널 데이터: ${JSON.stringify(event.data)}`, 'info');
+                };
+                log('monitor-log', 'BroadcastChannel 리스너 활성화', 'info');
+            } catch (e) {
+                log('monitor-log', `BroadcastChannel 에러: ${e.message}`, 'error');
+            }
+            
+            // 3. SessionStorage 모니터링
+            let lastSessionState = {};
+            storageInterval = setInterval(() => {
+                const oauthKeys = Object.keys(sessionStorage).filter(key => 
+                    key.includes('oauth') || key.includes('auth')
+                );
+                
+                oauthKeys.forEach(key => {
+                    const value = sessionStorage.getItem(key);
+                    if (value !== lastSessionState[key]) {
+                        log('monitor-log', `SessionStorage 변경 - ${key}: ${value?.substring(0, 50)}...`, 'info');
+                        lastSessionState[key] = value;
+                    }
+                });
+            }, 500);
+            log('monitor-log', 'SessionStorage 모니터링 활성화', 'info');
+        }
+
+        function stopMonitoring() {
+            monitoringActive = false;
+            
+            if (messageHandler) {
+                window.removeEventListener('message', messageHandler);
+                messageHandler = null;
+            }
+            
+            if (broadcastChannel) {
+                broadcastChannel.close();
+                broadcastChannel = null;
+            }
+            
+            if (storageInterval) {
+                clearInterval(storageInterval);
+                storageInterval = null;
+            }
+            
+            log('monitor-log', '=== 모니터링 중지 ===', 'error');
+        }
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        async function testOAuthPopup() {
+            log('oauth-log', '=== OAuth 팝업 테스트 시작 ===', 'success');
+            
+            // 모니터링이 꺼져있으면 자동으로 켜기
+            if (!monitoringActive) {
+                startMonitoring();
+                log('oauth-log', '모니터링 자동 시작됨', 'info');
+            }
+            
+            // OAuth 파라미터 준비
+            const state = 'test_' + Date.now() + '_force_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            const nonce = generateRandomString(32);
+            
+            // SessionStorage에 저장
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_nonce', nonce);
+            sessionStorage.setItem('oauth_popup_mode', 'true');
+            sessionStorage.setItem('oauth_force_account_selection', 'true');
+            
+            log('oauth-log', `State: ${state.substring(0, 30)}...`, 'info');
+            log('oauth-log', `Code Verifier: ${codeVerifier.substring(0, 30)}...`, 'info');
+            
+            // OAuth URL 생성
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                nonce: nonce,
+                prompt: 'login',
+                max_age: '0'
+            });
+            
+            const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+            log('oauth-log', `OAuth URL: ${authUrl.substring(0, 100)}...`, 'info');
+            
+            // 팝업 열기
+            popup = window.open(authUrl, 'oauth_popup', 'width=600,height=700');
+            
+            if (!popup) {
+                log('oauth-log', '❌ 팝업이 차단되었습니다!', 'error');
+                return;
+            }
+            
+            log('oauth-log', '✅ 팝업이 열렸습니다', 'success');
+            
+            // 팝업 상태 모니터링
+            let checkCount = 0;
+            const popupInterval = setInterval(() => {
+                checkCount++;
+                
+                if (popup.closed) {
+                    clearInterval(popupInterval);
+                    log('oauth-log', '팝업이 닫혔습니다', 'info');
+                    
+                    // 결과 확인
+                    setTimeout(() => {
+                        const success = sessionStorage.getItem('oauth_success');
+                        const error = sessionStorage.getItem('oauth_error');
+                        const tokenData = sessionStorage.getItem('oauth_token_data');
+                        
+                        if (success || tokenData) {
+                            log('oauth-log', '✅ OAuth 성공!', 'success');
+                            if (tokenData) {
+                                log('oauth-log', `토큰 데이터: ${tokenData.substring(0, 50)}...`, 'success');
+                            }
+                        } else if (error) {
+                            log('oauth-log', `❌ OAuth 에러: ${error}`, 'error');
+                        } else {
+                            log('oauth-log', '⚠️ OAuth 결과를 확인할 수 없습니다', 'error');
+                        }
+                    }, 1000);
+                    
+                    return;
+                }
+                
+                // 팝업 URL 체크 시도 (cross-origin이면 실패)
+                try {
+                    const popupUrl = popup.location.href;
+                    log('oauth-log', `팝업 URL: ${popupUrl}`, 'info');
+                } catch (e) {
+                    // Cross-origin이므로 정상
+                }
+                
+                if (checkCount % 10 === 0) {
+                    log('oauth-log', `${checkCount}초 경과...`, 'info');
+                }
+                
+                if (checkCount > 120) {
+                    clearInterval(popupInterval);
+                    log('oauth-log', '타임아웃 (2분)', 'error');
+                }
+            }, 1000);
+        }
+
+        function checkSessionStorage() {
+            log('storage-log', '=== SessionStorage 상태 ===', 'success');
+            
+            const allKeys = Object.keys(sessionStorage);
+            const oauthKeys = allKeys.filter(key => key.includes('oauth') || key.includes('auth'));
+            
+            log('storage-log', `전체 키 개수: ${allKeys.length}`, 'info');
+            log('storage-log', `OAuth 관련 키 개수: ${oauthKeys.length}`, 'info');
+            
+            if (oauthKeys.length === 0) {
+                log('storage-log', 'OAuth 관련 데이터가 없습니다', 'error');
+            } else {
+                oauthKeys.forEach(key => {
+                    const value = sessionStorage.getItem(key);
+                    const displayValue = value && value.length > 100 ? 
+                        value.substring(0, 100) + '...' : value;
+                    log('storage-log', `${key}: ${displayValue}`, 'info');
+                });
+            }
+            
+            // LocalStorage도 확인
+            const localAuthKeys = Object.keys(localStorage).filter(key => 
+                key.includes('token') || key.includes('auth') || key.includes('user')
+            );
+            
+            if (localAuthKeys.length > 0) {
+                log('storage-log', '\n=== LocalStorage 인증 데이터 ===', 'success');
+                localAuthKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    const displayValue = value && value.length > 50 ? 
+                        value.substring(0, 50) + '...' : value;
+                    log('storage-log', `${key}: ${displayValue}`, 'info');
+                });
+            }
+        }
+
+        // 페이지 로드 시 자동으로 모니터링 시작
+        window.addEventListener('load', () => {
+            log('monitor-log', '페이지 로드 완료', 'info');
+            checkSessionStorage();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Return Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+        .section { margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f5f5f5; padding: 15px; overflow-x: auto; border-radius: 4px; font-size: 12px; }
+        .log { background: #f0f0f0; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>OAuth Return Flow 디버그</h1>
+    
+    <div class="section">
+        <h2>1. OAuth URL 생성 및 추적</h2>
+        <button onclick="generateAndTrackOAuth()">OAuth URL 생성 (추적 모드)</button>
+        <div id="oauth-info"></div>
+        <div class="log" id="track-log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. 로그인 페이지 URL 분석</h2>
+        <p>로그인 페이지로 리다이렉트된 후, 그 URL을 여기에 붙여넣으세요:</p>
+        <input type="text" id="login-url" style="width: 100%; padding: 5px;" placeholder="/login?oauth_return=...">
+        <button onclick="analyzeLoginUrl()">URL 분석</button>
+        <div class="log" id="login-analysis"></div>
+    </div>
+    
+    <div class="section">
+        <h2>3. 수동 OAuth Return 테스트</h2>
+        <button onclick="manualOAuthReturn()">수동으로 OAuth Return 시뮬레이션</button>
+        <div class="log" id="manual-log"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const typeClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<span class="${typeClass}">${timestamp} - ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function generateAndTrackOAuth() {
+            const logEl = document.getElementById('track-log');
+            logEl.innerHTML = '';
+            
+            const state = 'track_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            const nonce = generateRandomString(32);
+            
+            // SessionStorage에 저장
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_nonce', nonce);
+            
+            log('track-log', 'OAuth 파라미터 생성됨', 'success');
+            log('track-log', `State: ${state}`, 'info');
+            log('track-log', `Code Verifier: ${codeVerifier.substring(0, 50)}...`, 'info');
+            
+            const params = {
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                nonce: nonce,
+                prompt: 'login',
+                max_age: '0'
+            };
+            
+            log('track-log', 'OAuth 파라미터:', 'info');
+            log('track-log', JSON.stringify(params, null, 2), 'info');
+            
+            const queryString = new URLSearchParams(params).toString();
+            const authUrl = `http://localhost:8000/api/oauth/authorize?${queryString}`;
+            
+            document.getElementById('oauth-info').innerHTML = `
+                <h3>생성된 OAuth URL:</h3>
+                <pre style="word-wrap: break-word;">${authUrl}</pre>
+                <button onclick="window.open('${authUrl}', '_blank')">새 탭에서 열기</button>
+                <button onclick="navigator.clipboard.writeText('${authUrl}').then(() => alert('복사됨!'))">URL 복사</button>
+            `;
+            
+            log('track-log', '새 탭에서 OAuth URL을 열고 다음을 확인하세요:', 'success');
+            log('track-log', '1. 로그인 페이지로 리다이렉트되는가?', 'info');
+            log('track-log', '2. URL에 oauth_return 파라미터가 있는가?', 'info');
+            log('track-log', '3. 로그인 후 어디로 이동하는가?', 'info');
+        }
+
+        function analyzeLoginUrl() {
+            const logEl = document.getElementById('login-analysis');
+            logEl.innerHTML = '';
+            
+            const loginUrl = document.getElementById('login-url').value;
+            if (!loginUrl) {
+                log('login-analysis', 'URL을 입력하세요', 'error');
+                return;
+            }
+            
+            log('login-analysis', '=== 로그인 URL 분석 ===', 'success');
+            
+            try {
+                // URL 파싱
+                const url = new URL(loginUrl, 'http://localhost:8000');
+                log('login-analysis', `경로: ${url.pathname}`, 'info');
+                
+                // oauth_return 파라미터 추출
+                const oauthReturn = url.searchParams.get('oauth_return');
+                if (oauthReturn) {
+                    log('login-analysis', 'oauth_return 파라미터 발견!', 'success');
+                    log('login-analysis', `인코딩된 값: ${oauthReturn.substring(0, 100)}...`, 'info');
+                    
+                    // 디코딩 시도
+                    try {
+                        const decodedReturn = decodeURIComponent(oauthReturn);
+                        log('login-analysis', 'URL 디코딩 성공', 'success');
+                        log('login-analysis', `디코딩된 값: ${decodedReturn}`, 'info');
+                        
+                        // JSON 파싱 시도
+                        try {
+                            const oauthParams = JSON.parse(decodedReturn);
+                            log('login-analysis', 'JSON 파싱 성공!', 'success');
+                            log('login-analysis', 'OAuth 파라미터:', 'info');
+                            log('login-analysis', JSON.stringify(oauthParams, null, 2), 'info');
+                            
+                            // 재구성된 OAuth URL
+                            const reconstructedUrl = `http://localhost:8000/api/oauth/authorize?${new URLSearchParams(oauthParams).toString()}`;
+                            log('login-analysis', '재구성된 OAuth URL:', 'success');
+                            log('login-analysis', reconstructedUrl, 'info');
+                            
+                        } catch (jsonError) {
+                            log('login-analysis', `JSON 파싱 실패: ${jsonError.message}`, 'error');
+                        }
+                    } catch (decodeError) {
+                        log('login-analysis', `URL 디코딩 실패: ${decodeError.message}`, 'error');
+                    }
+                } else {
+                    log('login-analysis', 'oauth_return 파라미터가 없습니다!', 'error');
+                    log('login-analysis', '이것이 문제일 수 있습니다.', 'error');
+                }
+                
+                // force_login 파라미터 확인
+                const forceLogin = url.searchParams.get('force_login');
+                if (forceLogin) {
+                    log('login-analysis', `force_login: ${forceLogin}`, 'info');
+                }
+                
+            } catch (error) {
+                log('login-analysis', `URL 파싱 실패: ${error.message}`, 'error');
+            }
+        }
+
+        function manualOAuthReturn() {
+            const logEl = document.getElementById('manual-log');
+            logEl.innerHTML = '';
+            
+            log('manual-log', '=== 수동 OAuth Return 시뮬레이션 ===', 'success');
+            
+            // 현재 sessionStorage에서 OAuth 정보 가져오기
+            const state = sessionStorage.getItem('oauth_state') || 'manual_' + Date.now();
+            const codeVerifier = sessionStorage.getItem('oauth_code_verifier') || generateRandomString(128);
+            
+            const oauthParams = {
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                prompt: 'login',
+                max_age: '0'
+            };
+            
+            log('manual-log', 'OAuth 파라미터:', 'info');
+            log('manual-log', JSON.stringify(oauthParams, null, 2), 'info');
+            
+            // oauth_return 생성
+            const oauthReturn = encodeURIComponent(JSON.stringify(oauthParams));
+            const loginUrl = `http://localhost:8000/login?oauth_return=${oauthReturn}&force_login=true`;
+            
+            log('manual-log', '생성된 로그인 URL:', 'success');
+            log('manual-log', loginUrl, 'info');
+            
+            const button = document.createElement('button');
+            button.textContent = '이 URL로 이동';
+            button.onclick = () => window.location.href = loginUrl;
+            document.getElementById('manual-log').appendChild(button);
+        }
+    </script>
+</body>
+</html>

@@ -41,6 +41,8 @@ export interface ProcessFlow extends ProcessFlowScope {
   publish_token?: string;
   current_version?: number;
   data_source_id?: string;
+  // Temporary flag to mark imported flows
+  _isImported?: boolean;
 }
 
 export interface ProcessFlowCreateData {

@@ -344,8 +344,6 @@ export function registerOAuthTestHelpers(): void {
       actualRefresh: testActualRefreshTokenCall
     };
     
-    console.log('🧪 OAuth test helpers registered. Use window.oauthTest in console:');
-    console.log('  - oauthTest.compatibility() - 서버 호환성 종합 테스트');
-    console.log('  - oauthTest.actualRefresh() - 실제 refresh token 호출 테스트');
+    // Debug utility console logs removed
   }
 }

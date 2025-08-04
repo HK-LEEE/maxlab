@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Server Response Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .error { background: #fef2f2; border: 2px solid #ef4444; }
+        .success { background: #dcfce7; border: 2px solid #22c55e; }
+        .info { background: #dbeafe; border: 2px solid #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 OAuth Server Response Analysis</h1>
+        <p>현재 받은 에러를 분석해보겠습니다:</p>
+    </div>
+
+    <div class="container error">
+        <h2>❌ 현재 에러</h2>
+        <p><strong>에러 타입:</strong> login_required</p>
+        <p><strong>에러 설명:</strong> Force re-authentication required</p>
+        <p><strong>상태:</strong> 5aZEEfpLhGztgutr5xP4K7sXm2Y8gDCKEn9OGUcq4es_force_1754270186088</p>
+    </div>
+
+    <div class="container info">
+        <h2>🔍 분석 결과</h2>
+        <p>이 에러는 OAuth 서버가 <code>prompt=login</code> 파라미터를 제대로 처리하지 못하거나, 추가적인 인증이 필요하다는 의미입니다.</p>
+        
+        <h3>📋 가능한 원인들:</h3>
+        <ul>
+            <li><strong>서버 구현 문제:</strong> OAuth 서버에서 prompt=login을 올바르게 처리하지 못함</li>
+            <li><strong>세션 문제:</strong> 기존 세션이 완전히 정리되지 않음</li>
+            <li><strong>클라이언트 설정 문제:</strong> 클라이언트 ID나 리다이렉트 URI 문제</li>
+            <li><strong>스코프 문제:</strong> 요청한 스코프에 문제가 있음</li>
+        </ul>
+    </div>
+
+    <div class="container success">
+        <h2>✅ 해결 방안들</h2>
+        
+        <h3>1. Prompt 파라미터 변경</h3>
+        <p><code>prompt=login</code> 대신 다른 값들을 시도:</p>
+        <ul>
+            <li><code>prompt=consent</code> - 동의 화면 강제 표시</li>
+            <li><code>prompt=select_account</code> - 계정 선택 화면 표시</li>
+            <li>Prompt 파라미터 없이 시도</li>
+        </ul>
+
+        <h3>2. OAuth 서버 세션 정리</h3>
+        <p>OAuth 서버의 세션을 완전히 정리한 후 재시도</p>
+
+        <h3>3. 다른 강제 로그인 방법</h3>
+        <p><code>max_age=0</code> 파라미터 사용으로 강제 재인증</p>
+    </div>
+
+    <div class="container info">
+        <h2>🧪 테스트 권장사항</h2>
+        <p>다음 순서로 테스트해보세요:</p>
+        <ol>
+            <li><strong>기본 로그인:</strong> prompt 파라미터 없이 시도</li>
+            <li><strong>Consent 강제:</strong> prompt=consent로 시도</li>
+            <li><strong>계정 선택:</strong> prompt=select_account로 시도</li>
+            <li><strong>Max Age:</strong> max_age=0으로 강제 재인증</li>
+        </ol>
+        
+        <p><a href="/test-basic-oauth.html" style="color: #3b82f6; text-decoration: underline;">
+            👉 Basic OAuth Test 페이지에서 테스트해보기
+        </a></p>
+    </div>
+
+    <script>
+        // 현재 에러 정보를 localStorage에 저장
+        const errorInfo = {
+            type: 'login_required',
+            description: 'Force re-authentication required',
+            state: '5aZEEfpLhGztgutr5xP4K7sXm2Y8gDCKEn9OGUcq4es_force_1754270186088',
+            timestamp: new Date().toISOString(),
+            analysis: 'OAuth server prompt=login parameter handling issue'
+        };
+        
+        console.log('🔬 OAuth Error Analysis:', errorInfo);
+        localStorage.setItem('last_oauth_error', JSON.stringify(errorInfo));
+    </script>
+</body>
+</html>

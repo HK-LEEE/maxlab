@@ -356,24 +356,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
       const shouldScroll = isMonitorPage && globalAutoScrollValue;
       
       // Debug logging for auto-scroll conditions
-      console.log('[Auto-scroll Debug]', {
-        nodeId: id,
-        pathname: window.location.pathname,
-        isMonitorPage,
-        globalAutoScrollValue,
-        shouldScroll,
-        hasMeasurements: !!data.measurements,
-        measurementCount: data.measurements?.length || 0,
-        hasScrollRef: !!scrollRef.current,
-        isResizing,
-        isScrollActive: isScrollActiveRef.current,
-        isGlobalScrollActive: isGlobalScrollActive(),
-        // Additional debug info
-        equipmentCode: data.equipmentCode,
-        equipmentName: data.equipmentName,
-        displayMeasurements: data.displayMeasurements,
-        rawMeasurements: data.measurements
-      });
+      // Auto-scroll debug console log removed
       
       // Only log if there's an issue or first time scroll starts
       if (shouldScroll && data.measurements && !isScrollActiveRef.current) {

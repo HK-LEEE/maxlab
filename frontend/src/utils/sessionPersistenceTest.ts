@@ -327,10 +327,7 @@ export function registerSessionTestHelpers(): void {
       rotation: testTokenRotation
     };
     
-    console.log('🧪 Session test helpers registered. Use window.sessionTest in console:');
-    console.log('  - sessionTest.persistence() - 30일 세션 지속성 종합 테스트');
-    console.log('  - sessionTest.simulate() - 장기 세션 시뮬레이션');
-    console.log('  - sessionTest.rotation() - 토큰 회전 테스트');
+    // Debug utility console logs removed
   }
 }
 

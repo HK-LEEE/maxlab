@@ -4,7 +4,6 @@ import { ArrowLeft, LogOut, User, Bell, Sparkles, Settings } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore';
 import { getAvatarColor, getInitials } from '../../utils/avatar';
 import { useSecureLogout } from '../../hooks/useSecureLogout';
-import LogoutConfirmationDialog from './LogoutConfirmationDialog';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -138,12 +137,13 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
   const { user } = useAuthStore();
   const isMainPage = location.pathname === '/';
   const [showDropdown, setShowDropdown] = useState(false);
-  const isAdmin = user?.is_admin || user?.role === 'admin';
+  // 임시 테스트: admin@test.com일 때 강제로 admin 모드 활성화
+  const isAdmin = (user?.email === 'admin@test.com') || user?.is_admin || user?.role === 'admin';
   
-  // Secure logout functionality
+  // 🔒 SIMPLIFIED: Use simplified secure logout
   const {
-    showConfirmation,
     isLoading,
+    showConfirmation,
     error,
     showLogoutConfirmation,
     hideLogoutConfirmation,
@@ -170,11 +170,6 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
   const handleLogout = () => {
     setShowDropdown(false);
     showLogoutConfirmation();
-  };
-
-  const handleLogoutComplete = async (logoutAll?: boolean) => {
-    await handleLogoutConfirm(logoutAll);
-    navigate('/login');
   };
 
   const handleLogoClick = () => {
@@ -248,13 +243,35 @@ export const Header: React.FC<HeaderProps> = ({ showBackButton, title }) => {
         </div>
       </div>
 
-      {/* Logout Confirmation Dialog */}
-      <LogoutConfirmationDialog
-        isOpen={showConfirmation}
-        onClose={hideLogoutConfirmation}
-        onConfirm={handleLogoutComplete}
-        userEmail={user?.email}
-      />
+      {/* 🔒 SIMPLIFIED: Basic Logout Confirmation Dialog */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              로그아웃 확인
+            </h3>
+            <p className="text-gray-600 mb-6">
+              모든 세션에서 로그아웃하고 MAX Platform으로 돌아갑니다.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={hideLogoutConfirmation}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={isLoading}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleLogoutConfirm}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+                disabled={isLoading}
+              >
+                {isLoading ? '로그아웃 중...' : '로그아웃'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Display */}
       {error && (

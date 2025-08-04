@@ -21,6 +21,9 @@ interface ProcessFlow {
   scope_type?: ScopeType;
   visibility_scope?: VisibilityScope;
   shared_with_workspace?: boolean;
+  workspace_id?: string;
+  flow_data?: any;
+  _isImported?: boolean;
 }
 
 interface FlowVersion {
@@ -66,6 +69,7 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importPreview, setImportPreview] = useState<any>(null);
+  const [importFlowName, setImportFlowName] = useState<string>('');
 
   useEffect(() => {
     if (selectedFlow && activeTab === 'versions') {
@@ -173,10 +177,14 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
         try {
           const content = JSON.parse(e.target?.result as string);
           setImportPreview(content);
+          // Set default flow name from the imported content or file name
+          const defaultName = content.name || file.name.replace('.json', '') || 'Imported Flow';
+          setImportFlowName(defaultName);
         } catch (error) {
           toast.error('Invalid JSON file');
           setImportFile(null);
           setImportPreview(null);
+          setImportFlowName('');
         }
       };
       reader.readAsText(file);
@@ -184,26 +192,43 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
   };
 
   const handleImport = () => {
-    if (importPreview) {
-      // Create a temporary flow object for import
-      const tempFlow: ProcessFlow = {
-        id: `import_${Date.now()}`,
-        name: importPreview.name || 'Imported Flow',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      onLoad(tempFlow, {
-        id: tempFlow.id,
-        flow_id: tempFlow.id,
-        version_number: 1,
-        name: tempFlow.name,
-        flow_data: importPreview.flow_data || importPreview,
-        created_by: 'import',
-        created_at: tempFlow.created_at,
-        is_published: false,
-      });
-      onClose();
+    if (!importPreview) {
+      toast.error('No file selected');
+      return;
     }
+    
+    // Generate a proper UUID for the imported flow
+    const importId = crypto.randomUUID();
+    
+    // Use original flow name or file name as default (will be changeable when saving)
+    const defaultName = importPreview.name || importFile?.name?.replace('.json', '') || 'Imported Flow';
+    
+    // Create a temporary flow object for import
+    const tempFlow: ProcessFlow = {
+      id: importId,
+      workspace_id: '', // Will be set by saveFlow logic
+      name: defaultName, // Use default name, user can change when saving
+      flow_data: { nodes: [], edges: [] }, // Placeholder, actual data in version
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      // Default scope settings for imported flows
+      scope_type: 'USER',
+      visibility_scope: 'PRIVATE',
+      shared_with_workspace: false,
+      // Mark as imported flow so saveFlow logic can handle it correctly
+      _isImported: true,
+    };
+    onLoad(tempFlow, {
+      id: importId,
+      flow_id: importId,
+      version_number: 1,
+      name: tempFlow.name,
+      flow_data: importPreview.flow_data || importPreview,
+      created_by: 'import',
+      created_at: tempFlow.created_at,
+      is_published: false,
+    });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -547,29 +572,32 @@ export const LoadFlowDialog: React.FC<LoadFlowDialogProps> = ({
                 </div>
 
                 {importFile && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <FileText size={20} className="text-gray-600" />
-                        <span className="text-sm font-medium">{importFile.name}</span>
+                  <div className="mt-4 space-y-4">
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <FileText size={20} className="text-gray-600" />
+                          <span className="text-sm font-medium">{importFile.name}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setImportFile(null);
+                            setImportPreview(null);
+                            setImportFlowName('');
+                          }}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <X size={16} />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          setImportFile(null);
-                          setImportPreview(null);
-                        }}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        <X size={16} />
-                      </button>
+                      {importPreview && (
+                        <div className="text-sm text-gray-600">
+                          <p>Original name: {importPreview.name || 'Unnamed'}</p>
+                          <p>Nodes: {importPreview.flow_data?.nodes?.length || importPreview.nodes?.length || 0}</p>
+                          <p>Edges: {importPreview.flow_data?.edges?.length || importPreview.edges?.length || 0}</p>
+                        </div>
+                      )}
                     </div>
-                    {importPreview && (
-                      <div className="text-sm text-gray-600">
-                        <p>Flow name: {importPreview.name || 'Unnamed'}</p>
-                        <p>Nodes: {importPreview.flow_data?.nodes?.length || importPreview.nodes?.length || 0}</p>
-                        <p>Edges: {importPreview.flow_data?.edges?.length || importPreview.edges?.length || 0}</p>
-                      </div>
-                    )}
                   </div>
                 )}
 

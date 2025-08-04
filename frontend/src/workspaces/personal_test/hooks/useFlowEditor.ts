@@ -22,6 +22,7 @@ interface ProcessFlow {
   scope_type?: 'WORKSPACE' | 'USER';
   visibility_scope?: 'WORKSPACE' | 'PRIVATE';
   shared_with_workspace?: boolean;
+  _isImported?: boolean;
 }
 
 interface Equipment {
@@ -73,8 +74,34 @@ export const useFlowEditor = (workspaceId: string) => {
   };
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge({ ...params, type: edgeType }, eds)),
-    [setEdges, edgeType]
+    (params: Connection) => {
+      // Get source and target nodes to determine edge styling
+      const sourceNode = nodes.find(n => n.id === params.source);
+      const targetNode = nodes.find(n => n.id === params.target);
+      
+      // Determine if this edge should have status representation
+      const shouldShowStatus = sourceNode?.type === 'equipment' && targetNode?.type === 'equipment';
+      
+      // Set edge style based on node types
+      const edgeStyle = shouldShowStatus 
+        ? { strokeWidth: 2, stroke: '#374151' } // Default gray for equipment-to-equipment (will be updated with status colors)
+        : { strokeWidth: 1, stroke: '#000000', strokeDasharray: '3,2' }; // Black dashed for equipment-to-other
+      
+      const newEdge = {
+        ...params,
+        type: edgeType,
+        style: edgeStyle,
+        data: { 
+          type: edgeType,
+          showStatus: shouldShowStatus,
+          sourceNodeType: sourceNode?.type,
+          targetNodeType: targetNode?.type
+        }
+      };
+      
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
+    [setEdges, edgeType, nodes]
   );
 
   const deleteSelectedNodes = useCallback(() => {
@@ -100,7 +127,7 @@ export const useFlowEditor = (workspaceId: string) => {
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes]);
 
-  const saveFlow = async (isAutoSave = false, scopeData?: { scopeType: 'WORKSPACE' | 'USER', visibilityScope: 'WORKSPACE' | 'PRIVATE', sharedWithWorkspace: boolean }) => {
+  const saveFlow = async (isAutoSave = false, scopeData?: { scopeType: 'WORKSPACE' | 'USER', visibilityScope: 'WORKSPACE' | 'PRIVATE', sharedWithWorkspace: boolean }, overrideName?: string): Promise<any> => {
     if (!workspaceId) return;
     
     if (!isAutoSave) {
@@ -108,9 +135,11 @@ export const useFlowEditor = (workspaceId: string) => {
     }
     setError(null);
     
+    const finalFlowName = overrideName || flowName;
+    
     log.debug('Flow save initiated', {
       totalNodes: nodes.length,
-      flowName,
+      flowName: finalFlowName,
       nodeSize: nodeSize,
       scopeData
     });
@@ -125,7 +154,7 @@ export const useFlowEditor = (workspaceId: string) => {
       
       const flowData = {
         workspace_id: workspaceUuid,
-        name: flowName,
+        name: finalFlowName,
         flow_data: { nodes, edges, nodeSize },
         data_source_id: selectedDataSourceId,
         scope_type: scope.scopeType,
@@ -133,9 +162,12 @@ export const useFlowEditor = (workspaceId: string) => {
         shared_with_workspace: scope.sharedWithWorkspace,
       };
 
-      if (currentFlow) {
+      let savedFlow;
+      
+      // Check if this is an imported flow that needs to be created instead of updated
+      if (currentFlow && !currentFlow._isImported) {
         const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
-          name: flowName,
+          name: finalFlowName,
           flow_data: { nodes, edges, nodeSize },
           data_source_id: selectedDataSourceId,
           scope_type: scope.scopeType,
@@ -144,15 +176,27 @@ export const useFlowEditor = (workspaceId: string) => {
         });
         // Update currentFlow with the response to ensure we have the latest data
         log.debug('Flow update response received', { flowId: response.data.id });
-        setCurrentFlow(response.data);
+        savedFlow = response.data;
+        setCurrentFlow(savedFlow);
         if (!isAutoSave) {
           toast.success('Flow updated successfully');
         }
       } else {
-        const response = await apiClient.post('/api/v1/personal-test/process-flow/flows', flowData);
-        setCurrentFlow(response.data);
+        // Create new flow (either no currentFlow or imported flow)
+        // IMPORTANT: Don't send the pre-generated id for imported flows
+        const createFlowData = { ...flowData };
+        if (currentFlow?._isImported) {
+          // Remove the pre-generated id to let backend generate a new one
+          delete (createFlowData as any).id;
+          log.debug('Creating imported flow without pre-generated ID');
+        }
+        
+        const response = await apiClient.post('/api/v1/personal-test/process-flow/flows', createFlowData);
+        // Don't set _isImported flag on the saved flow - it's now a real flow in the database
+        savedFlow = response.data;
+        setCurrentFlow(savedFlow);
         if (!isAutoSave) {
-          toast.success('Flow created successfully');
+          toast.success(currentFlow?._isImported ? 'Imported flow saved successfully' : 'Flow created successfully');
         }
       }
       
@@ -162,15 +206,18 @@ export const useFlowEditor = (workspaceId: string) => {
       
       // 저장 성공 시 백업 삭제 (수동 저장일 때만, 자동 저장은 백업을 유지)
       if (!isAutoSave) {
-        deleteFlowBackup(workspaceId, currentFlow?.id || null);
+        deleteFlowBackup(workspaceId, savedFlow?.id || null);
         log.debug('Backup deleted after successful save');
       }
+      
+      return savedFlow;
     } catch (err) {
       setError('Failed to save process flow');
       if (!isAutoSave) {
         toast.error('Failed to save flow');
       }
       log.error('Flow save failed', { error: err });
+      throw err; // Re-throw error so caller can handle it
     } finally {
       if (!isAutoSave) {
         setIsSaving(false);
@@ -204,7 +251,7 @@ export const useFlowEditor = (workspaceId: string) => {
     
     log.debug('Data source ID set', { dataSourceId: flow.data_source_id || null });
     
-    const nodesWithDefaults = (flow.flow_data.nodes || []).map((node: Node) => {
+    const nodesWithDefaults = (flow.flow_data?.nodes || []).map((node: Node) => {
       // Ensure all nodes have proper structure
       const baseNode = {
         ...node,
@@ -256,10 +303,39 @@ export const useFlowEditor = (workspaceId: string) => {
     });
     setNodes(nodesWithDefaults);
     
-    const edgesWithType = (flow.flow_data.edges || []).map((edge: Edge) => ({
-      ...edge,
-      type: edge.type === 'bezier' ? 'default' : (edge.type || 'step')
-    }));
+    const edgesWithType = (flow.flow_data?.edges || []).map((edge: Edge) => {
+      // Preserve existing edge data and ensure backward compatibility
+      const baseEdge = {
+        ...edge,
+        type: edge.type === 'bezier' ? 'default' : (edge.type || 'step')
+      };
+      
+      // For existing edges without showStatus data, determine based on connected nodes
+      if (baseEdge.data?.showStatus === undefined) {
+        const sourceNode = nodesWithDefaults.find(n => n.id === edge.source);
+        const targetNode = nodesWithDefaults.find(n => n.id === edge.target);
+        const shouldShowStatus = sourceNode?.type === 'equipment' && targetNode?.type === 'equipment';
+        
+        // Update edge style if it's not equipment-to-equipment connection
+        if (!shouldShowStatus && (!baseEdge.style?.strokeDasharray)) {
+          baseEdge.style = {
+            ...baseEdge.style,
+            stroke: '#000000',
+            strokeDasharray: '3,2',
+            strokeWidth: 1
+          };
+        }
+        
+        baseEdge.data = {
+          ...baseEdge.data,
+          showStatus: shouldShowStatus,
+          sourceNodeType: sourceNode?.type,
+          targetNodeType: targetNode?.type
+        };
+      }
+      
+      return baseEdge;
+    });
     setEdges(edgesWithType);
   };
 

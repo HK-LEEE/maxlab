@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Port 3000 Handler</title>
+    <script>
+        // 이 페이지는 localhost:3000에서 실행되어야 합니다
+        // OAuth 서버가 잘못 리다이렉트하는 경우를 처리합니다
+        
+        console.log('🔧 OAuth Port 3000 Handler loaded');
+        console.log('📍 Current location:', window.location.href);
+        
+        // URL에서 OAuth 파라미터 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        
+        if (code && state) {
+            console.log('✅ OAuth authorization code received:', code.substring(0, 10) + '...');
+            
+            // OAuth 데이터를 storage에 저장 (cross-origin recovery가 찾을 수 있도록)
+            const oauthResult = {
+                success: true,
+                code: code,
+                state: state,
+                timestamp: Date.now(),
+                origin: 'port-3000-handler'
+            };
+            
+            // 여러 storage keys에 저장하여 recovery 확률 높이기
+            sessionStorage.setItem('oauth_result', JSON.stringify(oauthResult));
+            sessionStorage.setItem('oauth_success', 'true');
+            sessionStorage.setItem('oauth_code', code);
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_completion_timestamp', Date.now().toString());
+            
+            console.log('💾 OAuth data saved to sessionStorage');
+            
+            // Port 3010으로 메시지 전송 시도
+            try {
+                // BroadcastChannel로 전송
+                const channel = new BroadcastChannel('oauth_channel');
+                channel.postMessage({
+                    type: 'OAUTH_SUCCESS',
+                    code: code,
+                    state: state,
+                    source: 'port-3000-handler'
+                });
+                console.log('📡 Sent OAuth success via BroadcastChannel');
+                
+                // PostMessage로도 전송 (여러 origin 시도)
+                const targetOrigins = [
+                    'http://localhost:3010',
+                    'http://localhost:3011',
+                    'http://localhost:3012',
+                    '*' // 최후의 수단
+                ];
+                
+                for (const origin of targetOrigins) {
+                    try {
+                        if (window.opener) {
+                            window.opener.postMessage({
+                                type: 'OAUTH_SUCCESS',
+                                code: code,
+                                state: state,
+                                source: 'port-3000-handler'
+                            }, origin);
+                            console.log(`📤 Sent OAuth success to opener with origin: ${origin}`);
+                        }
+                    } catch (e) {
+                        console.warn(`Failed to send to origin ${origin}:`, e);
+                    }
+                }
+                
+            } catch (e) {
+                console.error('Failed to send OAuth data:', e);
+            }
+            
+            // 성공 메시지 표시
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 50px; font-family: system-ui;">
+                    <h2>✅ 로그인 성공!</h2>
+                    <p>이 창은 자동으로 닫힙니다...</p>
+                    <p style="color: #666; font-size: 14px;">OAuth code: ${code.substring(0, 10)}...</p>
+                </div>
+            `;
+            
+            // 2초 후 창 닫기
+            setTimeout(() => {
+                window.close();
+            }, 2000);
+            
+        } else if (error) {
+            console.error('❌ OAuth error:', error);
+            
+            // 에러 정보 저장
+            sessionStorage.setItem('oauth_error', error);
+            sessionStorage.setItem('oauth_error_description', urlParams.get('error_description') || '');
+            
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 50px; font-family: system-ui;">
+                    <h2>❌ 로그인 실패</h2>
+                    <p>${error}: ${urlParams.get('error_description') || ''}</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                window.close();
+            }, 3000);
+            
+        } else {
+            console.log('⚠️ No OAuth parameters found in URL');
+            
+            // 일반 로그인 페이지로 보이도록
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 50px; font-family: system-ui;">
+                    <h1>MAX Platform</h1>
+                    <p>로그인 처리 중...</p>
+                </div>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: system-ui;">
+        <h1>OAuth 처리 중...</h1>
+        <p>잠시만 기다려주세요...</p>
+    </div>
+</body>
+</html>

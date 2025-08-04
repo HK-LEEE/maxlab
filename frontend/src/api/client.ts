@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 import { csrfProtection } from '../services/csrfProtection';
 import { setupAxiosInterceptor } from '../services/authErrorInterceptor';
+import { securityHeaders } from '../services/securityHeaders';
+import { userIsolatedTokenStorage } from '../services/userIsolatedTokenStorage';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010',
@@ -10,18 +12,33 @@ const apiClient = axios.create({
   },
 });
 
-// Auth client now points to Max Lab backend proxy (8010) instead of direct maxplatform (8000)
+// Auth client points to maxplatform auth server (8000)
 const authClient = axios.create({
-  baseURL: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8010',
+  baseURL: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // Add auth token and CSRF protection to requests for both clients
-apiClient.interceptors.request.use((config) => {
-  // OAuth 토큰은 localStorage에서 가져옴
-  const token = localStorage.getItem('accessToken');
+apiClient.interceptors.request.use(async (config) => {
+  // Get current user ID for security headers
+  const userId = userIsolatedTokenStorage.getCurrentUserId();
+  
+  // Add comprehensive security headers
+  const secHeaders = securityHeaders.getSecurityHeaders(userId || undefined);
+  Object.assign(config.headers, secHeaders);
+  
+  // OAuth 토큰은 localStorage에서 가져옴 (fallback to user-isolated storage)
+  let token = localStorage.getItem('accessToken');
+  if (!token && userId) {
+    // Try to get from user-isolated storage
+    const userTokens = await userIsolatedTokenStorage.getTokens(userId);
+    if (userTokens) {
+      token = userTokens.accessToken;
+    }
+  }
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -46,9 +63,24 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-authClient.interceptors.request.use((config) => {
-  // OAuth 토큰은 localStorage에서 가져옴
-  const token = localStorage.getItem('accessToken');
+authClient.interceptors.request.use(async (config) => {
+  // Get current user ID for security headers
+  const userId = userIsolatedTokenStorage.getCurrentUserId();
+  
+  // Add comprehensive security headers
+  const secHeaders = securityHeaders.getSecurityHeaders(userId || undefined);
+  Object.assign(config.headers, secHeaders);
+  
+  // OAuth 토큰은 localStorage에서 가져옴 (fallback to user-isolated storage)
+  let token = localStorage.getItem('accessToken');
+  if (!token && userId) {
+    // Try to get from user-isolated storage
+    const userTokens = await userIsolatedTokenStorage.getTokens(userId);
+    if (userTokens) {
+      token = userTokens.accessToken;
+    }
+  }
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

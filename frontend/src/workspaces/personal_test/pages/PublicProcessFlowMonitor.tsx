@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactFlow, {
   Background,
@@ -17,6 +17,7 @@ import { EquipmentNode } from '../components/common/EquipmentNode';
 import { InstrumentNode } from '../components/common/InstrumentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
+import { CustomTableNode } from '../components/common/CustomTableNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { DatabaseConfigAlert } from '../components/common/DatabaseConfigAlert';
@@ -26,13 +27,8 @@ import { EquipmentSidebar } from '../components/monitor/EquipmentSidebar';
 import { usePublicFlowMonitor } from '../hooks/usePublicFlowMonitor';
 import { useDataSources } from '../hooks/useDataSources';
 
-// Define nodeTypes and edgeTypes outside component to avoid re-creation
-const nodeTypes = Object.freeze({
-  equipment: EquipmentNode,
-  instrument: InstrumentNode,
-  group: GroupNode,
-  text: TextNode,
-});
+// Define edgeTypes outside component to avoid re-creation
+// nodeTypes will be defined inside component to access tableData
 
 const edgeTypes = Object.freeze({
   custom: CustomEdgeWithLabel,
@@ -49,6 +45,8 @@ const nodeColor = (node: Node) => {
       return '#8b5cf6';
     case 'text':
       return '#10b981';
+    case 'table':
+      return node.data.color || '#f59e0b'; // Use table's color or orange default
     default:
       return '#6b7280';
   }
@@ -169,6 +167,15 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
     retryCount,
     maxRetries,
   } = usePublicFlowMonitor(publishToken || '');
+
+  // Define nodeTypes - Custom Table nodes handle their own data fetching
+  const nodeTypes = useMemo(() => ({
+    equipment: EquipmentNode,
+    instrument: InstrumentNode,
+    group: GroupNode,
+    text: TextNode,
+    table: CustomTableNode,
+  }), []);
 
   const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {

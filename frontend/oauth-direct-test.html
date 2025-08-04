@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Direct Test</title>
+</head>
+<body>
+    <h1>OAuth Direct Test</h1>
+    <p>Click the link below to test OAuth directly:</p>
+    <a href="http://localhost:8000/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=http%3A%2F%2Flocalhost%3A3010%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=test_state&code_challenge=test_challenge&code_challenge_method=S256&nonce=test_nonce&prompt=login" target="_blank">
+        Test OAuth Login (New Tab)
+    </a>
+    
+    <h2>Instructions:</h2>
+    <ol>
+        <li>Click the link above</li>
+        <li>Check if OAuth login page loads correctly</li>
+        <li>Try logging in</li>
+        <li>Check if it redirects to callback properly</li>
+    </ol>
+</body>
+</html>

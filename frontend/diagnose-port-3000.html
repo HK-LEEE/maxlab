@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Port 3000 OAuth Callback 진단</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .critical { background: #fecaca; border: 2px solid #ef4444; }
+        .info { background: #dbeafe; border: 2px solid #3b82f6; }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .diagnose-button { background: #dc2626; }
+        .diagnose-button:hover { background: #b91c1c; }
+    </style>
+</head>
+<body>
+    <div class="container critical">
+        <h1>🔍 Port 3000 OAuth Callback 진단</h1>
+        <p><strong>문제:</strong> 팝업에서 로그인 완료해도 OAuth 데이터가 sessionStorage에 저장되지 않음</p>
+        <p><strong>원인:</strong> Port 3000의 MAX Platform 콜백 페이지가 예상과 다른 방식으로 작동</p>
+    </div>
+
+    <div class="container info">
+        <h2>🎯 진단 목표</h2>
+        <ul>
+            <li>Port 3000 콜백 페이지가 어떤 storage keys를 사용하는지 확인</li>
+            <li>실제로 어떤 postMessage나 communication 방식을 사용하는지 파악</li>
+            <li>BroadcastChannel, localStorage, 또는 다른 방식 사용 여부 확인</li>
+            <li>Cross-origin recovery 메커니즘 개선 방향 결정</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <button onclick="startDiagnosis()" class="diagnose-button" id="diagnoseBtn">
+            🔍 실제 OAuth 진단 시작
+        </button>
+        <button onclick="monitorAllStorage()" id="monitorBtn">
+            📊 Storage 전체 모니터링
+        </button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 진단 결과</h2>
+        <div class="log" id="debug-log"></div>
+    </div>
+
+    <script>
+        let diagnosisInterval = null;
+        let storageMonitorInterval = null;
+        let diagnosisPopup = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88',
+                'debug': '#88ff88',
+                'critical': '#ff4444'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function clearLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            log('🧹 로그 삭제됨', 'info');
+        }
+
+        function generateOAuthParams() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        function monitorAllStorage() {
+            const monitorBtn = document.getElementById('monitorBtn');
+            
+            if (storageMonitorInterval) {
+                clearInterval(storageMonitorInterval);
+                storageMonitorInterval = null;
+                monitorBtn.textContent = '📊 Storage 전체 모니터링';
+                log('⏹️ Storage 모니터링 중지됨', 'info');
+                return;
+            }
+
+            log('📊 전체 Storage 모니터링 시작...', 'info');
+            monitorBtn.textContent = '⏹️ 모니터링 중지';
+
+            // Take initial snapshot
+            const initialSessionStorage = {...sessionStorage};
+            const initialLocalStorage = {...localStorage};
+            
+            log(`📸 초기 상태: sessionStorage ${Object.keys(initialSessionStorage).length}개, localStorage ${Object.keys(initialLocalStorage).length}개`, 'debug');
+
+            storageMonitorInterval = setInterval(() => {
+                // Check for new sessionStorage keys
+                const currentSessionKeys = Object.keys(sessionStorage);
+                const newSessionKeys = currentSessionKeys.filter(key => !(key in initialSessionStorage));
+                const changedSessionKeys = currentSessionKeys.filter(key => 
+                    key in initialSessionStorage && sessionStorage.getItem(key) !== initialSessionStorage[key]
+                );
+
+                if (newSessionKeys.length > 0) {
+                    log(`🆕 새 sessionStorage 키: ${newSessionKeys.join(', ')}`, 'success');
+                    newSessionKeys.forEach(key => {
+                        const value = sessionStorage.getItem(key);
+                        log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+                    });
+                }
+
+                if (changedSessionKeys.length > 0) {
+                    log(`🔄 변경된 sessionStorage 키: ${changedSessionKeys.join(', ')}`, 'warn');
+                    changedSessionKeys.forEach(key => {
+                        const value = sessionStorage.getItem(key);
+                        log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+                    });
+                }
+
+                // Check for new localStorage keys
+                const currentLocalKeys = Object.keys(localStorage);
+                const newLocalKeys = currentLocalKeys.filter(key => !(key in initialLocalStorage));
+                const changedLocalKeys = currentLocalKeys.filter(key => 
+                    key in initialLocalStorage && localStorage.getItem(key) !== initialLocalStorage[key]
+                );
+
+                if (newLocalKeys.length > 0) {
+                    log(`🆕 새 localStorage 키: ${newLocalKeys.join(', ')}`, 'success');
+                    newLocalKeys.forEach(key => {
+                        const value = localStorage.getItem(key);
+                        log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+                    });
+                }
+
+                if (changedLocalKeys.length > 0) {
+                    log(`🔄 변경된 localStorage 키: ${changedLocalKeys.join(', ')}`, 'warn');
+                    changedLocalKeys.forEach(key => {
+                        const value = localStorage.getItem(key);
+                        log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+                    });
+                }
+
+                // Update snapshots with new keys
+                currentSessionKeys.forEach(key => {
+                    if (!(key in initialSessionStorage)) {
+                        initialSessionStorage[key] = sessionStorage.getItem(key);
+                    }
+                });
+                currentLocalKeys.forEach(key => {
+                    if (!(key in initialLocalStorage)) {
+                        initialLocalStorage[key] = localStorage.getItem(key);
+                    }
+                });
+
+            }, 500); // Check every 500ms
+        }
+
+        async function startDiagnosis() {
+            log('🔍 실제 OAuth 콜백 진단 시작...', 'critical');
+            
+            const diagnoseBtn = document.getElementById('diagnoseBtn');
+            diagnoseBtn.disabled = true;
+            diagnoseBtn.textContent = '🔄 진단 중...';
+
+            try {
+                // Clear existing OAuth state
+                const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                oauthKeys.forEach(key => sessionStorage.removeItem(key));
+                log(`🧹 기존 OAuth 키 ${oauthKeys.length}개 삭제`, 'debug');
+
+                // Generate OAuth parameters
+                const state = generateOAuthParams();
+                const codeVerifier = generateOAuthParams();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateOAuthParams();
+
+                log('✅ OAuth 파라미터 생성 완료', 'success');
+
+                // Create OAuth flow state (similar to real implementation)
+                const flowId = 'diagnosis_' + Date.now();
+                const flowState = {
+                    state: state,
+                    codeVerifier: codeVerifier,
+                    nonce: nonce,
+                    flowId: flowId,
+                    flowType: 'popup',
+                    clientId: 'maxlab',
+                    redirectUri: `${window.location.origin}/oauth/callback`,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (15 * 60 * 1000),
+                    parentOrigin: window.location.origin,
+                    forceAccountSelection: true, // Force different user
+                    status: 'in_progress',
+                    lastUpdated: Date.now()
+                };
+
+                // Store OAuth state
+                sessionStorage.setItem(`oauth_flow_${flowId}`, JSON.stringify(flowState));
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_parent_origin', window.location.origin);
+                sessionStorage.setItem('oauth_force_account_selection', 'true');
+
+                log(`✅ OAuth 플로우 상태 생성됨: ${flowId}`, 'success');
+
+                // Start comprehensive monitoring
+                log('📊 종합 모니터링 시작: PostMessage, BroadcastChannel, Storage 변화', 'info');
+
+                // PostMessage listener
+                const messageHandler = (event) => {
+                    log(`📨 PostMessage 수신: ${event.data?.type} from ${event.origin}`, 'success');
+                    log(`   Data: ${JSON.stringify(event.data)}`, 'debug');
+                };
+                window.addEventListener('message', messageHandler);
+
+                // BroadcastChannel listener
+                let broadcastChannel = null;
+                try {
+                    broadcastChannel = new BroadcastChannel('oauth_channel');
+                    broadcastChannel.onmessage = (event) => {
+                        log(`📡 BroadcastChannel 수신: ${event.data?.type}`, 'success');
+                        log(`   Data: ${JSON.stringify(event.data)}`, 'debug');
+                    };
+                } catch (e) {
+                    log('⚠️ BroadcastChannel 지원 안됨', 'warn');
+                }
+
+                // Build OAuth URL with force parameters for different user login
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'select_account', // Force account selection
+                    max_age: '0', // Force re-authentication
+                    diagnostic: 'true' // Enable diagnostic mode
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`🔗 OAuth URL: ${authUrl.substring(0, 100)}...`, 'debug');
+
+                // Open popup
+                diagnosisPopup = window.open(
+                    authUrl,
+                    'oauth-diagnosis',
+                    'width=500,height=600,scrollbars=yes,resizable=yes'
+                );
+
+                if (!diagnosisPopup) {
+                    throw new Error('팝업이 차단되었습니다!');
+                }
+
+                log('✅ 진단 팝업 열림 - 로그인을 완료해주세요', 'success');
+                log('🎯 로그인 후 이 페이지에서 storage 변화를 모니터링합니다', 'info');
+
+                // Monitor popup and storage changes
+                let checkCount = 0;
+                diagnosisInterval = setInterval(() => {
+                    checkCount++;
+                    
+                    if (diagnosisPopup.closed) {
+                        log('🚪 진단 팝업이 닫혔습니다', 'warn');
+                        clearInterval(diagnosisInterval);
+                        
+                        // Final storage analysis
+                        log('🔍 최종 storage 분석...', 'info');
+                        const finalOAuthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                        const finalAllKeys = [...Object.keys(sessionStorage), ...Object.keys(localStorage)];
+                        
+                        log(`📊 최종 OAuth 키 ${finalOAuthKeys.length}개: ${finalOAuthKeys.join(', ')}`, 'debug');
+                        log(`📊 총 storage 키 ${finalAllKeys.length}개`, 'debug');
+                        
+                        window.removeEventListener('message', messageHandler);
+                        if (broadcastChannel) broadcastChannel.close();
+                        
+                        diagnoseBtn.disabled = false;
+                        diagnoseBtn.textContent = '🔍 실제 OAuth 진단 시작';
+                        return;
+                    }
+
+                    // Check for any new data every 2 seconds
+                    if (checkCount % 4 === 0) { // Every 2 seconds (500ms * 4)
+                        const currentOAuthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                        const newKeys = currentOAuthKeys.filter(key => !['oauth_state', 'oauth_code_verifier', 'oauth_nonce', 'oauth_popup_mode', 'oauth_parent_origin', 'oauth_force_account_selection'].includes(key) && !key.startsWith('oauth_flow_'));
+                        
+                        if (newKeys.length > 0) {
+                            log(`🆕 새로운 OAuth 키 발견: ${newKeys.join(', ')}`, 'success');
+                            newKeys.forEach(key => {
+                                const value = sessionStorage.getItem(key);
+                                log(`   ${key}: ${value?.substring(0, 100)}${value?.length > 100 ? '...' : ''}`, 'debug');
+                            });
+                        }
+                    }
+
+                    // Safety timeout after 5 minutes
+                    if (checkCount > 600) { // 5 minutes at 500ms intervals
+                        log('⏰ 진단 타임아웃 (5분)', 'warn');
+                        clearInterval(diagnosisInterval);
+                        
+                        if (diagnosisPopup && !diagnosisPopup.closed) {
+                            diagnosisPopup.close();
+                        }
+                        
+                        window.removeEventListener('message', messageHandler);
+                        if (broadcastChannel) broadcastChannel.close();
+                        
+                        diagnoseBtn.disabled = false;
+                        diagnoseBtn.textContent = '🔍 실제 OAuth 진단 시작';
+                    }
+                }, 500);
+
+            } catch (error) {
+                log(`❌ 진단 실패: ${error.message}`, 'error');
+                
+                diagnoseBtn.disabled = false;
+                diagnoseBtn.textContent = '🔍 실제 OAuth 진단 시작';
+            }
+        }
+
+        // Initialize
+        log('🔍 Port 3000 OAuth 콜백 진단 도구 초기화됨', 'critical');
+        log('📋 이 도구는 실제 OAuth 플로우에서 port 3000 콜백이 어떻게 작동하는지 분석합니다', 'info');
+        log('🎯 "다른 사용자로 로그인" 버튼과 동일한 OAuth 플로우를 사용합니다', 'info');
+    </script>
+</body>
+</html>

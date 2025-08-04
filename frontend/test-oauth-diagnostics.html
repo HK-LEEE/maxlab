@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Diagnostics</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .diagnostic-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .warning { background: #ff9800; }
+        .info { background: #2196f3; }
+        .button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .button:hover {
+            background: #1565c0;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OAuth 진단 도구</h1>
+        
+        <div class="diagnostic-section">
+            <h2>1. 환경 진단</h2>
+            <div id="env-status"></div>
+            <button class="button" onclick="checkEnvironment()">환경 확인</button>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>2. 세션 스토리지 상태</h2>
+            <div id="session-status"></div>
+            <button class="button" onclick="checkSessionStorage()">세션 확인</button>
+            <button class="button" onclick="clearOAuthData()">OAuth 데이터 삭제</button>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>3. OAuth 플로우 진단</h2>
+            <div id="oauth-status"></div>
+            <button class="button" onclick="testNormalOAuth()">일반 OAuth 테스트</button>
+            <button class="button" onclick="testForceAccountOAuth()">다른 사용자 OAuth 테스트</button>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>4. 실시간 모니터링</h2>
+            <div id="monitor-status"></div>
+            <button class="button" onclick="startMonitoring()">모니터링 시작</button>
+            <button class="button" onclick="stopMonitoring()">모니터링 중지</button>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>5. 상세 로그</h2>
+            <div class="code-block" id="detailed-logs" style="max-height: 400px; overflow-y: auto;"></div>
+            <button class="button" onclick="clearLogs()">로그 삭제</button>
+        </div>
+    </div>
+
+    <script>
+        let monitoringInterval = null;
+        let monitoringChannel = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logs = document.getElementById('detailed-logs');
+            const typeEmoji = {
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️',
+                'info': 'ℹ️'
+            };
+            logs.innerHTML += `${timestamp} ${typeEmoji[type]} ${message}\n`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function addStatus(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const item = document.createElement('div');
+            item.className = 'status-item';
+            item.innerHTML = `
+                <div class="status-icon ${type}"></div>
+                <div>${message}</div>
+            `;
+            container.appendChild(item);
+        }
+
+        function checkEnvironment() {
+            const container = document.getElementById('env-status');
+            container.innerHTML = '';
+
+            // Check current URL
+            addStatus('env-status', `현재 URL: ${window.location.href}`, 'info');
+            addStatus('env-status', `Origin: ${window.location.origin}`, 'info');
+            
+            // Check if running on correct port
+            if (window.location.port === '3010') {
+                addStatus('env-status', '정상 포트 (3010)에서 실행 중', 'success');
+            } else {
+                addStatus('env-status', `비정상 포트 (${window.location.port || '80'})에서 실행 중`, 'warning');
+            }
+
+            // Check if popup
+            if (window.opener) {
+                addStatus('env-status', '팝업 창으로 열림', 'info');
+            } else {
+                addStatus('env-status', '일반 창으로 열림', 'info');
+            }
+
+            // Check browser
+            const browser = navigator.userAgent.includes('Chrome') ? 'Chrome' :
+                           navigator.userAgent.includes('Firefox') ? 'Firefox' :
+                           navigator.userAgent.includes('Safari') ? 'Safari' : 'Unknown';
+            addStatus('env-status', `브라우저: ${browser}`, 'info');
+
+            log('환경 진단 완료', 'success');
+        }
+
+        function checkSessionStorage() {
+            const container = document.getElementById('session-status');
+            container.innerHTML = '';
+
+            const oauthKeys = Object.keys(sessionStorage).filter(key => 
+                key.includes('oauth') || key.includes('auth')
+            );
+
+            if (oauthKeys.length === 0) {
+                addStatus('session-status', 'OAuth 관련 데이터 없음', 'warning');
+            } else {
+                addStatus('session-status', `OAuth 데이터 ${oauthKeys.length}개 발견`, 'success');
+                
+                oauthKeys.forEach(key => {
+                    const value = sessionStorage.getItem(key);
+                    const displayValue = value && value.length > 50 ? 
+                        value.substring(0, 50) + '...' : value;
+                    addStatus('session-status', `${key}: ${displayValue}`, 'info');
+                });
+            }
+
+            // Check localStorage too
+            const localKeys = Object.keys(localStorage).filter(key => 
+                key.includes('token') || key.includes('auth')
+            );
+            
+            if (localKeys.length > 0) {
+                addStatus('session-status', `LocalStorage에 인증 데이터 ${localKeys.length}개 발견`, 'info');
+            }
+
+            log('세션 스토리지 확인 완료', 'success');
+        }
+
+        function clearOAuthData() {
+            const sessionKeys = Object.keys(sessionStorage).filter(key => 
+                key.includes('oauth') || key.includes('auth')
+            );
+            sessionKeys.forEach(key => sessionStorage.removeItem(key));
+
+            const localKeys = Object.keys(localStorage).filter(key => 
+                key.includes('oauth') || key.includes('auth') || key.includes('token')
+            );
+            localKeys.forEach(key => localStorage.removeItem(key));
+
+            log(`SessionStorage ${sessionKeys.length}개, LocalStorage ${localKeys.length}개 항목 삭제`, 'success');
+            checkSessionStorage();
+        }
+
+        function generateCodeChallenge() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+            let result = '';
+            for (let i = 0; i < 128; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function testNormalOAuth() {
+            const container = document.getElementById('oauth-status');
+            container.innerHTML = '';
+
+            const state = 'test_' + Date.now();
+            const codeVerifier = generateCodeChallenge();
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_popup_mode', 'true');
+
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256'
+            });
+
+            const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+            
+            addStatus('oauth-status', '일반 OAuth 플로우 시작', 'info');
+            addStatus('oauth-status', `State: ${state.substring(0, 20)}...`, 'info');
+            
+            log('일반 OAuth 팝업 열기', 'info');
+            log(`URL: ${authUrl}`, 'info');
+
+            const popup = window.open(authUrl, 'oauth_popup', 'width=600,height=700');
+            if (!popup) {
+                addStatus('oauth-status', '팝업이 차단되었습니다!', 'error');
+                log('팝업 차단됨', 'error');
+            } else {
+                addStatus('oauth-status', '팝업이 열렸습니다', 'success');
+                monitorPopup(popup);
+            }
+        }
+
+        function testForceAccountOAuth() {
+            const container = document.getElementById('oauth-status');
+            container.innerHTML = '';
+
+            const state = 'test_' + Date.now() + '_force_' + Date.now();
+            const codeVerifier = generateCodeChallenge();
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_popup_mode', 'true');
+            sessionStorage.setItem('oauth_force_account_selection', 'true');
+
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                prompt: 'select_account',
+                max_age: '0'
+            });
+
+            const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+            
+            addStatus('oauth-status', '다른 사용자 OAuth 플로우 시작', 'info');
+            addStatus('oauth-status', 'prompt=select_account 추가됨', 'warning');
+            addStatus('oauth-status', 'max_age=0 추가됨', 'warning');
+            addStatus('oauth-status', `State: ${state.substring(0, 20)}...`, 'info');
+            
+            log('다른 사용자 OAuth 팝업 열기', 'info');
+            log(`URL: ${authUrl}`, 'info');
+
+            const popup = window.open(authUrl, 'oauth_popup', 'width=600,height=700');
+            if (!popup) {
+                addStatus('oauth-status', '팝업이 차단되었습니다!', 'error');
+                log('팝업 차단됨', 'error');
+            } else {
+                addStatus('oauth-status', '팝업이 열렸습니다', 'success');
+                monitorPopup(popup);
+            }
+        }
+
+        function monitorPopup(popup) {
+            let checkCount = 0;
+            const checkInterval = setInterval(() => {
+                checkCount++;
+                
+                if (popup.closed) {
+                    clearInterval(checkInterval);
+                    log('팝업이 닫혔습니다', 'warning');
+                    
+                    // Check for OAuth result
+                    const success = sessionStorage.getItem('oauth_success');
+                    const error = sessionStorage.getItem('oauth_error');
+                    
+                    if (success) {
+                        log('OAuth 성공!', 'success');
+                        addStatus('oauth-status', 'OAuth 인증 성공!', 'success');
+                    } else if (error) {
+                        log(`OAuth 오류: ${error}`, 'error');
+                        addStatus('oauth-status', `OAuth 오류: ${error}`, 'error');
+                    } else {
+                        log('OAuth 결과를 확인할 수 없습니다', 'warning');
+                    }
+                    
+                    return;
+                }
+                
+                // Try to check popup URL (may fail due to cross-origin)
+                try {
+                    const popupUrl = popup.location.href;
+                    log(`팝업 URL: ${popupUrl}`, 'info');
+                } catch (e) {
+                    // Expected for cross-origin
+                }
+                
+                if (checkCount > 120) { // 2 minutes
+                    clearInterval(checkInterval);
+                    log('팝업 모니터링 타임아웃', 'warning');
+                }
+            }, 1000);
+        }
+
+        function startMonitoring() {
+            const container = document.getElementById('monitor-status');
+            container.innerHTML = '<div class="status-item"><div class="status-icon info"></div><div>모니터링 중...</div></div>';
+            
+            log('실시간 모니터링 시작', 'info');
+
+            // Monitor PostMessage
+            window.addEventListener('message', handleMessage);
+            
+            // Monitor BroadcastChannel
+            monitoringChannel = new BroadcastChannel('oauth_channel');
+            monitoringChannel.onmessage = (event) => {
+                log(`BroadcastChannel 메시지: ${JSON.stringify(event.data)}`, 'success');
+            };
+            
+            // Monitor SessionStorage changes
+            monitoringInterval = setInterval(() => {
+                const oauthKeys = Object.keys(sessionStorage).filter(key => 
+                    key.includes('oauth')
+                );
+                
+                oauthKeys.forEach(key => {
+                    const value = sessionStorage.getItem(key);
+                    if (value && !window.__lastSessionState?.[key]) {
+                        log(`SessionStorage 변경 감지 - ${key}: ${value.substring(0, 50)}...`, 'info');
+                    }
+                });
+                
+                // Store current state
+                window.__lastSessionState = {};
+                oauthKeys.forEach(key => {
+                    window.__lastSessionState[key] = sessionStorage.getItem(key);
+                });
+            }, 500);
+        }
+
+        function handleMessage(event) {
+            log(`PostMessage 수신 - Origin: ${event.origin}, Type: ${event.data?.type}`, 'success');
+            if (event.data) {
+                log(`PostMessage 데이터: ${JSON.stringify(event.data)}`, 'info');
+            }
+        }
+
+        function stopMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+            
+            if (monitoringChannel) {
+                monitoringChannel.close();
+                monitoringChannel = null;
+            }
+            
+            window.removeEventListener('message', handleMessage);
+            
+            const container = document.getElementById('monitor-status');
+            container.innerHTML = '<div class="status-item"><div class="status-icon warning"></div><div>모니터링 중지됨</div></div>';
+            
+            log('실시간 모니터링 중지', 'warning');
+        }
+
+        function clearLogs() {
+            document.getElementById('detailed-logs').innerHTML = '';
+            log('로그 삭제됨', 'info');
+        }
+
+        // Auto-check environment on load
+        window.addEventListener('load', () => {
+            checkEnvironment();
+            checkSessionStorage();
+        });
+    </script>
+</body>
+</html>

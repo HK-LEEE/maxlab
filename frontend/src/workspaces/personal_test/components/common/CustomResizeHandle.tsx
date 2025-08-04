@@ -35,7 +35,7 @@ export const CustomResizeHandle: React.FC<CustomResizeHandleProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🔍 Resize handle clicked:', { nodeId });
+    // Debug console log removed
     setIsResizing(true);
     
     // Enhanced DOM element selection with ReactFlow specific attributes

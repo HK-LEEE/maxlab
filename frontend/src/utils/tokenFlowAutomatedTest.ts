@@ -640,10 +640,7 @@ export function registerTokenFlowTestHelpers(): void {
       createAdvancedSuite: createAdvancedTokenFlowTestSuite
     };
     
-    console.log('🧪 Token flow test helpers registered. Use window.tokenFlowTest in console:');
-    console.log('  - tokenFlowTest.runBasic() - 기본 토큰 플로우 테스트');
-    console.log('  - tokenFlowTest.runAdvanced() - 고급 스트레스 테스트');
-    console.log('  - tokenFlowTest.runAll() - 모든 테스트 실행');
+    // Debug utility console logs removed
   }
 }
 

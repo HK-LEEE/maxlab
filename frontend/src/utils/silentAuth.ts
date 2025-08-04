@@ -27,8 +27,8 @@ export class SilentAuth {
   private readonly clientId = import.meta.env.VITE_CLIENT_ID || 'maxlab';
   private readonly redirectUri: string;
   private readonly authUrl: string;
-  private readonly scopes = ['read:profile', 'read:groups', 'manage:workflows'];
-  private readonly timeout = 5000; // 5초 타임아웃
+  private readonly scopes = ['openid', 'profile', 'email', 'read:profile', 'read:groups', 'manage:workflows'];
+  private readonly timeout = 10000; // 10초 타임아웃 (UX 개선)
 
   constructor() {
     this.redirectUri = import.meta.env.VITE_REDIRECT_URI || `${window.location.origin}/oauth/callback`;
@@ -56,9 +56,17 @@ export class SilentAuth {
       .replace(/=/g, '');
   }
 
-  async attemptSilentAuth(): Promise<SilentAuthResult> {
+  // Generate nonce for OIDC
+  private generateNonce(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+
+  async attemptSilentAuth(maxAge?: number): Promise<SilentAuthResult> {
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+    const nonce = this.generateNonce(); // OIDC nonce
     
     return new Promise((resolve) => {
       try {
@@ -70,6 +78,7 @@ export class SilentAuth {
         // 세션 스토리지에 저장
         sessionStorage.setItem('silent_oauth_state', state);
         sessionStorage.setItem('silent_oauth_code_verifier', codeVerifier);
+        sessionStorage.setItem('silent_oauth_nonce', nonce); // OIDC nonce
 
         // Silent OAuth URL 생성 (prompt=none이 핵심)
         const params = new URLSearchParams({
@@ -80,8 +89,15 @@ export class SilentAuth {
           state: state,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          prompt: 'none' // 🔑 사용자 상호작용 없이 인증 시도
+          prompt: 'none', // 🔑 사용자 상호작용 없이 인증 시도
+          nonce: nonce // OIDC nonce 추가
         });
+
+        // Add max_age if specified
+        if (maxAge !== undefined) {
+          params.append('max_age', maxAge.toString());
+          sessionStorage.setItem('oauth_max_age', maxAge.toString());
+        }
 
         const silentAuthUrl = `${this.authUrl}/api/oauth/authorize?${params}`;
 
@@ -162,6 +178,8 @@ export class SilentAuth {
     // 세션 스토리지 정리
     sessionStorage.removeItem('silent_oauth_state');
     sessionStorage.removeItem('silent_oauth_code_verifier');
+    sessionStorage.removeItem('silent_oauth_nonce');
+    sessionStorage.removeItem('oauth_max_age');
 
     this.iframe = null;
     this.messageHandler = null;
@@ -175,6 +193,32 @@ export class SilentAuth {
 
 // 편의 함수
 export async function attemptSilentLogin(): Promise<SilentAuthResult> {
+  // 🔒 CRITICAL: Check if user has logged out recently
+  const hasLoggedOut = localStorage.getItem('hasLoggedOut');
+  const preventSilentAuth = sessionStorage.getItem('preventSilentAuth');
+  const logoutTimestamp = localStorage.getItem('logoutTimestamp');
+  
+  if (hasLoggedOut === 'true' || preventSilentAuth === 'true') {
+    console.log('🚫 Silent auth blocked - user has logged out recently');
+    
+    // Auto-clear the flag after 5 minutes for user convenience
+    if (logoutTimestamp) {
+      const timeSinceLogout = Date.now() - parseInt(logoutTimestamp);
+      const fiveMinutes = 5 * 60 * 1000;
+      
+      if (timeSinceLogout > fiveMinutes) {
+        console.log('🔓 Auto-clearing logout flags after 5 minutes');
+        localStorage.removeItem('hasLoggedOut');
+        localStorage.removeItem('logoutTimestamp');
+        sessionStorage.removeItem('preventSilentAuth');
+      } else {
+        return { success: false, error: 'Silent auth blocked after logout' };
+      }
+    } else {
+      return { success: false, error: 'Silent auth blocked after logout' };
+    }
+  }
+
   // 더 엄격한 페이지 검증
   if (!isSafePageForTokenRefresh()) {
     const currentPath = window.location.pathname;
@@ -209,6 +253,8 @@ export async function attemptSilentLogin(): Promise<SilentAuthResult> {
   console.log('✅ Silent auth conditions met, starting...');
   const silentAuth = new SilentAuth();
   try {
+    // You can pass maxAge parameter to enforce fresh authentication
+    // e.g., maxAge: 300 = require auth within last 5 minutes
     return await silentAuth.attemptSilentAuth();
   } finally {
     silentAuth.forceCleanup();
@@ -246,6 +292,15 @@ export function isSafePageForTokenRefresh(): boolean {
     window.location.search.includes('oauth_callback_processing')
   );
 
+  // 🔒 SECURITY: Check if OAuth callback was recently completed
+  const isRecentOAuthComplete = Boolean(
+    currentPath === '/oauth/callback' && 
+    !isOAuthInProgress && 
+    !isOAuthCallback && 
+    !isImplicitOAuth &&
+    localStorage.getItem('accessToken') // User is already authenticated
+  );
+
   // 글로벌 OAuth 콜백 처리 상태 확인 (DOM 기반)
   const isOAuthCallbackProcessing = Boolean(
     document.querySelector('[data-oauth-processing="true"]') ||
@@ -263,6 +318,12 @@ export function isSafePageForTokenRefresh(): boolean {
     return false;
   }
   
+  // 🔒 SECURITY: Allow token refresh if OAuth was recently completed
+  if (isRecentOAuthComplete) {
+    console.log('✅ OAuth callback completed, allowing token refresh');
+    return true;
+  }
+
   // 현재 페이지가 안전하지 않거나 OAuth 처리 중이면 false
   if (unsafePaths.some(path => currentPath.startsWith(path))) {
     console.log('🚫 Unsafe path for token refresh:', currentPath);

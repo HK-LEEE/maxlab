@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Login Redirect Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+        .section { margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f5f5f5; padding: 15px; overflow-x: auto; border-radius: 4px; font-size: 12px; }
+        .log { background: #f0f0f0; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        .warning { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>OAuth 로그인 리다이렉트 테스트</h1>
+    
+    <div class="warning">
+        <strong>이 테스트는 OAuth 서버가 로그인 후 올바르게 리다이렉트하는지 확인합니다.</strong>
+    </div>
+    
+    <div class="section">
+        <h2>1. OAuth Return 시뮬레이션</h2>
+        <p>로그인 페이지가 받을 oauth_return 파라미터를 시뮬레이션합니다.</p>
+        <button onclick="simulateLoginPage()">로그인 페이지 시뮬레이션</button>
+        <div class="log" id="login-sim-log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. 로그인 후 리다이렉트 테스트</h2>
+        <p>로그인 성공 후 OAuth authorize로 리다이렉트되는지 테스트합니다.</p>
+        <button onclick="testLoginRedirect()">로그인 후 리다이렉트 테스트</button>
+        <div class="log" id="redirect-log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>3. 전체 플로우 시각화</h2>
+        <button onclick="visualizeFlow()">플로우 시각화</button>
+        <div id="flow-diagram"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const typeClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<span class="${typeClass}">${timestamp} - ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function simulateLoginPage() {
+            const logEl = document.getElementById('login-sim-log');
+            logEl.innerHTML = '';
+            
+            log('login-sim-log', '=== 로그인 페이지 시뮬레이션 ===', 'success');
+            
+            // OAuth 파라미터 생성
+            const oauthParams = {
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: 'test_' + Date.now(),
+                code_challenge: generateRandomString(128),
+                code_challenge_method: 'S256',
+                nonce: generateRandomString(32),
+                prompt: 'login',
+                max_age: '0'
+            };
+            
+            log('login-sim-log', 'OAuth 파라미터:', 'info');
+            log('login-sim-log', JSON.stringify(oauthParams, null, 2), 'info');
+            
+            // oauth_return 생성
+            const oauthReturn = encodeURIComponent(JSON.stringify(oauthParams));
+            log('login-sim-log', '\nEncoded oauth_return:', 'info');
+            log('login-sim-log', oauthReturn.substring(0, 100) + '...', 'info');
+            
+            // 로그인 페이지 URL
+            const loginUrl = `http://localhost:8000/login?oauth_return=${oauthReturn}&force_login=true`;
+            log('login-sim-log', '\n로그인 페이지 URL:', 'success');
+            log('login-sim-log', loginUrl.substring(0, 150) + '...', 'info');
+            
+            // 로그인 후 예상되는 리다이렉트 URL
+            const expectedRedirect = '/api/oauth/authorize?' + new URLSearchParams(oauthParams).toString();
+            log('login-sim-log', '\n로그인 후 예상 리다이렉트:', 'success');
+            log('login-sim-log', expectedRedirect, 'info');
+        }
+
+        function testLoginRedirect() {
+            const logEl = document.getElementById('redirect-log');
+            logEl.innerHTML = '';
+            
+            log('redirect-log', '=== 로그인 리다이렉트 테스트 ===', 'success');
+            
+            // 테스트용 oauth_return 생성
+            const oauthParams = {
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: 'redirect_test_' + Date.now(),
+                code_challenge: generateRandomString(128),
+                code_challenge_method: 'S256'
+            };
+            
+            const oauthReturn = encodeURIComponent(JSON.stringify(oauthParams));
+            
+            log('redirect-log', '1. 로그인 페이지에 전달될 데이터:', 'info');
+            log('redirect-log', `oauth_return=${oauthReturn.substring(0, 50)}...`, 'info');
+            
+            log('redirect-log', '\n2. 로그인 폼 제출 시뮬레이션:', 'info');
+            log('redirect-log', 'POST /api/auth/login', 'info');
+            log('redirect-log', 'username: test@example.com', 'info');
+            log('redirect-log', 'password: ********', 'info');
+            log('redirect-log', `oauth_return: ${oauthReturn.substring(0, 50)}...`, 'info');
+            
+            log('redirect-log', '\n3. 서버가 해야 할 처리:', 'success');
+            log('redirect-log', '- oauth_return URL 디코딩', 'info');
+            log('redirect-log', '- JSON 파싱', 'info');
+            log('redirect-log', '- OAuth URL 재구성', 'info');
+            log('redirect-log', '- /api/oauth/authorize로 리다이렉트', 'info');
+            
+            // 최종 예상 결과
+            const finalCallbackUrl = `http://localhost:3010/oauth/callback?code=AUTH_CODE&state=${oauthParams.state}`;
+            log('redirect-log', '\n4. 최종 callback URL:', 'success');
+            log('redirect-log', finalCallbackUrl, 'info');
+        }
+
+        function visualizeFlow() {
+            const flowDiv = document.getElementById('flow-diagram');
+            flowDiv.innerHTML = `
+                <h3>OAuth 플로우 다이어그램</h3>
+                <pre style="line-height: 1.4;">
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Frontend      │     │  OAuth Server   │     │   Login Page    │
+└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
+         │                       │                        │
+         │ 1. OAuth Request      │                        │
+         │ (prompt=login)        │                        │
+         ├──────────────────────>│                        │
+         │                       │                        │
+         │                       │ 2. Delete Session      │
+         │                       │ & Redirect to Login    │
+         │                       ├───────────────────────>│
+         │                       │ (with oauth_return)    │
+         │                       │                        │
+         │                       │                        │ 3. User Login
+         │                       │                        │ (Form Submit)
+         │                       │                        │
+         │                       │ 4. Login Success       │
+         │                       │<───────────────────────┤
+         │                       │ (with oauth_return)    │
+         │                       │                        │
+         │                       │ 5. Parse oauth_return  │
+         │                       │ & Redirect to OAuth    │
+         │                       ├───────────────────────>│
+         │                       │ (/api/oauth/authorize) │
+         │                       │                        │
+         │ 6. Authorization Code │                        │
+         │ & Redirect to Callback│                        │
+         │<──────────────────────┤                        │
+         │                       │                        │
+         │ 7. Token Exchange     │                        │
+         ├──────────────────────>│                        │
+         │                       │                        │
+         │ 8. Access Token       │                        │
+         │<──────────────────────┤                        │
+         │                       │                        │
+         ▼                       ▼                        ▼
+
+<span class="success">현재 문제: Step 4-5가 구현되지 않아 플로우가 중단됨</span>
+<span class="error">로그인 후 OAuth authorize로 리다이렉트하지 않음</span>
+                </pre>
+            `;
+        }
+    </script>
+</body>
+</html>

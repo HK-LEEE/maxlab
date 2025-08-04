@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Account Selection Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        .button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .button:hover {
+            background: #1565c0;
+        }
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .secondary {
+            background: #757575;
+        }
+        .secondary:hover {
+            background: #616161;
+        }
+        .output {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        .success {
+            background: #4caf50;
+            color: white;
+        }
+        .error {
+            background: #f44336;
+            color: white;
+        }
+        .warning {
+            background: #ff9800;
+            color: white;
+        }
+        .info {
+            background: #2196f3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OAuth Account Selection Test</h1>
+        
+        <div class="test-section">
+            <h2>1. OAuth 서버 상태 확인</h2>
+            <button class="button" onclick="checkOAuthServer()">서버 상태 확인</button>
+            <button class="button secondary" onclick="checkCurrentSession()">현재 세션 확인</button>
+            <div id="server-status" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. OAuth 파라미터 테스트</h2>
+            <button class="button" onclick="testNormalLogin()">일반 로그인 (prompt 없음)</button>
+            <button class="button" onclick="testPromptLogin()">prompt=login 테스트</button>
+            <button class="button" onclick="testSelectAccount()">prompt=select_account 테스트</button>
+            <button class="button" onclick="testMaxAge0()">max_age=0 테스트</button>
+            <button class="button" onclick="testBothParams()">prompt=select_account + max_age=0</button>
+            <div id="oauth-params" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. 팝업 통신 테스트</h2>
+            <button class="button" onclick="testPopupCommunication()">팝업 통신 테스트</button>
+            <button class="button secondary" onclick="clearTestData()">테스트 데이터 삭제</button>
+            <div id="popup-comm" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. 실제 OAuth 플로우 테스트</h2>
+            <button class="button" onclick="testFullOAuthFlow(false)">일반 OAuth 로그인</button>
+            <button class="button" onclick="testFullOAuthFlow(true)">다른 사용자로 로그인</button>
+            <div id="oauth-flow" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        const AUTH_SERVER_URL = 'http://localhost:8000';
+        const CLIENT_ID = 'maxlab';
+        const REDIRECT_URI = 'http://localhost:3010/oauth/callback';
+        let testPopup = null;
+
+        function log(elementId, message, type = 'info') {
+            const output = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const typeEmoji = {
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️',
+                'info': 'ℹ️'
+            };
+            output.innerHTML += `${timestamp} ${typeEmoji[type]} ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function checkOAuthServer() {
+            const output = document.getElementById('server-status');
+            output.innerHTML = '';
+            
+            try {
+                log('server-status', 'OAuth 서버 연결 중...', 'info');
+                
+                // Health check
+                const healthResponse = await fetch(`${AUTH_SERVER_URL}/api/health`);
+                if (healthResponse.ok) {
+                    log('server-status', 'OAuth 서버가 정상적으로 실행 중입니다', 'success');
+                } else {
+                    log('server-status', `OAuth 서버 응답 오류: ${healthResponse.status}`, 'error');
+                }
+                
+                // Check OAuth endpoints
+                const endpoints = [
+                    '/api/oauth/authorize',
+                    '/api/oauth/token',
+                    '/api/oauth/userinfo'
+                ];
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(`${AUTH_SERVER_URL}${endpoint}`, {
+                            method: 'OPTIONS'
+                        });
+                        log('server-status', `${endpoint}: ${response.status === 404 ? 'Not Found' : 'Available'}`, 
+                            response.status === 404 ? 'error' : 'success');
+                    } catch (e) {
+                        log('server-status', `${endpoint}: 접근 불가`, 'error');
+                    }
+                }
+            } catch (error) {
+                log('server-status', `OAuth 서버 연결 실패: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkCurrentSession() {
+            const output = document.getElementById('server-status');
+            
+            try {
+                log('server-status', '\n현재 세션 확인 중...', 'info');
+                
+                // Check if user is logged in
+                const response = await fetch(`${AUTH_SERVER_URL}/api/auth/me`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    log('server-status', `현재 로그인된 사용자: ${user.email || user.username}`, 'success');
+                    log('server-status', `사용자 ID: ${user.id}`, 'info');
+                } else if (response.status === 401) {
+                    log('server-status', '현재 로그인되지 않았습니다', 'warning');
+                } else {
+                    log('server-status', `세션 확인 오류: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log('server-status', `세션 확인 실패: ${error.message}`, 'error');
+            }
+        }
+
+        function generateCodeChallenge() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+            let result = '';
+            for (let i = 0; i < 128; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function buildOAuthUrl(params) {
+            const baseParams = {
+                response_type: 'code',
+                client_id: CLIENT_ID,
+                redirect_uri: REDIRECT_URI,
+                scope: 'openid profile email',
+                state: 'test_' + Date.now(),
+                code_challenge: generateCodeChallenge(),
+                code_challenge_method: 'S256'
+            };
+            
+            const allParams = { ...baseParams, ...params };
+            const queryString = new URLSearchParams(allParams).toString();
+            return `${AUTH_SERVER_URL}/api/oauth/authorize?${queryString}`;
+        }
+
+        function testNormalLogin() {
+            const url = buildOAuthUrl({});
+            const output = document.getElementById('oauth-params');
+            output.innerHTML = '';
+            log('oauth-params', '일반 로그인 URL:', 'info');
+            log('oauth-params', url, 'info');
+            
+            window.open(url, '_blank', 'width=600,height=700');
+        }
+
+        function testPromptLogin() {
+            const url = buildOAuthUrl({ prompt: 'login' });
+            const output = document.getElementById('oauth-params');
+            output.innerHTML = '';
+            log('oauth-params', 'prompt=login URL:', 'info');
+            log('oauth-params', url, 'info');
+            
+            window.open(url, '_blank', 'width=600,height=700');
+        }
+
+        function testSelectAccount() {
+            const url = buildOAuthUrl({ prompt: 'select_account' });
+            const output = document.getElementById('oauth-params');
+            output.innerHTML = '';
+            log('oauth-params', 'prompt=select_account URL:', 'info');
+            log('oauth-params', url, 'info');
+            
+            window.open(url, '_blank', 'width=600,height=700');
+        }
+
+        function testMaxAge0() {
+            const url = buildOAuthUrl({ max_age: '0' });
+            const output = document.getElementById('oauth-params');
+            output.innerHTML = '';
+            log('oauth-params', 'max_age=0 URL:', 'info');
+            log('oauth-params', url, 'info');
+            
+            window.open(url, '_blank', 'width=600,height=700');
+        }
+
+        function testBothParams() {
+            const url = buildOAuthUrl({ prompt: 'select_account', max_age: '0' });
+            const output = document.getElementById('oauth-params');
+            output.innerHTML = '';
+            log('oauth-params', 'prompt=select_account + max_age=0 URL:', 'info');
+            log('oauth-params', url, 'info');
+            
+            window.open(url, '_blank', 'width=600,height=700');
+        }
+
+        function testPopupCommunication() {
+            const output = document.getElementById('popup-comm');
+            output.innerHTML = '';
+            
+            // Set up message listener
+            const messageHandler = (event) => {
+                log('popup-comm', `PostMessage 수신: ${JSON.stringify(event.data)}`, 'success');
+            };
+            window.addEventListener('message', messageHandler);
+            
+            // Set up BroadcastChannel
+            const channel = new BroadcastChannel('oauth_channel');
+            channel.onmessage = (event) => {
+                log('popup-comm', `BroadcastChannel 수신: ${JSON.stringify(event.data)}`, 'success');
+            };
+            
+            // Monitor sessionStorage
+            const checkSessionStorage = () => {
+                const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                if (oauthKeys.length > 0) {
+                    log('popup-comm', 'SessionStorage OAuth 키:', 'info');
+                    oauthKeys.forEach(key => {
+                        const value = sessionStorage.getItem(key);
+                        log('popup-comm', `  ${key}: ${value?.substring(0, 50)}...`, 'info');
+                    });
+                }
+            };
+            
+            // Check every second
+            const intervalId = setInterval(checkSessionStorage, 1000);
+            
+            log('popup-comm', '팝업 통신 모니터링 시작...', 'info');
+            log('popup-comm', 'PostMessage, BroadcastChannel, SessionStorage를 모니터링합니다', 'info');
+            
+            // Clean up after 30 seconds
+            setTimeout(() => {
+                clearInterval(intervalId);
+                window.removeEventListener('message', messageHandler);
+                channel.close();
+                log('popup-comm', '모니터링 종료', 'warning');
+            }, 30000);
+        }
+
+        function clearTestData() {
+            // Clear OAuth-related sessionStorage
+            const keysToRemove = Object.keys(sessionStorage).filter(key => 
+                key.includes('oauth') || key.includes('auth')
+            );
+            keysToRemove.forEach(key => sessionStorage.removeItem(key));
+            
+            // Clear OAuth-related localStorage
+            const localKeysToRemove = Object.keys(localStorage).filter(key => 
+                key.includes('oauth') || key.includes('auth') || key.includes('token')
+            );
+            localKeysToRemove.forEach(key => localStorage.removeItem(key));
+            
+            log('popup-comm', `SessionStorage에서 ${keysToRemove.length}개 항목 삭제`, 'success');
+            log('popup-comm', `LocalStorage에서 ${localKeysToRemove.length}개 항목 삭제`, 'success');
+        }
+
+        async function testFullOAuthFlow(forceAccountSelection) {
+            const output = document.getElementById('oauth-flow');
+            output.innerHTML = '';
+            
+            log('oauth-flow', `OAuth 플로우 시작 (다른 사용자: ${forceAccountSelection})`, 'info');
+            
+            // Build OAuth URL
+            const params = forceAccountSelection 
+                ? { prompt: 'select_account', max_age: '0' } 
+                : {};
+            const authUrl = buildOAuthUrl(params);
+            
+            log('oauth-flow', 'OAuth URL:', 'info');
+            log('oauth-flow', authUrl, 'info');
+            
+            // Open popup
+            testPopup = window.open(authUrl, 'oauth_popup', 'width=600,height=700');
+            
+            if (!testPopup) {
+                log('oauth-flow', '팝업이 차단되었습니다!', 'error');
+                return;
+            }
+            
+            log('oauth-flow', '팝업이 열렸습니다. 응답 대기 중...', 'info');
+            
+            // Set up all communication channels
+            const messageHandler = (event) => {
+                if (event.data.type === 'oauth_complete' || event.data.type === 'OAUTH_COMPLETE') {
+                    log('oauth-flow', `OAuth 완료! (PostMessage)`, 'success');
+                    log('oauth-flow', `데이터: ${JSON.stringify(event.data)}`, 'info');
+                } else if (event.data.error) {
+                    log('oauth-flow', `OAuth 오류! (PostMessage): ${event.data.error}`, 'error');
+                    if (event.data.error === 'Account selection required') {
+                        log('oauth-flow', '백엔드가 계정 선택을 지원하지 않습니다', 'warning');
+                        log('oauth-flow', 'OAUTH_ACCOUNT_SELECTION_IMPLEMENTATION.md 참조', 'info');
+                    }
+                }
+            };
+            window.addEventListener('message', messageHandler);
+            
+            // Monitor popup
+            const popupInterval = setInterval(() => {
+                if (testPopup && testPopup.closed) {
+                    clearInterval(popupInterval);
+                    log('oauth-flow', '팝업이 닫혔습니다', 'warning');
+                    window.removeEventListener('message', messageHandler);
+                }
+            }, 500);
+            
+            // Check sessionStorage
+            const storageInterval = setInterval(() => {
+                const oauthSuccess = sessionStorage.getItem('oauth_success');
+                const oauthError = sessionStorage.getItem('oauth_error');
+                
+                if (oauthSuccess === 'true') {
+                    clearInterval(storageInterval);
+                    log('oauth-flow', 'OAuth 성공! (SessionStorage)', 'success');
+                    const tokenData = sessionStorage.getItem('oauth_token_data');
+                    if (tokenData) {
+                        log('oauth-flow', `토큰 데이터: ${tokenData.substring(0, 50)}...`, 'info');
+                    }
+                } else if (oauthError) {
+                    clearInterval(storageInterval);
+                    log('oauth-flow', `OAuth 오류! (SessionStorage): ${oauthError}`, 'error');
+                }
+            }, 500);
+            
+            // Timeout after 60 seconds
+            setTimeout(() => {
+                clearInterval(popupInterval);
+                clearInterval(storageInterval);
+                window.removeEventListener('message', messageHandler);
+                log('oauth-flow', '테스트 타임아웃 (60초)', 'warning');
+            }, 60000);
+        }
+    </script>
+</body>
+</html>

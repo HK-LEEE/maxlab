@@ -17,6 +17,30 @@ export interface OIDCClaims {
   is_admin?: boolean;       // Admin status
 }
 
+// MAX Platform Enhanced Claims
+export interface MAXPlatformClaims extends OIDCClaims {
+  // Group information
+  group_id?: string;        // Primary group ID
+  group_name?: string;      // Primary group name
+  
+  // Role information
+  role_id?: string;         // Role ID
+  role_name?: string;       // Role name
+  
+  // Permission information
+  permissions?: string[];   // Detailed permissions list
+  
+  // Additional information
+  department?: string;      // Department
+  position?: string;        // Position/Title
+  employee_id?: string;     // Employee ID
+  
+  // Authentication metadata
+  auth_time?: number;       // Time of authentication
+  acr?: string;             // Authentication Context Class Reference
+  amr?: string[];           // Authentication Methods References
+}
+
 export interface User {
   // Primary identifiers
   id?: string;

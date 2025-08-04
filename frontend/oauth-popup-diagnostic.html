@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Popup Diagnostic - Final Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #dcfce7; color: #16a34a; }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        .status.info { background: #dbeafe; color: #2563eb; }
+        .important {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .test-step {
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #e5e7eb;
+        }
+        .test-step.pending {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+        .test-step.active {
+            background: #dbeafe;
+            color: #2563eb;
+            border-color: #3b82f6;
+        }
+        .test-step.success {
+            background: #dcfce7;
+            color: #16a34a;
+            border-color: #22c55e;
+        }
+        .test-step.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #ef4444;
+        }
+        .summary {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 OAuth Popup Communication - Final Diagnostic</h1>
+        <p>This comprehensive test will diagnose exactly what happens during the OAuth popup flow.</p>
+        
+        <div class="important">
+            <h3>🎯 What This Test Does</h3>
+            <p>1. Creates proper OAuth flow state in React app format</p>
+            <p>2. Opens popup with diagnostic tracking enabled</p>
+            <p>3. Monitors ALL communication channels simultaneously</p>
+            <p>4. Shows exactly where the communication breaks down</p>
+            <p>5. Provides detailed logs for debugging</p>
+        </div>
+
+        <div class="status info" id="status">
+            Ready to start comprehensive diagnostic test
+        </div>
+
+        <div>
+            <button onclick="startFullDiagnostic()" id="diagnosticBtn">🚀 Start Full Diagnostic</button>
+            <button onclick="clearAllLogs()">🧹 Clear All Logs</button>
+            <button onclick="clearAllStorage()">🗑️ Clear All Storage</button>
+            <button onclick="simulateCallbackMessage()">📨 Simulate Callback Message</button>
+        </div>
+
+        <div class="test-grid" id="testProgress">
+            <div class="test-step pending" id="step1">
+                <div>⏳</div>
+                <div>1. Setup State</div>
+            </div>
+            <div class="test-step pending" id="step2">
+                <div>⏳</div>
+                <div>2. Open Popup</div>
+            </div>
+            <div class="test-step pending" id="step3">
+                <div>⏳</div>
+                <div>3. Callback Loads</div>
+            </div>
+            <div class="test-step pending" id="step4">
+                <div>⏳</div>
+                <div>4. Communication</div>
+            </div>
+        </div>
+
+        <h3>🔍 Real-Time Diagnostic Log</h3>
+        <div class="log" id="debug-log"></div>
+
+        <div class="summary" id="summary" style="display: none;">
+            <h3>📊 Test Summary</h3>
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let testState = {
+            setupComplete: false,
+            popupOpened: false,
+            callbackLoaded: false,
+            communicationReceived: false,
+            popup: null,
+            startTime: null,
+            messages: []
+        };
+
+        // Debug logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88',
+                'debug': '#88ff88',
+                'critical': '#ff8800'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        // Update test step status
+        function updateTestStep(stepNum, status) {
+            const step = document.getElementById(`step${stepNum}`);
+            if (!step) return;
+
+            step.className = `test-step ${status}`;
+            const icon = step.querySelector('div');
+            
+            switch (status) {
+                case 'active':
+                    icon.textContent = '🔄';
+                    break;
+                case 'success':
+                    icon.textContent = '✅';
+                    break;
+                case 'error':
+                    icon.textContent = '❌';
+                    break;
+                default:
+                    icon.textContent = '⏳';
+            }
+        }
+
+        // Status updates
+        function setStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // PKCE utilities
+        function generateCodeVerifier() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        // Setup comprehensive communication listeners
+        function setupCommunicationListeners() {
+            log('📡 Setting up comprehensive communication listeners...', 'info');
+
+            // PostMessage listener
+            window.addEventListener('message', (event) => {
+                const messageInfo = {
+                    timestamp: Date.now(),
+                    origin: event.origin,
+                    type: event.data?.type,
+                    data: event.data
+                };
+                
+                testState.messages.push(messageInfo);
+                
+                log(`📨 PostMessage received from ${event.origin}:`, 'info');
+                log(`   Type: ${event.data?.type}`, 'debug');
+                log(`   Data: ${JSON.stringify(event.data, null, 2)}`, 'debug');
+                
+                if (event.data?.type === 'POPUP_LOADED') {
+                    testState.callbackLoaded = true;
+                    updateTestStep(3, 'success');
+                    log('✅ POPUP_LOADED message received - callback page loaded successfully!', 'success');
+                } else if (event.data?.type === 'OAUTH_SUCCESS') {
+                    testState.communicationReceived = true;
+                    updateTestStep(4, 'success');
+                    log('✅ OAUTH_SUCCESS message received - communication successful!', 'success');
+                    finalizeDiagnostic('success');
+                } else if (event.data?.type === 'OAUTH_ERROR') {
+                    testState.communicationReceived = true;
+                    updateTestStep(4, 'error');
+                    log('❌ OAUTH_ERROR message received', 'error');
+                    log(`   Error: ${event.data.error}`, 'error');
+                    finalizeDiagnostic('error');
+                }
+            });
+
+            // BroadcastChannel listener
+            try {
+                const channel = new BroadcastChannel('oauth_channel');
+                channel.onmessage = (event) => {
+                    const messageInfo = {
+                        timestamp: Date.now(),
+                        origin: 'BroadcastChannel',
+                        type: event.data?.type,
+                        data: event.data
+                    };
+                    
+                    testState.messages.push(messageInfo);
+                    
+                    log(`📡 BroadcastChannel message received:`, 'info');
+                    log(`   Type: ${event.data?.type}`, 'debug');
+                    log(`   Data: ${JSON.stringify(event.data, null, 2)}`, 'debug');
+                    
+                    if (event.data?.type === 'POPUP_LOADED') {
+                        testState.callbackLoaded = true;
+                        updateTestStep(3, 'success');
+                        log('✅ POPUP_LOADED via BroadcastChannel - callback loaded!', 'success');
+                    } else if (event.data?.type === 'OAUTH_SUCCESS') {
+                        testState.communicationReceived = true;
+                        updateTestStep(4, 'success');
+                        log('✅ OAUTH_SUCCESS via BroadcastChannel!', 'success');
+                        finalizeDiagnostic('success');
+                    }
+                };
+                log('✅ BroadcastChannel listener setup', 'success');
+            } catch (e) {
+                log('❌ BroadcastChannel not supported', 'warn');
+            }
+
+            // SessionStorage polling with enhanced detection
+            let pollCount = 0;
+            const maxPolls = 1200; // 60 seconds (50ms * 1200)
+            
+            const pollInterval = setInterval(() => {
+                pollCount++;
+                
+                // Check for diagnostic callback loaded
+                const diagnosticLoaded = sessionStorage.getItem('oauth_diagnostic_loaded');
+                if (diagnosticLoaded && !testState.callbackLoaded) {
+                    try {
+                        const loadedData = JSON.parse(diagnosticLoaded);
+                        testState.callbackLoaded = true;
+                        updateTestStep(3, 'success');
+                        log('✅ POPUP_LOADED found in sessionStorage!', 'success');
+                        log(`   Data: ${JSON.stringify(loadedData, null, 2)}`, 'debug');
+                        sessionStorage.removeItem('oauth_diagnostic_loaded');
+                    } catch (e) {
+                        log('⚠️ Failed to parse diagnostic loaded data', 'warn');
+                    }
+                }
+
+                // Check for OAuth results
+                const keys = ['oauth_result', 'oauth_success', 'oauth_token_data', 'oauth_error', 'oauth_access_token'];
+                
+                for (const key of keys) {
+                    const value = sessionStorage.getItem(key);
+                    if (value) {
+                        const messageInfo = {
+                            timestamp: Date.now(),
+                            origin: 'SessionStorage',
+                            type: key,
+                            data: value
+                        };
+                        
+                        testState.messages.push(messageInfo);
+                        testState.communicationReceived = true;
+                        updateTestStep(4, 'success');
+                        
+                        log(`💾 OAuth result found in sessionStorage key: ${key}`, 'success');
+                        log(`   Value: ${value}`, 'debug');
+                        
+                        sessionStorage.removeItem(key);
+                        clearInterval(pollInterval);
+                        finalizeDiagnostic('success');
+                        return;
+                    }
+                }
+
+                // Stop polling after max attempts
+                if (pollCount >= maxPolls) {
+                    clearInterval(pollInterval);
+                    log('⏰ SessionStorage polling timeout (60s)', 'warn');
+                    if (!testState.communicationReceived) {
+                        updateTestStep(4, 'error');
+                        finalizeDiagnostic('timeout');
+                    }
+                }
+            }, 50);
+
+            log('✅ All communication listeners setup complete', 'success');
+        }
+
+        // Monitor popup window
+        function monitorPopup(popup) {
+            log('👁️ Starting popup monitoring...', 'info');
+
+            const checkInterval = setInterval(() => {
+                if (popup.closed) {
+                    log('🚪 Popup window was closed', 'info');
+                    clearInterval(checkInterval);
+                    
+                    if (!testState.communicationReceived) {
+                        log('⚠️ Popup closed but no communication was received', 'warn');
+                        updateTestStep(4, 'error');
+                        finalizeDiagnostic('popup_closed_no_communication');
+                    }
+                }
+            }, 1000);
+
+            // Send test messages to popup
+            setTimeout(() => {
+                if (!popup.closed) {
+                    try {
+                        popup.postMessage({ 
+                            type: 'PARENT_PING',
+                            timestamp: Date.now(),
+                            message: 'Ping from parent for diagnostic'
+                        }, '*');
+                        log('📤 Sent PARENT_PING to popup', 'debug');
+                    } catch (e) {
+                        log(`❌ Failed to send PARENT_PING: ${e.message}`, 'error');
+                    }
+                }
+            }, 5000);
+
+            // Timeout after 5 minutes
+            setTimeout(() => {
+                if (!popup.closed) {
+                    log('⏰ Auto-closing popup after 5 minutes', 'warn');
+                    popup.close();
+                }
+                clearInterval(checkInterval);
+            }, 300000);
+        }
+
+        // Main diagnostic function
+        async function startFullDiagnostic() {
+            log('🚀 Starting comprehensive OAuth popup diagnostic...', 'critical');
+            setStatus('Running full diagnostic...', 'info');
+            
+            const diagnosticBtn = document.getElementById('diagnosticBtn');
+            diagnosticBtn.disabled = true;
+            diagnosticBtn.textContent = '🔄 Testing...';
+
+            // Reset test state
+            testState = {
+                setupComplete: false,
+                popupOpened: false,
+                callbackLoaded: false,
+                communicationReceived: false,
+                popup: null,
+                startTime: Date.now(),
+                messages: []
+            };
+
+            // Hide summary
+            document.getElementById('summary').style.display = 'none';
+
+            try {
+                // Step 1: Setup OAuth state
+                updateTestStep(1, 'active');
+                log('🔐 Step 1: Setting up OAuth flow state...', 'info');
+                
+                // Complete cleanup
+                const oauthKeys = Object.keys(sessionStorage).filter(key => 
+                    key.includes('oauth') || key.includes('_force_') || key.includes('state_')
+                );
+                oauthKeys.forEach(key => sessionStorage.removeItem(key));
+                log(`   Cleared ${oauthKeys.length} existing OAuth keys`, 'debug');
+
+                // Generate OAuth parameters
+                const state = generateCodeVerifier();
+                const codeVerifier = generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateCodeVerifier();
+                const forceState = state + '_force_' + Date.now();
+
+                log(`   Generated state: ${state.substring(0, 8)}...`, 'debug');
+                log(`   Generated force state: ${forceState}`, 'debug');
+                log(`   Code verifier: ${codeVerifier.substring(0, 8)}...`, 'debug');
+
+                // Create OAuth flow state in React app format
+                const flowId = 'diagnostic_flow_' + Date.now();
+                const flowState = {
+                    state: state, // Original state for lookup
+                    codeVerifier: codeVerifier,
+                    nonce: nonce,
+                    flowId: flowId,
+                    flowType: 'popup',
+                    clientId: 'maxlab',
+                    redirectUri: `${window.location.origin}/oauth/callback`,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (15 * 60 * 1000),
+                    parentOrigin: window.location.origin,
+                    forceAccountSelection: true,
+                    status: 'in_progress',
+                    lastUpdated: Date.now()
+                };
+
+                // Store OAuth flow state
+                const stateKey = `oauth_flow_${flowId}`;
+                sessionStorage.setItem(stateKey, JSON.stringify(flowState));
+                
+                // Legacy format for backward compatibility
+                sessionStorage.setItem('oauth_state', forceState);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_force_account_selection', 'true');
+                sessionStorage.setItem('oauth_parent_origin', window.location.origin);
+
+                testState.setupComplete = true;
+                updateTestStep(1, 'success');
+                log('✅ Step 1 complete: OAuth flow state created', 'success');
+                log(`   Flow ID: ${flowId}`, 'debug');
+                log(`   State key: ${stateKey}`, 'debug');
+
+                // Step 2: Setup listeners and open popup
+                updateTestStep(2, 'active');
+                log('📡 Step 2: Setting up listeners and opening popup...', 'info');
+                
+                setupCommunicationListeners();
+
+                // Build OAuth URL with diagnostic flag
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: forceState,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'login',
+                    // CRITICAL: Add diagnostic flag
+                    diagnostic: 'true'
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`   Opening popup with URL: ${authUrl}`, 'debug');
+
+                // Open popup
+                const popup = window.open(
+                    authUrl,
+                    'oauth-comprehensive-diagnostic',
+                    'width=500,height=600,scrollbars=yes,resizable=yes,location=yes'
+                );
+
+                if (!popup) {
+                    throw new Error('Popup blocked by browser. Please allow popups and try again.');
+                }
+
+                testState.popup = popup;
+                testState.popupOpened = true;
+                updateTestStep(2, 'success');
+                log('✅ Step 2 complete: Popup opened successfully', 'success');
+
+                // Step 3: Wait for callback to load
+                updateTestStep(3, 'active');
+                log('⏳ Step 3: Waiting for OAuth callback page to load...', 'info');
+                
+                monitorPopup(popup);
+                setStatus('Popup opened - complete authentication and watch for communication...', 'info');
+
+                // Step 4 will be updated by message listeners
+                setTimeout(() => {
+                    if (!testState.callbackLoaded) {
+                        updateTestStep(3, 'error');
+                        log('❌ Step 3 timeout: Callback page did not load within expected time', 'error');
+                    }
+                }, 30000); // 30 second timeout for callback load
+
+            } catch (error) {
+                log(`❌ Diagnostic failed: ${error.message}`, 'error');
+                setStatus(`Error: ${error.message}`, 'error');
+                
+                updateTestStep(1, 'error');
+                updateTestStep(2, 'error');
+                updateTestStep(3, 'error');
+                updateTestStep(4, 'error');
+                
+                diagnosticBtn.disabled = false;
+                diagnosticBtn.textContent = '🚀 Start Full Diagnostic';
+            }
+        }
+
+        // Finalize diagnostic with summary
+        function finalizeDiagnostic(result) {
+            const endTime = Date.now();
+            const duration = endTime - testState.startTime;
+            
+            log(`🏁 Diagnostic completed: ${result}`, 'critical');
+            log(`   Duration: ${Math.round(duration / 1000)}s`, 'info');
+            log(`   Messages received: ${testState.messages.length}`, 'info');
+
+            // Update status
+            const diagnosticBtn = document.getElementById('diagnosticBtn');
+            diagnosticBtn.disabled = false;
+            diagnosticBtn.textContent = '🚀 Start Full Diagnostic';
+
+            // Generate summary
+            const summary = document.getElementById('summary');
+            const summaryContent = document.getElementById('summaryContent');
+            
+            let summaryHtml = `
+                <h4>Test Result: ${result}</h4>
+                <p><strong>Duration:</strong> ${Math.round(duration / 1000)} seconds</p>
+                <p><strong>Messages Received:</strong> ${testState.messages.length}</p>
+                <p><strong>Setup Complete:</strong> ${testState.setupComplete ? '✅' : '❌'}</p>
+                <p><strong>Popup Opened:</strong> ${testState.popupOpened ? '✅' : '❌'}</p>
+                <p><strong>Callback Loaded:</strong> ${testState.callbackLoaded ? '✅' : '❌'}</p>
+                <p><strong>Communication Received:</strong> ${testState.communicationReceived ? '✅' : '❌'}</p>
+            `;
+
+            if (testState.messages.length > 0) {
+                summaryHtml += '<h4>Messages Received:</h4><ul>';
+                testState.messages.forEach((msg, i) => {
+                    summaryHtml += `<li><strong>${msg.origin}:</strong> ${msg.type} (${new Date(msg.timestamp).toLocaleTimeString()})</li>`;
+                });
+                summaryHtml += '</ul>';
+            }
+
+            // Recommendations
+            summaryHtml += '<h4>Recommendations:</h4><ul>';
+            if (!testState.callbackLoaded) {
+                summaryHtml += '<li>❌ Callback page did not load - check OAuth server and routing</li>';
+            }
+            if (!testState.communicationReceived && testState.callbackLoaded) {
+                summaryHtml += '<li>❌ Callback loaded but no messages sent - communication issue in callback page</li>';
+            }
+            if (testState.communicationReceived) {
+                summaryHtml += '<li>✅ Communication working - OAuth flow should be functional</li>';
+            }
+            summaryHtml += '</ul>';
+
+            summaryContent.innerHTML = summaryHtml;
+            summary.style.display = 'block';
+
+            // Set final status
+            const statusMap = {
+                'success': 'All tests passed - OAuth communication working!',
+                'error': 'OAuth error received - check server configuration',
+                'timeout': 'Communication timeout - callback may not be sending messages',
+                'popup_closed_no_communication': 'Popup closed without communication - likely callback issue'
+            };
+
+            setStatus(statusMap[result] || `Test completed: ${result}`, result === 'success' ? 'success' : 'error');
+        }
+
+        // Simulate callback message (for testing)
+        function simulateCallbackMessage() {
+            log('🧪 Simulating OAuth callback message...', 'debug');
+            
+            const successMessage = {
+                type: 'OAUTH_SUCCESS',
+                timestamp: Date.now(),
+                token: 'simulated_token_' + Date.now(),
+                tokenData: {
+                    access_token: 'simulated_access_token',
+                    token_type: 'Bearer',
+                    expires_in: 3600
+                }
+            };
+
+            window.postMessage(successMessage, window.location.origin);
+            log('📤 Simulated OAuth success message sent', 'success');
+        }
+
+        // Clear logs
+        function clearAllLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            log('🧹 All logs cleared', 'info');
+        }
+
+        // Clear all storage
+        function clearAllStorage() {
+            const sessionKeys = Object.keys(sessionStorage);
+            const localKeys = Object.keys(localStorage);
+            
+            sessionKeys.forEach(key => sessionStorage.removeItem(key));
+            localKeys.forEach(key => localStorage.removeItem(key));
+            
+            log(`🧹 Cleared all storage: ${sessionKeys.length} session + ${localKeys.length} local keys`, 'info');
+            setStatus('All storage cleared', 'info');
+        }
+
+        // Initialize
+        log('🚀 OAuth Popup Comprehensive Diagnostic initialized', 'critical');
+        log('📋 Configuration:', 'debug');
+        log(`   OAuth Server: http://localhost:8000`, 'debug');
+        log(`   Backend API: http://localhost:8010`, 'debug');
+        log(`   Client ID: maxlab`, 'debug');
+        log(`   Redirect URI: ${window.location.origin}/oauth/callback`, 'debug');
+        setStatus('Ready to start comprehensive diagnostic', 'info');
+    </script>
+</body>
+</html>

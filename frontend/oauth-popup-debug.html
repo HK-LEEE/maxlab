@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Popup Debug Tool</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success { background: #dcfce7; color: #16a34a; }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        .status.info { background: #dbeafe; color: #2563eb; }
+        .config {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #3b82f6;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 OAuth Popup Debug Tool</h1>
+        <p>This tool helps debug OAuth popup communication issues for "다른 사용자로 로그인" functionality.</p>
+        
+        <div class="config">
+            <h3>Configuration</h3>
+            <div id="config-display"></div>
+        </div>
+
+        <div class="status info" id="status">
+            Ready to test OAuth popup flow
+        </div>
+
+        <div>
+            <button onclick="testOAuthConfig()">Test Backend Config</button>
+            <button onclick="testPopupOAuth()">Test Popup OAuth</button>
+            <button onclick="testForceAccountSelection()">Test 다른 사용자로 로그인</button>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <button onclick="clearStorage()">Clear Storage</button>
+        </div>
+
+        <h3>Live Debug Log</h3>
+        <div class="log" id="debug-log"></div>
+
+        <h3>Communication Test</h3>
+        <div id="comm-test"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const config = {
+            authServerUrl: 'http://localhost:8000',
+            backendApiUrl: 'http://localhost:8010',
+            clientId: 'maxlab',
+            redirectUri: `${window.location.origin}/oauth/callback`,
+            currentOrigin: window.location.origin
+        };
+
+        // Display configuration
+        document.getElementById('config-display').innerHTML = `
+            <pre>${JSON.stringify(config, null, 2)}</pre>
+        `;
+
+        // Debug logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(message);
+        }
+
+        // Status updates
+        function setStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Test backend OAuth configuration
+        async function testOAuthConfig() {
+            log('🔧 Testing backend OAuth configuration...', 'info');
+            setStatus('Testing backend configuration...', 'info');
+            
+            try {
+                const response = await fetch(`${config.backendApiUrl}/api/oauth/validate-config`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Backend OAuth config test successful', 'success');
+                    log(`📋 Config: ${JSON.stringify(data, null, 2)}`, 'info');
+                    setStatus('Backend configuration valid', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`❌ Backend OAuth config test failed: ${error.message}`, 'error');
+                setStatus(`Backend configuration error: ${error.message}`, 'error');
+            }
+        }
+
+        // Generate PKCE parameters
+        function generateCodeVerifier() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        // Test basic popup OAuth
+        async function testPopupOAuth() {
+            log('🔐 Testing basic popup OAuth...', 'info');
+            setStatus('Testing basic popup OAuth...', 'info');
+            
+            try {
+                // Generate OAuth parameters
+                const state = generateCodeVerifier();
+                const codeVerifier = generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateCodeVerifier();
+
+                // Store for callback
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+
+                log(`📋 OAuth Parameters Generated:`, 'info');
+                log(`   State: ${state.substring(0, 8)}...`, 'info');
+                log(`   Code Verifier: ${codeVerifier.substring(0, 8)}...`, 'info');
+                log(`   Code Challenge: ${codeChallenge.substring(0, 8)}...`, 'info');
+                log(`   Nonce: ${nonce.substring(0, 8)}...`, 'info');
+
+                // Build OAuth URL
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: config.clientId,
+                    redirect_uri: config.redirectUri,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce
+                });
+
+                const authUrl = `${config.authServerUrl}/api/oauth/authorize?${params}`;
+                log(`🔗 OAuth URL: ${authUrl}`, 'info');
+
+                // Setup message listeners
+                setupMessageListeners();
+
+                // Open popup
+                const popup = window.open(authUrl, 'oauth-popup', 'width=500,height=600,scrollbars=yes,resizable=yes');
+                
+                if (!popup) {
+                    throw new Error('Popup blocked by browser');
+                }
+
+                log('🪟 Popup opened successfully', 'success');
+                setStatus('Popup opened - waiting for response...', 'info');
+
+                // Monitor popup
+                monitorPopup(popup);
+
+            } catch (error) {
+                log(`❌ Basic popup OAuth test failed: ${error.message}`, 'error');
+                setStatus(`Popup OAuth error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test forced account selection (different user login)
+        async function testForceAccountSelection() {
+            log('🔄 Testing forced account selection (다른 사용자로 로그인)...', 'info');
+            setStatus('Testing different user login...', 'info');
+            
+            try {
+                // Clear previous OAuth state
+                const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+                oauthKeys.forEach(key => sessionStorage.removeItem(key));
+                log(`🧹 Cleared ${oauthKeys.length} OAuth sessionStorage keys`, 'info');
+
+                // Generate OAuth parameters with force flag
+                const state = generateCodeVerifier();
+                const codeVerifier = generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateCodeVerifier();
+
+                // Add force pattern to state
+                const forceState = state + '_force_' + Date.now();
+
+                // Store for callback
+                sessionStorage.setItem('oauth_state', forceState);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_force_account_selection', 'true');
+
+                log(`📋 Force OAuth Parameters Generated:`, 'info');
+                log(`   Original State: ${state.substring(0, 8)}...`, 'info');
+                log(`   Force State: ${forceState}`, 'info');
+                log(`   Code Verifier: ${codeVerifier.substring(0, 8)}...`, 'info');
+                log(`   Force Account Selection: true`, 'info');
+
+                // Build OAuth URL with force parameters
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: config.clientId,
+                    redirect_uri: config.redirectUri,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: forceState,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'login' // Force re-authentication
+                });
+
+                const authUrl = `${config.authServerUrl}/api/oauth/authorize?${params}`;
+                log(`🔗 Force OAuth URL: ${authUrl}`, 'info');
+
+                // Setup enhanced message listeners
+                setupMessageListeners(true);
+
+                // Open popup
+                const popup = window.open(authUrl, 'oauth-popup-force', 'width=500,height=600,scrollbars=yes,resizable=yes');
+                
+                if (!popup) {
+                    throw new Error('Popup blocked by browser');
+                }
+
+                log('🪟 Force account selection popup opened successfully', 'success');
+                setStatus('Force account selection popup opened - waiting for response...', 'info');
+
+                // Monitor popup with enhanced logging
+                monitorPopup(popup, true);
+
+            } catch (error) {
+                log(`❌ Force account selection test failed: ${error.message}`, 'error');
+                setStatus(`Force account selection error: ${error.message}`, 'error');
+            }
+        }
+
+        // Setup message listeners
+        function setupMessageListeners(enhanced = false) {
+            log('📡 Setting up message listeners...', 'info');
+
+            // PostMessage listener
+            window.addEventListener('message', (event) => {
+                log(`📨 Received PostMessage: ${JSON.stringify(event.data)}`, 'info');
+                log(`   Origin: ${event.origin}`, 'info');
+                log(`   Source: ${event.source ? 'popup' : 'unknown'}`, 'info');
+
+                if (event.data && event.data.type) {
+                    handleOAuthMessage(event.data);
+                }
+            });
+
+            // BroadcastChannel listener
+            try {
+                const channel = new BroadcastChannel('oauth_channel');
+                channel.onmessage = (event) => {
+                    log(`📡 Received BroadcastChannel message: ${JSON.stringify(event.data)}`, 'info');
+                    if (event.data && event.data.type) {
+                        handleOAuthMessage(event.data);
+                    }
+                };
+                log('✅ BroadcastChannel listener setup complete', 'success');
+            } catch (e) {
+                log('❌ BroadcastChannel not supported', 'warn');
+            }
+
+            // SessionStorage polling
+            if (enhanced) {
+                log('🔄 Starting enhanced sessionStorage polling...', 'info');
+                const pollInterval = setInterval(() => {
+                    const keys = ['oauth_result', 'oauth_success', 'oauth_token_data', 'oauth_error'];
+                    
+                    for (const key of keys) {
+                        const value = sessionStorage.getItem(key);
+                        if (value) {
+                            try {
+                                const data = JSON.parse(value);
+                                log(`💾 SessionStorage detected: ${key} = ${JSON.stringify(data)}`, 'success');
+                                handleOAuthMessage(data);
+                                sessionStorage.removeItem(key);
+                                clearInterval(pollInterval);
+                                return;
+                            } catch (e) {
+                                log(`⚠️ Invalid sessionStorage data in ${key}: ${value}`, 'warn');
+                            }
+                        }
+                    }
+                }, 100);
+
+                // Stop polling after 60 seconds
+                setTimeout(() => {
+                    clearInterval(pollInterval);
+                    log('⏰ SessionStorage polling timeout (60s)', 'warn');
+                }, 60000);
+            }
+        }
+
+        // Handle OAuth messages
+        function handleOAuthMessage(data) {
+            log(`🎯 Processing OAuth message: ${JSON.stringify(data)}`, 'info');
+
+            if (data.type === 'OAUTH_SUCCESS') {
+                log('✅ OAuth SUCCESS received!', 'success');
+                setStatus('OAuth authentication successful!', 'success');
+                
+                if (data.tokenData) {
+                    log(`🔑 Token received: ${data.tokenData.access_token?.substring(0, 20)}...`, 'success');
+                    log(`   Token Type: ${data.tokenData.token_type}`, 'info');
+                    log(`   Expires In: ${data.tokenData.expires_in}`, 'info');
+                    log(`   Has Refresh Token: ${!!data.tokenData.refresh_token}`, 'info');
+                    log(`   Has ID Token: ${!!data.tokenData.id_token}`, 'info');
+                }
+
+                // Send acknowledgment
+                try {
+                    const ackChannel = new BroadcastChannel('oauth_channel');
+                    ackChannel.postMessage({ type: 'OAUTH_ACK' });
+                    ackChannel.close();
+                    log('📤 Acknowledgment sent via BroadcastChannel', 'success');
+                } catch (e) {
+                    log('❌ Failed to send BroadcastChannel acknowledgment', 'error');
+                }
+
+                // Also try sessionStorage acknowledgment
+                sessionStorage.setItem('oauth_ack', 'true');
+                log('📤 Acknowledgment sent via sessionStorage', 'success');
+
+            } else if (data.type === 'OAUTH_ERROR') {
+                log('❌ OAuth ERROR received!', 'error');
+                log(`   Error: ${data.error}`, 'error');
+                if (data.details) {
+                    log(`   Details: ${JSON.stringify(data.details)}`, 'error');
+                }
+                setStatus(`OAuth error: ${data.error}`, 'error');
+            }
+        }
+
+        // Monitor popup window
+        function monitorPopup(popup, enhanced = false) {
+            log('👁️ Starting popup monitoring...', 'info');
+
+            const checkInterval = setInterval(() => {
+                if (popup.closed) {
+                    log('🚪 Popup window closed', 'info');
+                    clearInterval(checkInterval);
+                    
+                    // Check if we received a success response
+                    const hasToken = sessionStorage.getItem('oauth_access_token');
+                    if (hasToken) {
+                        log('✅ Token found in sessionStorage after popup close', 'success');
+                        setStatus('Authentication completed successfully', 'success');
+                    } else {
+                        log('⚠️ No token found after popup close', 'warn');
+                        setStatus('Popup closed without successful authentication', 'warn');
+                    }
+                }
+            }, 500);
+
+            // Enhanced monitoring for force account selection
+            if (enhanced) {
+                setTimeout(() => {
+                    if (!popup.closed) {
+                        log('⏰ Popup still open after 30 seconds', 'info');
+                        
+                        // Try to send a test message to popup
+                        try {
+                            popup.postMessage({ type: 'PING' }, '*');
+                            log('📤 Test PING sent to popup', 'info');
+                        } catch (e) {
+                            log('❌ Failed to send test message to popup', 'error');
+                        }
+                    }
+                }, 30000);
+            }
+
+            // Auto-cleanup after 5 minutes
+            setTimeout(() => {
+                if (!popup.closed) {
+                    log('⏰ Auto-closing popup after 5 minutes', 'warn');
+                    popup.close();
+                }
+                clearInterval(checkInterval);
+            }, 300000);
+        }
+
+        // Clear logs
+        function clearLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            log('🧹 Debug logs cleared', 'info');
+        }
+
+        // Clear storage
+        function clearStorage() {
+            const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+            oauthKeys.forEach(key => sessionStorage.removeItem(key));
+            
+            const localKeys = Object.keys(localStorage).filter(key => 
+                key.includes('oauth') || key.includes('token') || key.includes('auth')
+            );
+            localKeys.forEach(key => localStorage.removeItem(key));
+            
+            log(`🧹 Cleared ${oauthKeys.length} sessionStorage keys and ${localKeys.length} localStorage keys`, 'info');
+            setStatus('Storage cleared', 'info');
+        }
+
+        // Initialize
+        log('🚀 OAuth Popup Debug Tool initialized', 'info');
+        log(`📋 Configuration loaded: ${JSON.stringify(config)}`, 'info');
+
+        // Auto-test backend config on load
+        setTimeout(testOAuthConfig, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Complete Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+        .section { margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f5f5f5; padding: 15px; overflow-x: auto; border-radius: 4px; font-size: 12px; }
+        .log { background: #f0f0f0; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        .warning { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .flow-step { padding: 10px; margin: 5px 0; border-left: 3px solid #007bff; background: #f8f9fa; }
+        .flow-step.completed { border-color: #28a745; background: #d4edda; }
+        .flow-step.current { border-color: #ffc107; background: #fff3cd; }
+        .flow-step.error { border-color: #dc3545; background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>OAuth 전체 플로우 테스트</h1>
+    
+    <div class="warning">
+        <strong>이 테스트는 프론트엔드의 OAuth return 처리가 제대로 작동하는지 확인합니다.</strong>
+    </div>
+    
+    <div class="section">
+        <h2>1. OAuth Return Flow 시뮬레이션</h2>
+        <p>OAuth 서버가 로그인 페이지로 리다이렉트하는 것을 시뮬레이션합니다.</p>
+        <button onclick="simulateOAuthReturn()">OAuth Return 시뮬레이션</button>
+        <div class="log" id="oauth-return-log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. 플로우 추적</h2>
+        <div id="flow-tracker">
+            <div class="flow-step" id="step-1">1. OAuth 요청 (prompt=login)</div>
+            <div class="flow-step" id="step-2">2. 세션 삭제 및 로그인 페이지로 리다이렉트</div>
+            <div class="flow-step" id="step-3">3. 로그인 페이지에서 oauth_return 파싱</div>
+            <div class="flow-step" id="step-4">4. 사용자 로그인</div>
+            <div class="flow-step" id="step-5">5. 로그인 성공 후 OAuth authorize로 리다이렉트</div>
+            <div class="flow-step" id="step-6">6. Authorization code 생성</div>
+            <div class="flow-step" id="step-7">7. Callback URL로 최종 리다이렉트</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>3. 수동 테스트</h2>
+        <button onclick="manualTest()">수동 플로우 테스트</button>
+        <div class="log" id="manual-test-log"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const typeClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<span class="${typeClass}">${timestamp} - ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function updateFlowStep(stepId, status) {
+            const step = document.getElementById(stepId);
+            step.classList.remove('completed', 'current', 'error');
+            step.classList.add(status);
+        }
+
+        function simulateOAuthReturn() {
+            const logEl = document.getElementById('oauth-return-log');
+            logEl.innerHTML = '';
+            
+            log('oauth-return-log', '=== OAuth Return Flow 시뮬레이션 시작 ===', 'success');
+            
+            // Step 1: OAuth 파라미터 생성
+            updateFlowStep('step-1', 'completed');
+            const oauthParams = {
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: 'test_' + Date.now(),
+                code_challenge: generateRandomString(128),
+                code_challenge_method: 'S256',
+                nonce: generateRandomString(32),
+                prompt: 'login',
+                max_age: '0'
+            };
+            
+            log('oauth-return-log', 'OAuth 파라미터 생성:', 'info');
+            log('oauth-return-log', JSON.stringify(oauthParams, null, 2), 'info');
+            
+            // Step 2: oauth_return 생성
+            updateFlowStep('step-2', 'completed');
+            const oauthReturn = encodeURIComponent(JSON.stringify(oauthParams));
+            const loginUrl = `http://localhost:3010/login?oauth_return=${oauthReturn}&force_login=true`;
+            
+            log('oauth-return-log', '\n로그인 페이지 URL:', 'success');
+            log('oauth-return-log', loginUrl.substring(0, 150) + '...', 'info');
+            
+            // SessionStorage에 상태 저장
+            updateFlowStep('step-3', 'current');
+            sessionStorage.setItem('oauth_state', oauthParams.state);
+            sessionStorage.setItem('oauth_code_verifier', oauthParams.code_challenge);
+            sessionStorage.setItem('oauth_nonce', oauthParams.nonce);
+            
+            log('oauth-return-log', '\nSessionStorage에 저장된 값:', 'info');
+            log('oauth-return-log', `state: ${oauthParams.state}`, 'info');
+            log('oauth-return-log', `code_verifier: ${oauthParams.code_challenge.substring(0, 50)}...`, 'info');
+            
+            // 버튼 생성
+            const buttonDiv = document.createElement('div');
+            buttonDiv.style.marginTop = '10px';
+            buttonDiv.innerHTML = `
+                <button onclick="window.location.href='${loginUrl}'">로그인 페이지로 이동</button>
+                <button onclick="window.open('${loginUrl}', '_blank')">새 탭에서 열기</button>
+            `;
+            document.getElementById('oauth-return-log').appendChild(buttonDiv);
+            
+            log('oauth-return-log', '\n예상되는 동작:', 'success');
+            log('oauth-return-log', '1. 로그인 페이지에서 oauth_return 파라미터 감지', 'info');
+            log('oauth-return-log', '2. "다른 계정으로 로그인하려면..." 메시지 표시', 'info');
+            log('oauth-return-log', '3. 로그인 성공 시 /api/oauth/authorize로 자동 리다이렉트', 'info');
+            log('oauth-return-log', '4. OAuth 플로우 완료 후 callback URL로 리다이렉트', 'info');
+        }
+
+        function manualTest() {
+            const logEl = document.getElementById('manual-test-log');
+            logEl.innerHTML = '';
+            
+            log('manual-test-log', '=== 수동 플로우 테스트 가이드 ===', 'success');
+            
+            log('manual-test-log', '\n1단계: 로그아웃 상태 확인', 'info');
+            log('manual-test-log', '- MAX Lab (localhost:3010)에서 로그아웃', 'info');
+            log('manual-test-log', '- MAX Platform (localhost:8000)에서도 로그아웃', 'info');
+            
+            log('manual-test-log', '\n2단계: OAuth 시작', 'info');
+            log('manual-test-log', '- MAX Lab 로그인 페이지에서 "다른 사용자로 로그인" 클릭', 'info');
+            log('manual-test-log', '- OAuth 팝업이 열리고 로그인 페이지로 리다이렉트되는지 확인', 'info');
+            
+            log('manual-test-log', '\n3단계: 로그인', 'info');
+            log('manual-test-log', '- 로그인 페이지에 oauth_return 파라미터가 있는지 확인', 'info');
+            log('manual-test-log', '- 로그인 진행', 'info');
+            
+            log('manual-test-log', '\n4단계: OAuth 플로우 완료', 'info');
+            log('manual-test-log', '- 로그인 후 자동으로 OAuth authorize로 리다이렉트되는지 확인', 'info');
+            log('manual-test-log', '- 최종적으로 callback URL로 리다이렉트되는지 확인', 'info');
+            log('manual-test-log', '- 팝업이 닫히고 메인 페이지가 업데이트되는지 확인', 'info');
+            
+            log('manual-test-log', '\n현재 SessionStorage 상태:', 'success');
+            const oauthKeys = Object.keys(sessionStorage).filter(key => key.includes('oauth'));
+            if (oauthKeys.length === 0) {
+                log('manual-test-log', 'OAuth 관련 데이터 없음', 'error');
+            } else {
+                oauthKeys.forEach(key => {
+                    const value = sessionStorage.getItem(key);
+                    log('manual-test-log', `${key}: ${value?.substring(0, 50)}...`, 'info');
+                });
+            }
+        }
+
+        // 페이지 로드 시 현재 상태 확인
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('oauth_return')) {
+                updateFlowStep('step-3', 'current');
+                alert('OAuth return 파라미터가 감지되었습니다!');
+            }
+        });
+    </script>
+</body>
+</html>

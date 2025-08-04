@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Communication Final Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .critical {
+            background: #fee2e2;
+            border: 3px solid #dc2626;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #dcfce7;
+            border: 3px solid #16a34a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .emergency { background: #dc2626; }
+        .emergency:hover { background: #b91c1c; }
+        .test-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .test-result {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .test-result.pass {
+            background: #dcfce7;
+            color: #16a34a;
+            border: 2px solid #22c55e;
+        }
+        .test-result.fail {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #ef4444;
+        }
+        .test-result.pending {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 OAuth Communication Final Test</h1>
+        <p>이 테스트는 OAuth 팝업 통신 문제의 정확한 원인을 찾기 위한 최종 진단 도구입니다.</p>
+    </div>
+
+    <div class="critical">
+        <h2>🎯 현재 문제 상황</h2>
+        <p><strong>현상:</strong> "다른 사용자로 로그인" 클릭 시 팝업이 열리고 인증은 완료되지만, 팝업이 닫히지 않고 메인 페이지로 전환되지 않음</p>
+        <p><strong>추정 원인:</strong> OAuth 콜백 페이지에서 부모 윈도우로 메시지를 전송하지 못하거나, 부모 윈도우에서 메시지를 받지 못함</p>
+        <p><strong>테스트 목표:</strong> 정확히 어느 단계에서 통신이 실패하는지 확인</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 테스트 단계</h2>
+        <div class="test-results" id="testResults">
+            <div class="test-result pending" id="step1">
+                <div>⏳</div>
+                <div>1. OAuth 상태 생성</div>
+            </div>
+            <div class="test-result pending" id="step2">
+                <div>⏳</div>
+                <div>2. 팝업 열기</div>
+            </div>
+            <div class="test-result pending" id="step3">
+                <div>⏳</div>
+                <div>3. 콜백 페이지 로드</div>
+            </div>
+            <div class="test-result pending" id="step4">
+                <div>⏳</div>
+                <div>4. 메시지 통신</div>
+            </div>
+            <div class="test-result pending" id="step5">
+                <div>⏳</div>
+                <div>5. 팝업 닫기</div>
+            </div>
+        </div>
+
+        <button onclick="startCriticalTest()" id="testBtn">🚨 중요 테스트 시작</button>
+        <button onclick="forceClosePopup()" class="emergency">🚪 강제로 팝업 닫기</button>
+        <button onclick="clearAllData()">🧹 모든 데이터 삭제</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 실시간 분석 로그</h2>
+        <div class="log" id="debug-log"></div>
+    </div>
+
+    <script>
+        let testState = {
+            popup: null,
+            startTime: null,
+            steps: {
+                stateCreated: false,
+                popupOpened: false,
+                callbackLoaded: false,
+                messageReceived: false,
+                popupClosed: false
+            },
+            messages: [],
+            timeouts: []
+        };
+
+        // 로그 함수
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('.')[0];
+            const logElement = document.getElementById('debug-log');
+            const typeColors = {
+                'info': '#00ff00',
+                'warn': '#ffff00',
+                'error': '#ff0000',
+                'success': '#00ff88',
+                'debug': '#88ff88',
+                'critical': '#ff8800'
+            };
+            
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.innerHTML += `<span style="color: ${typeColors[type] || '#00ff00'}">${logEntry}</span>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        // 테스트 단계 업데이트
+        function updateStep(stepNum, status) {
+            const step = document.getElementById(`step${stepNum}`);
+            if (!step) return;
+
+            const icons = { pending: '⏳', pass: '✅', fail: '❌' };
+            step.className = `test-result ${status}`;
+            step.querySelector('div').textContent = icons[status] || '⏳';
+        }
+
+        // PKCE 유틸리티
+        function generateCodeVerifier() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        // 통신 리스너 설정
+        function setupListeners() {
+            log('📡 모든 통신 채널 리스너 설정 중...', 'critical');
+
+            // PostMessage 리스너
+            window.addEventListener('message', (event) => {
+                log(`📨 PostMessage 수신: ${event.origin}`, 'info');
+                log(`   타입: ${event.data?.type}`, 'debug');
+                log(`   데이터: ${JSON.stringify(event.data, null, 2)}`, 'debug');
+
+                testState.messages.push({
+                    timestamp: Date.now(),
+                    channel: 'PostMessage',
+                    origin: event.origin,
+                    data: event.data
+                });
+
+                if (event.data?.type === 'POPUP_LOADED') {
+                    testState.steps.callbackLoaded = true;
+                    updateStep(3, 'pass');
+                    log('✅ 콜백 페이지 로드 확인됨!', 'success');
+                } else if (event.data?.type === 'OAUTH_SUCCESS') {
+                    testState.steps.messageReceived = true;
+                    updateStep(4, 'pass');
+                    log('✅ OAuth 성공 메시지 수신!', 'success');
+                    
+                    // 성공 시 팝업 닫기 시도
+                    if (testState.popup && !testState.popup.closed) {
+                        setTimeout(() => {
+                            testState.popup.close();
+                            log('🚪 팝업 닫기 시도됨', 'info');
+                        }, 2000);
+                    }
+                }
+            });
+
+            // BroadcastChannel 리스너
+            try {
+                const channel = new BroadcastChannel('oauth_channel');
+                channel.onmessage = (event) => {
+                    log(`📡 BroadcastChannel 메시지 수신`, 'info');
+                    log(`   타입: ${event.data?.type}`, 'debug');
+                    log(`   데이터: ${JSON.stringify(event.data, null, 2)}`, 'debug');
+
+                    testState.messages.push({
+                        timestamp: Date.now(),
+                        channel: 'BroadcastChannel',
+                        data: event.data
+                    });
+
+                    if (event.data?.type === 'POPUP_LOADED') {
+                        testState.steps.callbackLoaded = true;
+                        updateStep(3, 'pass');
+                        log('✅ BroadcastChannel을 통한 콜백 로드 확인!', 'success');
+                    } else if (event.data?.type === 'OAUTH_SUCCESS') {
+                        testState.steps.messageReceived = true;
+                        updateStep(4, 'pass');
+                        log('✅ BroadcastChannel을 통한 OAuth 성공!', 'success');
+                    }
+                };
+                log('✅ BroadcastChannel 리스너 활성화', 'success');
+            } catch (e) {
+                log('❌ BroadcastChannel 지원 안됨', 'warn');
+            }
+
+            // SessionStorage 폴링
+            let pollCount = 0;
+            const maxPolls = 2400; // 2분 (50ms * 2400)
+            
+            const pollInterval = setInterval(() => {
+                pollCount++;
+
+                // 진단 콜백 로드 확인
+                const diagnosticLoaded = sessionStorage.getItem('oauth_diagnostic_loaded');
+                if (diagnosticLoaded && !testState.steps.callbackLoaded) {
+                    testState.steps.callbackLoaded = true;
+                    updateStep(3, 'pass');
+                    log('✅ SessionStorage에서 콜백 로드 확인!', 'success');
+                    sessionStorage.removeItem('oauth_diagnostic_loaded');
+                }
+
+                // OAuth 결과 확인
+                const keys = ['oauth_result', 'oauth_success', 'oauth_token_data', 'oauth_access_token'];
+                for (const key of keys) {
+                    const value = sessionStorage.getItem(key);
+                    if (value) {
+                        testState.steps.messageReceived = true;
+                        updateStep(4, 'pass');
+                        log(`✅ SessionStorage에서 OAuth 결과 발견: ${key}`, 'success');
+                        log(`   값: ${value}`, 'debug');
+                        
+                        testState.messages.push({
+                            timestamp: Date.now(),
+                            channel: 'SessionStorage',
+                            key: key,
+                            data: value
+                        });
+
+                        sessionStorage.removeItem(key);
+                        clearInterval(pollInterval);
+                        return;
+                    }
+                }
+
+                if (pollCount >= maxPolls) {
+                    clearInterval(pollInterval);
+                    log('⏰ SessionStorage 폴링 타임아웃 (2분)', 'warn');
+                    if (!testState.steps.messageReceived) {
+                        updateStep(4, 'fail');
+                        log('❌ 어떤 채널로도 OAuth 메시지를 받지 못함', 'error');
+                    }
+                }
+            }, 50);
+
+            testState.timeouts.push(pollInterval);
+            log('✅ 모든 리스너 설정 완료', 'success');
+        }
+
+        // 팝업 모니터링
+        function monitorPopup(popup) {
+            log('👁️ 팝업 모니터링 시작...', 'info');
+
+            const monitorInterval = setInterval(() => {
+                if (popup.closed) {
+                    testState.steps.popupClosed = true;
+                    updateStep(5, 'pass');
+                    log('🚪 팝업이 닫혔습니다', 'info');
+                    clearInterval(monitorInterval);
+                    
+                    // 최종 결과 분석
+                    analyzeResults();
+                }
+            }, 1000);
+
+            testState.timeouts.push(monitorInterval);
+
+            // 팝업과 통신 테스트
+            setTimeout(() => {
+                if (!popup.closed) {
+                    try {
+                        popup.postMessage({
+                            type: 'PARENT_PING',
+                            timestamp: Date.now(),
+                            message: 'Parent window is ready'
+                        }, '*');
+                        log('📤 부모 윈도우에서 팝업으로 핑 전송', 'debug');
+                    } catch (e) {
+                        log(`❌ 팝업으로 메시지 전송 실패: ${e.message}`, 'error');
+                    }
+                }
+            }, 3000);
+
+            // 5분 후 강제 종료
+            setTimeout(() => {
+                if (!popup.closed) {
+                    log('⏰ 5분 후 팝업 자동 닫기', 'warn');
+                    popup.close();
+                }
+                clearInterval(monitorInterval);
+            }, 300000);
+        }
+
+        // 결과 분석
+        function analyzeResults() {
+            const duration = Date.now() - testState.startTime;
+            log(`🏁 테스트 완료 - 소요시간: ${Math.round(duration / 1000)}초`, 'critical');
+            log(`📊 총 메시지 수: ${testState.messages.length}`, 'info');
+
+            // 상세 분석
+            if (!testState.steps.callbackLoaded) {
+                log('❌ 문제 진단: 콜백 페이지가 로드되지 않음 - 라우팅 또는 서버 문제', 'error');
+            } else if (!testState.steps.messageReceived) {
+                log('❌ 문제 진단: 콜백 페이지는 로드되었으나 메시지 전송 안됨 - 콜백 페이지의 통신 코드 문제', 'error');
+            } else {
+                log('✅ 진단 결과: OAuth 통신이 정상 작동함', 'success');
+            }
+
+            // 메시지 상세 정보
+            if (testState.messages.length > 0) {
+                log('📋 수신된 메시지들:', 'info');
+                testState.messages.forEach((msg, i) => {
+                    log(`   ${i + 1}. [${msg.channel}] ${new Date(msg.timestamp).toLocaleTimeString()}: ${JSON.stringify(msg.data)}`, 'debug');
+                });
+            }
+
+            // 버튼 복원
+            const testBtn = document.getElementById('testBtn');
+            testBtn.disabled = false;
+            testBtn.textContent = '🚨 중요 테스트 시작';
+        }
+
+        // 메인 테스트 함수
+        async function startCriticalTest() {
+            log('🚨 OAuth 통신 중요 테스트 시작!', 'critical');
+            
+            const testBtn = document.getElementById('testBtn');
+            testBtn.disabled = true;
+            testBtn.textContent = '🔄 테스트 중...';
+
+            // 상태 초기화
+            testState = {
+                popup: null,
+                startTime: Date.now(),
+                steps: {
+                    stateCreated: false,
+                    popupOpened: false,
+                    callbackLoaded: false,
+                    messageReceived: false,
+                    popupClosed: false
+                },
+                messages: [],
+                timeouts: []
+            };
+
+            // 모든 단계를 pending으로 초기화
+            for (let i = 1; i <= 5; i++) {
+                updateStep(i, 'pending');
+            }
+
+            try {
+                // 1단계: OAuth 상태 생성
+                updateStep(1, 'pass');
+                log('🔐 1단계: OAuth 상태 생성...', 'info');
+                
+                // 기존 OAuth 데이터 정리
+                const keysToRemove = Object.keys(sessionStorage).filter(key => 
+                    key.includes('oauth') || key.includes('_force_') || key.includes('state_')
+                );
+                keysToRemove.forEach(key => sessionStorage.removeItem(key));
+                log(`   기존 OAuth 키 ${keysToRemove.length}개 삭제됨`, 'debug');
+
+                // OAuth 파라미터 생성
+                const state = generateCodeVerifier();
+                const codeVerifier = generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateCodeVerifier();
+                const forceState = state + '_force_' + Date.now();
+
+                // React 앱 형식으로 OAuth 플로우 상태 생성
+                const flowId = 'critical_test_' + Date.now();
+                const flowState = {
+                    state: state,
+                    codeVerifier: codeVerifier,
+                    nonce: nonce,
+                    flowId: flowId,
+                    flowType: 'popup',
+                    clientId: 'maxlab',
+                    redirectUri: `${window.location.origin}/oauth/callback`,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (15 * 60 * 1000),
+                    parentOrigin: window.location.origin,
+                    forceAccountSelection: true,
+                    status: 'in_progress',
+                    lastUpdated: Date.now()
+                };
+
+                // 상태 저장
+                sessionStorage.setItem(`oauth_flow_${flowId}`, JSON.stringify(flowState));
+                sessionStorage.setItem('oauth_state', forceState);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                sessionStorage.setItem('oauth_popup_mode', 'true');
+                sessionStorage.setItem('oauth_force_account_selection', 'true');
+                sessionStorage.setItem('oauth_parent_origin', window.location.origin);
+
+                testState.steps.stateCreated = true;
+                updateStep(1, 'pass');
+                log('✅ 1단계 완료: OAuth 상태 생성됨', 'success');
+
+                // 2단계: 리스너 설정 및 팝업 열기
+                log('📡 2단계: 리스너 설정 및 팝업 열기...', 'info');
+                setupListeners();
+
+                // OAuth URL 구성 (진단 플래그 포함)
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: 'maxlab',
+                    redirect_uri: `${window.location.origin}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: forceState,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce,
+                    prompt: 'login',
+                    diagnostic: 'true' // 진단 플래그 추가
+                });
+
+                const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+                log(`   OAuth URL: ${authUrl}`, 'debug');
+
+                // 팝업 열기
+                const popup = window.open(
+                    authUrl,
+                    'oauth-critical-test',
+                    'width=500,height=600,scrollbars=yes,resizable=yes,location=yes'
+                );
+
+                if (!popup) {
+                    throw new Error('팝업이 브라우저에 의해 차단되었습니다. 팝업을 허용해주세요.');
+                }
+
+                testState.popup = popup;
+                testState.steps.popupOpened = true;
+                updateStep(2, 'pass');
+                log('✅ 2단계 완료: 팝업 열림', 'success');
+
+                // 3, 4, 5단계는 리스너와 모니터링에 의해 처리됨
+                monitorPopup(popup);
+                log('⏳ 3-5단계: 콜백 로드 및 통신 대기 중...', 'info');
+
+                // 30초 후에도 콜백이 로드되지 않으면 실패 처리
+                setTimeout(() => {
+                    if (!testState.steps.callbackLoaded) {
+                        updateStep(3, 'fail');
+                        log('❌ 콜백 페이지 로드 타임아웃 (30초)', 'error');
+                    }
+                }, 30000);
+
+                // 60초 후에도 메시지가 없으면 실패 처리
+                setTimeout(() => {
+                    if (!testState.steps.messageReceived) {
+                        updateStep(4, 'fail');
+                        log('❌ OAuth 메시지 수신 타임아웃 (60초)', 'error');
+                    }
+                }, 60000);
+
+            } catch (error) {
+                log(`❌ 테스트 실패: ${error.message}`, 'error');
+                updateStep(1, 'fail');
+                updateStep(2, 'fail');
+                
+                testBtn.disabled = false;
+                testBtn.textContent = '🚨 중요 테스트 시작';
+            }
+        }
+
+        // 강제 팝업 닫기
+        function forceClosePopup() {
+            if (testState.popup && !testState.popup.closed) {
+                testState.popup.close();
+                log('🚪 팝업 강제로 닫음', 'warn');
+                testState.steps.popupClosed = true;
+                updateStep(5, 'pass');
+            } else {
+                log('⚠️ 닫을 팝업이 없음', 'warn');
+            }
+        }
+
+        // 모든 데이터 삭제
+        function clearAllData() {
+            // 타임아웃 정리
+            testState.timeouts.forEach(timeout => clearInterval(timeout));
+            testState.timeouts = [];
+
+            // 스토리지 정리
+            const sessionKeys = Object.keys(sessionStorage);
+            const localKeys = Object.keys(localStorage);
+            
+            sessionKeys.forEach(key => sessionStorage.removeItem(key));
+            localKeys.forEach(key => localStorage.removeItem(key));
+            
+            log(`🧹 모든 데이터 삭제: session ${sessionKeys.length}개, local ${localKeys.length}개`, 'info');
+        }
+
+        // 로그 삭제
+        function clearLogs() {
+            document.getElementById('debug-log').innerHTML = '';
+            log('🧹 로그 삭제됨', 'info');
+        }
+
+        // 초기화
+        log('🚀 OAuth 통신 최종 테스트 도구 초기화됨', 'critical');
+        log('📋 설정:', 'debug');
+        log(`   OAuth 서버: http://localhost:8000`, 'debug');
+        log(`   백엔드 API: http://localhost:8010`, 'debug');
+        log(`   리다이렉트 URI: ${window.location.origin}/oauth/callback`, 'debug');
+    </script>
+</body>
+</html>

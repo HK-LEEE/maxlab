@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Server Logout Helper</title>
+</head>
+<body>
+    <script>
+        // This page should be hosted on the OAuth server domain
+        // It helps clear OAuth server session cookies
+        
+        // Clear all cookies
+        document.cookie.split(";").forEach(c => {
+            const eqPos = c.indexOf("=");
+            const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        });
+        
+        // Notify parent window
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'OAUTH_LOGOUT_COMPLETE',
+                success: true
+            }, '*');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Debug Simple</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        button { padding: 10px; margin: 5px; }
+        #log { background: #f0f0f0; padding: 10px; margin-top: 20px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>OAuth 디버그 (간단 버전)</h1>
+    
+    <button onclick="testDirectOAuth()">직접 OAuth URL 테스트</button>
+    <button onclick="clearLog()">로그 삭제</button>
+    
+    <div id="log"></div>
+
+    <script>
+        function log(msg) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.textContent += `${time} - ${msg}\n`;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function testDirectOAuth() {
+            const state = 'test_' + Date.now() + '_force_' + Date.now();
+            const codeVerifier = generateRandomString(128);
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('oauth_state', state);
+            sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+            sessionStorage.setItem('oauth_force_account_selection', 'true');
+            
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: 'maxlab',
+                redirect_uri: 'http://localhost:3010/oauth/callback',
+                scope: 'openid profile email',
+                state: state,
+                code_challenge: codeVerifier,
+                code_challenge_method: 'S256',
+                prompt: 'login',
+                max_age: '0'
+            });
+            
+            const authUrl = `http://localhost:8000/api/oauth/authorize?${params}`;
+            
+            log('OAuth URL 생성됨:');
+            log(authUrl);
+            log('');
+            log('prompt=login 포함됨 ✓');
+            log('max_age=0 포함됨 ✓');
+            log('');
+            log('팝업 열기...');
+            
+            const popup = window.open(authUrl, 'oauth_test', 'width=600,height=700');
+            
+            if (!popup) {
+                log('❌ 팝업이 차단되었습니다!');
+                return;
+            }
+            
+            log('팝업이 열렸습니다. OAuth 서버 응답 대기 중...');
+            
+            // Monitor popup
+            let checkCount = 0;
+            const interval = setInterval(() => {
+                checkCount++;
+                
+                if (popup.closed) {
+                    clearInterval(interval);
+                    log('팝업이 닫혔습니다.');
+                    
+                    // Check results
+                    const error = sessionStorage.getItem('oauth_error');
+                    const success = sessionStorage.getItem('oauth_success');
+                    
+                    if (error) {
+                        log(`❌ OAuth 에러: ${error}`);
+                        const errorDesc = sessionStorage.getItem('oauth_error_description');
+                        if (errorDesc) {
+                            log(`에러 설명: ${errorDesc}`);
+                        }
+                    } else if (success) {
+                        log('✅ OAuth 성공!');
+                    } else {
+                        log('⚠️ 결과를 확인할 수 없습니다.');
+                    }
+                    
+                    return;
+                }
+                
+                // Try to check popup location (will fail for cross-origin)
+                try {
+                    const popupUrl = popup.location.href;
+                    if (popupUrl.includes('/oauth/callback')) {
+                        log(`콜백 URL 감지됨: ${popupUrl}`);
+                    }
+                } catch (e) {
+                    // Expected for cross-origin
+                }
+                
+                if (checkCount % 5 === 0) {
+                    log(`${checkCount}초 경과...`);
+                }
+                
+                if (checkCount > 60) {
+                    clearInterval(interval);
+                    log('타임아웃 (60초)');
+                }
+            }, 1000);
+            
+            // Also listen for messages
+            window.addEventListener('message', function handler(event) {
+                log(`PostMessage 수신: ${JSON.stringify(event.data)}`);
+                if (event.data.type === 'OAUTH_ERROR' || event.data.type === 'OAUTH_SUCCESS') {
+                    window.removeEventListener('message', handler);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

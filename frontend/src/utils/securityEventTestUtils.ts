@@ -427,10 +427,7 @@ export function registerSecurityEventTestHelpers(): void {
       logger: securityEventLogger
     };
     
-    console.log('🧪 Security event test helpers registered. Use window.securityEventTest in console:');
-    console.log('  - securityEventTest.comprehensive() - 종합 보안 이벤트 테스트');
-    console.log('  - securityEventTest.monitor(60000) - 실시간 이벤트 모니터링');
-    console.log('  - securityEventTest.logger.getQueueStatus() - 현재 큐 상태 확인');
+    // Debug utility console logs removed
   }
 }
 

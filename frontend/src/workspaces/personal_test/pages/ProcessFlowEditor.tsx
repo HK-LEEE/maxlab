@@ -14,6 +14,7 @@ import { EquipmentNode } from '../components/common/EquipmentNode';
 import { InstrumentNode } from '../components/common/InstrumentNode';
 import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
+import { CustomTableNode } from '../components/common/CustomTableNode';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { NodeConfigDialog } from '../components/common/NodeConfigDialog';
 import { TextConfigDialog } from '../components/common/TextConfigDialog';
@@ -77,12 +78,23 @@ const WrappedInstrumentNode = (props: any) => (
   </EquipmentNodeErrorBoundary>
 );
 
+// Wrapped table node with error boundary
+const WrappedCustomTableNode = (props: any) => (
+  <EquipmentNodeErrorBoundary 
+    nodeId={props.id} 
+    equipmentType="table"
+  >
+    <CustomTableNode {...props} />
+  </EquipmentNodeErrorBoundary>
+);
+
 // Define nodeTypes and edgeTypes outside component to avoid re-creation
 const nodeTypes = Object.freeze({
   equipment: WrappedEquipmentNode,
   group: WrappedGroupNode,
   text: WrappedTextNode,
   instrument: WrappedInstrumentNode,
+  table: WrappedCustomTableNode,
 });
 
 const edgeTypes = Object.freeze({
@@ -275,8 +287,15 @@ const ProcessFlowEditorContent: React.FC = () => {
 
   // 수동 저장 래퍼 (저장 시간 추적)
   const handleManualSave = useCallback(async () => {
-    // For new flows, show scope selection dialog
-    if (!currentFlow) {
+    // Debug log to help troubleshoot save behavior
+    console.log('Save button clicked:', {
+      hasCurrentFlow: !!currentFlow,
+      isImported: currentFlow?._isImported,
+      flowName: currentFlow?.name
+    });
+    
+    // For new flows or imported flows, show scope selection dialog
+    if (!currentFlow || currentFlow._isImported) {
       setPendingSaveAction('save');
       setShowScopeDialog(true);
       return;
@@ -288,16 +307,17 @@ const ProcessFlowEditorContent: React.FC = () => {
 
   // 새 버전으로 저장
   const handleSaveAsNewVersion = useCallback(async () => {
-    if (!currentFlow) {
-      // If no current flow, show scope dialog first
+    if (!currentFlow || currentFlow._isImported) {
+      // If no current flow or imported flow, show scope dialog first
       setPendingSaveAction('saveAsNew');
       setShowScopeDialog(true);
       return;
     }
 
     // First, try to save normally to ensure data is persisted
+    let savedFlow;
     try {
-      await saveFlow(false);
+      savedFlow = await saveFlow(false);
       setLastSaveTime(new Date());
       toast.success('Flow saved successfully', {
         duration: 3000,
@@ -314,8 +334,8 @@ const ProcessFlowEditorContent: React.FC = () => {
     const description = `Saved from editor at ${new Date().toLocaleString()}`;
     
     try {
-      // Attempting to create new version
-      const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/versions`, {
+      // Use the saved flow's ID for version creation
+      const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${savedFlow.id}/versions`, {
         name: versionName,
         description,
         flow_data: { nodes, edges, nodeSize }
@@ -376,11 +396,6 @@ const ProcessFlowEditorContent: React.FC = () => {
   }) => {
     setShowScopeDialog(false);
     
-    // Update flow name if changed
-    if (data.name !== flowName) {
-      setFlowName(data.name);
-    }
-    
     // Convert scope type to the format expected by saveFlow
     const scopeData = {
       scopeType: data.scopeType,
@@ -388,17 +403,39 @@ const ProcessFlowEditorContent: React.FC = () => {
       sharedWithWorkspace: data.scopeType === 'WORKSPACE'
     };
     
-    // Save with selected scope
-    await saveFlow(false, scopeData);
+    // Save with selected scope and name
+    const savedFlow = await saveFlow(false, scopeData, data.name);
+    
+    // Update flow name after successful save
+    if (data.name !== flowName) {
+      setFlowName(data.name);
+    }
     setLastSaveTime(new Date());
     
-    // If this was save as new version, proceed with version creation
-    if (pendingSaveAction === 'saveAsNew' && currentFlow) {
-      await handleSaveAsNewVersion();
+    // If this was save as new version, proceed with version creation using saved flow
+    if (pendingSaveAction === 'saveAsNew' && savedFlow) {
+      const versionName = `${data.name} - Version ${new Date().toLocaleString()}`;
+      const description = `Saved from editor at ${new Date().toLocaleString()}`;
+      
+      try {
+        const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${savedFlow.id}/versions`, {
+          name: versionName,
+          description,
+          flow_data: { nodes, edges, nodeSize }
+        });
+        
+        toast.success('Flow saved and version created successfully', {
+          duration: 3000,
+          icon: '🎉'
+        });
+      } catch (versionError) {
+        console.error('Version creation failed:', versionError);
+        toast.error('Flow saved but version creation failed');
+      }
     }
     
     setPendingSaveAction(null);
-  }, [saveFlow, pendingSaveAction, currentFlow, handleSaveAsNewVersion, flowName, setFlowName]);
+  }, [saveFlow, pendingSaveAction, currentFlow, handleSaveAsNewVersion, flowName, setFlowName, nodes, edges, nodeSize, apiClient]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -521,6 +558,18 @@ const ProcessFlowEditorContent: React.FC = () => {
             nodeSize: '1',
           },
         };
+      } else if (type === 'table') {
+        // Create table node
+        newNode = {
+          id: `table_${Date.now()}`,
+          type: 'table',
+          position,
+          style: { width: 400, height: 300 },
+          data: {
+            ...data,
+            nodeSize: '2'
+          },
+        };
       } else if (type === 'template') {
         // Create node from template
         const templateType = data.equipmentType ? 'equipment' : data.label !== undefined ? 'group' : 'text';
@@ -567,6 +616,8 @@ const ProcessFlowEditorContent: React.FC = () => {
       setGroupConfigNode(node);
     } else if (node.type === 'text') {
       setTextConfigNode(node);
+    } else if (node.type === 'table') {
+      setConfigNode(node);
     }
   }, []);
 
@@ -576,7 +627,21 @@ const ProcessFlowEditorContent: React.FC = () => {
   };
 
   const handleLoadFlow = async (flow: any, version?: any) => {
-    await loadFlow(flow);
+    // For JSON imports, the actual flow data is in the version parameter
+    if (version) {
+      // Create a merged flow object with the actual flow data
+      const flowWithData = {
+        ...flow,
+        flow_data: version.flow_data,
+        // Preserve any data source ID from the imported data
+        data_source_id: version.flow_data?.data_source_id || flow.data_source_id || null,
+        // IMPORTANT: Preserve the _isImported flag so save button shows scope dialog
+        _isImported: flow._isImported
+      };
+      await loadFlow(flowWithData);
+    } else {
+      await loadFlow(flow);
+    }
     setIsLoadDialogOpen(false);
   };
 
@@ -607,7 +672,10 @@ const ProcessFlowEditorContent: React.FC = () => {
     type: 'custom',
     animated: false,
     style: { strokeWidth: 2, stroke: '#374151' },
-    data: { type: edgeType }, // Pass edge type in data for CustomEdgeWithLabel
+    data: { 
+      type: edgeType, // Pass edge type in data for CustomEdgeWithLabel
+      showStatus: true // Default to show status (will be overridden by onConnect logic)
+    }, 
   }), [edgeType]);
 
   return (
@@ -707,7 +775,9 @@ const ProcessFlowEditorContent: React.FC = () => {
                         <Save size={14} />
                         <span>Save & Create Version</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">Saves flow and attempts to create version</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {currentFlow?._isImported ? 'Save imported flow with custom name' : 'Saves flow and attempts to create version'}
+                      </div>
                     </button>
                     <button
                       onClick={() => {
@@ -719,9 +789,11 @@ const ProcessFlowEditorContent: React.FC = () => {
                     >
                       <div className="flex items-center space-x-2">
                         <Save size={14} />
-                        <span>Update Current Version</span>
+                        <span>{currentFlow?._isImported ? 'Save Flow' : 'Update Current Version'}</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">Overwrites existing flow</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {currentFlow?._isImported ? 'Save imported flow with custom name' : 'Overwrites existing flow'}
+                      </div>
                     </button>
                   </div>
                 )}
@@ -865,6 +937,7 @@ const ProcessFlowEditorContent: React.FC = () => {
             onClose={() => setConfigNode(null)}
             onSave={handleNodeConfigSave}
             isInstrumentNode={configNode.type === 'instrument'}
+            isTableNode={configNode.type === 'table'}
           />
         )}
 
