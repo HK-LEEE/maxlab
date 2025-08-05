@@ -31,6 +31,7 @@ from .routers.metrics import router as metrics_router
 from .routers.oauth import router as oauth_router
 from .routers.total_monitoring import router as total_monitoring_router
 from .routers.user_sessions import router as user_sessions_router
+from .routers.admin import router as admin_router
 from .api.v1.endpoints.csrf import router as csrf_router
 from .api.v1.endpoints.session import router as session_router
 from .api.v1.endpoints.rate_limit import router as rate_limit_router
@@ -235,6 +236,7 @@ app.include_router(external_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1/metrics", tags=["Performance Metrics"])
 app.include_router(oauth_router, prefix="/api")
 app.include_router(user_sessions_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
 app.include_router(total_monitoring_router)
 
 # Debug router (development only)

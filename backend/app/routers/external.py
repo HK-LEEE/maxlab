@@ -81,6 +81,47 @@ async def search_users(
         return []
 
 
+@router.get("/users", response_model=List[Dict[str, Any]])
+async def get_users(
+    request: Request,
+    skip: int = QueryParam(0, ge=0),
+    limit: int = QueryParam(100, ge=1, le=1000),
+    current_user: dict = Depends(get_current_user)
+) -> List[Dict[str, Any]]:
+    """Get list of all users from maxplatform."""
+    try:
+        # Get the token from request headers
+        auth_header = request.headers.get("Authorization", "")
+        token = auth_header.replace("Bearer ", "") if auth_header.startswith("Bearer ") else ""
+        
+        print(f"🔍 External users request from user: {current_user.get('email', 'unknown')}")
+        print(f"🔑 Token available: {'Yes' if token else 'No'}")
+        
+        if not token:
+            print("❌ No authorization token found in request")
+            return []
+        
+        users = await external_api.get_users(token, skip, limit)
+        print(f"📊 Returning {len(users)} users to frontend")
+        
+        # Debug: Log the structure of users being returned
+        if users and len(users) > 0:
+            print(f"🔍 Sample user being returned to frontend:")
+            print(f"   First user: {users[0]}")
+            if isinstance(users[0], dict):
+                print(f"   Keys: {list(users[0].keys())}")
+                print(f"   ID field: {users[0].get('id', 'NO ID FIELD')}")
+                print(f"   Email field: {users[0].get('email', 'NO EMAIL FIELD')}")
+        
+        return users
+        
+    except Exception as e:
+        print(f"💥 Error in get_users endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return []
+
+
 @router.get("/groups/search", response_model=List[Dict[str, Any]])
 async def search_groups(
     q: str = QueryParam(..., min_length=1, description="Search query"),

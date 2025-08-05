@@ -49,8 +49,8 @@ class WorkspaceCreate(WorkspaceBase):
     """워크스페이스 생성 스키마"""
     # Permission fields
     permission_mode: Optional[str] = Field(None, description="권한 모드 (user/group)")
-    selected_users: Optional[List[uuid.UUID]] = Field(default_factory=list, description="선택된 사용자 UUID 목록")
-    selected_groups: Optional[List[uuid.UUID]] = Field(default_factory=list, description="선택된 그룹 UUID 목록")
+    selected_users: Optional[List[str]] = Field(default_factory=list, description="선택된 사용자 UUID 목록")
+    selected_groups: Optional[List[str]] = Field(default_factory=list, description="선택된 그룹 UUID 목록")
 
 class WorkspaceUpdate(BaseModel):
     """워크스페이스 수정 스키마"""

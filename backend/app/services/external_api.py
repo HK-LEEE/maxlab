@@ -75,6 +75,71 @@ class ExternalAPIService:
                 traceback.print_exc()
                 return []
     
+    async def get_users(self, token: str, skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
+        """Get list of all users from maxplatform using /admin/users endpoint."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            try:
+                print(f"🔍 Getting users from {self.base_url}")
+                print(f"🔑 Using token: {token[:20]}..." if token else "❌ No token provided")
+                
+                # Use the correct endpoint: /admin/users
+                endpoint = "/admin/users"
+                full_url = f"{self.base_url}{endpoint}"
+                print(f"🌐 Using admin users endpoint: {full_url}")
+                
+                response = await client.get(
+                    full_url,
+                    params={"skip": skip, "limit": limit},
+                    headers={
+                        "Authorization": f"Bearer {token}",
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    }
+                )
+                
+                print(f"📊 Response status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    print(f"🔍 Raw response type: {type(result)}")
+                    if isinstance(result, dict):
+                        print(f"🔍 Response keys: {list(result.keys())}")
+                    
+                    # Handle both direct list and paginated response formats
+                    if isinstance(result, dict) and "items" in result:
+                        users = result["items"]
+                    elif isinstance(result, dict) and "users" in result:
+                        users = result["users"]
+                    elif isinstance(result, list):
+                        users = result
+                    else:
+                        users = []
+                        print(f"⚠️ Unexpected response format: {result}")
+                    
+                    print(f"✅ Success! Found {len(users)} users")
+                    
+                    # Log the structure of the first user for debugging
+                    if users and len(users) > 0:
+                        print(f"🔍 First user data structure: {users[0]}")
+                        print(f"🔍 User keys: {list(users[0].keys()) if isinstance(users[0], dict) else 'Not a dict'}")
+                        
+                        # 사용자도 display_name이 없으면 다른 필드 사용
+                        for user in users:
+                            if isinstance(user, dict) and 'display_name' not in user:
+                                user['display_name'] = user.get('full_name', user.get('username', user.get('email', 'Unknown')))
+                                print(f"📝 User {user.get('email', 'unknown')}: No display_name, using fallback: {user['display_name']}")
+                    
+                    return users
+                else:
+                    print(f"⚠️ Status {response.status_code}: {response.text[:200]}")
+                    return []
+                
+            except Exception as e:
+                print(f"💥 Critical error in get_users: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return []
+    
     async def search_users(self, token: str, query: str) -> List[Dict[str, Any]]:
         """Search users from maxplatform using /admin/users endpoint."""
         async with httpx.AsyncClient(timeout=self.timeout) as client:

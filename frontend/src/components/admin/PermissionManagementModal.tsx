@@ -39,13 +39,9 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   const [activeTab, setActiveTab] = useState<'users' | 'groups'>('groups');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string>('');
-  const [selectedUser, setSelectedUser] = useState<string>('');
-  const [selectedPermission, setSelectedPermission] = useState<'read' | 'write' | 'admin'>('read');
   const [quickAddPermission, setQuickAddPermission] = useState<'read' | 'write' | 'admin'>('read');
+  const [quickAddUserPermission, setQuickAddUserPermission] = useState<'read' | 'write' | 'admin'>('read');
   const [userSearchTerm, setUserSearchTerm] = useState('');
-  const [userSuggestions, setUserSuggestions] = useState<User[]>([]);
-  const [isLoadingUserSearch, setIsLoadingUserSearch] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch workspace groups
@@ -79,57 +75,42 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     enabled: isOpen, // Fetch once when modal opens
   });
 
-  // Search users with debounce
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (userSearchTerm.length >= 2) {
-        setIsLoadingUserSearch(true);
-        try {
-          const results = await authApi.searchUsers(userSearchTerm);
-          setUserSuggestions(results);
-          setShowUserDropdown(true);
-        } catch (error) {
-          // Failed to search users
-        } finally {
-          setIsLoadingUserSearch(false);
-        }
-      } else {
-        setUserSuggestions([]);
-        setShowUserDropdown(false);
-      }
-    }, 300);
+  // Fetch all users once when modal opens - no search parameter
+  const { data: adminUsersData, isLoading: isLoadingAdminUsers } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      return await authApi.getAdminUsers(0, 100); // Get all users without search
+    },
+    enabled: isOpen, // Fetch once when modal opens
+  });
 
-    return () => clearTimeout(timer);
-  }, [userSearchTerm]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.user-search-container')) {
-        setShowUserDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   // Add user mutation
   const addUserMutation = useMutation({
     mutationFn: async (data: { user_id: string; permission_level: string }) => {
-      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/users/`, data);
-      return response.data;
+      console.log('Adding user:', data);
+      try {
+        const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/users/`, data);
+        console.log('User add response:', response);
+        return response.data;
+      } catch (error) {
+        console.error('User add error in mutationFn:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('User add success:', data);
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
       toast.success('User added successfully');
-      setSelectedUser('');
       setUserSearchTerm('');
-      setSelectedPermission('read');
     },
-    onError: () => {
-      toast.error('Failed to add user');
+    onError: (error: any) => {
+      console.error('User add error in onError:', error);
+      if (error.response?.data?.detail) {
+        toast.error(`Failed to add user: ${error.response.data.detail}`);
+      } else {
+        toast.error('Failed to add user');
+      }
     },
   });
 
@@ -155,18 +136,29 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
         group_id: data.group_id,
         permission_level: data.permission_level
       };
-      // Group creation request
-      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, requestData);
-      return response.data;
+      console.log('Adding group:', requestData);
+      try {
+        const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, requestData);
+        console.log('Group add response:', response);
+        return response.data;
+      } catch (error) {
+        console.error('Group add error in mutationFn:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Group add success:', data);
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });
       toast.success('Group added successfully');
       setSelectedGroup('');
-      setSelectedPermission('read');
     },
-    onError: () => {
-      toast.error('Failed to add group');
+    onError: (error: any) => {
+      console.error('Group add error in onError:', error);
+      if (error.response?.data?.detail) {
+        toast.error(`Failed to add group: ${error.response.data.detail}`);
+      } else {
+        toast.error('Failed to add group');
+      }
     },
   });
 
@@ -202,24 +194,6 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   });
 
   if (!isOpen || !workspace) return null;
-
-  const handleAddUser = () => {
-    if (!selectedUser) {
-      toast.error('Please select a user');
-      return;
-    }
-    addUserMutation.mutate({
-      user_id: selectedUser,
-      permission_level: selectedPermission,
-    });
-  };
-
-
-  const handleSelectUser = (user: User) => {
-    setSelectedUser(user.email || user.id);
-    setUserSearchTerm(user.full_name || user.username || user.email);
-    setShowUserDropdown(false);
-  };
 
   const allGroups = adminGroupsData || [];
   
@@ -290,110 +264,204 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
 
           <div className="p-6">
             {activeTab === 'users' ? (
-              <>
-                {/* Add User Section */}
-                <div className="mb-6">
-                  <h3 className="text-md font-medium mb-3">Add User Permission</h3>
-                  <div className="flex gap-3">
-                    <div className="flex-1 relative user-search-container">
+              <div className="flex gap-4 h-[500px]">
+                {/* Left Sidebar - Available Users */}
+                <div className="w-1/2 flex flex-col border-r pr-4">
+                  <div className="mb-4">
+                    <h3 className="text-md font-medium mb-3">Available Users</h3>
+                    <div className="relative mb-3">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                       <input
                         type="text"
-                        placeholder="Search users by name or email..."
+                        placeholder="Search by name, email or ID..."
                         value={userSearchTerm}
                         onChange={(e) => setUserSearchTerm(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                       />
-                      {isLoadingUserSearch && (
-                        <div className="absolute right-3 top-2.5">
-                          <Loader2 size={16} className="animate-spin text-gray-400" />
-                        </div>
-                      )}
-                      
-                      {/* User Dropdown */}
-                      {showUserDropdown && userSuggestions.length > 0 && (
-                        <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto mt-1">
-                          {userSuggestions.map((user) => (
-                            <button
-                              key={user.id}
-                              type="button"
-                              onClick={() => handleSelectUser(user)}
-                              className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center justify-between"
-                            >
-                              <div>
-                                <div className="text-sm font-medium">{user.full_name || user.username || user.email}</div>
-                                <div className="text-xs text-gray-500">{user.email}</div>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
-                    <select
-                      value={selectedPermission}
-                      onChange={(e) => setSelectedPermission(e.target.value as any)}
-                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-                    >
-                      <option value="read">Read</option>
-                      <option value="write">Write</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                    <button
-                      onClick={handleAddUser}
-                      disabled={!selectedUser || addUserMutation.isPending}
-                      className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      <Plus size={16} />
-                      Add
-                    </button>
+                    
+                    {/* Quick Permission Selector */}
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-600">Default permission:</span>
+                      <div className="flex gap-1">
+                        {(['read', 'write', 'admin'] as const).map((level) => (
+                          <button
+                            key={level}
+                            onClick={() => setQuickAddUserPermission(level)}
+                            className={`px-2 py-1 rounded capitalize ${
+                              quickAddUserPermission === level
+                                ? 'bg-black text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {level}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Users List */}
+                  <div className="flex-1 overflow-y-auto">
+                    {isLoadingAdminUsers ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <Loader2 size={20} className="animate-spin mx-auto mb-2" />
+                        Loading users...
+                      </div>
+                    ) : (() => {
+                      const allUsers = adminUsersData || [];
+                      
+                      // Filter users based on search term (client-side filtering)
+                      const availableUsers = userSearchTerm
+                        ? allUsers.filter((user: User) => 
+                            (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+                            (user.full_name && user.full_name.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+                            (user.username && user.username.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+                            (user.id && user.id.toLowerCase().includes(userSearchTerm.toLowerCase()))
+                          )
+                        : allUsers;
+                      
+                      const assignedUserIds = workspaceUsers?.map((u: WorkspaceUser) => u.user_id) || [];
+                      
+                      // Helper function to handle user assignment
+                      const handleAssignUser = (user: User, permissionLevel: 'read' | 'write' | 'admin' = 'read') => {
+                        addUserMutation.mutate({
+                          user_id: user.email || user.id,
+                          permission_level: permissionLevel,
+                        });
+                      };
+                      
+                      return availableUsers.length === 0 ? (
+                        <div className="text-center py-4 text-gray-500">
+                          {userSearchTerm ? 'No users found matching your search' : 'No users available'}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {availableUsers.map((user: User) => {
+                            const isAssigned = assignedUserIds.includes(user.email || user.id);
+                            
+                            return (
+                              <div
+                                key={user.id}
+                                className={`p-3 rounded-md border transition-all cursor-pointer ${
+                                  isAssigned 
+                                    ? 'bg-gray-100 border-gray-300 opacity-50 cursor-not-allowed' 
+                                    : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-sm'
+                                }`}
+                                onClick={() => !isAssigned}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-sm">
+                                      {user.real_name || user.full_name || user.username || user.email} {user.groups && user.groups.length > 0 ? `(${user.groups.join(', ')})` : ''}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {user.email}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      <span className="text-gray-400">UUID:</span> <span className="font-mono">{user.id}</span>
+                                    </div>
+                                  </div>
+                                  {!isAssigned && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAssignUser(user, quickAddUserPermission);
+                                      }}
+                                      disabled={addUserMutation.isPending}
+                                      className="px-3 py-1 text-xs bg-black text-white rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      {addUserMutation.isPending ? '...' : 'Add →'}
+                                    </button>
+                                  )}
+                                  {isAssigned && (
+                                    <span className="text-xs text-gray-500">Already assigned</span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
-                {/* Current User Permissions */}
-                <div>
-                  <h3 className="text-md font-medium mb-3">Current User Permissions</h3>
-                  {isLoadingUsers ? (
-                    <div className="text-center py-4 text-gray-500">Loading user permissions...</div>
-                  ) : workspaceUsers?.length === 0 ? (
-                    <div className="text-center py-4 text-gray-500">No users assigned yet</div>
-                  ) : (
-                    <div className="space-y-2">
-                      {workspaceUsers?.map((user: WorkspaceUser) => (
-                        <div
-                          key={user.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-                        >
-                          <div className="flex-1">
-                            <div className="font-medium">
-                              {user.user_display_name || user.user_id}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              User ID: {user.user_id}
+                {/* Right Panel - Assigned Users */}
+                <div className="w-1/2 flex flex-col pl-4">
+                  <div className="mb-4">
+                    <h3 className="text-md font-medium mb-3">Assigned Users</h3>
+                    <p className="text-sm text-gray-600">Users with access to this workspace</p>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto">
+                    {isLoadingUsers ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <Loader2 size={20} className="animate-spin mx-auto mb-2" />
+                        Loading permissions...
+                      </div>
+                    ) : workspaceUsers?.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <UserPlus size={40} className="mx-auto mb-2 text-gray-300" />
+                        <p>No users assigned yet</p>
+                        <p className="text-xs mt-1">Add users from the left panel</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {workspaceUsers?.map((user: WorkspaceUser) => (
+                          <div
+                            key={user.id}
+                            className="p-3 bg-gray-50 rounded-md border border-gray-200"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">
+                                  {user.user_display_name || 'User'}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  <span className="text-gray-400">ID:</span> <span className="font-mono">{user.user_id}</span>
+                                </div>
+                                <div className="text-xs text-gray-400 mt-1">
+                                  Added on {new Date(user.created_at).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <select
+                                  value={user.permission_level}
+                                  onChange={(e) => {
+                                    // TODO: Add update user permission mutation
+                                    console.log('Permission update not implemented yet');
+                                  }}
+                                  disabled={true} // TODO: Enable when update mutation is implemented
+                                  className={`px-2 py-1 text-xs rounded border ${
+                                    user.permission_level === 'admin'
+                                      ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                      : user.permission_level === 'write'
+                                      ? 'bg-blue-100 text-blue-800 border-blue-200'
+                                      : 'bg-gray-100 text-gray-800 border-gray-200'
+                                  } disabled:opacity-50`}
+                                >
+                                  <option value="read">Read</option>
+                                  <option value="write">Write</option>
+                                  <option value="admin">Admin</option>
+                                </select>
+                                <button
+                                  onClick={() => removeUserMutation.mutate(user.id)}
+                                  disabled={removeUserMutation.isPending}
+                                  className="text-red-600 hover:text-red-800 disabled:opacity-50 p-1"
+                                  title="Remove user"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <span className={`px-3 py-1 text-sm rounded-full ${
-                              user.permission_level === 'admin'
-                                ? 'bg-purple-100 text-purple-800'
-                                : user.permission_level === 'write'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {user.permission_level}
-                            </span>
-                            <button
-                              onClick={() => removeUserMutation.mutate(user.id)}
-                              disabled={removeUserMutation.isPending}
-                              className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </>
+              </div>
             ) : (
               <div className="flex gap-4 h-[500px]">
                 {/* Left Sidebar - Available Groups */}
@@ -485,9 +553,10 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
                                       e.stopPropagation();
                                       handleAssignGroup(group, quickAddPermission);
                                     }}
-                                    className="px-3 py-1 text-xs bg-black text-white rounded hover:bg-gray-800 transition-colors"
+                                    disabled={addGroupMutation.isPending}
+                                    className="px-3 py-1 text-xs bg-black text-white rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    Add →
+                                    {addGroupMutation.isPending ? '...' : 'Add →'}
                                   </button>
                                 )}
                                 {isAssigned && (

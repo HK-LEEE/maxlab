@@ -6,6 +6,7 @@ export interface User {
   username?: string;
   email: string;
   full_name?: string;
+  real_name?: string;
   is_active: boolean;
   is_admin: boolean;
   role?: string;
@@ -143,6 +144,29 @@ export const authApi = {
       return response.data || [];
     } catch (error: any) {
       console.error('❌ Frontend: Error getting admin groups:', error);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      return [];
+    }
+  },
+
+  getAdminUsers: async (skip = 0, limit = 100, search?: string): Promise<User[]> => {
+    try {
+      const params = new URLSearchParams({
+        skip: skip.toString(),
+        limit: limit.toString(),
+      });
+      if (search) {
+        params.append('search', search);
+      }
+      console.log('🔍 Frontend: Getting admin users');
+      const response = await authClient.get<User[]>(`/api/admin/users?${params}`);
+      console.log(`✅ Frontend: Found ${response.data?.length || 0} admin users`);
+      return response.data || [];
+    } catch (error: any) {
+      console.error('❌ Frontend: Error getting admin users:', error);
       if (error.response) {
         console.error('Response status:', error.response.status);
         console.error('Response data:', error.response.data);
