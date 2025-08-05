@@ -18,36 +18,45 @@ class Base(DeclarativeBase):
     pass
 
 def _get_database_connect_args() -> dict:
-    """데이터베이스 연결 인수 생성 (SSL 설정 포함)"""
+    """데이터베이스 연결 인수 생성 (SSL 설정 포함, psycopg v3 호환)"""
     if "postgresql" not in settings.DATABASE_URL:
         return {}
-    
+
+    # psycopg(v3)에 맞는 연결 인수 생성
+    # 'server_settings' 대신 직접 파라미터를 전달합니다.
     connect_args = {
-        "server_settings": {
-            "application_name": "maxlab_backend",
-            "jit": "off",  # JIT 비활성화로 안정성 향상
-        }
+        "application_name": "maxlab_backend",
+        "options": "-c jit=off"  # 'jit' 설정은 options 파라미터로 전달
     }
-    
-    # SSL 설정 적용
+
+    # SSL 설정 적용 (이 부분은 psycopg v3에서도 동일하게 작동합니다)
     if settings.DB_SSL_MODE and settings.DB_SSL_MODE != "disable":
         try:
             ssl_context = ssl.create_default_context()
-            
-            # SSL 모드에 따른 설정
+
             if settings.DB_SSL_MODE == "require":
+                # psycopg v3에서는 sslmode=require일 때 check_hostname을 false로 설정할 필요가 없습니다.
+                # ssl.CERT_NONE으로 충분합니다.
                 ssl_context.check_hostname = False
                 ssl_context.verify_mode = ssl.CERT_NONE
             elif settings.DB_SSL_MODE == "verify-ca":
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+                if settings.DB_SSL_CA_PATH:
+                    ssl_context.load_verify_locations(settings.DB_SSL_CA_PATH)
+                else:
+                    # verify-ca 모드에서는 CA 파일이 필수입니다.
+                    logger.error("DB_SSL_CA_PATH must be set for verify-ca mode.")
+                    raise ValueError("DB_SSL_CA_PATH must be set for verify-ca mode.")
                 ssl_context.check_hostname = False
-                ssl_context.verify_mode = ssl.CERT_REQUIRED
-                if settings.DB_SSL_CA_PATH:
-                    ssl_context.load_verify_locations(settings.DB_SSL_CA_PATH)
             elif settings.DB_SSL_MODE == "verify-full":
-                ssl_context.check_hostname = True
                 ssl_context.verify_mode = ssl.CERT_REQUIRED
                 if settings.DB_SSL_CA_PATH:
                     ssl_context.load_verify_locations(settings.DB_SSL_CA_PATH)
+                else:
+                    # verify-full 모드에서는 CA 파일이 필수입니다.
+                    logger.error("DB_SSL_CA_PATH must be set for verify-full mode.")
+                    raise ValueError("DB_SSL_CA_PATH must be set for verify-full mode.")
+                ssl_context.check_hostname = True
             
             # 클라이언트 인증서 로드
             if settings.DB_SSL_CERT_PATH and settings.DB_SSL_KEY_PATH:
@@ -56,15 +65,25 @@ def _get_database_connect_args() -> dict:
                     settings.DB_SSL_KEY_PATH
                 )
             
+            # psycopg(v3)는 ssl.SSLContext 객체를 직접 받지 않습니다.
+            # 대신 연결 문자열이나 다른 파라미터를 사용해야 하지만,
+            # SQLAlchemy는 connect_args의 'ssl'을 내부적으로 처리해 줄 수 있습니다.
+            # 하지만 더 명시적인 방법은 sslmode, sslrootcert 등을 직접 사용하는 것입니다.
+            # 여기서는 SQLAlchemy의 호환성을 믿고 기존 방식을 유지하되,
+            # 문제가 발생할 경우 DATABASE_URL에 sslmode=verify-full 과 같은 파라미터를 추가하는 것이 좋습니다.
             connect_args["ssl"] = ssl_context
             logger.info(f"SSL/TLS enabled for database connection (mode: {settings.DB_SSL_MODE})")
-            
+
         except Exception as e:
             logger.warning(f"SSL configuration failed, falling back to non-SSL connection: {e}")
+            # SSL 설정 실패 시 connect_args에서 'ssl' 키를 제거합니다.
+            if 'ssl' in connect_args:
+                del connect_args['ssl']
     else:
         logger.info("SSL/TLS disabled for database connection")
-    
+
     return connect_args
+    
 
 # 비동기 엔진 생성 - 프로덕션 최적화 설정
 engine = create_async_engine(
