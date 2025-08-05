@@ -1,0 +1,78 @@
+[Unit]
+Description=MaxLab Backend Production Service
+Documentation=https://maxlab.chem.co.kr/docs
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=notify
+User=maxlab
+Group=maxlab
+WorkingDirectory=/opt/maxlab/backend
+Environment="PATH=/opt/maxlab/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/maxlab/backend"
+
+# Load environment from file
+EnvironmentFile=/opt/maxlab/backend/.env
+
+# Start command using gunicorn with uvicorn workers
+ExecStart=/opt/maxlab/venv/bin/gunicorn \
+    -w ${WORKERS:-4} \
+    -k ${WORKER_CLASS:-uvicorn.workers.UvicornWorker} \
+    --bind ${HOST:-0.0.0.0}:${PORT:-8010} \
+    --timeout ${WORKER_TIMEOUT:-60} \
+    --graceful-timeout ${GRACEFUL_TIMEOUT:-30} \
+    --keepalive ${KEEPALIVE:-5} \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --access-logfile /var/log/maxlab/access-production.log \
+    --error-logfile /var/log/maxlab/error-production.log \
+    --log-level ${LOG_LEVEL:-warning} \
+    --capture-output \
+    --enable-stdio-inheritance \
+    --worker-tmp-dir /dev/shm \
+    --statsd-host=localhost:8125 \
+    --statsd-prefix=maxlab.production \
+    app.main:app
+
+# Restart configuration
+Restart=always
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/maxlab /var/www/maxlab
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RemoveIPC=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryLimit=2G
+CPUQuota=200%
+
+# Kill settings
+KillMode=mixed
+KillSignal=SIGTERM
+SendSIGKILL=yes
+TimeoutStopSec=30
+
+# Process monitoring
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=maxlab-backend-production
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,67 @@
+[Unit]
+Description=MaxLab Backend Development Service
+Documentation=https://devmaxlab.chem.co.kr/docs
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=notify
+User=maxlab
+Group=maxlab
+WorkingDirectory=/opt/maxlab/backend-dev
+Environment="PATH=/opt/maxlab/venv-dev/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/maxlab/backend-dev"
+
+# Load environment from file
+EnvironmentFile=/opt/maxlab/backend-dev/.env
+
+# Start command using gunicorn with uvicorn workers (development mode)
+ExecStart=/opt/maxlab/venv-dev/bin/gunicorn \
+    -w ${WORKERS:-2} \
+    -k ${WORKER_CLASS:-uvicorn.workers.UvicornWorker} \
+    --bind ${HOST:-0.0.0.0}:${PORT:-8010} \
+    --timeout ${WORKER_TIMEOUT:-120} \
+    --graceful-timeout ${GRACEFUL_TIMEOUT:-10} \
+    --keepalive ${KEEPALIVE:-5} \
+    --reload \
+    --reload-extra-file /opt/maxlab/backend-dev/.env \
+    --access-logfile /var/log/maxlab/access-development.log \
+    --error-logfile /var/log/maxlab/error-development.log \
+    --log-level ${LOG_LEVEL:-debug} \
+    --capture-output \
+    --enable-stdio-inheritance \
+    --worker-tmp-dir /dev/shm \
+    app.main:app
+
+# Restart configuration
+Restart=always
+RestartSec=3
+StartLimitInterval=60
+StartLimitBurst=5
+
+# Less restrictive security for development
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=false
+ReadWritePaths=/var/log/maxlab /var/www/maxlab-dev /opt/maxlab/backend-dev
+
+# Resource limits (more generous for development)
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryLimit=4G
+CPUQuota=400%
+
+# Kill settings
+KillMode=mixed
+KillSignal=SIGTERM
+SendSIGKILL=yes
+TimeoutStopSec=10
+
+# Process monitoring
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=maxlab-backend-development
+
+[Install]
+WantedBy=multi-user.target

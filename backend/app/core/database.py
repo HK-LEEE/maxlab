@@ -1,6 +1,6 @@
 """
 데이터베이스 설정
-SQLAlchemy 2.0 비동기 패턴을 사용하여 PostgreSQL 17과 연결합니다.
+SQLAlchemy 2.0 비동기 패턴과 asyncpg 드라이버를 사용하여 PostgreSQL 17과 연결합니다.
 """
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,18 +18,27 @@ class Base(DeclarativeBase):
     pass
 
 def _get_database_connect_args() -> dict:
-    """데이터베이스 연결 인수 생성 (SSL 설정 포함, psycopg v3 호환)"""
+    """데이터베이스 연결 인수 생성 (SSL 설정 포함, asyncpg 호환)"""
     if "postgresql" not in settings.DATABASE_URL:
         return {}
 
-    # psycopg(v3)에 맞는 연결 인수 생성
-    # 'server_settings' 대신 직접 파라미터를 전달합니다.
-    connect_args = {
-        "application_name": "maxlab_backend",
-        "options": "-c jit=off"  # 'jit' 설정은 options 파라미터로 전달
-    }
+    # asyncpg를 사용하는 경우와 그렇지 않은 경우를 구분
+    connect_args = {}
+    
+    # asyncpg를 사용하는 경우 server_settings로 PostgreSQL 파라미터 전달
+    if "asyncpg" in settings.DATABASE_URL:
+        connect_args["server_settings"] = {
+            "application_name": "maxlab_backend",
+            "jit": "off"
+        }
+    else:
+        # psycopg 등 다른 드라이버를 사용하는 경우
+        connect_args = {
+            "application_name": "maxlab_backend",
+            "options": "-c jit=off"
+        }
 
-    # SSL 설정 적용 (이 부분은 psycopg v3에서도 동일하게 작동합니다)
+    # SSL 설정 적용 (asyncpg와 psycopg 모두 지원)
     if settings.DB_SSL_MODE and settings.DB_SSL_MODE != "disable":
         try:
             ssl_context = ssl.create_default_context()
@@ -65,12 +74,8 @@ def _get_database_connect_args() -> dict:
                     settings.DB_SSL_KEY_PATH
                 )
             
-            # psycopg(v3)는 ssl.SSLContext 객체를 직접 받지 않습니다.
-            # 대신 연결 문자열이나 다른 파라미터를 사용해야 하지만,
-            # SQLAlchemy는 connect_args의 'ssl'을 내부적으로 처리해 줄 수 있습니다.
-            # 하지만 더 명시적인 방법은 sslmode, sslrootcert 등을 직접 사용하는 것입니다.
-            # 여기서는 SQLAlchemy의 호환성을 믿고 기존 방식을 유지하되,
-            # 문제가 발생할 경우 DATABASE_URL에 sslmode=verify-full 과 같은 파라미터를 추가하는 것이 좋습니다.
+            # asyncpg는 ssl context를 직접 지원합니다.
+            # SQLAlchemy가 이를 적절히 asyncpg에 전달합니다.
             connect_args["ssl"] = ssl_context
             logger.info(f"SSL/TLS enabled for database connection (mode: {settings.DB_SSL_MODE})")
 

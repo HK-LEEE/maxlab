@@ -1063,19 +1063,46 @@ def get_or_create_encryption_key() -> bytes:
     key_str = os.getenv("ENCRYPTION_KEY")
     
     if not key_str:
-        # Generate new key
-        key = Fernet.generate_key()
-        key_str = key.decode()
-        
-        # Save to .env file
+        # Try to load from .env file directly
         env_path = os.path.join(os.path.dirname(__file__), "../../.env")
-        try:
-            with open(env_path, "a") as f:
-                f.write(f"\n# Auto-generated encryption key for sensitive data\n")
-                f.write(f"ENCRYPTION_KEY={key_str}\n")
-            logger.info("Generated new encryption key and saved to .env")
-        except Exception as e:
-            logger.warning(f"Could not save encryption key to .env: {e}")
+        if os.path.exists(env_path):
+            try:
+                # Read existing .env file
+                with open(env_path, "r") as f:
+                    lines = f.readlines()
+                
+                # Check if ENCRYPTION_KEY already exists
+                for i, line in enumerate(lines):
+                    if line.strip().startswith("ENCRYPTION_KEY="):
+                        key_str = line.split("=", 1)[1].strip()
+                        logger.info(f"Found existing encryption key in .env file")
+                        break
+                
+                if not key_str:
+                    # Generate new key
+                    key = Fernet.generate_key()
+                    key_str = key.decode()
+                    
+                    # Add to .env file (not append, but modify in place)
+                    lines.append(f"\n# Auto-generated encryption key for sensitive data\n")
+                    lines.append(f"ENCRYPTION_KEY={key_str}\n")
+                    
+                    # Write back to file
+                    with open(env_path, "w") as f:
+                        f.writelines(lines)
+                    logger.info("Generated new encryption key and saved to .env")
+                    
+            except Exception as e:
+                logger.error(f"Error handling .env file: {e}")
+                # Generate key but don't save if file operations fail
+                key = Fernet.generate_key()
+                key_str = key.decode()
+                logger.warning("Using temporary encryption key due to file error")
+        else:
+            # No .env file exists, generate key
+            key = Fernet.generate_key()
+            key_str = key.decode()
+            logger.warning(".env file not found, using temporary encryption key")
     
     # Convert to bytes if needed
     if isinstance(key_str, str):

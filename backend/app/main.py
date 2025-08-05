@@ -10,6 +10,10 @@ from contextlib import asynccontextmanager
 import os
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (override existing ones)
+load_dotenv(override=True)
 
 from .core.config import settings
 from .core.database import get_db, close_db, create_tables
@@ -21,6 +25,7 @@ from .routers.auth_proxy import router as auth_proxy_router
 from .routers.files import router as files_router
 from .routers.mvp_modules import router as mvp_modules_router
 from .routers.personal_test_process_flow import router as personal_test_process_flow_router
+from .routers.personal_test_process_flow_datasource_extension import router as process_flow_datasource_router
 from .routers.external import router as external_router
 from .routers.metrics import router as metrics_router
 from .routers.oauth import router as oauth_router
@@ -225,6 +230,7 @@ app.include_router(auth_proxy_router, prefix="/api/v1")
 app.include_router(files_router, prefix="/api/v1")
 app.include_router(mvp_modules_router, prefix="/api/v1")
 app.include_router(personal_test_process_flow_router)
+app.include_router(process_flow_datasource_router)
 app.include_router(external_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1/metrics", tags=["Performance Metrics"])
 app.include_router(oauth_router, prefix="/api")

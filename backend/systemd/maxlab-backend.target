@@ -1,0 +1,7 @@
+[Unit]
+Description=MaxLab Backend Services Target
+Documentation=https://maxlab.chem.co.kr/docs
+After=network.target
+
+[Install]
+WantedBy=multi-user.target

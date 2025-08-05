@@ -70,6 +70,7 @@ ENVIRONMENT_CONFIGS: Dict[Environment, EnvironmentConfig] = {
         cookie_samesite="lax",
         cors_allow_credentials=True,
         cors_allow_origins=[
+            "https://devmaxlab.chem.co.kr",
             "http://localhost:3000",
             "http://localhost:3007",
             "http://localhost:3008",
@@ -155,9 +156,9 @@ ENVIRONMENT_CONFIGS: Dict[Environment, EnvironmentConfig] = {
         cookie_samesite="strict",
         cors_allow_credentials=True,
         cors_allow_origins=[
-            "https://maxlab.com",
-            "https://app.maxlab.com",
-            "https://api.maxlab.com",
+            "https://maxlab.chem.co.kr",
+            "https://www.maxlab.chem.co.kr",
+            "https://app.maxlab.chem.co.kr",
         ],
         
         # 로깅
