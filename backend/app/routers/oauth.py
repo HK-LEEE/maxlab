@@ -24,8 +24,11 @@ ALLOWED_REDIRECT_PATTERNS = [
     r"^http://localhost:301[0-9]/oauth/callback$",  # Frontend callback (3010-3019)
     r"^http://localhost:301[0-9]/$",  # Frontend root
     r"^http://localhost:301[0-9]/login$",  # Frontend login
-    r"^https://[a-zA-Z0-9-]+\.maxlab\.io/oauth/callback$",  # Production domain
-    r"^https://[a-zA-Z0-9-]+\.maxlab\.io/$",  # Production root
+    r"^https://[a-zA-Z0-9-]+\.maxlab\.io/oauth/callback$",  # Production domain (maxlab.io)
+    r"^https://[a-zA-Z0-9-]+\.maxlab\.io/$",  # Production root (maxlab.io)
+    r"^https://maxlab\.dwchem\.co\.kr/oauth/callback$",  # Production domain (dwchem)
+    r"^https://maxlab\.dwchem\.co\.kr/$",  # Production root (dwchem)
+    r"^https://maxlab\.dwchem\.co\.kr/login$",  # Production login (dwchem)
 ]
 
 def validate_redirect_uri(redirect_uri: str) -> bool:
@@ -72,6 +75,7 @@ def get_trusted_origins() -> List[str]:
         "http://localhost:8010",  # Backend API
         "https://maxlab.io",      # Production
         "https://app.maxlab.io",  # Production app
+        "https://maxlab.dwchem.co.kr",  # Production (dwchem)
     ]
 
 
