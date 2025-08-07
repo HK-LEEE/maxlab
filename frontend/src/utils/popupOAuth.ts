@@ -39,15 +39,28 @@ export class PopupOAuthLogin {
   private readonly scopes = ['openid', 'profile', 'email', 'offline_access', 'read:profile', 'read:groups', 'manage:workflows'];
 
   constructor() {
-    this.clientId = import.meta.env.VITE_CLIENT_ID || 'maxlab';
-    this.redirectUri = import.meta.env.VITE_REDIRECT_URI || `${window.location.origin}/oauth/callback`;
-    this.authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+    // 🔧 PRODUCTION FIX: Use runtime config first, then env vars, then fallback
+    // This allows configuration without rebuilding in production
+    const runtimeConfig = (window as any).ENV_CONFIG;
     
-    // 🔍 DEBUG: OAuth Configuration
+    this.clientId = runtimeConfig?.CLIENT_ID || 
+                    import.meta.env.VITE_CLIENT_ID || 
+                    'maxlab';
+    
+    this.redirectUri = runtimeConfig?.REDIRECT_URI || 
+                       import.meta.env.VITE_REDIRECT_URI || 
+                       `${window.location.origin}/oauth/callback`;
+    
+    this.authUrl = runtimeConfig?.AUTH_SERVER_URL || 
+                   import.meta.env.VITE_AUTH_SERVER_URL || 
+                   'http://localhost:8000';
+    
+    // 🔍 DEBUG: OAuth Configuration with runtime config
     console.log('🔐 OAuth Configuration:', {
       clientId: this.clientId,
       redirectUri: this.redirectUri,
       authUrl: this.authUrl,
+      runtimeConfig: runtimeConfig ? 'Available' : 'Not available',
       envAuthUrl: import.meta.env.VITE_AUTH_SERVER_URL,
       currentOrigin: window.location.origin
     });

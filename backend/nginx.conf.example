@@ -1,0 +1,117 @@
+# Nginx configuration for MaxLab Backend with PM2 load balancing
+# Place this file in /etc/nginx/sites-available/maxlab-backend
+
+upstream maxlab_backend {
+    # PM2로 실행된 백엔드 인스턴스들
+    server 127.0.0.1:8010 max_fails=3 fail_timeout=30s;
+    server 127.0.0.1:8011 max_fails=3 fail_timeout=30s;
+    server 127.0.0.1:8012 max_fails=3 fail_timeout=30s;
+    
+    # 헬스체크와 로드밸런싱 전략
+    keepalive 32;
+    keepalive_requests 100;
+    keepalive_timeout 60s;
+}
+
+server {
+    listen 80;
+    server_name maxlab.chem.co.kr www.maxlab.chem.co.kr;
+    
+    # HTTPS로 리다이렉트
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name maxlab.chem.co.kr www.maxlab.chem.co.kr;
+    
+    # SSL 인증서 설정
+    ssl_certificate /etc/letsencrypt/live/maxlab.chem.co.kr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/maxlab.chem.co.kr/privkey.pem;
+    
+    # SSL 보안 설정
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    
+    # 보안 헤더
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    
+    # 로그 설정
+    access_log /var/log/nginx/maxlab-backend-access.log;
+    error_log /var/log/nginx/maxlab-backend-error.log;
+    
+    # 정적 파일 제공 (React 앱)
+    root /var/www/maxlab/static;
+    index index.html;
+    
+    # API 프록시 설정
+    location /api/ {
+        proxy_pass http://maxlab_backend/api/;
+        proxy_http_version 1.1;
+        
+        # 프록시 헤더 설정
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        # WebSocket 지원
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # 타임아웃 설정
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        
+        # 버퍼링 설정
+        proxy_buffering off;
+        proxy_request_buffering off;
+        
+        # Keep-alive 설정
+        proxy_set_header Connection "";
+        
+        # CORS 처리 (백엔드에서 처리하므로 주석 처리)
+        # add_header Access-Control-Allow-Origin $http_origin always;
+        # add_header Access-Control-Allow-Credentials true always;
+    }
+    
+    # OAuth 콜백 라우트
+    location /oauth/callback {
+        try_files $uri /index.html;
+    }
+    
+    # 헬스체크 엔드포인트
+    location /health {
+        proxy_pass http://maxlab_backend/api/v1/health;
+        access_log off;
+    }
+    
+    # React 앱 라우팅 (SPA)
+    location / {
+        try_files $uri $uri/ /index.html;
+        
+        # 캐시 설정
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+    
+    # 파일 업로드 크기 제한
+    client_max_body_size 100M;
+    
+    # Gzip 압축
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/rss+xml application/atom+xml image/svg+xml text/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype;
+}
