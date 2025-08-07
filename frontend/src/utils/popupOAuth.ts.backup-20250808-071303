@@ -889,58 +889,94 @@ export class PopupOAuthLogin {
       const nestedMessage = event.data as OAuthMessageNested;
       const innerData = nestedMessage.data;
       
-      // DEPRECATED message types - these should not be sent in the new OAuth flow
+      // Map auth server message types to our expected types
       if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE' || 
           innerData.type === 'OAUTH_ALREADY_AUTHENTICATED') {
-        console.warn(`⚠️ DEPRECATED: Received deprecated message type '${innerData.type}'`);
-        console.warn('🔴 This message type should not be sent in the new OAuth flow');
-        console.warn('📋 The OAuth server should follow standard authorization code flow');
+        console.log(`🔄 Mapping ${innerData.type} to OAUTH_SUCCESS`);
         
-        // For now, still handle these for backward compatibility
-        // But log warnings to encourage server updates
+        // Extract token or auth data from oauthParams
         if (innerData.oauthParams) {
-          console.log('📝 OAuth params received (deprecated flow):', innerData.oauthParams);
+          console.log('📝 OAuth params received:', innerData.oauthParams);
           
-          // Check if we have proper authorization code
-          if (innerData.oauthParams.code) {
-            console.log('✅ Authorization code found, proceeding with token exchange');
-            const code = innerData.oauthParams.code;
-            const state = innerData.oauthParams.state || this.currentFlowState?.state;
+          // Store the OAuth params for callback to use
+          sessionStorage.setItem('oauth_callback_params', JSON.stringify(innerData.oauthParams));
+          sessionStorage.setItem('oauth_callback_timestamp', Date.now().toString());
+          
+          // 🔧 CRITICAL FIX: Handle different authentication scenarios
+          if (innerData.type === 'OAUTH_ALREADY_AUTHENTICATED') {
+            // User is already authenticated, no redirect will happen
+            // Check if we have an authorization code or token in oauthParams
+            console.log('👤 User already authenticated, checking for auth data...');
             
-            exchangeCodeForToken(code, state)
-              .then(tokenResponse => {
-                console.log('✅ Token exchange successful');
-                this.messageReceived = true;
-                this.cleanup();
-                resolve(tokenResponse);
-              })
-              .catch(error => {
-                console.error('❌ Token exchange failed:', error);
-                this.cleanup();
-                reject(error);
-              });
-            return;
-          } else {
-            // No authorization code - this is the OAuth server bug
-            console.error('❌ OAuth Server Bug: Message without authorization code');
-            console.error('🔴 Server sent:', innerData.type);
-            console.error('🔴 With params:', Object.keys(innerData.oauthParams));
-            console.error('📋 Expected: authorization code in params');
-            
-            this.cleanup();
-            reject(new Error(
-              `OAuth Server Error: ${innerData.type} response missing authorization code. ` +
-              'The OAuth server must provide an authorization code for ALL authentication flows. ' +
-              'Please contact the OAuth server team to implement standard OAuth 2.0 flow.'
-            ));
-            return;
+            if (innerData.oauthParams.code) {
+              // We have an authorization code, exchange it for token
+              console.log('🔐 Authorization code found, exchanging for token...');
+              const code = innerData.oauthParams.code;
+              const state = innerData.oauthParams.state || this.currentFlowState?.state;
+              
+              exchangeCodeForToken(code, state)
+                .then(tokenResponse => {
+                  console.log('✅ Token exchange successful');
+                  this.messageReceived = true;
+                  this.cleanup();
+                  resolve(tokenResponse);
+                })
+                .catch(error => {
+                  console.error('❌ Token exchange failed:', error);
+                  this.cleanup();
+                  reject(error);
+                });
+              return;
+            } else if (innerData.oauthParams.access_token || innerData.tokenData) {
+              // We already have a token
+              console.log('✅ Token already available');
+              this.messageReceived = true;
+              this.cleanup();
+              
+              if (innerData.tokenData) {
+                resolve(innerData.tokenData);
+              } else {
+                resolve({
+                  access_token: innerData.oauthParams.access_token,
+                  token_type: innerData.oauthParams.token_type || 'Bearer',
+                  expires_in: innerData.oauthParams.expires_in || 3600,
+                  scope: innerData.oauthParams.scope || this.scopes.join(' '),
+                  refresh_token: innerData.oauthParams.refresh_token
+                });
+              }
+              return;
+            } else {
+              // No usable auth data - OAuth server bug
+              console.error('❌ OAuth Server Bug: OAUTH_ALREADY_AUTHENTICATED without authorization code');
+              console.error('🔴 The OAuth server must provide an authorization code for authenticated users');
+              console.log('📊 Received params (incorrect):', Object.keys(innerData.oauthParams));
+              console.log('📄 Expected params: ["code", "state"] or ["access_token", "token_type", "expires_in"]');
+              
+              // Reject with clear error message
+              this.cleanup();
+              reject(new Error(
+                'OAuth Server Error: OAUTH_ALREADY_AUTHENTICATED response missing authorization code. ' +
+                'The OAuth server must generate and return an authorization code even for already authenticated users. ' +
+                'Please contact the OAuth server team to fix this issue.'
+              ));
+              return;
+            }
+          } else if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE') {
+            // Normal flow - callback page will handle token exchange
+            console.log('⏳ Waiting for callback page to complete token exchange...');
           }
+          
+          // Continue waiting for real token from callback page
+          return;
         }
         
-        // If no oauthParams, reject as invalid
-        this.cleanup();
-        reject(new Error(`Invalid ${innerData.type} message structure`));
-        return;
+        // Normalize to flat structure for processing
+        messageData = {
+          type: 'OAUTH_SUCCESS' as const,
+          tokenData: innerData.tokenData,
+          token: innerData.token
+        };
+        actualMessageType = 'OAUTH_SUCCESS';
       } else if (innerData.type === 'OAUTH_SUCCESS' || innerData.type === 'OAUTH_ERROR' || innerData.type === 'OAUTH_ACK') {
         // Direct mapping for standard types
         messageData = {
@@ -1064,22 +1100,6 @@ export class PopupOAuthLogin {
 
   // Handle BroadcastChannel message
   private handleBroadcastMessage(event: MessageEvent, resolve: Function, reject: Function, broadcastChannel: BroadcastChannel | null): void {
-    // DEPRECATED message types handling
-    if (event.data.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE' || 
-        event.data.type === 'OAUTH_ALREADY_AUTHENTICATED') {
-      console.warn(`⚠️ DEPRECATED: Received deprecated BroadcastChannel message type '${event.data.type}'`);
-      console.warn('🔴 This message type should not be sent in the new OAuth flow');
-      
-      this.cleanup();
-      broadcastChannel?.close();
-      
-      reject(new Error(
-        `Deprecated OAuth BroadcastChannel message type: ${event.data.type}.\n` +
-        `Please update the OAuth server to use the new standard flow.`
-      ));
-      return;
-    }
-    
     if (event.data.type === 'OAUTH_SUCCESS') {
       console.log('✅ OAuth success via BroadcastChannel');
       this.messageReceived = true;
