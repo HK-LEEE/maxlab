@@ -16,7 +16,8 @@ export interface TokenResponse {
   id_token?: string; // OIDC ID Token
 }
 
-export interface OAuthMessage {
+// Original flat OAuth message structure
+export interface OAuthMessageFlat {
   type: 'OAUTH_SUCCESS' | 'OAUTH_ERROR' | 'OAUTH_ACK';
   token?: string;
   tokenData?: TokenResponse;
@@ -24,6 +25,26 @@ export interface OAuthMessage {
   error_description?: string;
   acknowledged?: boolean;
 }
+
+// Auth server inner message structure
+export interface OAuthInnerMessage {
+  type: 'OAUTH_LOGIN_SUCCESS_CONTINUE' | 'OAUTH_ALREADY_AUTHENTICATED' | 'OAUTH_SUCCESS' | 'OAUTH_ERROR' | 'OAUTH_ACK';
+  oauthParams?: any;
+  token?: string;
+  tokenData?: TokenResponse;
+  error?: string;
+  error_description?: string;
+  timestamp?: number;
+}
+
+// Nested OAuth message structure from auth server
+export interface OAuthMessageNested {
+  type: 'OAUTH_MESSAGE';
+  data: OAuthInnerMessage;
+}
+
+// Union type for all OAuth message types
+export type OAuthMessage = OAuthMessageFlat | OAuthMessageNested;
 
 export class PopupOAuthLogin {
   private popup: Window | null = null;
@@ -859,13 +880,14 @@ export class PopupOAuthLogin {
     console.log('Message type:', event.data.type);
     
     // 🔧 FIX: Normalize message structure - handle both flat and nested formats
-    let messageData = event.data;
-    let actualMessageType = messageData.type;
+    let messageData: OAuthMessageFlat;
+    let actualMessageType: string;
     
     // Handle nested OAUTH_MESSAGE structure from auth server
-    if (messageData.type === 'OAUTH_MESSAGE' && messageData.data) {
+    if (event.data.type === 'OAUTH_MESSAGE' && 'data' in event.data) {
       console.log('📦 Processing nested OAuth message from auth server');
-      const innerData = messageData.data;
+      const nestedMessage = event.data as OAuthMessageNested;
+      const innerData = nestedMessage.data;
       
       // Map auth server message types to our expected types
       if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE' || 
@@ -902,16 +924,36 @@ export class PopupOAuthLogin {
         
         // Normalize to flat structure for processing
         messageData = {
-          type: 'OAUTH_SUCCESS',
+          type: 'OAUTH_SUCCESS' as const,
           tokenData: innerData.tokenData,
           token: innerData.token
         };
         actualMessageType = 'OAUTH_SUCCESS';
-      } else {
-        // Use inner data as the actual message
-        messageData = innerData;
+      } else if (innerData.type === 'OAUTH_SUCCESS' || innerData.type === 'OAUTH_ERROR' || innerData.type === 'OAUTH_ACK') {
+        // Direct mapping for standard types
+        messageData = {
+          type: innerData.type,
+          tokenData: innerData.tokenData,
+          token: innerData.token,
+          error: innerData.error,
+          error_description: innerData.error_description
+        };
         actualMessageType = innerData.type;
+      } else {
+        // Unknown inner type, reject
+        console.error('Unknown inner OAuth message type:', innerData.type);
+        reject(new Error('Unknown OAuth message type'));
+        return;
       }
+    } else if (event.data.type === 'OAUTH_SUCCESS' || event.data.type === 'OAUTH_ERROR' || event.data.type === 'OAUTH_ACK') {
+      // Already flat structure
+      messageData = event.data as OAuthMessageFlat;
+      actualMessageType = messageData.type;
+    } else {
+      // Invalid message type
+      console.error('Invalid OAuth message type:', event.data.type);
+      reject(new Error('Invalid OAuth message type'));
+      return;
     }
     
     this.messageReceived = true;
@@ -966,8 +1008,8 @@ export class PopupOAuthLogin {
       this.cleanup();
       
       // 🔧 ENHANCED: Check for login_required error and suggest fallback
-      if (event.data.error === 'login_required' || 
-          (event.data.error_description && event.data.error_description.includes('Force re-authentication required'))) {
+      if (messageData.error === 'login_required' || 
+          (messageData.error_description && messageData.error_description.includes('Force re-authentication required'))) {
         console.log('🔄 OAuth server rejected forced login, this is expected behavior');
         console.log('ℹ️ The "다른 사용자로 로그인" flow requires manual logout from OAuth server first');
         
@@ -983,12 +1025,12 @@ export class PopupOAuthLogin {
         (helpfulError as any).code = 'LOGIN_REQUIRED';
         (helpfulError as any).recoverable = true;
         reject(helpfulError);
-      } else if (event.data.error === 'Account selection required' || 
-                 event.data.error === 'User must select an account') {
+      } else if (messageData.error === 'Account selection required' || 
+                 messageData.error === 'User must select an account') {
         // 🔧 NEW: Handle new error from OAuth server (with both possible error messages)
         console.log('🔄 OAuth server requires account selection');
         console.log('ℹ️ The OAuth server is requesting account selection but may not support it properly');
-        console.log('📊 Actual error message:', event.data.error);
+        console.log('📊 Actual error message:', messageData.error);
         
         // Provide helpful error message for this specific case
         const accountSelectionError = new Error(
@@ -1002,8 +1044,8 @@ export class PopupOAuthLogin {
         (accountSelectionError as any).recoverable = true;
         reject(accountSelectionError);
       } else {
-        console.log('🚨 Unexpected OAuth error:', event.data.error);
-        reject(new Error(event.data.error || 'OAuth authentication failed'));
+        console.log('🚨 Unexpected OAuth error:', messageData.error);
+        reject(new Error(messageData.error || 'OAuth authentication failed'));
       }
     }
   }
