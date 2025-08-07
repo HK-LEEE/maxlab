@@ -1662,9 +1662,9 @@ export async function exchangeCodeForToken(code: string, state?: string): Promis
     try {
       // 🔧 CRITICAL FIX: Call backend API instead of OAuth server directly
       const backendApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
-      console.log('🔄 Calling backend OAuth token endpoint:', `${backendApiUrl}/api/oauth/token`);
+      console.log('🔄 Calling backend OAuth token endpoint:', `${backendApiUrl}/oauth/token`);
       
-      const response = await fetch(`${backendApiUrl}/api/oauth/token`, {
+      const response = await fetch(`${backendApiUrl}/oauth/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -1828,9 +1828,9 @@ export function isPopupMode(): boolean {
 export async function getUserInfo(accessToken: string): Promise<any> {
   // 🔧 CRITICAL FIX: Call backend API instead of OAuth server directly
   const backendApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
-  console.log('🔄 Calling backend OAuth userinfo endpoint:', `${backendApiUrl}/api/oauth/userinfo`);
+  console.log('🔄 Calling backend OAuth userinfo endpoint:', `${backendApiUrl}/oauth/userinfo`);
   
-  const response = await fetch(`${backendApiUrl}/api/oauth/userinfo`, {
+  const response = await fetch(`${backendApiUrl}/oauth/userinfo`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }

@@ -125,11 +125,11 @@ class OIDCService {
     return {
       issuer: this.authUrl,
       authorization_endpoint: `${this.authUrl}/api/oauth/authorize`, // OAuth server (popup)
-      token_endpoint: `${backendApiUrl}/api/oauth/token`, // Backend API
-      userinfo_endpoint: `${backendApiUrl}/api/oauth/userinfo`, // Backend API
+      token_endpoint: `${backendApiUrl}/oauth/token`, // Backend API
+      userinfo_endpoint: `${backendApiUrl}/oauth/userinfo`, // Backend API
       jwks_uri: `${this.authUrl}/api/oauth/jwks`, // OAuth server
       end_session_endpoint: `${this.authUrl}/api/oauth/logout`, // OAuth server
-      revocation_endpoint: `${backendApiUrl}/api/oauth/revoke`, // Backend API
+      revocation_endpoint: `${backendApiUrl}/oauth/revoke`, // Backend API
       scopes_supported: ['openid', 'profile', 'email', 'offline_access', 'groups', 'roles'],
       response_types_supported: ['code', 'id_token', 'token', 'code id_token', 'code token', 'id_token token', 'code id_token token'],
       grant_types_supported: ['authorization_code', 'refresh_token', 'client_credentials'],
