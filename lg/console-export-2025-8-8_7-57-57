@@ -1,0 +1,79 @@
+07:57:30.520 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: true, forceLogin: false, oauthProcessedRef: false }
+index-DJl22wc1.js:715:971
+07:57:30.521 ✅ User authenticated, checking OAuth return... index-DJl22wc1.js:715:1270
+07:57:30.521 🔄 OAuth return processing: 
+Object { isInPopup: true, oauthParams: {…} }
+index-DJl22wc1.js:715:1403
+07:57:30.521 {"response_type":"code","client_id":"maxlab","redirect_uri":"https://maxlab.dwchem.co.kr/oauth/callback","scope":"openid profile email offline_access read:profile read:groups manage:workflows","state":"XylLeNGgIwec69FhWxXqHQAlYpospN5ePiTqPPVRnkY","code_challenge":"GAmwuUVtmyoGuiO9Zzca7lxqskqwgVYgxSJI1Frd93M","code_challenge_method":"S256","nonce":"Go77b1oJKkELcTZxw57pp2lXYVUjDzTSfKbLS9UIK6g"} index-DJl22wc1.js:715:1474
+07:57:30.522 🚀 User already authenticated in popup, redirecting to OAuth authorize... index-DJl22wc1.js:715:1619
+07:57:30.522 🔄 Popup redirecting to OAuth authorize for code generation: https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=XylLeNGgIwec69FhWxXqHQAlYpospN5ePiTqPPVRnkY&code_challenge=GAmwuUVtmyoGuiO9Zzca7lxqskqwgVYgxSJI1Frd93M&code_challenge_method=S256&nonce=Go77b1oJKkELcTZxw57pp2lXYVUjDzTSfKbLS9UIK6g index-DJl22wc1.js:715:1834
+07:57:30.525 ❌ 인증 초기화 실패: 
+Object { message: "Request aborted", name: "AxiosError", code: "ECONNABORTED", config: {…}, request: XMLHttpRequest, stack: "", … }
+index-DJl22wc1.js:539:65417
+    d4 https://max.dwchem.co.kr/assets/index-DJl22wc1.js:539
+    d4 https://max.dwchem.co.kr/assets/index-DJl22wc1.js:539
+    Wc https://max.dwchem.co.kr/assets/index-DJl22wc1.js:40
+    ea https://max.dwchem.co.kr/assets/index-DJl22wc1.js:40
+    aN https://max.dwchem.co.kr/assets/index-DJl22wc1.js:40
+    _ https://max.dwchem.co.kr/assets/index-DJl22wc1.js:25
+    D https://max.dwchem.co.kr/assets/index-DJl22wc1.js:25
+    (Async: EventHandlerNonNull)
+    <anonymous> https://max.dwchem.co.kr/assets/index-DJl22wc1.js:25
+    <anonymous> https://max.dwchem.co.kr/assets/index-DJl22wc1.js:25
+07:57:30.526 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: true }
+index-DJl22wc1.js:715:971
+07:57:30.526 ⏭️ OAuth already processed, skipping... index-DJl22wc1.js:715:1118
+07:57:30.526 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: true }
+index-DJl22wc1.js:715:971
+07:57:30.526 ⏭️ OAuth already processed, skipping... index-DJl22wc1.js:715:1118
+07:57:30.526 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-DJl22wc1.js:539:64682
+07:57:30.527 📡 TRY start index-DJl22wc1.js:539:64744
+07:57:30.527 ❌ 토큰이 없어 인증되지 않은 상태 index-DJl22wc1.js:539:65367
+07:57:30.541 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+offline_access+read:profile+read:groups+manage:workflows&state=XylLeNGgIwec69FhWxXqHQAlYpospN5ePiTqPPVRnkY&code_challenge=GAmwuUVtmyoGuiO9Zzca7lxqskqwgVYgxSJI1Frd93M&code_challenge_method=S256&nonce=Go77b1oJKkELcTZxw57pp2lXYVUjDzTSfKbLS9UIK6g
+NS_BINDING_ABORTED
+
+	
+GET
+	https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid profile email offline_access read:profile read:groups manage:workflows&state=XylLeNGgIwec69FhWxXqHQAlYpospN5ePiTqPPVRnkY&code_challenge=GAmwuUVtmyoGuiO9Zzca7lxqskqwgVYgxSJI1Frd93M&code_challenge_method=S256&nonce=Go77b1oJKkELcTZxw57pp2lXYVUjDzTSfKbLS9UIK6g
+Transferred0 GB (0 GB size)
+Referrer Policystrict-origin-when-cross-origin
+Request PriorityHighest
+DNS ResolutionSystem
+
+07:57:30.544 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+offline_access+read:profile+read:groups+manage:workflows&state=XylLeNGgIwec69FhWxXqHQAlYpospN5ePiTqPPVRnkY&code_challenge=GAmwuUVtmyoGuiO9Zzca7lxqskqwgVYgxSJI1Frd93M&code_challenge_method=S256&nonce=Go77b1oJKkELcTZxw57pp2lXYVUjDzTSfKbLS9UIK6g
+[HTTP/2 307  8ms]
+
+07:57:30.559 GET
+https://max.dwchem.co.kr/login?oauth_return={"response_type": "code", "client_id": "maxlab", "redirect_uri": "https://maxlab.dwchem.co.kr/oauth/callback", "scope": "openid profile email offline_access read:profile read:groups manage:workflows", "state": "XylLeNGgIwec69FhWxXqHQAlYpospN5ePiTqPPVRnkY", "code_challenge": "GAmwuUVtmyoGuiO9Zzca7lxqskqwgVYgxSJI1Frd93M", "code_challenge_method": "S256", "nonce": "Go77b1oJKkELcTZxw57pp2lXYVUjDzTSfKbLS9UIK6g"}
+[HTTP/2 200  0ms]
+
+07:57:30.571 GET
+https://max.dwchem.co.kr/assets/index-DHTf0g6U.css
+[HTTP/2 200 OK 0ms]
+
+07:57:30.625 GET
+https://max.dwchem.co.kr/assets/index-DJl22wc1.js
+[HTTP/2 200  0ms]
+
+07:57:30.679 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: true, forceLogin: false, oauthProcessedRef: false }
+index-DJl22wc1.js:715:971
+07:57:30.681 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-DJl22wc1.js:539:64682
+07:57:30.682 📡 TRY start index-DJl22wc1.js:539:64744
+07:57:30.682 ❌ 토큰이 없어 인증되지 않은 상태 index-DJl22wc1.js:539:65367
+07:57:30.683 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: true, forceLogin: false, oauthProcessedRef: false }
+index-DJl22wc1.js:715:971
+07:57:30.698 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
