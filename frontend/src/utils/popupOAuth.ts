@@ -921,19 +921,51 @@ export class PopupOAuthLogin {
               });
             return;
           } else {
-            // No authorization code - this is the OAuth server bug
-            console.error('❌ OAuth Server Bug: Message without authorization code');
-            console.error('🔴 Server sent:', innerData.type);
-            console.error('🔴 With params:', Object.keys(innerData.oauthParams));
-            console.error('📋 Expected: authorization code in params');
+            // 🔧 FIX: When already authenticated without code, redirect to OAuth callback with code
+            console.warn('⚠️ OAuth Server sent ALREADY_AUTHENTICATED without authorization code');
+            console.log('🔄 Redirecting to complete OAuth flow with authorization code...');
             
-            this.cleanup();
-            reject(new Error(
-              `OAuth Server Error: ${innerData.type} response missing authorization code. ` +
-              'The OAuth server must provide an authorization code for ALL authentication flows. ' +
-              'Please contact the OAuth server team to implement standard OAuth 2.0 flow.'
-            ));
-            return;
+            // Build OAuth URL to force getting an authorization code
+            const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'https://max.dwchem.co.kr';
+            const redirectUri = `${window.location.origin}/oauth/callback`;
+            const state = this.currentFlowState?.state || generateState();
+            
+            // Force OAuth flow to get authorization code
+            const oauthUrl = `${authUrl}/api/oauth/authorize?` +
+              `response_type=code&` +
+              `client_id=maxlab&` +
+              `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+              `scope=${encodeURIComponent(innerData.oauthParams?.scope || 'openid profile email offline_access read:profile read:groups manage:workflows')}&` +
+              `state=${state}&` +
+              `code_challenge=${this.currentFlowState?.codeChallenge || ''}&` +
+              `code_challenge_method=S256&` +
+              `nonce=${this.currentFlowState?.nonce || ''}`;
+            
+            console.log('🚀 Redirecting to OAuth URL to get authorization code:', oauthUrl);
+            
+            // Navigate the popup to the OAuth URL to get the authorization code
+            if (this.popup && !this.popup.closed) {
+              try {
+                this.popup.location.href = oauthUrl;
+                console.log('✅ Popup redirected to OAuth authorization endpoint');
+                
+                // Keep listening for the proper OAuth callback - don't cleanup or reject
+                // The message listener will continue to wait for the OAuth callback
+                return;
+              } catch (e) {
+                console.error('❌ Failed to redirect popup:', e);
+                this.cleanup();
+                reject(new Error('Failed to redirect OAuth popup. Please try logging in again.'));
+                return;
+              }
+            } else {
+              // If popup is closed, cleanup and reject with specific error
+              this.cleanup();
+              reject(new Error(
+                'OAuth popup was closed. Please try logging in again.'
+              ));
+              return;
+            }
           }
         }
         

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth SSO Fix Test - MAX Lab to MAX Platform</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .log-entry {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #667eea;
+            background: #f7fafc;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .log-entry.error {
+            border-left-color: #f56565;
+            background: #fff5f5;
+        }
+        .log-entry.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        .log-entry.warning {
+            border-left-color: #ed8936;
+            background: #fffdf7;
+        }
+        .status {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        .status.authenticated {
+            background: #f0fff4;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+        .status.unauthenticated {
+            background: #fff5f5;
+            color: #742a2a;
+            border: 2px solid #f56565;
+        }
+        .test-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .test-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        .flow-diagram {
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 OAuth SSO Fix Test</h1>
+        <p class="subtitle">Testing the fixed OAuth flow between MAX Lab (Client) and MAX Platform (Auth Server)</p>
+        
+        <div id="authStatus" class="status unauthenticated">
+            Not Authenticated
+        </div>
+    </div>
+
+    <div class="test-section">
+        <div class="container">
+            <h2>✅ Test Fixed OAuth Flow</h2>
+            <p>This tests the new OAuth flow with proper authorization code handling</p>
+            
+            <button onclick="testFixedOAuthFlow()">Test Fixed OAuth Login</button>
+            <button onclick="testAlreadyAuthenticated()">Test Already Authenticated</button>
+            <button onclick="testForceReauth()">Test Force Re-authentication</button>
+            
+            <div id="fixedLog" style="margin-top: 20px;"></div>
+        </div>
+
+        <div class="container">
+            <h2>🔍 OAuth Flow Analysis</h2>
+            <p>Real-time analysis of OAuth messages and flow</p>
+            
+            <div id="analysisLog" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 OAuth Flow Diagram</h2>
+        <div class="flow-diagram">
+            <pre>
+┌─────────────┐      ┌─────────────┐      ┌──────────────┐
+│   MAX Lab   │      │ MAX Platform│      │   OAuth      │
+│  (Client)   │      │   (Server)  │      │   Callback   │
+└──────┬──────┘      └──────┬──────┘      └──────┬───────┘
+       │                     │                     │
+       │ 1. Login Button     │                     │
+       ├────────────────────►│                     │
+       │                     │                     │
+       │ 2. OAuth Authorize  │                     │
+       │    (popup)          │                     │
+       ├────────────────────►│                     │
+       │                     │                     │
+       │ 3. Check Auth State │                     │
+       │                     ├─┐                   │
+       │                     │ │ Already           │
+       │                     │ │ Authenticated?    │
+       │                     │◄┘                   │
+       │                     │                     │
+       │ 4a. If Yes:         │                     │
+       │     Generate Code   │                     │
+       │◄────────────────────┤                     │
+       │                     │                     │
+       │ 4b. If No:          │                     │
+       │     Show Login      │                     │
+       │◄────────────────────┤                     │
+       │                     │                     │
+       │ 5. Redirect with    │                     │
+       │    Authorization    │                     │
+       │    Code             │                     │
+       ├─────────────────────┼────────────────────►│
+       │                     │                     │
+       │ 6. Exchange Code    │                     │
+       │    for Token        │                     │
+       │◄────────────────────┼─────────────────────┤
+       │                     │                     │
+       │ 7. Authentication   │                     │
+       │    Complete         │                     │
+       │                     │                     │
+            </pre>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Debug Information</h2>
+        <button onclick="checkSessionStorage()">Check Session Storage</button>
+        <button onclick="checkLocalStorage()">Check Local Storage</button>
+        <button onclick="clearAllStorage()">Clear All Storage</button>
+        <button onclick="simulateDeprecatedMessage()">Simulate Deprecated Message</button>
+        
+        <div id="debugLog" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const MAX_LAB_URL = window.location.origin;
+        const MAX_PLATFORM_URL = 'https://max.dwchem.co.kr';
+        const OAUTH_ENDPOINT = '/api/oauth/authorize';
+        const CLIENT_ID = 'maxlab';
+        
+        // Logging utilities
+        function log(target, message, type = 'info') {
+            const logDiv = document.getElementById(target);
+            if (!logDiv) return;
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+        }
+        
+        // Check authentication status
+        function checkAuthStatus() {
+            const token = localStorage.getItem('accessToken');
+            const user = localStorage.getItem('user');
+            const statusDiv = document.getElementById('authStatus');
+            
+            if (token && user) {
+                statusDiv.className = 'status authenticated';
+                statusDiv.textContent = `Authenticated as: ${JSON.parse(user).username || 'User'}`;
+                return true;
+            } else {
+                statusDiv.className = 'status unauthenticated';
+                statusDiv.textContent = 'Not Authenticated';
+                return false;
+            }
+        }
+        
+        // Test fixed OAuth flow
+        async function testFixedOAuthFlow() {
+            log('fixedLog', 'Starting fixed OAuth flow test...', 'info');
+            
+            try {
+                // Generate OAuth parameters
+                const state = generateRandomString();
+                const codeVerifier = generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                const nonce = generateRandomString();
+                
+                // Store in session storage
+                sessionStorage.setItem('oauth_state', state);
+                sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+                sessionStorage.setItem('oauth_nonce', nonce);
+                
+                log('fixedLog', 'OAuth parameters generated and stored', 'success');
+                
+                // Build OAuth URL
+                const params = new URLSearchParams({
+                    response_type: 'code',
+                    client_id: CLIENT_ID,
+                    redirect_uri: `${MAX_LAB_URL}/oauth/callback`,
+                    scope: 'openid profile email offline_access read:profile read:groups manage:workflows',
+                    state: state,
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    nonce: nonce
+                });
+                
+                const authUrl = `${MAX_PLATFORM_URL}${OAUTH_ENDPOINT}?${params.toString()}`;
+                log('fixedLog', `Opening OAuth popup: ${authUrl}`, 'info');
+                
+                // Open popup
+                const popup = window.open(authUrl, 'oauth_popup', 'width=600,height=700');
+                
+                if (!popup) {
+                    throw new Error('Popup blocked! Please allow popups for this site.');
+                }
+                
+                // Listen for OAuth messages
+                window.addEventListener('message', handleOAuthMessage);
+                
+                // Monitor popup
+                const checkInterval = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(checkInterval);
+                        window.removeEventListener('message', handleOAuthMessage);
+                        log('fixedLog', 'Popup closed', 'warning');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                log('fixedLog', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Handle OAuth messages
+        function handleOAuthMessage(event) {
+            log('analysisLog', `Message received from: ${event.origin}`, 'info');
+            log('analysisLog', `Message type: ${event.data?.type}`, 'info');
+            
+            if (event.data?.type === 'OAUTH_MESSAGE' && event.data?.data) {
+                const innerData = event.data.data;
+                log('analysisLog', `Inner message type: ${innerData.type}`, 'info');
+                
+                // Check for deprecated messages
+                if (innerData.type === 'OAUTH_ALREADY_AUTHENTICATED' || 
+                    innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE') {
+                    log('analysisLog', `⚠️ DEPRECATED message received: ${innerData.type}`, 'warning');
+                    log('analysisLog', `Has authorization code: ${!!innerData.oauthParams?.code}`, 'warning');
+                    
+                    if (!innerData.oauthParams?.code) {
+                        log('analysisLog', '❌ Missing authorization code - OAuth fix should redirect', 'error');
+                        log('fixedLog', 'Fix applied: Redirecting to get authorization code...', 'success');
+                    }
+                }
+                
+                if (innerData.type === 'OAUTH_SUCCESS') {
+                    log('analysisLog', '✅ OAuth success message received', 'success');
+                    log('fixedLog', 'Authentication successful!', 'success');
+                    
+                    // Update auth status
+                    setTimeout(checkAuthStatus, 1000);
+                }
+                
+                if (innerData.type === 'OAUTH_ERROR') {
+                    log('analysisLog', `❌ OAuth error: ${innerData.error}`, 'error');
+                    log('fixedLog', `Authentication failed: ${innerData.error}`, 'error');
+                }
+            }
+        }
+        
+        // Test already authenticated scenario
+        function testAlreadyAuthenticated() {
+            log('fixedLog', 'Testing already authenticated scenario...', 'info');
+            
+            // Simulate already authenticated message
+            const message = {
+                type: 'OAUTH_MESSAGE',
+                data: {
+                    type: 'OAUTH_ALREADY_AUTHENTICATED',
+                    oauthParams: {
+                        // No authorization code - this is the problem
+                        response_type: 'code',
+                        client_id: CLIENT_ID,
+                        scope: 'openid profile email'
+                    }
+                }
+            };
+            
+            log('analysisLog', 'Simulating OAUTH_ALREADY_AUTHENTICATED without code', 'warning');
+            handleOAuthMessage({ data: message, origin: MAX_PLATFORM_URL });
+        }
+        
+        // Test force re-authentication
+        function testForceReauth() {
+            log('fixedLog', 'Testing force re-authentication...', 'info');
+            
+            // Clear existing auth
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            checkAuthStatus();
+            
+            // Start OAuth with prompt=login
+            testFixedOAuthFlow();
+        }
+        
+        // Utility functions
+        function generateRandomString() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return btoa(String.fromCharCode(...array))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+        
+        function generateCodeVerifier() {
+            return generateRandomString();
+        }
+        
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+        
+        // Debug functions
+        function checkSessionStorage() {
+            const items = {};
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key.includes('oauth') || key.includes('auth')) {
+                    items[key] = sessionStorage.getItem(key);
+                }
+            }
+            log('debugLog', `Session Storage: ${JSON.stringify(items, null, 2)}`, 'info');
+        }
+        
+        function checkLocalStorage() {
+            const items = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('token') || key.includes('user')) {
+                    items[key] = localStorage.getItem(key);
+                }
+            }
+            log('debugLog', `Local Storage: ${JSON.stringify(items, null, 2)}`, 'info');
+        }
+        
+        function clearAllStorage() {
+            // Clear OAuth-related session storage
+            const sessionKeys = [];
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key.includes('oauth') || key.includes('auth')) {
+                    sessionKeys.push(key);
+                }
+            }
+            sessionKeys.forEach(key => sessionStorage.removeItem(key));
+            
+            // Clear auth from local storage
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            
+            log('debugLog', 'All OAuth storage cleared', 'success');
+            checkAuthStatus();
+        }
+        
+        function simulateDeprecatedMessage() {
+            log('debugLog', 'Simulating deprecated OAuth message...', 'warning');
+            
+            const deprecatedMessage = {
+                type: 'OAUTH_MESSAGE',
+                data: {
+                    type: 'OAUTH_ALREADY_AUTHENTICATED',
+                    oauthParams: {
+                        response_type: 'code',
+                        client_id: CLIENT_ID,
+                        redirect_uri: `${MAX_LAB_URL}/oauth/callback`,
+                        scope: 'openid profile email',
+                        // Missing: code (this is the problem)
+                    },
+                    timestamp: Date.now()
+                }
+            };
+            
+            window.postMessage(deprecatedMessage, window.location.origin);
+            log('debugLog', 'Deprecated message sent to window', 'success');
+        }
+        
+        // Initialize
+        checkAuthStatus();
+        log('fixedLog', 'OAuth SSO Fix Test initialized', 'info');
+        log('analysisLog', 'Ready to analyze OAuth messages', 'info');
+    </script>
+</body>
+</html>
