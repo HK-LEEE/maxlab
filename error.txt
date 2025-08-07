@@ -1,26 +1,143 @@
-2025-08-07T08:42:54: INFO:     Application shutdown complete.
-2025-08-07T08:42:54: INFO:     Finished server process [79635]
-2025-08-07T08:42:56: INFO:     Started server process [131871]
-2025-08-07T08:42:56: INFO:     Waiting for application startup.
-2025-08-07T08:42:56: INFO:     Application startup complete.
-2025-08-07T08:42:56: INFO:     Uvicorn running on http://127.0.0.1:8010 (Press CTRL+C to quit)
+14:26:39.083 🔄 Calling backend OAuth userinfo endpoint: https://maxlab.dwchem.co.kr/api/api/oauth/userinfo index-DpGqARjq.js:257:12487
+14:26:39.126
+XHRGET
+https://maxlab.dwchem.co.kr/api/api/oauth/userinfo
+[HTTP/2 404  2ms]
 
+	
+GET
+	https://maxlab.dwchem.co.kr/api/api/oauth/userinfo
+Status
+404
+VersionHTTP/2
+Transferred480 B (22 B size)
+Referrer Policystrict-origin-when-cross-origin
+DNS ResolutionSystem
 
-2025-08-06T15:13:57: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=HprI6o4SLTlTtIyrCQbIxnOy0Y-GfGyGvmScY_H2DO0&state=vdbfFzbBOQQT6dkD432r1aRi3zKg5PNvSHIXMP9yo0w HTTP/1.0" 404 Not F>
-2025-08-06T15:18:08: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=93ZOV4ddpiOjYVo-fakOB-LgUuIOjFkQEbc7jjvDOq4&state=k5_cwkgkslTdFd3-Zk_WBIZxSRY0pLdxoLp7eYx08fE HTTP/1.0" 404 Not F>
-2025-08-06T15:18:17: INFO:     127.0.0.1:37512 - "GET /docs HTTP/1.1" 404 Not Found
-2025-08-06T15:18:17: INFO:     127.0.0.1:37516 - "GET /favicon.ico HTTP/1.1" 404 Not Found
-2025-08-06T15:18:21: INFO:     127.0.0.1:37512 - "GET /docs HTTP/1.1" 404 Not Found
-2025-08-06T15:18:21: INFO:     127.0.0.1:37516 - "GET /favicon.ico HTTP/1.1" 404 Not Found
-2025-08-06T17:06:07: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=91nAmnUXDIuY7jWJ1pWLHqZC5YPGIxDyq1lNOTPjGf8&state=eY0R-slm2dl1xwqetGx_ygp2oAvsJQcvcbm68a4AYOE HTTP/1.0" 404 Not F>
-2025-08-06T17:14:12: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=D9Xc4NHV9JknIy2mmvF_BkLuMlwVHV92KXAel9G_0hE&state=cFv7p-w8GUbbYB8m80obZsakAitENtFbVPz0WX9TXdw HTTP/1.0" 404 Not F>
-2025-08-06T17:29:17: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=KVYRmfsyL7Av-D441Qi3dARU3k3CkUUF8DL-ZBC6qbs&state=lYn9P6NjkS2hogK9sbDPYovYipr9a58UuVPnP_rNluU HTTP/1.0" 404 Not F>
-2025-08-06T17:34:25: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=_Lro0hTExetKaF7GZ9Ov48JF6xQa-dFwtfCUlbDqF68&state=y7oZcfMQCHj3UWWsmQHgGHX30qcT1WYCJDBqeEpjNm4 HTTP/1.0" 404 Not F>
-2025-08-06T17:56:24: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-06T18:14:36: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-06T18:22:07: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-06T18:24:20: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-06T18:26:34: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-06T18:37:15: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-06T19:23:56: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
-2025-08-07T08:46:40: INFO:     192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 404 Not Found
+	
+content-length
+	22
+content-security-policy
+	default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'
+content-type
+	application/json
+date
+	Thu, 07 Aug 2025 05:26:39 GMT
+referrer-policy
+	strict-origin-when-cross-origin
+server
+	nginx/1.24.0 (Ubuntu)
+strict-transport-security
+	max-age=31536000; includeSubDomains
+x-content-type-options
+	nosniff
+X-Firefox-Spdy
+	h2
+x-frame-options
+	SAMEORIGIN
+x-xss-protection
+	1; mode=block
+	
+Accept
+	*/*
+Accept-Encoding
+	gzip, deflate, br, zstd
+Accept-Language
+	en-US,en;q=0.5
+Authorization
+	Bearer pending_callback
+Connection
+	keep-alive
+Cookie
+	csrf_token=d8e5d7c94c51dc1bc617aaa3661f85a99f48ba0d8daf5d4756aa0097549b4b17
+Host
+	maxlab.dwchem.co.kr
+Priority
+	u=4
+Referer
+	https://maxlab.dwchem.co.kr/login?logout=error
+Sec-Fetch-Dest
+	empty
+Sec-Fetch-Mode
+	cors
+Sec-Fetch-Site
+	same-origin
+TE
+	trailers
+User-Agent
+	Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0
+14:26:39.133
+Popup OAuth login error: Error: Failed to fetch user info: 
+    Fi https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:257
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:262
+    V https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:752
+    onClick https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:768
+    D0 https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    Pp https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    vf https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    bk https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    I0 https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    rf https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    af https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    af https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:864
+index-DpGqARjq.js:262:89301
+14:26:39.134 ⚠️ Preserving oauth_force_account_selection due to no success result index-DpGqARjq.js:257:1444
+14:26:39.134
+🔥 authService.loginWithPopupOAuth error: Error: OAuth login failed. Please try again or contact support if the problem persists.
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:262
+    V https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:752
+    onClick https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:768
+    D0 https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    Pp https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    vf https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    bk https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    I0 https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    rf https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    af https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    af https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:864
+index-DpGqARjq.js:752:11656
+14:26:39.134
+🔥 Error stack: loginWithPopupOAuth@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:262:89644
+async*V@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:752:11427
+onClick@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:768:2491
+D0@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:118234
+Ok/of/<@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:123532
+Pp@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:9041
+of@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:119471
+vf@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49:26825
+bk@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49:26645
+EventListener.handleEvent*I0@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:119032
+rf@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:118432
+Ok/af/<@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:118598
+af@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48:118543
+Ok/Ui.createRoot@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49:33858
+@https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:864:100808
+index-DpGqARjq.js:752:11739
+14:26:39.134
+OAuth login error: Error: OAuth login failed. Please try again or contact support if the problem persists.
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:262
+    V https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:752
+    onClick https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:768
+    D0 https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    Pp https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    vf https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    bk https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    I0 https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    rf https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    af https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    af https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-DpGqARjq.js:864
+index-DpGqARjq.js:752:12441
+14:26:39.134 🔥 Finally block executed index-DpGqARjq.js:768:388
+14:26:39.134 🔥 mountedRef.current: true
