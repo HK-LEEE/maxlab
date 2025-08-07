@@ -1,86 +1,140 @@
-14:35:36.703 ✅ Popup OAuth successful, getting user info... index-VZpQQGJR.js:262:87501
-14:35:36.704 🔄 Calling backend OAuth userinfo endpoint: https://maxlab.dwchem.co.kr/api/oauth/userinfo index-VZpQQGJR.js:257:12479
-14:35:36.745
+4:43:52.244 🔐 OAuth Configuration: 
+Object { clientId: "maxlab", redirectUri: "https://maxlab.dwchem.co.kr/oauth/callback", authUrl: "https://max.dwchem.co.kr", runtimeConfig: "Not available", envAuthUrl: "https://max.dwchem.co.kr", currentOrigin: "https://maxlab.dwchem.co.kr" }
+index--vgYCzxK.js:228:20734
+14:43:52.245 🔐 Starting popup OAuth login (force account selection: false)... index--vgYCzxK.js:262:86404
+14:43:52.245 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: true, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index--vgYCzxK.js:752:4401
+14:43:52.255 🔐 OAuth flow state created: 
+Object { flowId: "me0z1ry7cu83jgqxzmm", flowType: "popup", expiresIn: "900s", forceAccountSelection: false }
+index--vgYCzxK.js:228:12027
+14:43:52.255 🔄 OAuth flow status updated: 
+Object { flowId: "me0z1ry7cu83jgqxzmm", status: "in_progress", flowType: "popup" }
+index--vgYCzxK.js:228:14627
+14:43:52.255 🔐 OAuth Flow State Created: 
+Object { flowId: "me0z1ry7cu83jgqxzmm", flowType: "popup", state: "3Wx1JXwR...", codeVerifier: "tSWBZlXw...", nonce: "9evwSTaT...", forceAccountSelection: false, expiresAt: "2025-08-07T05:58:52.255Z", timestamp: "2025-08-07T05:43:52.256Z" }
+index--vgYCzxK.js:228:23061
+14:43:52.255 🔐 Opening OAuth popup: https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=3Wx1JXwRYkAak_s63Vv55_1Z5r7TTVadTu2xERzygpM&code_challenge=oD4lpDflO5Xn7vFim6YTXKqZ9BrA3Nl2Di4CAd9pLvE&code_challenge_method=S256&nonce=9evwSTaTQi1FQcMtHgy_b5ZM1c5zbvcXgkTpS1oIdgw index--vgYCzxK.js:228:24360
+14:43:52.255 📋 Full OAuth URL params: response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=3Wx1JXwRYkAak_s63Vv55_1Z5r7TTVadTu2xERzygpM&code_challenge=oD4lpDflO5Xn7vFim6YTXKqZ9BrA3Nl2Di4CAd9pLvE&code_challenge_method=S256&nonce=9evwSTaTQi1FQcMtHgy_b5ZM1c5zbvcXgkTpS1oIdgw index--vgYCzxK.js:228:24401
+14:43:52.255 📡 Setting up message listeners before popup... index--vgYCzxK.js:228:24455
+14:43:52.371 ✅ OAuth popup opened successfully index--vgYCzxK.js:233:153
+14:43:53.729 📨 Parent window received message: 
+Object { type: "OAUTH_MESSAGE", data: {…} }
+index--vgYCzxK.js:228:24551
+14:43:53.729 📨 OAuth message validation: 
+Object { origin: "https://max.dwchem.co.kr", messageType: "OAUTH_MESSAGE", validationResult: {…}, trustedOrigins: "https://maxlab.dwchem.co.kr,https://max.dwchem.co.kr,https://maxlab.io..." }
+index--vgYCzxK.js:233:4457
+14:43:53.730 📨 Received OAuth message: 
+Object { type: "OAUTH_MESSAGE", data: {…} }
+index--vgYCzxK.js:233:5658
+14:43:53.730 Message origin: https://max.dwchem.co.kr index--vgYCzxK.js:233:5707
+14:43:53.730 Message type: OAUTH_MESSAGE index--vgYCzxK.js:233:5747
+14:43:53.730 📦 Processing nested OAuth message from auth server index--vgYCzxK.js:233:5847
+14:43:53.730 🔄 Mapping OAUTH_LOGIN_SUCCESS_CONTINUE to OAUTH_SUCCESS index--vgYCzxK.js:233:6021
+14:43:53.730 📝 Auth server sent OAuth params, marking as success for callback processing index--vgYCzxK.js:233:6089
+14:43:53.730 🔍 Searching for OAuth flow state with state: 3Wx1JXwR... index--vgYCzxK.js:228:12200
+14:43:53.730 📋 Found total flow states: 1 index--vgYCzxK.js:228:12317
+14:43:53.730 ✅ Found OAuth flow state: 
+Object { flowId: "me0z1ry7cu83jgqxzmm", flowType: "popup", status: "in_progress", hasCodeVerifier: true, codeVerifierLength: 43 }
+index--vgYCzxK.js:228:13854
+14:43:53.730 🔄 OAuth flow status updated: 
+Object { flowId: "me0z1ry7cu83jgqxzmm", status: "completed", flowType: "popup" }
+index--vgYCzxK.js:228:14627
+14:43:53.730 🔄 OAuth flow state updated to: 
+Object { flowId: "me0z1ry7cu83jgqxzmm", status: "completed", messageReceived: true }
+index--vgYCzxK.js:257:678
+14:43:53.730 ⚠️ Preserving oauth_force_account_selection due to no success result index--vgYCzxK.js:257:1444
+14:43:53.730 ✅ Popup OAuth successful, getting user info... index--vgYCzxK.js:262:87550
+14:43:53.730 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index--vgYCzxK.js:257:12480
+14:43:53.773
 XHRGET
-https://maxlab.dwchem.co.kr/api/oauth/userinfo
-[HTTP/2 401  31ms]
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 401  3ms]
 
-14:35:36.793
-Popup OAuth login error: Error: Failed to fetch user info:
-    Fi https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:257
-    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:262
-    V https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:752
-    onClick https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:768
-    D0 https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    Pp https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    vf https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    bk https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    I0 https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    rf https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    af https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    af https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    createRoot https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    <anonymous> https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:864
-index-VZpQQGJR.js:262:89289
-14:35:36.794 ⚠️ Preserving oauth_force_account_selection due to no success result index-VZpQQGJR.js:257:1444
-14:35:36.795
-🔥 authService.loginWithPopupOAuth error: Error: OAuth login failed. Please try again or contact support if the problem persists.
-    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:262
-    V https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:752
-    onClick https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:768
-    D0 https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    Pp https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    vf https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    bk https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    I0 https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    rf https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    af https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    af https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    createRoot https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    <anonymous> https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:864
-index-VZpQQGJR.js:752:11656
-14:35:36.795
-🔥 Error stack: loginWithPopupOAuth@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:262:89632
-async*V@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:752:11427
-onClick@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:768:2491
-D0@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:118234
-Ok/of/<@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:123532
-Pp@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:9041
-of@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:119471
-vf@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49:26825
-bk@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49:26645
-EventListener.handleEvent*I0@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:119032
-rf@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:118432
-Ok/af/<@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:118598
-af@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48:118543
-Ok/Ui.createRoot@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49:33858
-@https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:864:100808
-index-VZpQQGJR.js:752:11739
-14:35:36.795
-OAuth login error: Error: OAuth login failed. Please try again or contact support if the problem persists.
-    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:262
-    V https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:752
-    onClick https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:768
-    D0 https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    Pp https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    vf https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    bk https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    I0 https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    rf https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    af https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    af https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:48
-    createRoot https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:49
-    <anonymous> https://maxlab.dwchem.co.kr/assets/index-VZpQQGJR.js:864
-index-VZpQQGJR.js:752:12441
-14:35:36.796 🔥 Finally block executed index-VZpQQGJR.js:768:388
-14:35:36.796 🔥 mountedRef.current: true index-VZpQQGJR.js:768:429
-14:35:36.796 🔥 About to set oauthLoading to false index-VZpQQGJR.js:768:477
-14:35:36.796 🔥 oauthLoading set to false index-VZpQQGJR.js:768:536
-14:35:36.796 🔥 Login component render - current state:
-Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+	
+GET
+	https://max.dwchem.co.kr/api/oauth/userinfo
+Status
+401
+VersionHTTP/2
+Transferred600 B (30 B size)
+Referrer Policystrict-origin-when-cross-origin
+DNS ResolutionSystem
+
+	
+access-control-allow-credentials
+	true
+access-control-allow-origin
+	https://maxlab.dwchem.co.kr
+content-length
+	30
+content-security-policy
+	default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'
+content-type
+	application/json
+date
+	Thu, 07 Aug 2025 05:43:53 GMT
+referrer-policy
+	strict-origin-when-cross-origin
+server
+	nginx/1.24.0 (Ubuntu)
+strict-transport-security
+	max-age=31536000; includeSubDomains
+vary
+	Origin
+x-content-type-options
+	nosniff
+X-Firefox-Spdy
+	h2
+x-frame-options
+	SAMEORIGIN
+x-xss-protection
+	1; mode=block
+	
+Accept
+	*/*
+Accept-Encoding
+	gzip, deflate, br, zstd
+Accept-Language
+	en-US,en;q=0.5
+Authorization
+	Bearer pending_callback
+Connection
+	keep-alive
+Host
+	max.dwchem.co.kr
+Origin
+	https://maxlab.dwchem.co.kr
+Priority
+	u=4
+Referer
+	https://maxlab.dwchem.co.kr/
+Sec-Fetch-Dest
+	empty
+Sec-Fetch-Mode
+	cors
+Sec-Fetch-Site
+	same-site
+TE
+	trailers
+User-Agent
+	Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0
+14:43:53.781
+Popup OAuth login error: Error: Failed to fetch user info: 
+    Fi https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:257
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:262
+    V https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:752
+    onClick https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:768
+    D0 https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    of https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    Pp https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    of https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    vf https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:49
+    bk https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:49
+    I0 https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    rf https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    af https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    af https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index--vgYCzxK.js:864
+index--vgYCzxK.js:262:89338
