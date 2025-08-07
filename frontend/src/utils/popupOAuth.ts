@@ -946,9 +946,20 @@ export class PopupOAuthLogin {
               }
               return;
             } else {
-              // No usable auth data, wait for callback or fail
-              console.warn('⚠️ No authorization code or token in OAUTH_ALREADY_AUTHENTICATED response');
-              console.log('📊 Available params:', Object.keys(innerData.oauthParams));
+              // No usable auth data - OAuth server bug
+              console.error('❌ OAuth Server Bug: OAUTH_ALREADY_AUTHENTICATED without authorization code');
+              console.error('🔴 The OAuth server must provide an authorization code for authenticated users');
+              console.log('📊 Received params (incorrect):', Object.keys(innerData.oauthParams));
+              console.log('📄 Expected params: ["code", "state"] or ["access_token", "token_type", "expires_in"]');
+              
+              // Reject with clear error message
+              this.cleanup();
+              reject(new Error(
+                'OAuth Server Error: OAUTH_ALREADY_AUTHENTICATED response missing authorization code. ' +
+                'The OAuth server must generate and return an authorization code even for already authenticated users. ' +
+                'Please contact the OAuth server team to fix this issue.'
+              ));
+              return;
             }
           } else if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE') {
             // Normal flow - callback page will handle token exchange
