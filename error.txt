@@ -79,8 +79,8 @@ Object { clientId: "maxlab", redirectUri: "https://maxlab.dwchem.co.kr/oauth/cal
 authUrl: "https://max.dwchem.co.kr"
 ​
 clientId: "maxlab"
-​
-currentOrigin: "https://maxlab.dwchem.co.kr"
+​`
+currentOrigin: "https://maxlab.dwchem.co.kr"`
 ​
 envAuthUrl: "https://max.dwchem.co.kr"
 ​
