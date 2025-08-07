@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Message Structure Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.error {
+            background: #dc3545;
+        }
+        button.error:hover {
+            background: #c82333;
+        }
+        button.success {
+            background: #28a745;
+        }
+        button.success:hover {
+            background: #218838;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-left: 3px solid #007bff;
+            background: white;
+        }
+        .log-entry.error {
+            border-left-color: #dc3545;
+        }
+        .log-entry.success {
+            border-left-color: #28a745;
+        }
+        .log-entry.warning {
+            border-left-color: #ffc107;
+        }
+        .timestamp {
+            color: #6c757d;
+            font-size: 11px;
+        }
+        .json-view {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .test-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .test-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 OAuth postMessage 구조 테스트</h1>
+        <p>이 페이지는 OAuth 메시지 구조를 테스트합니다. max.dwchem.co.kr에서 사용하세요.</p>
+    </div>
+
+    <div class="test-section">
+        <div class="container">
+            <h2>❌ 현재 구조 (문제)</h2>
+            <p>기존 플랫 구조로 메시지를 전송합니다.</p>
+            <button onclick="sendOldMessage('OAUTH_LOGIN_SUCCESS_CONTINUE')" class="error">
+                Send OLD LOGIN_SUCCESS
+            </button>
+            <button onclick="sendOldMessage('OAUTH_ALREADY_AUTHENTICATED')" class="error">
+                Send OLD ALREADY_AUTH
+            </button>
+            <button onclick="sendOldMessage('OAUTH_ERROR')" class="error">
+                Send OLD ERROR
+            </button>
+            <div id="oldLog" class="log"></div>
+        </div>
+
+        <div class="container">
+            <h2>✅ 표준 구조 (권장)</h2>
+            <p>표준 중첩 구조로 메시지를 전송합니다.</p>
+            <button onclick="sendNewMessage('OAUTH_LOGIN_SUCCESS_CONTINUE')" class="success">
+                Send NEW LOGIN_SUCCESS
+            </button>
+            <button onclick="sendNewMessage('OAUTH_ALREADY_AUTHENTICATED')" class="success">
+                Send NEW ALREADY_AUTH
+            </button>
+            <button onclick="sendNewMessage('OAUTH_ERROR')" class="success">
+                Send NEW ERROR
+            </button>
+            <div id="newLog" class="log"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📨 수신된 메시지</h2>
+        <p>다른 창에서 받은 postMessage가 여기 표시됩니다.</p>
+        <button onclick="clearReceivedLog()">Clear Log</button>
+        <div id="receivedLog" class="log"></div>
+    </div>
+
+    <script>
+        // 로그 헬퍼 함수
+        function addLog(logId, message, type = 'info') {
+            const log = document.getElementById(logId);
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `
+                <div class="timestamp">${timestamp}</div>
+                <div class="json-view">${JSON.stringify(message, null, 2)}</div>
+            `;
+            log.insertBefore(entry, log.firstChild);
+        }
+
+        // 기존 구조 (문제가 있는 플랫 구조)
+        function sendOldMessage(messageType) {
+            const targetOrigin = prompt('Target Origin (예: https://maxlab.dwchem.co.kr):', 
+                                       'https://maxlab.dwchem.co.kr');
+            if (!targetOrigin) return;
+
+            let message;
+            switch(messageType) {
+                case 'OAUTH_LOGIN_SUCCESS_CONTINUE':
+                    message = {
+                        type: messageType,
+                        oauthParams: {
+                            code: 'test_auth_code_123',
+                            state: 'test_state_456'
+                        },
+                        timestamp: Date.now()
+                    };
+                    break;
+                case 'OAUTH_ALREADY_AUTHENTICATED':
+                    message = {
+                        type: messageType,
+                        oauthParams: {
+                            userId: 'user_789',
+                            email: 'test@example.com'
+                        },
+                        timestamp: Date.now()
+                    };
+                    break;
+                case 'OAUTH_ERROR':
+                    message = {
+                        type: messageType,
+                        error: {
+                            code: 'AUTH_FAILED',
+                            message: 'Authentication failed'
+                        },
+                        timestamp: Date.now()
+                    };
+                    break;
+            }
+
+            // 팝업 창 열기
+            const popup = window.open('', 'oauth_test', 'width=400,height=300');
+            if (popup) {
+                setTimeout(() => {
+                    popup.postMessage(message, targetOrigin);
+                    addLog('oldLog', message, 'error');
+                    console.log('OLD Structure sent:', message);
+                }, 1000);
+            } else {
+                alert('팝업이 차단되었습니다. 팝업을 허용해주세요.');
+            }
+        }
+
+        // 표준 구조 (권장)
+        function sendNewMessage(messageType) {
+            const targetOrigin = prompt('Target Origin (예: https://maxlab.dwchem.co.kr):', 
+                                       'https://maxlab.dwchem.co.kr');
+            if (!targetOrigin) return;
+
+            let data;
+            switch(messageType) {
+                case 'OAUTH_LOGIN_SUCCESS_CONTINUE':
+                    data = {
+                        type: messageType,
+                        oauthParams: {
+                            code: 'test_auth_code_123',
+                            state: 'test_state_456'
+                        },
+                        timestamp: Date.now()
+                    };
+                    break;
+                case 'OAUTH_ALREADY_AUTHENTICATED':
+                    data = {
+                        type: messageType,
+                        oauthParams: {
+                            userId: 'user_789',
+                            email: 'test@example.com'
+                        },
+                        timestamp: Date.now()
+                    };
+                    break;
+                case 'OAUTH_ERROR':
+                    data = {
+                        type: messageType,
+                        error: {
+                            code: 'AUTH_FAILED',
+                            message: 'Authentication failed'
+                        },
+                        timestamp: Date.now()
+                    };
+                    break;
+            }
+
+            // 표준 메시지 구조
+            const message = {
+                type: 'OAUTH_MESSAGE',  // 최상위 타입
+                data: data              // 실제 데이터는 data 필드에
+            };
+
+            // 팝업 창 열기
+            const popup = window.open('', 'oauth_test', 'width=400,height=300');
+            if (popup) {
+                setTimeout(() => {
+                    popup.postMessage(message, targetOrigin);
+                    addLog('newLog', message, 'success');
+                    console.log('NEW Structure sent:', message);
+                }, 1000);
+            } else {
+                alert('팝업이 차단되었습니다. 팝업을 허용해주세요.');
+            }
+        }
+
+        // 메시지 수신 리스너
+        window.addEventListener('message', (event) => {
+            console.log('Message received:', event);
+            
+            const logEntry = {
+                origin: event.origin,
+                data: event.data,
+                timestamp: new Date().toISOString()
+            };
+            
+            // 구조 검증
+            let validationType = 'warning';
+            if (event.data && event.data.type === 'OAUTH_MESSAGE' && event.data.data) {
+                validationType = 'success';
+                logEntry.validation = '✅ 표준 구조';
+            } else if (event.data && event.data.type && event.data.type.startsWith('OAUTH_')) {
+                validationType = 'error';
+                logEntry.validation = '❌ 플랫 구조 (수정 필요)';
+            }
+            
+            addLog('receivedLog', logEntry, validationType);
+        });
+
+        function clearReceivedLog() {
+            document.getElementById('receivedLog').innerHTML = '';
+        }
+
+        // 페이지 로드 시 안내
+        window.onload = () => {
+            console.log('OAuth Message Test Page Loaded');
+            console.log('Open browser console to see detailed logs');
+        };
+    </script>
+</body>
+</html>

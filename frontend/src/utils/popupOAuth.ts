@@ -857,9 +857,66 @@ export class PopupOAuthLogin {
     console.log('📨 Received OAuth message:', event.data);
     console.log('Message origin:', event.origin);
     console.log('Message type:', event.data.type);
+    
+    // 🔧 FIX: Normalize message structure - handle both flat and nested formats
+    let messageData = event.data;
+    let actualMessageType = messageData.type;
+    
+    // Handle nested OAUTH_MESSAGE structure from auth server
+    if (messageData.type === 'OAUTH_MESSAGE' && messageData.data) {
+      console.log('📦 Processing nested OAuth message from auth server');
+      const innerData = messageData.data;
+      
+      // Map auth server message types to our expected types
+      if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE' || 
+          innerData.type === 'OAUTH_ALREADY_AUTHENTICATED') {
+        console.log(`🔄 Mapping ${innerData.type} to OAUTH_SUCCESS`);
+        
+        // Extract token or auth data from oauthParams
+        if (innerData.oauthParams) {
+          // Auth server sends auth params, need to complete the flow
+          // For now, mark as received and let callback handler process
+          console.log('📝 Auth server sent OAuth params, marking as success for callback processing');
+          this.messageReceived = true;
+          
+          // Store the OAuth params for callback to use
+          sessionStorage.setItem('oauth_callback_params', JSON.stringify(innerData.oauthParams));
+          sessionStorage.setItem('oauth_callback_timestamp', Date.now().toString());
+          
+          // Close popup since auth is complete on server side
+          if (this.popup && !this.popup.closed) {
+            this.popup.close();
+          }
+          
+          this.cleanup();
+          
+          // Resolve with placeholder - actual token exchange will happen in callback
+          resolve({
+            access_token: 'pending_callback',
+            token_type: 'Bearer',
+            expires_in: 3600,
+            scope: this.scopes.join(' ')
+          });
+          return;
+        }
+        
+        // Normalize to flat structure for processing
+        messageData = {
+          type: 'OAUTH_SUCCESS',
+          tokenData: innerData.tokenData,
+          token: innerData.token
+        };
+        actualMessageType = 'OAUTH_SUCCESS';
+      } else {
+        // Use inner data as the actual message
+        messageData = innerData;
+        actualMessageType = innerData.type;
+      }
+    }
+    
     this.messageReceived = true;
 
-    if (event.data.type === 'OAUTH_SUCCESS') {
+    if (actualMessageType === 'OAUTH_SUCCESS') {
       console.log('✅ OAUTH_SUCCESS message received, processing...');
       
       // Send acknowledgment back to popup
@@ -881,13 +938,13 @@ export class PopupOAuthLogin {
       this.cleanup();
       console.log('🧹 Cleanup completed');
       
-      if (event.data.tokenData) {
+      if (messageData.tokenData) {
         console.log('📦 Resolving with full token data');
-        resolve(event.data.tokenData);
-      } else if (event.data.token) {
+        resolve(messageData.tokenData);
+      } else if (messageData.token) {
         console.log('📦 Resolving with access token only');
         resolve({
-          access_token: event.data.token,
+          access_token: messageData.token,
           token_type: 'Bearer',
           expires_in: 3600,
           scope: this.scopes.join(' ')
@@ -896,7 +953,7 @@ export class PopupOAuthLogin {
         console.error('❌ No token data in message');
         reject(new Error('No token data received'));
       }
-    } else if (event.data.type === 'OAUTH_ERROR') {
+    } else if (actualMessageType === 'OAUTH_ERROR') {
       // Send acknowledgment for error case too
       if (event.source && typeof event.source.postMessage === 'function') {
         try {
@@ -1123,7 +1180,9 @@ export class PopupOAuthLogin {
     const prodOrigins = [
       'https://maxlab.io',
       'https://app.maxlab.io',
-      'https://auth.maxlab.io'
+      'https://auth.maxlab.io',
+      'https://max.dwchem.co.kr',  // DWChem auth server
+      'https://maxlab.dwchem.co.kr'  // DWChem MaxLab instance
     ];
 
     // Combine based on environment
@@ -1253,13 +1312,56 @@ export class PopupOAuthLogin {
       return false;
     }
 
-    // Check for required OAuth message types
+    // 🔧 FIX: Handle nested OAUTH_MESSAGE structure from auth server
+    if (messageData.type === 'OAUTH_MESSAGE' && messageData.data) {
+      // Auth server sends nested structure: { type: 'OAUTH_MESSAGE', data: { type: 'ACTUAL_TYPE', ... } }
+      const innerData = messageData.data;
+      
+      // Valid inner message types from auth server
+      const validInnerTypes = [
+        'OAUTH_LOGIN_SUCCESS_CONTINUE',
+        'OAUTH_ALREADY_AUTHENTICATED', 
+        'OAUTH_SUCCESS',
+        'OAUTH_ERROR',
+        'OAUTH_ACK'
+      ];
+      
+      if (!innerData.type || !validInnerTypes.includes(innerData.type)) {
+        console.warn('Invalid inner OAuth message type:', innerData.type);
+        return false;
+      }
+      
+      // Map auth server message types to our expected types for further processing
+      if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE' || 
+          innerData.type === 'OAUTH_ALREADY_AUTHENTICATED') {
+        // These are success messages from auth server
+        // They should contain oauthParams with necessary data
+        if (!innerData.oauthParams) {
+          console.warn('Missing oauthParams in auth server message');
+          return false;
+        }
+        return true; // Valid nested structure
+      }
+      
+      // Standard nested types
+      if (innerData.type === 'OAUTH_SUCCESS') {
+        return !!(innerData.token || innerData.tokenData);
+      }
+      
+      if (innerData.type === 'OAUTH_ERROR') {
+        return !!innerData.error;
+      }
+      
+      return true; // Other valid types
+    }
+
+    // Original flat structure validation (backward compatibility)
     const validTypes = ['OAUTH_SUCCESS', 'OAUTH_ERROR', 'OAUTH_ACK'];
     if (!messageData.type || !validTypes.includes(messageData.type)) {
       return false;
     }
 
-    // Type-specific validation
+    // Type-specific validation for flat structure
     if (messageData.type === 'OAUTH_SUCCESS') {
       // Success messages should have token data
       if (!messageData.token && !messageData.tokenData) {
