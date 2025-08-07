@@ -1,3 +1,11 @@
+2025-08-07T08:42:54: INFO:     Application shutdown complete.
+2025-08-07T08:42:54: INFO:     Finished server process [79635]
+2025-08-07T08:42:56: INFO:     Started server process [131871]
+2025-08-07T08:42:56: INFO:     Waiting for application startup.
+2025-08-07T08:42:56: INFO:     Application startup complete.
+2025-08-07T08:42:56: INFO:     Uvicorn running on http://127.0.0.1:8010 (Press CTRL+C to quit)
+
+
 2025-08-06T15:13:57: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=HprI6o4SLTlTtIyrCQbIxnOy0Y-GfGyGvmScY_H2DO0&state=vdbfFzbBOQQT6dkD432r1aRi3zKg5PNvSHIXMP9yo0w HTTP/1.0" 404 Not F>
 2025-08-06T15:18:08: INFO:     192.168.15.220:0 - "GET /oauth/callback?code=93ZOV4ddpiOjYVo-fakOB-LgUuIOjFkQEbc7jjvDOq4&state=k5_cwkgkslTdFd3-Zk_WBIZxSRY0pLdxoLp7eYx08fE HTTP/1.0" 404 Not F>
 2025-08-06T15:18:17: INFO:     127.0.0.1:37512 - "GET /docs HTTP/1.1" 404 Not Found
