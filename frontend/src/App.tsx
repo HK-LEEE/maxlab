@@ -314,6 +314,22 @@ function App() {
         const currentInitState = useAuthStore.getState().initState;
         const currentIsAuthenticated = useAuthStore.getState().isAuthenticated;
         
+        // 🔒 GUARD: Check if OAuth popup is currently redirecting
+        const oauthRedirecting = sessionStorage.getItem('oauth_popup_redirecting');
+        const redirectTime = sessionStorage.getItem('oauth_popup_redirect_time');
+        if (oauthRedirecting === 'true' && redirectTime) {
+          const timeSinceRedirect = Date.now() - parseInt(redirectTime);
+          // If OAuth popup redirected less than 5 seconds ago, skip initialization
+          if (timeSinceRedirect < 5000) {
+            console.log('🔄 OAuth popup is currently redirecting, skipping auth initialization');
+            return;
+          } else {
+            // Clean up stale redirect flag
+            sessionStorage.removeItem('oauth_popup_redirecting');
+            sessionStorage.removeItem('oauth_popup_redirect_time');
+          }
+        }
+        
         // 🔒 GUARD: Prevent duplicate initialization
         if (currentInitState === 'syncing' || currentInitState === 'silent_auth') {
           console.log('🛑 Authentication initialization already in progress:', currentInitState);

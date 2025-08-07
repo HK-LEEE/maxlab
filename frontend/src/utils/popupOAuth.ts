@@ -946,13 +946,26 @@ export class PopupOAuthLogin {
             // Navigate the popup to the OAuth URL to get the authorization code
             if (this.popup && !this.popup.closed) {
               try {
+                // Mark that we're expecting a redirect
+                sessionStorage.setItem('oauth_popup_redirecting', 'true');
+                sessionStorage.setItem('oauth_popup_redirect_time', Date.now().toString());
+                
                 this.popup.location.href = oauthUrl;
                 console.log('✅ Popup redirected to OAuth authorization endpoint');
                 
                 // Keep listening for the proper OAuth callback - don't cleanup or reject
                 // The message listener will continue to wait for the OAuth callback
+                // Note: Navigation may cause cross-origin errors which we should ignore
                 return;
               } catch (e) {
+                // Check if this is a cross-origin error due to navigation
+                if (e instanceof DOMException && e.name === 'SecurityError') {
+                  console.log('🔄 Cross-origin navigation detected (expected during OAuth flow)');
+                  // This is expected when the popup navigates to the OAuth server
+                  // Keep waiting for the OAuth callback
+                  return;
+                }
+                
                 console.error('❌ Failed to redirect popup:', e);
                 this.cleanup();
                 reject(new Error('Failed to redirect OAuth popup. Please try logging in again.'));
@@ -1200,6 +1213,10 @@ export class PopupOAuthLogin {
 
   // 🔒 SECURITY: Enhanced cleanup with state management
   private cleanup(): void {
+    // Clear OAuth popup redirect flags
+    sessionStorage.removeItem('oauth_popup_redirecting');
+    sessionStorage.removeItem('oauth_popup_redirect_time');
+    
     if (this.popup && !this.popup.closed) {
       this.popup.close();
     }
