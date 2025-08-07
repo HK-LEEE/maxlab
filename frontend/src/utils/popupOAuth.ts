@@ -896,22 +896,67 @@ export class PopupOAuthLogin {
         
         // Extract token or auth data from oauthParams
         if (innerData.oauthParams) {
-          // Auth server sends auth params, need to complete the flow
-          console.log('📝 Auth server sent OAuth params, waiting for token exchange in callback...');
+          console.log('📝 OAuth params received:', innerData.oauthParams);
           
           // Store the OAuth params for callback to use
           sessionStorage.setItem('oauth_callback_params', JSON.stringify(innerData.oauthParams));
           sessionStorage.setItem('oauth_callback_timestamp', Date.now().toString());
           
-          // 🔧 CRITICAL FIX: Don't resolve immediately - let the callback page complete token exchange
-          // The callback page will exchange the code for a real token and send it back
-          // We continue waiting for the real token through polling or postMessage
-          console.log('⏳ Waiting for callback page to complete token exchange...');
+          // 🔧 CRITICAL FIX: Handle different authentication scenarios
+          if (innerData.type === 'OAUTH_ALREADY_AUTHENTICATED') {
+            // User is already authenticated, no redirect will happen
+            // Check if we have an authorization code or token in oauthParams
+            console.log('👤 User already authenticated, checking for auth data...');
+            
+            if (innerData.oauthParams.code) {
+              // We have an authorization code, exchange it for token
+              console.log('🔐 Authorization code found, exchanging for token...');
+              const code = innerData.oauthParams.code;
+              const state = innerData.oauthParams.state || this.currentFlowState?.state;
+              
+              exchangeCodeForToken(code, state)
+                .then(tokenResponse => {
+                  console.log('✅ Token exchange successful');
+                  this.messageReceived = true;
+                  this.cleanup();
+                  resolve(tokenResponse);
+                })
+                .catch(error => {
+                  console.error('❌ Token exchange failed:', error);
+                  this.cleanup();
+                  reject(error);
+                });
+              return;
+            } else if (innerData.oauthParams.access_token || innerData.tokenData) {
+              // We already have a token
+              console.log('✅ Token already available');
+              this.messageReceived = true;
+              this.cleanup();
+              
+              if (innerData.tokenData) {
+                resolve(innerData.tokenData);
+              } else {
+                resolve({
+                  access_token: innerData.oauthParams.access_token,
+                  token_type: innerData.oauthParams.token_type || 'Bearer',
+                  expires_in: innerData.oauthParams.expires_in || 3600,
+                  scope: innerData.oauthParams.scope || this.scopes.join(' '),
+                  refresh_token: innerData.oauthParams.refresh_token
+                });
+              }
+              return;
+            } else {
+              // No usable auth data, wait for callback or fail
+              console.warn('⚠️ No authorization code or token in OAUTH_ALREADY_AUTHENTICATED response');
+              console.log('📊 Available params:', Object.keys(innerData.oauthParams));
+            }
+          } else if (innerData.type === 'OAUTH_LOGIN_SUCCESS_CONTINUE') {
+            // Normal flow - callback page will handle token exchange
+            console.log('⏳ Waiting for callback page to complete token exchange...');
+          }
           
-          // Don't mark as messageReceived yet - we need the real token
-          // Don't close popup - let callback page handle that
-          // Don't cleanup - keep listening for the real token
-          return; // Continue waiting for real token
+          // Continue waiting for real token from callback page
+          return;
         }
         
         // Normalize to flat structure for processing
