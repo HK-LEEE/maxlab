@@ -89,7 +89,7 @@ export async function handleOAuthRecovery(
   console.log('📋 Current params:', oauthParams);
   
   // Get current flow state if available
-  const flowState = getStoredFlowState();
+  const flowState = getStoredFlowState() || undefined;
   
   if (popup && !popup.closed) {
     // If we have a popup, redirect it to get the authorization code

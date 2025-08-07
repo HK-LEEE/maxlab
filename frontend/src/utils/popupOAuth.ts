@@ -937,7 +937,7 @@ export class PopupOAuthLogin {
               `redirect_uri=${encodeURIComponent(redirectUri)}&` +
               `scope=${encodeURIComponent(innerData.oauthParams?.scope || 'openid profile email offline_access read:profile read:groups manage:workflows')}&` +
               `state=${state}&` +
-              `code_challenge=${this.currentFlowState?.codeChallenge || ''}&` +
+              `code_challenge=${sessionStorage.getItem('oauth_code_challenge') || ''}&` +
               `code_challenge_method=S256&` +
               `nonce=${this.currentFlowState?.nonce || ''}`;
             
