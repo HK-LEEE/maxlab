@@ -1,0 +1,122 @@
+# MaxLab 운영 환경 설정 템플릿
+# 운영 환경에서 사용할 설정 템플릿 (실제 값으로 변경 필요)
+
+# 환경 설정 (반드시 production으로 설정)
+#ENVIRONMENT=production
+ENVIRONMENT=development
+
+# 애플리케이션 도메인
+APP_DOMAIN=maxlab.dwchem.co.kr
+APP_URL=https://maxlab.dwchem.co.kr
+
+# 데이터베이스 설정
+DATABASE_URL=postgresql+asyncpg://postgres:AdminMAXDB!@192.168.15.220:5432/max_lab
+
+# SSL 설정 (운영 환경에서는 자동으로 require 이상)
+DB_SSL_MODE=require
+DB_SSL_CERT_PATH=/home/app-user/docker_space/maxdb_postgress/config/certs/server.crt
+DB_SSL_KEY_PATH=/home/app-user/docker_space/maxdb_postgress/config/certs/server.key
+# DB_SSL_CA_PATH=/path/to/ca-cert.pem
+
+# 보안 키 (반드시 강력한 랜덤 값으로 변경)
+SECRET_KEY=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
+JWT_SECRET_KEY=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
+CSRF_SECRET_KEY=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
+SESSION_SECRET_KEY=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
+
+# 암호화 키 (32바이트 base64 인코딩된 키)
+# 생성 방법: python -c "import secrets, base64; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"
+ENCRYPTION_KEY=g8AGbZ-9ZZngEeD9ZaTqacU3Kx2nzxhY3TcBDXK5rNs=
+
+# 외부 인증 서버
+AUTH_SERVER_URL=https://max.dwchem.co.kr
+AUTH_SERVER_TIMEOUT=30.0
+
+# 서버 설정 (로드밸런싱을 위한 다중 인스턴스)
+HOST=0.0.0.0
+PORT=8010  # Primary instance
+# PORT=8011  # Secondary instance (다른 인스턴스에서 사용)
+
+# CORS 설정 (운영 도메인만 허용)
+CORS_ALLOW_ORIGINS=https://maxlab.dwchem.co.kr,https://max.dwchem.co.kr
+CORS_ALLOW_CREDENTIALS=true
+CORS_MAX_AGE=86400
+
+# 로깅 설정 (운영 환경)
+LOG_LEVEL=WARNING
+LOG_FORMAT=json
+LOG_FILE=/var/log/maxlab/backend-production.log
+LOG_ROTATION=daily
+LOG_RETENTION_DAYS=30
+
+# Redis 설정 (운영 환경)
+REDIS_URL=redis://redis-host:6379/0
+REDIS_POOL_SIZE=10
+REDIS_TIMEOUT=5
+
+# WebSocket Configuration
+ENABLE_WEBSOCKET=true
+WEBSOCKET_TOKEN=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
+
+# MSSQL Configuration (for data providers)
+MSSQL_CONNECTION_STRING=DRIVER={ODBC Driver 18 for SQL Server};SERVER=production-sql-server;DATABASE=equipment_db;UID=username;PWD=password;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;Command Timeout=60
+
+# Rate Limiting
+RATE_LIMITING_ENABLED=true
+RATE_LIMITING_FAIL_OPEN=false
+RATE_LIMITING_HEADERS_ENABLED=true
+
+# Session Configuration
+SESSION_COOKIE_SECURE=true
+SESSION_COOKIE_HTTPONLY=true
+SESSION_COOKIE_SAMESITE=strict
+SESSION_LIFETIME_SECONDS=3600  # 1 hour
+SESSION_REMEMBER_ME_LIFETIME_SECONDS=2592000  # 30 days
+SESSION_MAX_PER_USER=5
+
+# Security Headers
+SECURE_HEADERS_ENABLED=true
+HSTS_MAX_AGE=63072000  # 2 years
+HSTS_INCLUDE_SUBDOMAINS=true
+HSTS_PRELOAD=true
+
+# Static/Media Files
+STATIC_FILES_PATH=/var/www/maxlab/static
+MEDIA_FILES_PATH=/var/www/maxlab/media
+STATIC_FILES_ENABLED=false  # Nginx handles static files
+
+# Database Connection Pool
+DB_POOL_SIZE=20
+DB_MAX_OVERFLOW=40
+DB_POOL_PRE_PING=true
+DB_ECHO=false
+
+# Performance
+WORKERS=4  # Number of Gunicorn workers (2 * CPU cores + 1)
+WORKER_CLASS=uvicorn.workers.UvicornWorker
+WORKER_CONNECTIONS=1000
+WORKER_TIMEOUT=60
+KEEPALIVE=5
+GRACEFUL_TIMEOUT=30
+
+# Monitoring
+ENABLE_METRICS=true
+METRICS_PORT=9090  # Prometheus metrics
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+SENTRY_ENVIRONMENT=production
+SENTRY_TRACES_SAMPLE_RATE=0.1
+
+# Scheduler
+AUTO_CLOSE_DAYS_DEFAULT=90
+
+# OAuth/OIDC Configuration
+CLIENT_ID=maxlab
+
+# External Services
+PERPLEXITY_API_KEY=CHANGE_THIS_TO_REAL_API_KEY
+OPENAI_API_KEY=CHANGE_THIS_TO_REAL_API_KEY
+
+# Backup Configuration
+BACKUP_ENABLED=true
+BACKUP_S3_BUCKET=maxlab-backups
+BACKUP_RETENTION_DAYS=30

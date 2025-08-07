@@ -1,0 +1,39 @@
+# MaxLab Frontend Production Environment Template
+# Copy this file to .env.production and update the values for your production environment
+
+# OAuth 2.0 Settings (Production)
+VITE_AUTH_SERVER_URL=https://max.dwchem.co.kr
+VITE_CLIENT_ID=maxlab
+VITE_REDIRECT_URI=https://maxlab.dwchem.co.kr/oauth/callback
+
+# Backend API URL (Production)
+VITE_API_BASE_URL=https://maxlab.dwchem.co.kr
+VITE_AUTH_API_URL=https://max.dwchem.co.kr
+
+# Production Server Settings (usually not needed in production build)
+VITE_DEV_SERVER_HOST=0.0.0.0
+VITE_DEV_SERVER_PORT=3010
+
+# Environment
+VITE_NODE_ENV=production
+
+# Feature flags for production
+VITE_ENABLE_WEBSOCKET=true
+VITE_ENABLE_DEBUG_LOGS=false
+
+# Examples for different deployment scenarios:m
+# 
+# Internal deployment:
+# VITE_AUTH_SERVER_URL=https://internal-auth.company.com
+# VITE_API_BASE_URL=https://internal-api.company.com
+# VITE_REDIRECT_URI=https://internal-app.company.com/oauth/callback
+#
+# Cloud deployment:
+# VITE_AUTH_SERVER_URL=https://maxlab-auth.cloud-provider.com
+# VITE_API_BASE_URL=https://maxlab-api.cloud-provider.com
+# VITE_REDIRECT_URI=https://maxlab-app.cloud-provider.com/oauth/callback
+#
+# Kubernetes deployment:
+# VITE_AUTH_SERVER_URL=https://auth.maxlab.k8s.local
+# VITE_API_BASE_URL=https://api.maxlab.k8s.local
+# VITE_REDIRECT_URI=https://app.maxlab.k8s.local/oauth/callback
