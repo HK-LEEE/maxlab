@@ -897,29 +897,21 @@ export class PopupOAuthLogin {
         // Extract token or auth data from oauthParams
         if (innerData.oauthParams) {
           // Auth server sends auth params, need to complete the flow
-          // For now, mark as received and let callback handler process
-          console.log('📝 Auth server sent OAuth params, marking as success for callback processing');
-          this.messageReceived = true;
+          console.log('📝 Auth server sent OAuth params, waiting for token exchange in callback...');
           
           // Store the OAuth params for callback to use
           sessionStorage.setItem('oauth_callback_params', JSON.stringify(innerData.oauthParams));
           sessionStorage.setItem('oauth_callback_timestamp', Date.now().toString());
           
-          // Close popup since auth is complete on server side
-          if (this.popup && !this.popup.closed) {
-            this.popup.close();
-          }
+          // 🔧 CRITICAL FIX: Don't resolve immediately - let the callback page complete token exchange
+          // The callback page will exchange the code for a real token and send it back
+          // We continue waiting for the real token through polling or postMessage
+          console.log('⏳ Waiting for callback page to complete token exchange...');
           
-          this.cleanup();
-          
-          // Resolve with placeholder - actual token exchange will happen in callback
-          resolve({
-            access_token: 'pending_callback',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: this.scopes.join(' ')
-          });
-          return;
+          // Don't mark as messageReceived yet - we need the real token
+          // Don't close popup - let callback page handle that
+          // Don't cleanup - keep listening for the real token
+          return; // Continue waiting for real token
         }
         
         // Normalize to flat structure for processing
