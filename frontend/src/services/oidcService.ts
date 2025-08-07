@@ -119,17 +119,17 @@ class OIDCService {
   }
 
   private getStaticConfiguration(): OIDCConfiguration {
-    // 🔧 CRITICAL FIX: Use backend API for token and userinfo endpoints
-    const backendApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
+    // 🔧 CRITICAL FIX: Use OAuth server directly for all OAuth endpoints
+    const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL || import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
     
     return {
       issuer: this.authUrl,
-      authorization_endpoint: `${this.authUrl}/api/oauth/authorize`, // OAuth server (popup)
-      token_endpoint: `${backendApiUrl}/oauth/token`, // Backend API
-      userinfo_endpoint: `${backendApiUrl}/oauth/userinfo`, // Backend API
-      jwks_uri: `${this.authUrl}/api/oauth/jwks`, // OAuth server
-      end_session_endpoint: `${this.authUrl}/api/oauth/logout`, // OAuth server
-      revocation_endpoint: `${backendApiUrl}/oauth/revoke`, // Backend API
+      authorization_endpoint: import.meta.env.VITE_OAUTH_AUTHORIZE_URL || `${authServerUrl}/api/oauth/authorize`, // OAuth server
+      token_endpoint: import.meta.env.VITE_OAUTH_TOKEN_URL || `${authServerUrl}/api/oauth/token`, // OAuth server
+      userinfo_endpoint: import.meta.env.VITE_OAUTH_USERINFO_URL || `${authServerUrl}/api/oauth/userinfo`, // OAuth server
+      jwks_uri: `${authServerUrl}/api/oauth/jwks`, // OAuth server
+      end_session_endpoint: import.meta.env.VITE_OAUTH_LOGOUT_URL || `${authServerUrl}/api/oauth/logout`, // OAuth server
+      revocation_endpoint: `${authServerUrl}/api/oauth/revoke`, // OAuth server
       scopes_supported: ['openid', 'profile', 'email', 'offline_access', 'groups', 'roles'],
       response_types_supported: ['code', 'id_token', 'token', 'code id_token', 'code token', 'id_token token', 'code id_token token'],
       grant_types_supported: ['authorization_code', 'refresh_token', 'client_credentials'],

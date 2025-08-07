@@ -506,7 +506,7 @@ export class OAuthCrossOriginRecovery {
     
     try {
       // Check backend OAuth configuration endpoint
-      const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
+      const backendUrl = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8010';
       const response = await fetch(`${backendUrl}/api/oauth/validate-config`);
       
       if (response.ok) {

@@ -1490,7 +1490,7 @@ export class PopupOAuthLogin {
   // 🔒 SECURITY: Report critical security violations to backend
   private async reportSecurityViolation(securityLog: any): Promise<void> {
     try {
-      const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
+      const backendUrl = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8010';
       
       // Only report in production or when explicitly enabled
       const shouldReport = import.meta.env.VITE_ENABLE_SECURITY_REPORTING === 'true' ||
@@ -1660,11 +1660,12 @@ export async function exchangeCodeForToken(code: string, state?: string): Promis
   // 토큰 교환 Promise 생성 및 저장
   const tokenExchangePromise = (async (): Promise<TokenResponse> => {
     try {
-      // 🔧 CRITICAL FIX: Call backend API instead of OAuth server directly
-      const backendApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
-      console.log('🔄 Calling backend OAuth token endpoint:', `${backendApiUrl}/oauth/token`);
+      // 🔧 CRITICAL FIX: Call OAuth server directly for token exchange
+      const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL || import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
+      const tokenUrl = import.meta.env.VITE_OAUTH_TOKEN_URL || `${authServerUrl}/api/oauth/token`;
+      console.log('🔄 Calling OAuth token endpoint:', tokenUrl);
       
-      const response = await fetch(`${backendApiUrl}/oauth/token`, {
+      const response = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -1826,11 +1827,12 @@ export function isPopupMode(): boolean {
 
 // 사용자 정보 가져오기
 export async function getUserInfo(accessToken: string): Promise<any> {
-  // 🔧 CRITICAL FIX: Call backend API instead of OAuth server directly
-  const backendApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
-  console.log('🔄 Calling backend OAuth userinfo endpoint:', `${backendApiUrl}/oauth/userinfo`);
+  // 🔧 CRITICAL FIX: Call OAuth server directly for userinfo
+  const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL || import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
+  const userinfoUrl = import.meta.env.VITE_OAUTH_USERINFO_URL || `${authServerUrl}/api/oauth/userinfo`;
+  console.log('🔄 Calling OAuth userinfo endpoint:', userinfoUrl);
   
-  const response = await fetch(`${backendApiUrl}/oauth/userinfo`, {
+  const response = await fetch(userinfoUrl, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
