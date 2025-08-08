@@ -38,7 +38,8 @@ class AuthSyncService {
     // Try to use BroadcastChannel API
     if ('BroadcastChannel' in window) {
       try {
-        this.channel = new BroadcastChannel('auth_sync');
+        // 🚫 SIMPLIFIED: maxlab_auth_sync 채널 사용 (crossDomainLogout과 동일)
+        this.channel = new BroadcastChannel('maxlab_auth_sync');
         this.channel.onmessage = this.handleMessage.bind(this);
         console.log('✅ Auth sync initialized with BroadcastChannel');
       } catch (error) {

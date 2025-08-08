@@ -30,6 +30,7 @@ export class CrossDomainLogoutManager {
 
     // 1. Storage Event 리스너 (같은 도메인 내 다른 탭)
     window.addEventListener('storage', (e) => {
+      // 🚫 ENHANCED: 더 많은 키 체크
       if (e.key === LOGOUT_EVENT_KEY && e.newValue) {
         const logoutTime = parseInt(e.newValue, 10);
         if (logoutTime > this.lastLogoutTime) {
@@ -38,20 +39,49 @@ export class CrossDomainLogoutManager {
           this.handleLogout(onLogoutDetected);
         }
       }
+      
+      // accessToken이 제거되면 로그아웃으로 간주
+      if (e.key === 'accessToken' && !e.newValue) {
+        devLog.warn('🚨 Access token removed - logout detected');
+        this.handleLogout(onLogoutDetected);
+      }
+      
+      // user 정보가 제거되면 로그아웃으로 간주
+      if (e.key === 'user' && !e.newValue) {
+        devLog.warn('🚨 User data removed - logout detected');
+        this.handleLogout(onLogoutDetected);
+      }
     });
 
-    // 2. 주기적으로 max.dwchem.co.kr의 로그아웃 상태 체크
-    // Cookie나 특정 엔드포인트를 통해 확인
+    // 2. 주기적으로 세션 체크 (더 자주)
     this.checkInterval = setInterval(async () => {
+      // localStorage에 토큰이 없으면 로그아웃으로 간주
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        devLog.warn('🚨 No access token found - session expired');
+        this.handleLogout(onLogoutDetected);
+        return;
+      }
+      
+      // MAX Platform 세션 체크
       await this.checkMaxPlatformSession(onLogoutDetected);
     }, LOGOUT_CHECK_INTERVAL);
 
     // 3. BroadcastChannel API (동일 origin만 지원)
     if ('BroadcastChannel' in window) {
-      const channel = new BroadcastChannel('max_platform_auth');
+      const channel = new BroadcastChannel('maxlab_auth_sync');
       channel.onmessage = (event) => {
-        if (event.data.type === 'logout') {
+        if (event.data.type === 'logout' || event.data.type === 'LOGOUT') {
           devLog.warn('🚨 Logout broadcast received');
+          this.handleLogout(onLogoutDetected);
+        }
+      };
+      
+      // MAX Platform 채널도 수신
+      const maxPlatformChannel = new BroadcastChannel('max_platform_auth');
+      maxPlatformChannel.onmessage = (event) => {
+        if (event.data.type === 'logout') {
+          devLog.warn('🚨 MAX Platform logout broadcast received');
           this.handleLogout(onLogoutDetected);
         }
       };
@@ -63,6 +93,26 @@ export class CrossDomainLogoutManager {
       if (event.origin === 'https://max.dwchem.co.kr' && event.data?.type === 'logout') {
         devLog.warn('🚨 Cross-domain logout message received');
         this.handleLogout(onLogoutDetected);
+      }
+    });
+
+    // 5. 페이지 포커스 시 세션 체크
+    window.addEventListener('focus', async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        devLog.warn('🚨 No token on focus - logout detected');
+        this.handleLogout(onLogoutDetected);
+      }
+    });
+
+    // 6. 페이지 가시성 변경 시 체크
+    document.addEventListener('visibilitychange', async () => {
+      if (!document.hidden) {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          devLog.warn('🚨 No token on visibility change - logout detected');
+          this.handleLogout(onLogoutDetected);
+        }
       }
     });
   }
@@ -115,8 +165,33 @@ export class CrossDomainLogoutManager {
   private handleLogout(onLogoutDetected: () => void) {
     devLog.warn('🔒 Executing cross-domain logout cleanup');
     
+    // 중복 실행 방지
+    const now = Date.now();
+    if (now - this.lastLogoutTime < 500) { // 500ms 내 중복 실행 방지
+      return;
+    }
+    this.lastLogoutTime = now;
+    
     // 모든 스토리지 클리어
     this.clearAllStorage();
+    
+    // 다른 탭에도 로그아웃 브로드캐스트
+    if ('BroadcastChannel' in window) {
+      try {
+        const channel = new BroadcastChannel('maxlab_auth_sync');
+        channel.postMessage({ type: 'LOGOUT', reason: 'cross_domain_logout' });
+        channel.close();
+      } catch (e) {
+        devLog.error('Failed to broadcast logout:', e);
+      }
+    }
+    
+    // localStorage 이벤트로도 전파
+    try {
+      localStorage.setItem(LOGOUT_EVENT_KEY, now.toString());
+    } catch (e) {
+      devLog.error('Failed to set logout event:', e);
+    }
     
     // 콜백 실행 (앱 상태 리셋)
     onLogoutDetected();

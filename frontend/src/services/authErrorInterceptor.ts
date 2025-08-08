@@ -269,27 +269,27 @@ export class AuthErrorInterceptor {
       switch (errorData.category) {
         case 'AUTH':
           if (errorData.error_code === 'AUTH_001' || errorData.error_code === 'AUTH_002') {
-            // Token expired - try to refresh
-            if (currentRetryCount < this.config.maxRetries) {
-              recoveryAction = async () => {
-                const refreshSuccess = await authService.refreshToken();
-                if (refreshSuccess) {
-                  this.retryCount.set(requestKey, currentRetryCount + 1);
-                  return true;
-                }
-                return false;
-              };
-              shouldRetry = true;
-            } else {
-              shouldRedirect = this.config.enableAutoRedirect;
-            }
+            // 🚫 SIMPLIFIED: 401 에러 시 바로 MAX Platform으로 리다이렉트
+            // 토큰 리프레시 시도 없이 즉시 로그인 페이지로 이동
+            console.warn('🚨 Authentication failed - redirecting to MAX Platform');
+            
+            // 모든 스토리지 클리어
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // MAX Platform으로 직접 리다이렉트
+            window.location.href = 'https://max.dwchem.co.kr/login';
+            return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
           } else if (errorData.error_code === 'AUTH_004') {
-            // Authentication required
-            shouldRedirect = this.config.enableAutoRedirect;
+            // Authentication required - MAX Platform으로 리다이렉트
+            console.warn('🚨 Authentication required - redirecting to MAX Platform');
+            window.location.href = 'https://max.dwchem.co.kr/login';
+            return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
           } else if (errorData.error_code === 'AUTH_005') {
-            // Token revoked - force logout
+            // Token revoked - force logout and redirect
             await authService.logout();
-            shouldRedirect = true;
+            window.location.href = 'https://max.dwchem.co.kr/login';
+            return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
           }
           break;
 
