@@ -1,0 +1,237 @@
+14:10:06.393 GET
+https://maxlab.dwchem.co.kr/login
+[HTTP/2 200  3ms]
+
+14:10:06.471 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  3ms]
+
+14:10:06.473 GET
+https://maxlab.dwchem.co.kr/assets/index-DJbLVEIk.css
+[HTTP/2 200  30ms]
+
+14:10:06.491 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
+14:10:06.598 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+14:10:06.598 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+14:10:06.600 🛡️ CSRF protection initialized with existing token index-Dmbi0U-L.js:263:5675
+14:10:06.607 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+14:10:06.616 GET
+https://maxlab.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+14:10:06.625 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+14:10:06.625 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+14:10:06.626 GET
+https://maxlab.dwchem.co.kr/assets/inter-latin-400-normal-C38fXH4l.woff2
+[HTTP/2 200  0ms]
+
+14:10:06.626 GET
+https://maxlab.dwchem.co.kr/assets/inter-latin-700-normal-Drs_5D37.woff2
+[HTTP/2 200  1ms]
+
+14:10:06.626 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+14:10:06.626 🚫 Unsafe path for token refresh: /login index-Dmbi0U-L.js:258:18589
+14:10:06.626 🚫 Silent auth not allowed on current page: /login index-Dmbi0U-L.js:258:16610
+14:10:06.627 GET
+https://maxlab.dwchem.co.kr/assets/inter-latin-600-normal-LgqL8muc.woff2
+[HTTP/2 200  0ms]
+
+14:10:06.627 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-Dmbi0U-L.js:265:5993
+14:10:06.627 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+14:10:06.627 🚫 Unsafe path for token refresh: /login index-Dmbi0U-L.js:258:18589
+14:10:06.629 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:10:06.631 🛑 User not authenticated, stopping token refresh index-Dmbi0U-L.js:265:18223
+14:10:06.631 🔥 Component mounted, current oauthLoading: false index-Dmbi0U-L.js:758:2620
+14:10:06.632 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-Dmbi0U-L.js:758:2032
+14:10:06.633 🔄 Logout detected, resetting login component state index-Dmbi0U-L.js:758:3026
+14:10:06.633 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:10:06.641 GET
+https://maxlab.dwchem.co.kr/assets/inter-latin-500-normal-Cerq10X2.woff2
+[HTTP/2 200  1ms]
+
+14:10:06.732 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+14:10:06.732 🚫 Unsafe path for token refresh: /login index-Dmbi0U-L.js:258:18589
+14:10:06.732 🚫 Silent auth not allowed on current page: /login index-Dmbi0U-L.js:258:16610
+14:10:06.732 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-Dmbi0U-L.js:265:5993
+14:10:06.733 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:10:10.917 🔥 handleOAuthLogin called with forceAccountSelection: false index-Dmbi0U-L.js:758:4396
+14:10:10.917 🔥 Current oauthLoading state: false index-Dmbi0U-L.js:758:4468
+14:10:10.917 🔥 Current isAuthenticated state: false index-Dmbi0U-L.js:758:4516
+14:10:10.917 🔥 Setting oauthLoading to true index-Dmbi0U-L.js:758:4722
+14:10:10.917 🚀 About to call loginWithPopupOAuth with forceAccountSelection: false index-Dmbi0U-L.js:758:8366
+14:10:10.918 📊 Current state: 
+Object { isAuthenticated: false, oauthLoading: false, hasAccessToken: false, hasUser: false, forceAccountSelectionFlag: null }
+index-Dmbi0U-L.js:758:8448
+14:10:10.918 🔥 About to call authService.loginWithPopupOAuth index-Dmbi0U-L.js:758:8906
+14:10:10.918 🔥 authService object: 
+Object { loginWithPopupOAuth: async loginWithPopupOAuth(e), attemptSilentLogin: async attemptSilentLogin(), getCurrentUser: async getCurrentUser(), validateToken: async validateToken(), logout: async logout(e), _secureCleanup: async _secureCleanup(), isAuthenticated: isAuthenticated(), getStoredUser: getStoredUser(), redirectToSignup: redirectToSignup(), refreshToken: async refreshToken(e), … }
+index-Dmbi0U-L.js:758:8970
+14:10:10.918 🔥 forceAccountSelection: false index-Dmbi0U-L.js:758:9011
+14:10:10.918 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 2, recentAborted: 0, consecutiveFailures: 3, circuitBreakerOpen: false, totalAborted: 0 }
+index-Dmbi0U-L.js:227:4272
+14:10:10.918 🚫 MaxLab OAuth attempt blocked by authStore loop prevention: Recent automatic OAuth failures detected index-Dmbi0U-L.js:263:86462
+14:10:10.918 ❌ Auth error: loop_prevention - Recent automatic OAuth failures detected index-Dmbi0U-L.js:228:110
+14:10:10.919 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: true, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:10:10.923 🔥 authService.loginWithPopupOAuth error: Error: Recent automatic OAuth failures detected
+
+Suggested action: Try manual login instead
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:263
+    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
+    onClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
+    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
+index-Dmbi0U-L.js:758:9287
+14:10:10.924 🔥 Error stack: loginWithPopupOAuth@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:263:86695
+V@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758:9058
+onClick@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774:2491
+L0@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118234
+Ik/cf/<@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:123532
+Bp@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:9041
+cf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:119471
+Sf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:26825
+Sk@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:26645
+EventListener.handleEvent*z0@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:119032
+of@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118432
+Ik/lf/<@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118598
+lf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118543
+Ik/$i.createRoot@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:33858
+@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870:101167
+index-Dmbi0U-L.js:758:9370
+14:10:10.924 OAuth login error: Error: Recent automatic OAuth failures detected
+
+Suggested action: Try manual login instead
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:263
+    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
+    onClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
+    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
+index-Dmbi0U-L.js:758:10072
+14:10:10.924 🔥 Finally block executed index-Dmbi0U-L.js:774:388
+14:10:10.924 🔥 mountedRef.current: true index-Dmbi0U-L.js:774:429
+14:10:10.924 🔥 About to set oauthLoading to false index-Dmbi0U-L.js:774:477
+14:10:10.924 🔥 oauthLoading set to false index-Dmbi0U-L.js:774:536
+14:10:10.924 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:10:17.870 🔥 handleOAuthLogin called with forceAccountSelection: false index-Dmbi0U-L.js:758:4396
+14:10:17.870 🔥 Current oauthLoading state: false index-Dmbi0U-L.js:758:4468
+14:10:17.871 🔥 Current isAuthenticated state: false index-Dmbi0U-L.js:758:4516
+14:10:17.871 🔥 Setting oauthLoading to true index-Dmbi0U-L.js:758:4722
+14:10:17.871 🚀 About to call loginWithPopupOAuth with forceAccountSelection: false index-Dmbi0U-L.js:758:8366
+14:10:17.871 📊 Current state: 
+Object { isAuthenticated: false, oauthLoading: false, hasAccessToken: false, hasUser: false, forceAccountSelectionFlag: null }
+index-Dmbi0U-L.js:758:8448
+14:10:17.872 🔥 About to call authService.loginWithPopupOAuth index-Dmbi0U-L.js:758:8906
+14:10:17.872 🔥 authService object: 
+Object { loginWithPopupOAuth: async loginWithPopupOAuth(e), attemptSilentLogin: async attemptSilentLogin(), getCurrentUser: async getCurrentUser(), validateToken: async validateToken(), logout: async logout(e), _secureCleanup: async _secureCleanup(), isAuthenticated: isAuthenticated(), getStoredUser: getStoredUser(), redirectToSignup: redirectToSignup(), refreshToken: async refreshToken(e), … }
+index-Dmbi0U-L.js:758:8970
+14:10:17.872 🔥 forceAccountSelection: false index-Dmbi0U-L.js:758:9011
+14:10:17.872 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 2, recentAborted: 0, consecutiveFailures: 3, circuitBreakerOpen: false, totalAborted: 0 }
+index-Dmbi0U-L.js:227:4272
+14:10:17.872 🚫 MaxLab OAuth attempt blocked by authStore loop prevention: Recent automatic OAuth failures detected index-Dmbi0U-L.js:263:86462
+14:10:17.872 ❌ Auth error: loop_prevention - Recent automatic OAuth failures detected index-Dmbi0U-L.js:228:110
+14:10:17.875 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: true, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:10:17.880 🔥 authService.loginWithPopupOAuth error: Error: Recent automatic OAuth failures detected
+
+Suggested action: Try manual login instead
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:263
+    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
+    onLoginClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
+    i https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
+    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
+index-Dmbi0U-L.js:758:9287
+14:10:17.880 🔥 Error stack: loginWithPopupOAuth@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:263:86695
+V@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758:9058
+onLoginClick@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774:2950
+i@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758:1033
+L0@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118234
+Ik/cf/<@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:123532
+Bp@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:9041
+cf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:119471
+Sf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:26825
+Sk@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:26645
+EventListener.handleEvent*z0@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:119032
+of@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118432
+Ik/lf/<@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118598
+lf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118543
+Ik/$i.createRoot@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:33858
+@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870:101167
+index-Dmbi0U-L.js:758:9370
+14:10:17.880 OAuth login error: Error: Recent automatic OAuth failures detected
+
+Suggested action: Try manual login instead
+    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:263
+    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
+    onLoginClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
+    i https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
+    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
+    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
+index-Dmbi0U-L.js:758:10072
+14:10:17.880 🔥 Finally block executed index-Dmbi0U-L.js:774:388
+14:10:17.880 🔥 mountedRef.current: true index-Dmbi0U-L.js:774:429
+14:10:17.880 🔥 About to set oauthLoading to false index-Dmbi0U-L.js:774:477
+14:10:17.880 🔥 oauthLoading set to false index-Dmbi0U-L.js:774:536
+14:10:17.881 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
