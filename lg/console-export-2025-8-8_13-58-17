@@ -1,0 +1,244 @@
+13:57:59.586 GET
+https://max.dwchem.co.kr/login
+[HTTP/2 200  5ms]
+
+13:57:59.636 GET
+https://max.dwchem.co.kr/assets/index-C9FwpsSA.js
+[HTTP/2 200  3ms]
+
+13:57:59.638 GET
+https://max.dwchem.co.kr/assets/index-DHTf0g6U.css
+[HTTP/2 200  23ms]
+
+13:57:59.673 GET
+https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+[HTTP/2 200  175ms]
+
+13:57:59.677 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
+13:57:59.856 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:57:59.857 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-C9FwpsSA.js:539:65836
+13:57:59.857 📡 TRY start index-C9FwpsSA.js:539:65898
+13:57:59.857 ❌ 토큰이 없어 인증되지 않은 상태 index-C9FwpsSA.js:539:66583
+13:57:59.859 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:57:59.873 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  264ms]
+
+13:57:59.874 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  258ms]
+
+13:57:59.884 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  282ms]
+
+13:58:00.151 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+13:58:01.677 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  502ms]
+
+13:58:02.188 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  9ms]
+
+13:58:02.189 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-C9FwpsSA.js:539:65836
+13:58:02.189 📡 TRY start index-C9FwpsSA.js:539:65898
+13:58:02.189 📡 사용자 정보 로드 시작 index-C9FwpsSA.js:539:66325
+13:58:02.192 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  21ms]
+
+13:58:02.200 🔄 SSO: Syncing login to MAX Lab... index-C9FwpsSA.js:539:64721
+13:58:02.203 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:58:02.203 ✅ User authenticated, checking OAuth return... index-C9FwpsSA.js:715:1270
+13:58:02.204 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU0NjMwODgyLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjI5MDgyLCJqdGkiOiI3ZjRmNmVjZi0yNDA0LTQwZmMtYmZiYy1lZGZmOTA1NGQwMmQiLCJuYmYiOjE3NTQ2MjkwODIsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiJmZmQ3M2E5NDA1MTEyNDVkIn0.EbckZpS04qlwts5ADDYxWm0M0bMyVuYkgCyRtoaBjKI&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-08T04:58:02.162124","login_count":512,"roles":[],"groups":[]}
+[HTTP/2 200  1ms]
+
+13:58:02.223 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-C9FwpsSA.js:539:66529
+13:58:02.235 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  21ms]
+
+13:58:02.291 GET
+https://maxlab.dwchem.co.kr/assets/index-DJbLVEIk.css
+[HTTP/2 200  30ms]
+
+13:58:02.291 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  3ms]
+
+13:58:02.292 Features response: 
+Object { user_info: {…}, services: (8) […], categories: (5) […] }
+index-C9FwpsSA.js:722:42370
+13:58:02.292 Features data: 
+Array(8) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-C9FwpsSA.js:722:42411
+13:58:02.403 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+13:58:02.404 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+13:58:02.406 🛡️ CSRF protection initialized with existing token index-Dmbi0U-L.js:263:5675
+13:58:02.411 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+13:58:02.421 ✅ SSO: MAX Lab sync iframe loaded index-C9FwpsSA.js:539:64983
+13:58:02.422 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+13:58:02.422 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:58:02.423 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+13:58:02.423 ✅ Silent auth conditions met, starting... index-Dmbi0U-L.js:258:17410
+13:58:02.424 🔇 Starting silent authentication... index-Dmbi0U-L.js:258:13918
+13:58:02.427 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+read:profile+read:groups+manage:workflows&state=nHn23MIhGCLHmwPkxg0k8vg4z2kQKNvGDxNlK2zsiGk&code_challenge=PkHriaoZXovqMSlQ1_z3inzwXCjAqRQAX7gv7feeICw&code_challenge_method=S256&prompt=none&nonce=62a90485f1a6a6c0331319aaa6c4b925531e2f56b6e5ffaf169bbeb17b37bedc
+[HTTP/2 307  14ms]
+
+13:58:02.474 GET
+https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=nHn23MIhGCLHmwPkxg0k8vg4z2kQKNvGDxNlK2zsiGk&error_description=User+not+logged+in
+[HTTP/2 200  0ms]
+
+13:58:02.479 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  0ms]
+
+13:58:02.583 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+13:58:02.584 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+13:58:02.586 🛡️ CSRF protection initialized with existing token index-Dmbi0U-L.js:263:5675
+13:58:02.591 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+13:58:02.603 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+13:58:02.603 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:58:02.604 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+13:58:02.604 🚫 Unsafe path for token refresh: /oauth/callback index-Dmbi0U-L.js:258:18589
+13:58:02.604 🚫 Silent auth not allowed on current page: /oauth/callback index-Dmbi0U-L.js:258:16610
+13:58:02.605 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-Dmbi0U-L.js:265:5993
+13:58:02.605 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:58:02.606 🚫 Unsafe path for token refresh: /oauth/callback index-Dmbi0U-L.js:258:18589
+13:58:02.606 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:58:02.607 🔍 Searching for OAuth flow state with state: nHn23MIh... index-Dmbi0U-L.js:228:14242
+13:58:02.607 📋 Found total flow states: 1 index-Dmbi0U-L.js:228:14359
+13:58:02.607 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-Dmbi0U-L.js:228:14447
+13:58:02.607 🔍 Checking stored flow: 
+Object { key: "oauth_flow_me2b0v3q2nbbqevc9wv", flowId: "me2b0v3q2nbbqevc9wv", storedState: "u6m5t2lw...", matchesSearch: false }
+index-Dmbi0U-L.js:228:14730
+13:58:02.607 🔍 Checking stored flow: 
+Object { key: "oauth_flow_me2azesls33i3hhg6c9", flowId: "me2azesls33i3hhg6c9", storedState: "RaDk8eo5...", matchesSearch: false }
+index-Dmbi0U-L.js:228:14730
+13:58:02.607 🔍 Checking stored flow: 
+Object { key: "oauth_flow_me2cf7wkmtf5qs6mz2", flowId: "me2cf7wkmtf5qs6mz2", storedState: "7DsVpkWM...", matchesSearch: false }
+index-Dmbi0U-L.js:228:14730
+13:58:02.607 🚨 OAuth flow state not found for state: nHn23MIh... 
+Object { searchedFlows: 1, sessionStorageKeys: (13) […] }
+index-Dmbi0U-L.js:228:16290
+13:58:02.607 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:58:02.608 🛑 User not authenticated, stopping token refresh index-Dmbi0U-L.js:265:18223
+13:58:02.608 🔄 Migrating legacy OAuth state to new state manager index-Dmbi0U-L.js:228:21184
+13:58:02.608 🔐 OAuth flow state created: 
+Object { flowId: "me2cuoz4zg9r78vddc", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-Dmbi0U-L.js:228:14069
+13:58:02.608 ✅ Legacy OAuth state migrated: me2cuoz4zg9r78vddc index-Dmbi0U-L.js:228:21759
+13:58:02.608 🔄 Legacy OAuth state migrated: 
+Object { migrated: 1, removed: 3, errors: 0 }
+index-Dmbi0U-L.js:774:8206
+13:58:02.608 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:58:02.608 🔍 Searching for OAuth flow state with state: nHn23MIh... index-Dmbi0U-L.js:228:14242
+13:58:02.608 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
+13:58:02.608 ✅ Found OAuth flow state: 
+Object { flowId: "me2cuoz4zg9r78vddc", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:58:02.608 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:58:02.608 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: false, hasError: true, sessionKeys: (11) […] }
+index-Dmbi0U-L.js:774:9042
+13:58:02.608 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=nHn23MIhGCLHmwPkxg0k8vg4z2kQKNvGDxNlK2zsiGk&error_description=User+not+logged+in", pathname: "/oauth/callback", search: "?error=login_required&state=nHn23MIhGCLHmwPkxg0k8vg4z2kQKNvGDxNlK2zsiGk&error_description=User+not+logged+in", code: "null", state: "nHn23MIh...", error: "login_required", errorDescription: "User not logged in", allParams: {…} }
+index-Dmbi0U-L.js:774:10043
+13:58:02.608 🚨 OAuth Server Error: 
+Object { error: "login_required", errorDescription: "User not logged in", fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=nHn23MIhGCLHmwPkxg0k8vg4z2kQKNvGDxNlK2zsiGk&error_description=User+not+logged+in", allParams: {…} }
+index-Dmbi0U-L.js:774:10366
+13:58:12.404 Feature clicked: 
+Object { id: "15", name: "MAX LAB", display_name: "MAX LAB", description: "", category: "dashboard", icon: "max lab", url_path: "https://maxlab.dwchem.co.kr", is_external: true, open_in_new_tab: true, is_active: true }
+index-C9FwpsSA.js:722:43950
+13:58:12.405 Feature URL path: https://maxlab.dwchem.co.kr index-C9FwpsSA.js:722:43984
+
+
+
+
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.491 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=z_v86jv4MmnXNZ35atn13SWIB7Wjgg_EV1tBo22HgyY&code_challenge=zly1lBBoJRLySRM-s66-uC-FnbQQdJooXK-A_IzMkdw&code_challenge_method=S256&nonce=9zyC_bC7aC0BZOOF3nENSvzgs3imMSTZoTj6dBLbkbE HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.553 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.554 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.576 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.577 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.577 [INFO] app.api.oauth_simple:779 - 🔍 Worker 446038: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.577 [INFO] app.api.oauth_simple:781 - 🔍 Worker 446038: Authenticated user: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:785 - 🔍 Worker 446038: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:787 - 🔍 Worker 446038: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:797 - 🔍 Worker 446038: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.578 [INFO] app.api.oauth_simple:800 - 🔍 Worker 446038: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.579 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.579 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.580 [WARNING] app.api.oauth_simple:844 - ⚠️ Worker 446038: User authenticated but no Redis session found - forcing re-authentication
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.583 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=z_v86jv4MmnXNZ35atn13SWIB7Wjgg_EV1tBo22HgyY&code_challenge=zly1lBBoJRLySRM-s66-uC-FnbQQdJooXK-A_IzMkdw&code_challenge_method=S256&nonce=9zyC_bC7aC0BZOOF3nENSvzgs3imMSTZoTj6dBLbkbE HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.652 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.653 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.672 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.673 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.673 [INFO] app.api.oauth_simple:779 - 🔍 Worker 446038: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.673 [INFO] app.api.oauth_simple:781 - 🔍 Worker 446038: Authenticated user: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.673 [INFO] app.api.oauth_simple:785 - 🔍 Worker 446038: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:787 - 🔍 Worker 446038: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:797 - 🔍 Worker 446038: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.674 [INFO] app.api.oauth_simple:800 - 🔍 Worker 446038: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.676 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.676 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.676 [WARNING] app.api.oauth_simple:844 - ⚠️ Worker 446038: User authenticated but no Redis session found - forcing re-authentication
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.678 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=z_v86jv4MmnXNZ35atn13SWIB7Wjgg_EV1tBo22HgyY&code_challenge=zly1lBBoJRLySRM-s66-uC-FnbQQdJooXK-A_IzMkdw&code_challenge_method=S256&nonce=9zyC_bC7aC0BZOOF3nENSvzgs3imMSTZoTj6dBLbkbE HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.740 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.742 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.756 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:779 - 🔍 Worker 446038: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:781 - 🔍 Worker 446038: Authenticated user: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:785 - 🔍 Worker 446038: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:787 - 🔍 Worker 446038: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:793 - 🔍 Worker 446038: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:797 - 🔍 Worker 446038: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.758 [INFO] app.api.oauth_simple:800 - 🔍 Worker 446038: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.760 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.760 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.760 [WARNING] app.api.oauth_simple:844 - ⚠️ Worker 446038: User authenticated but no Redis session found - forcing re-authentication
+0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.763 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=z_v86jv4MmnXNZ35atn13SWIB7Wjgg_EV1tBo22HgyY&code_challenge=zly1lBBoJRLySRM-s66-uC-FnbQQdJooXK-A_IzMkdw&code_challenge_method=S256&nonce=9zyC_bC7aC0BZOOF3nENSvzgs3imMSTZoTj6dBLbkbE HTTP/1.1" 307
