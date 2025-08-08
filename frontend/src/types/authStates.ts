@@ -12,7 +12,7 @@ export type AuthInitState =
   | 'error';         // 에러 상태
 
 export interface AuthError {
-  type: 'network' | 'token_expired' | 'server_error' | 'silent_auth_timeout' | 'unknown' | 'oauth_infinite_loop' | 'loop_prevention';
+  type: 'network' | 'token_expired' | 'server_error' | 'silent_auth_timeout' | 'unknown' | 'oauth_infinite_loop' | 'loop_prevention' | 'sso_sync';
   message: string;
   recoverable: boolean;
   retryCount?: number;
@@ -44,5 +44,6 @@ export const ERROR_MESSAGES: Record<AuthError['type'], string> = {
   silent_auth_timeout: '자동 로그인 시간이 초과되었습니다',
   unknown: '알 수 없는 오류가 발생했습니다',
   oauth_infinite_loop: 'OAuth 무한 루프가 감지되었습니다',
-  loop_prevention: 'OAuth 루프 방지가 활성화되었습니다'
+  loop_prevention: 'OAuth 루프 방지가 활성화되었습니다',
+  sso_sync: 'SSO 동기화 중 오류가 발생했습니다'
 };
