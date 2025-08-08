@@ -28,6 +28,7 @@ ALLOWED_REDIRECT_PATTERNS = [
     r"^https://[a-zA-Z0-9-]+\.maxlab\.io/$",  # Production root (maxlab.io)
     r"^https://maxlab\.dwchem\.co\.kr/oauth/callback$",  # Production domain (dwchem)
     r"^https://maxlab\.dwchem\.co\.kr/$",  # Production root (dwchem)
+    r"^https://[a-zA-Z0-9-]+\.dwchem\.co\.kr/$",  # Production root (dwchem)
     r"^https://maxlab\.dwchem\.co\.kr/login$",  # Production login (dwchem)
 ]
 
@@ -73,8 +74,8 @@ def get_trusted_origins() -> List[str]:
         "http://localhost:3012",  # Frontend staging
         "http://localhost:8000",  # OAuth server
         "http://localhost:8010",  # Backend API
-        "https://maxlab.io",      # Production
-        "https://app.maxlab.io",  # Production app
+        "https://dwchem.co.kr",      # Production
+        "https://max.dwchem.co.kr",  # Production app
         "https://maxlab.dwchem.co.kr",  # Production (dwchem)
     ]
 
