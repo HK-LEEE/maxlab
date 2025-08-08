@@ -1,149 +1,17 @@
-14:13:06.209 🔥 handleOAuthLogin called with forceAccountSelection: false index-Dmbi0U-L.js:758:4396
-14:13:06.209 🔥 Current oauthLoading state: false index-Dmbi0U-L.js:758:4468
-14:13:06.209 🔥 Current isAuthenticated state: false index-Dmbi0U-L.js:758:4516
-14:13:06.209 🔥 Setting oauthLoading to true index-Dmbi0U-L.js:758:4722
-14:13:06.209 🚀 About to call loginWithPopupOAuth with forceAccountSelection: false index-Dmbi0U-L.js:758:8366
-14:13:06.209 📊 Current state: 
-Object { isAuthenticated: false, oauthLoading: false, hasAccessToken: false, hasUser: false, forceAccountSelectionFlag: null }
-index-Dmbi0U-L.js:758:8448
-14:13:06.210 🔥 About to call authService.loginWithPopupOAuth index-Dmbi0U-L.js:758:8906
-14:13:06.210 🔥 authService object: 
-Object { loginWithPopupOAuth: async loginWithPopupOAuth(e), attemptSilentLogin: async attemptSilentLogin(), getCurrentUser: async getCurrentUser(), validateToken: async validateToken(), logout: async logout(e), _secureCleanup: async _secureCleanup(), isAuthenticated: isAuthenticated(), getStoredUser: getStoredUser(), redirectToSignup: redirectToSignup(), refreshToken: async refreshToken(e), … }
-index-Dmbi0U-L.js:758:8970
-14:13:06.210 🔥 forceAccountSelection: false index-Dmbi0U-L.js:758:9011
-14:13:06.210 🔍 MaxLab OAuth loop prevention check: 
-Object { type: "auto", recentAttempts: 1, recentAborted: 0, consecutiveFailures: 4, circuitBreakerOpen: false, totalAborted: 0 }
-index-Dmbi0U-L.js:227:4272
-14:13:06.210 🔐 OAuth Configuration: 
-Object { clientId: "maxlab", redirectUri: "https://maxlab.dwchem.co.kr/oauth/callback", authUrl: "https://max.dwchem.co.kr", runtimeConfig: "Not available", envAuthUrl: "https://max.dwchem.co.kr", currentOrigin: "https://maxlab.dwchem.co.kr" }
-index-Dmbi0U-L.js:228:22776
-14:13:06.210 🔐 Starting popup OAuth login (force account selection: false, type: auto)... index-Dmbi0U-L.js:265:150
-14:13:06.211 🔥 Login component render - current state: 
-Object { isAuthenticated: false, oauthLoading: true, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
-index-Dmbi0U-L.js:758:2032
-14:13:06.218 🔐 OAuth flow state created: 
-Object { flowId: "me2de27eybe4ff2gdo9", flowType: "popup", expiresIn: "900s", forceAccountSelection: false }
-index-Dmbi0U-L.js:228:14069
-14:13:06.218 🔄 OAuth flow status updated: 
-Object { flowId: "me2de27eybe4ff2gdo9", status: "in_progress", flowType: "popup" }
-index-Dmbi0U-L.js:228:16669
-14:13:06.218 🔐 OAuth Flow State Created: 
-Object { flowId: "me2de27eybe4ff2gdo9", flowType: "popup", state: "S0VnyiYV...", codeVerifier: "Q_JPliXz...", nonce: "o5OpSVh7...", forceAccountSelection: false, expiresAt: "2025-08-08T05:28:06.218Z", timestamp: "2025-08-08T05:13:06.219Z" }
-index-Dmbi0U-L.js:228:25103
-14:13:06.218 🔐 Opening OAuth popup: https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=S0VnyiYVJjIrKG-yDkxIloMy74DIA84M2qCSODD7iJU&code_challenge=XA9JfDFV2ofibZLQv7oGncGJQd3xi261Iw3Fw6vQJbA&code_challenge_method=S256&nonce=o5OpSVh7jdcWrXb7eqcr3424NARjcs6MFRD-3Fpnm4M index-Dmbi0U-L.js:228:26402
-14:13:06.218 📋 Full OAuth URL params: response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=S0VnyiYVJjIrKG-yDkxIloMy74DIA84M2qCSODD7iJU&code_challenge=XA9JfDFV2ofibZLQv7oGncGJQd3xi261Iw3Fw6vQJbA&code_challenge_method=S256&nonce=o5OpSVh7jdcWrXb7eqcr3424NARjcs6MFRD-3Fpnm4M index-Dmbi0U-L.js:228:26443
-14:13:06.218 📡 Setting up message listeners before popup... index-Dmbi0U-L.js:228:26497
-14:13:06.335 ✅ OAuth popup opened successfully index-Dmbi0U-L.js:233:153
-14:13:06.617 📨 Parent window received message: 
-Object { type: "OAUTH_ERROR", error: "OAuth error: server_error" }
-index-Dmbi0U-L.js:228:26593
-14:13:06.618 📨 OAuth message validation: 
-Object { origin: "https://maxlab.dwchem.co.kr", messageType: "OAUTH_ERROR", validationResult: {…}, trustedOrigins: "https://maxlab.dwchem.co.kr,https://max.dwchem.co.kr,https://maxlab.io..." }
-index-Dmbi0U-L.js:233:4457
-14:13:06.618 📨 Received OAuth message: 
-Object { type: "OAUTH_ERROR", error: "OAuth error: server_error" }
-index-Dmbi0U-L.js:233:5658
-14:13:06.618 Message origin: https://maxlab.dwchem.co.kr index-Dmbi0U-L.js:233:5707
-14:13:06.618 Message type: OAUTH_ERROR index-Dmbi0U-L.js:233:5747
-14:13:06.618 🔍 Searching for OAuth flow state with state: S0VnyiYV... index-Dmbi0U-L.js:228:14242
-14:13:06.618 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
-14:13:06.618 ✅ Found OAuth flow state: 
-Object { flowId: "me2de27eybe4ff2gdo9", flowType: "popup", status: "in_progress", hasCodeVerifier: true, codeVerifierLength: 43 }
-index-Dmbi0U-L.js:228:15896
-14:13:06.618 🔄 OAuth flow status updated: 
-Object { flowId: "me2de27eybe4ff2gdo9", status: "completed", flowType: "popup" }
-index-Dmbi0U-L.js:228:16669
-14:13:06.619 🔄 OAuth flow state updated to: 
-Object { flowId: "me2de27eybe4ff2gdo9", status: "completed", messageReceived: true }
-index-Dmbi0U-L.js:258:786
-14:13:06.619 ⚠️ Preserving oauth_force_account_selection due to no success result index-Dmbi0U-L.js:258:1552
-14:13:06.619 🚨 Unexpected OAuth error: OAuth error: server_error index-Dmbi0U-L.js:245:94
-14:13:06.619 Popup OAuth login error: Error: OAuth error: server_error
-    handleOAuthMessage https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:245
-    messageHandler https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:228
-    startAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:228
-    startAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:228
-    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:265
-    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
-    onClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
-    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
-index-Dmbi0U-L.js:265:3219
-14:13:06.619 🔌 Circuit breaker opened due to consecutive failures index-Dmbi0U-L.js:227:6437
-14:13:06.619 📊 MaxLab OAuth attempt recorded: 
-Object { type: "auto", success: false, error: "OAuth error: server_error...", aborted: false, consecutiveFailures: 5, totalAborted: 0 }
-index-Dmbi0U-L.js:227:6525
-14:13:06.619 🔍 MaxLab Infinite loop detection result: 
-Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 2 }
-index-Dmbi0U-L.js:227:7740
-14:13:06.619 🔍 MaxLab Infinite loop detection result: 
-Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 2 }
-index-Dmbi0U-L.js:227:7740
-14:13:06.619 ⚠️ Preserving oauth_force_account_selection due to no success result index-Dmbi0U-L.js:258:1552
-14:13:06.619 🔥 authService.loginWithPopupOAuth error: Error: OAuth login failed. Please try again or contact support if the problem persists.
-    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:265
-    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
-    onClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
-    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
-index-Dmbi0U-L.js:758:9287
-14:13:06.620 🔥 Error stack: loginWithPopupOAuth@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:265:4247
-async*V@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758:9058
-onClick@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774:2491
-L0@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118234
-Ik/cf/<@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:123532
-Bp@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:9041
-cf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:119471
-Sf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:26825
-Sk@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:26645
-EventListener.handleEvent*z0@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:119032
-of@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118432
-Ik/lf/<@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118598
-lf@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48:118543
-Ik/$i.createRoot@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49:33858
-@https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870:101167
-index-Dmbi0U-L.js:758:9370
-14:13:06.620 OAuth login error: Error: OAuth login failed. Please try again or contact support if the problem persists.
-    loginWithPopupOAuth https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:265
-    V https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:758
-    onClick https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:774
-    L0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    Bp https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    cf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    Sf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    Sk https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    z0 https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    of https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    lf https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:48
-    createRoot https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:49
-    <anonymous> https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js:870
-index-Dmbi0U-L.js:758:10072
-14:13:06.620 🔥 Finally block executed index-Dmbi0U-L.js:774:388
-14:13:06.620 🔥 mountedRef.current: true index-Dmbi0U-L.js:774:429
-14:13:06.620 🔥 About to set oauthLoading to false index-Dmbi0U-L.js:774:477
-14:13:06.620 🔥 oauthLoading set to false index-Dmbi0U-L.js:774:536
-14:13:06.621 🔥 Login component render - current state: 
-Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
-index-Dmbi0U-L.js:758:2032
+/home/app-user/maxproject/maxplatform/backend/logs/pm2-out-0.log last 15 lines:
+0|maxplatf | 2025-08-08T14:26:08: 2025-08-08 14:26:08.902 [INFO] app.main:82 - Application services initialized
+0|maxplatf | 2025-08-08T14:26:08: 2025-08-08 14:26:08.902 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatf | 2025-08-08T14:26:08: 2025-08-08 14:26:08.903 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatf | 2025-08-08T14:26:08: 2025-08-08 14:26:08.905 [INFO] uvicorn.error:60 - Application startup complete.
+0|maxplatf | 2025-08-08T14:26:08: 2025-08-08 14:26:08.906 [INFO] uvicorn.error:218 - Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.293 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.294 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.294 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.295 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.295 [INFO] app.api.oauth_simple:779 - 🔍 Worker 452744: Current user authentication status: False
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.295 [INFO] app.api.oauth_simple:785 - 🔍 Worker 452744: Request cookies: []
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.295 [INFO] app.api.oauth_simple:789 - 🔍 Worker 452744: No access_token cookie found
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.295 [INFO] app.api.oauth_simple:797 - 🔍 Worker 452744: Authorization header: None
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.295 [ERROR] app.api.oauth_simple:1639 - Authorization error: cannot access local variable 'settings' where it is not associated with a value
+0|maxplatf | 2025-08-08T14:26:26: 2025-08-08 14:26:26.299 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=fxSsksE0vFQWEzkXbv97Iy9gRPVzA7F6ilAIZ1SK-jw&code_challenge=NnF_YF4BiYTai4_sivA1Qy628guKLi_k5mCWUk-QeB0&code_challenge_method=S256&nonce=fA3DDkvlz7YwngKK031gmIu2GEcwIGbusXHMkg7tzWM HTTP/1.1" 307
+
