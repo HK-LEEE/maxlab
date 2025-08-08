@@ -53,8 +53,9 @@ export const useSecureLogout = () => {
       }
       
       // 2단계: 백엔드 로그아웃 호출 (토큰과 함께)
+      const currentOrigin = window.location.origin; // 현재 도메인 동적 사용
       const logoutUrl = '/api/oauth/logout?client_id=maxlab&post_logout_redirect_uri=' +
-        encodeURIComponent('http://localhost:3010/login?logout=success');
+        encodeURIComponent(`${currentOrigin}/login?logout=success`);
       
       console.log('🚪 Backend logout URL:', logoutUrl);
       
