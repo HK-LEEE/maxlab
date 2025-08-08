@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '../types/auth';
 import type { AuthInitState, AuthError, EnhancedAuthState } from '../types/authStates';
+import { oauthLoopPrevention } from '../utils/oauthInfiniteLoopPrevention';
 
 interface AuthState extends EnhancedAuthState {
   user: User | null;
@@ -37,6 +38,29 @@ interface AuthState extends EnhancedAuthState {
     message: string;
     priority: 'high' | 'medium' | 'low';
   } | null;
+  
+  // OAuth Infinite Loop Prevention methods
+  canAttemptOAuth: (type?: 'auto' | 'manual' | 'retry') => {
+    allowed: boolean;
+    reason?: string;
+    suggestedAction?: string;
+    waitTime?: number;
+  };
+  recordOAuthAttempt: (type: 'auto' | 'manual' | 'retry', success: boolean, error?: string) => void;
+  detectInfiniteLoop: () => {
+    inLoop: boolean;
+    confidence: number;
+    indicators: string[];
+    recommendation: string;
+  };
+  resetOAuthLoopState: () => void;
+  getOAuthLoopDebugState: () => any;
+  getOAuthRecoveryActions: () => Array<{
+    action: string;
+    description: string;
+    priority: 'high' | 'medium' | 'low';
+    automated?: boolean;
+  }>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -108,6 +132,14 @@ export const useAuthStore = create<AuthState>()(
           lastSyncTime: Date.now()
         });
         
+        // 🔄 Record successful OAuth attempt for loop prevention
+        try {
+          oauthLoopPrevention.recordAttempt('manual', true);
+          console.log('✅ OAuth success recorded in loop prevention system');
+        } catch (loopError) {
+          console.warn('⚠️ Failed to record OAuth success in loop prevention:', loopError);
+        }
+        
         console.log('✅ User authenticated successfully');
       },
       
@@ -153,6 +185,14 @@ export const useAuthStore = create<AuthState>()(
           
           keysToRemove.forEach(key => localStorage.removeItem(key));
           sessionStorage.clear();
+        }
+        
+        // 🔄 Reset OAuth loop prevention state on logout
+        try {
+          oauthLoopPrevention.manualReset();
+          console.log('✅ OAuth loop prevention state reset');
+        } catch (loopError) {
+          console.warn('⚠️ Failed to reset OAuth loop prevention state:', loopError);
         }
         
         console.log('✅ User logged out successfully');
@@ -260,12 +300,115 @@ export const useAuthStore = create<AuthState>()(
               message: '잠시 후 다시 시도해주세요',
               priority: 'medium'
             };
+          case 'oauth_infinite_loop':
+            return {
+              action: 'clear_cache_and_manual_login',
+              message: 'OAuth 무한루프가 감지되었습니다. 브라우저 캐시를 지우고 수동 로그인해주세요',
+              priority: 'high'
+            };
+          case 'loop_prevention':
+            return {
+              action: 'wait_or_manual_login',
+              message: state.error.suggestion || '잠시 후 다시 시도하거나 수동 로그인해주세요',
+              priority: 'medium'
+            };
           default:
             return {
               action: 'refresh_page',
               message: '페이지를 새로고침해주세요',
               priority: 'low'
             };
+        }
+      },
+      
+      // OAuth Infinite Loop Prevention implementation
+      canAttemptOAuth: (type = 'auto') => {
+        try {
+          return oauthLoopPrevention.canAttemptOAuth(type);
+        } catch (error) {
+          console.error('❌ OAuth loop prevention check failed:', error);
+          return { allowed: true }; // Fail open for graceful degradation
+        }
+      },
+      
+      recordOAuthAttempt: (type, success, error) => {
+        try {
+          oauthLoopPrevention.recordAttempt(type, success, error);
+          
+          // If OAuth attempt failed, update auth store error state
+          if (!success && error) {
+            const loopDetection = oauthLoopPrevention.detectInfiniteLoop();
+            
+            if (loopDetection.inLoop) {
+              set({
+                error: {
+                  type: 'oauth_infinite_loop',
+                  message: `OAuth 무한루프 감지됨 (신뢰도: ${loopDetection.confidence}%)`,
+                  recoverable: true,
+                  suggestion: loopDetection.recommendation
+                },
+                initState: 'error'
+              });
+            } else if (error.includes('aborted') || error.includes('NS_BINDING_ABORTED')) {
+              // Handle aborted requests as potential loop indicators
+              set({
+                error: {
+                  type: 'network',
+                  message: 'OAuth 요청이 중단되었습니다',
+                  recoverable: true,
+                  suggestion: '네트워크 연결을 확인하고 다시 시도해주세요'
+                },
+                initState: 'error'
+              });
+            }
+          }
+        } catch (loopError) {
+          console.error('❌ Failed to record OAuth attempt:', loopError);
+        }
+      },
+      
+      detectInfiniteLoop: () => {
+        try {
+          return oauthLoopPrevention.detectInfiniteLoop();
+        } catch (error) {
+          console.error('❌ OAuth loop detection failed:', error);
+          return {
+            inLoop: false,
+            confidence: 0,
+            indicators: [],
+            recommendation: 'Manual login recommended due to detection error'
+          };
+        }
+      },
+      
+      resetOAuthLoopState: () => {
+        try {
+          oauthLoopPrevention.manualReset();
+          console.log('✅ OAuth loop state reset manually');
+        } catch (error) {
+          console.error('❌ Failed to reset OAuth loop state:', error);
+        }
+      },
+      
+      getOAuthLoopDebugState: () => {
+        try {
+          return oauthLoopPrevention.getDebugState();
+        } catch (error) {
+          console.error('❌ Failed to get OAuth loop debug state:', error);
+          return { error: 'Debug state unavailable' };
+        }
+      },
+      
+      getOAuthRecoveryActions: () => {
+        try {
+          return oauthLoopPrevention.getRecoveryActions();
+        } catch (error) {
+          console.error('❌ Failed to get OAuth recovery actions:', error);
+          return [{
+            action: 'manual_reset',
+            description: '수동으로 로그인을 다시 시도해주세요',
+            priority: 'medium'
+          }];
         }
       },
     }),

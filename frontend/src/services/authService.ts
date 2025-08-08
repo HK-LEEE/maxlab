@@ -1,6 +1,7 @@
 /**
  * OAuth-Only Authentication Service
  * Focused exclusively on OAuth 2.0 SSO with MAX Platform integration
+ * Enhanced with OAuth Infinite Loop Prevention
  */
 
 import { PopupOAuthLogin, getUserInfo } from '../utils/popupOAuth';
@@ -15,6 +16,8 @@ import type { User, MAXPlatformClaims } from '../types/auth';
 import { jwtDecode } from 'jwt-decode';
 import { oidcService } from './oidcService';
 import { authSyncService } from './authSyncService';
+import { useOAuthLoopPrevention, oauthLoopPrevention } from '../utils/oauthInfiniteLoopPrevention';
+import { useAuthStore } from '../stores/authStore';
 
 // Re-export for backward compatibility
 export type IDTokenClaims = MAXPlatformClaims;
@@ -27,13 +30,38 @@ export interface AuthServiceResult {
 
 export const authService = {
   /**
-   * 팝업 OAuth 로그인
+   * 팝업 OAuth 로그인 (Enhanced with Loop Prevention through AuthStore)
    */
   loginWithPopupOAuth: async (forceAccountSelection = false): Promise<User> => {
+    // Get authStore instance for integrated loop prevention
+    const authStore = useAuthStore.getState();
+    
+    // Check if OAuth attempt should be allowed through authStore
+    const attemptType = forceAccountSelection ? 'manual' : 'auto';
+    const canAttempt = authStore.canAttemptOAuth(attemptType);
+    
+    if (!canAttempt.allowed) {
+      console.warn('🚫 MaxLab OAuth attempt blocked by authStore loop prevention:', canAttempt.reason);
+      
+      // Set error state in authStore
+      authStore.setAuthError({
+        type: 'loop_prevention',
+        message: canAttempt.reason || 'OAuth attempt blocked by loop prevention',
+        recoverable: true,
+        suggestion: canAttempt.suggestedAction
+      });
+      
+      const error = new Error(canAttempt.reason + (canAttempt.suggestedAction ? `\n\nSuggested action: ${canAttempt.suggestedAction}` : ''));
+      (error as any).blocked = true;
+      (error as any).suggestion = canAttempt.suggestedAction;
+      (error as any).waitTime = canAttempt.waitTime;
+      throw error;
+    }
+
     const oauthInstance = new PopupOAuthLogin();
     
     try {
-      console.log(`🔐 Starting popup OAuth login (force account selection: ${forceAccountSelection})...`);
+      console.log(`🔐 Starting popup OAuth login (force account selection: ${forceAccountSelection}, type: ${attemptType})...`);
       
       // 🚨 CRITICAL: Complete session cleanup for different user login
       if (forceAccountSelection) {
@@ -82,6 +110,10 @@ export const authService = {
       }
       
       const tokenResponse = await oauthInstance.startAuth(forceAccountSelection);
+      
+      // Record successful OAuth attempt
+      oauthLoopPrevention.recordAttempt(attemptType, true);
+      console.log('✅ OAuth attempt successful - recorded in loop prevention system');
       console.log('✅ Popup OAuth successful, getting user info...');
       
       const userInfo = await getUserInfo(tokenResponse.access_token);
@@ -163,18 +195,53 @@ export const authService = {
       sessionStorage.removeItem('preventSilentAuth');
       console.log('🔓 Cleared logout flags after successful login');
       
+      // Record successful OAuth attempt through authStore
+      authStore.recordOAuthAttempt(attemptType, true);
+      
       return user;
       
     } catch (error: any) {
       console.error('Popup OAuth login error:', error);
       
+      // Record failed OAuth attempt through authStore (automatically handles loop detection)
+      authStore.recordOAuthAttempt(attemptType, false, error.message);
+      
+      // Check if infinite loop was detected (authStore handles this automatically)
+      const loopDetection = authStore.detectInfiniteLoop();
+      if (loopDetection.inLoop) {
+        console.warn('🚨 MaxLab OAuth infinite loop detected via authStore!', loopDetection);
+        
+        // Try automated recovery through authStore
+        const recoveryActions = authStore.getOAuthRecoveryActions();
+        const automatedAction = recoveryActions.find(action => action.automated);
+        
+        if (automatedAction) {
+          console.log('🔄 MaxLab: Attempting automated recovery:', automatedAction.action);
+          const recoverySuccess = await oauthLoopPrevention.executeRecoveryAction(automatedAction.action);
+          
+          if (recoverySuccess) {
+            console.log('✅ MaxLab automated recovery successful');
+          }
+        }
+        
+        // Enhance error with loop information
+        (error as any).infiniteLoop = true;
+        (error as any).loopDetection = loopDetection;
+        (error as any).recoveryActions = recoveryActions;
+      }
+      
       // 구체적인 에러 메시지
-      if (error.message?.includes('blocked')) {
+      if (error.blocked) {
+        // Error already processed by loop prevention
+        throw error;
+      } else if (error.message?.includes('blocked')) {
         throw new Error('Popup was blocked. Please allow popups for this site and try again.');
       } else if (error.message?.includes('cancelled')) {
         throw new Error('Login was cancelled by the user.');
       } else if (error.message?.includes('login_required')) {
         throw new Error('Please log in to MAX Platform first, then try OAuth login again.');
+      } else if (error.message?.includes('aborted') || error.message?.includes('NS_BINDING_ABORTED')) {
+        throw new Error('OAuth request was aborted. This might be due to a session mismatch. Please try clearing your browser cache and cookies, then try manual login.');
       } else {
         throw new Error('OAuth login failed. Please try again or contact support if the problem persists.');
       }
