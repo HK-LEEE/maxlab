@@ -1,0 +1,197 @@
+14:57:34.599 🔒 force_login detected - showing login form index-C9FwpsSA.js:715:1190
+14:57:34.599 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-C9FwpsSA.js:539:65836
+14:57:34.599 📡 TRY start index-C9FwpsSA.js:539:65898
+14:57:34.599 📡 사용자 정보 로드 시작 index-C9FwpsSA.js:539:66325
+14:57:34.641 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-C9FwpsSA.js:539:66529
+14:57:34.645 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: true, forceLogin: true, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+14:57:34.645 ✅ User authenticated, checking OAuth return... index-C9FwpsSA.js:715:1270
+14:57:34.645 🔄 OAuth return processing: 
+Object { isInPopup: true, oauthParams: {…} }
+index-C9FwpsSA.js:715:1403
+14:57:34.645 {"response_type":"code","client_id":"maxlab","redirect_uri":"https://maxlab.dwchem.co.kr/oauth/callback","scope":"openid profile email offline_access read:profile read:groups manage:workflows","state":"K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI","code_challenge":"HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo","code_challenge_method":"S256","prompt":"login","nonce":"fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU"} index-C9FwpsSA.js:715:1474
+14:57:34.646 🚀 User already authenticated in popup, redirecting to OAuth authorize... index-C9FwpsSA.js:715:1619
+14:57:34.647 🔄 Popup redirecting to OAuth authorize for code generation (v2 with form.submit): https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI&code_challenge=HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo&code_challenge_method=S256&prompt=login&nonce=fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU index-C9FwpsSA.js:715:1834
+14:57:34.650 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: true, oauthProcessedRef: true }
+index-C9FwpsSA.js:715:971
+14:57:34.650 ⏭️ OAuth already processed, skipping... index-C9FwpsSA.js:715:1118
+14:57:34.684 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+offline_access+read:profile+read:groups+manage:workflows&state=K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI&code_challenge=HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo&code_challenge_method=S256&prompt=login&nonce=fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU
+[HTTP/2 307  69ms]
+
+14:57:34.756 GET
+https://max.dwchem.co.kr/login?oauth_return={"response_type": "code", "client_id": "maxlab", "redirect_uri": "https://maxlab.dwchem.co.kr/oauth/callback", "scope": "openid profile email offline_access read:profile read:groups manage:workflows", "state": "K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI", "code_challenge": "HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo", "code_challenge_method": "S256", "prompt": "login", "nonce": "fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU"}&force_login=true
+[HTTP/2 200  0ms]
+
+14:57:34.772 GET
+https://max.dwchem.co.kr/assets/index-DHTf0g6U.css
+[HTTP/2 200 OK 0ms]
+
+14:57:34.805 GET
+https://max.dwchem.co.kr/assets/index-C9FwpsSA.js
+NS_BINDING_ABORTED
+
+14:57:34.806 GET
+https://max.dwchem.co.kr/favicon.ico
+NS_BINDING_ABORTED
+
+14:57:34.809 Loading failed for the module with source “https://max.dwchem.co.kr/assets/index-C9FwpsSA.js”. login:12:71
+
+
+
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.473 [INFO] app.api.oauth_simple:1123 - Redirecting to login page with force_login=true: https://max.dwchem.co.kr/login?oauth_return=%7B%22response_type%22%3A%20%22code%22%2C%20%22client_id%22%3A%20%22maxlab%22%2C%20%22redirect_uri%22%3A%20%22https%3A//maxlab.dwchem.co.kr/oauth/callback%22%2C%20%22scope%22%3A%20%22openid%20profile%20email%20offline_access%20read%3Aprofile%20read%3Agroups%20manage%3Aworkflows%22%2C%20%22state%22%3A%20%22K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI%22%2C%20%22code_challenge%22%3A%20%22HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo%22%2C%20%22code_challenge_method%22%3A%20%22S256%22%2C%20%22prompt%22%3A%20%22login%22%2C%20%22nonce%22%3A%20%22fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU%22%7D&force_login=true
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.477 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI&code_challenge=HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo&code_challenge_method=S256&prompt=login&nonce=fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.626 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.628 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.688 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.689 [INFO] app.api.oauth_simple:776 - OAuth authorize request: client_id=maxlab, display=None, prompt=login, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.689 [INFO] app.api.oauth_simple:781 - 🔍 Worker 458809: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.689 [INFO] app.api.oauth_simple:783 - 🔍 Worker 458809: Authenticated user: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.689 [INFO] app.api.oauth_simple:787 - 🔍 Worker 458809: Request cookies: ['access_token']
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.690 [INFO] app.api.oauth_simple:789 - 🔍 Worker 458809: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.690 [INFO] app.api.oauth_simple:795 - 🔍 Worker 458809: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.690 [INFO] app.api.oauth_simple:799 - 🔍 Worker 458809: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.690 [INFO] app.api.oauth_simple:802 - 🔍 Worker 458809: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.692 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 6b680f04-fd4c-4ff9-9c4a-3cb6a310a3b6
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.693 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: c43586d9-0c42-4d8f-8da5-5b49afa299d0
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.693 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 0b2ba6f3-e8bf-47f6-9118-e3aa374df349
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.694 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: aa7c542f-df66-4269-acd0-e1f4b3d068a7
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.694 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 30d1c325-a20b-4ccf-b91d-da2304458996
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.695 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 4b7cd096-93a6-42bf-a0a6-371b220dec4f
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.695 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: fc8808cf-1ea1-407d-a9ab-1690377021aa
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.696 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b9d941da-9809-4280-8015-d5c0305487c1
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.696 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 13c20279-4d67-4d6f-bee4-57cf47262115
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.697 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: c070c284-498e-418f-b09c-5123e3fd9893
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.697 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 511af432-883b-4439-9466-fc617c3f8cc2
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.698 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: dde5e7b1-9af8-4632-b4ad-60582a27259a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.698 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: acdedb7b-25a8-4f44-a484-527202995745
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.699 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: bab826bf-d82f-4a6e-b58f-11913cd29716
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.699 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: fbb070be-72f8-43f2-b657-50109c2cd0d2
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.700 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 4414a50d-fcf1-4cbb-a60a-be74d310a7d2
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.700 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 7473e63c-b641-46e1-a387-b4b4d0b0cf76
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.701 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 4acabbbc-4fce-4f7c-838f-ff88e2e4a258
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.701 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 00bd45f2-73b9-4c0f-be18-6cd97909ae61
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.701 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b89d466a-eb33-4eb9-9f2f-973c128adcfb
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.701 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 2ec6f1e2-e8dd-4a41-a743-a0b7ab40b8b4
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.702 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 5a680516-75fb-4deb-993c-e05e82d1543d
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.702 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 334e71a2-3212-434a-9307-76ba13771e09
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.703 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 0c140201-29d9-4464-91c4-e3ffd1116392
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.703 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 6d69606a-e7f5-4fac-929a-444af3410c7d
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.703 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b1cbe0ef-f4e5-448b-84a6-3748f1e8fbef
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.704 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 8374c015-0ab1-40f7-bb9a-6aa7728baf21
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.704 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: abc12f5c-0d42-43d3-8f90-3a54355a4094
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.704 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f5419b12-804f-4afb-8e33-a71174cb65fb
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.705 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b5463dfc-756e-46fc-9fda-259016f8d78f
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.705 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 91d8bac1-46d1-4f17-a67a-e9f95b4b1644
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.706 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 6427844e-7570-4086-9cf8-74da8c5fe161
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.706 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: bd2a9ff7-b3c5-41eb-9b76-09b5d269e693
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.706 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 97b3990d-9a68-4930-90d3-719b56babcfd
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.707 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 35eb0336-7800-48bf-8766-56455e12b65b
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.708 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 39890169-9c69-4dd3-98b8-10a9c15c3e44
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.710 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: fda7edc0-1df2-4ea9-8a51-cbbd35ba8269
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.711 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 3172b31b-d623-4a32-b872-a9c78a1abcc8
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.711 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: dd5bc8c4-c996-4b24-a4f7-fb70f4d2e7c1
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.712 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 2569ad17-c478-464e-a360-3fb607248d35
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.712 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 264509be-f1f9-4a38-823a-8ae7aaf08225
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.713 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 5bb0dc5d-387e-48f1-b6cd-d484e2aa3019
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.714 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: c8b62d49-6178-4037-aef1-cac28404c380
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.714 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 417c0743-3453-46c9-8fc0-356b8fa0f074
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.714 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 11ea4636-1022-4aa7-a1a6-d4a1d3840a47
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.715 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 856823c3-29c7-443d-af81-52a48d1d1523
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.715 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 656d6ef8-f276-4e1f-95de-947f72548f27
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.715 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 1ac80787-f984-40cd-babd-b242056eebeb
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.716 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 69b9dda0-fc2a-4e8d-a4af-89b06c23e01b
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.716 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 31569503-5d24-47ab-9a88-d793bbedec12
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.717 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: e932fa08-51e1-4b7d-9752-05e99e20d858
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.717 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 05bca664-a541-4228-8976-4f47bc4edc73
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.718 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 36617fd1-6134-4e2b-8685-eac561303d3f
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.718 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: de240648-85dd-4d26-885d-8288d11d307c
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.718 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 3d207d3b-4cba-47c5-b1cc-1cdf87d433ec
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.719 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 131b15b9-92c9-4437-a350-1648c8503aa4
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.719 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: fb937ac7-c870-405c-b242-2694927d3326
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.719 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 88813599-8a7d-486a-9f6b-5f93a87e22c9
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.720 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 538a431d-a4c9-4e83-a634-c85adbdb7d1a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.720 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 396ed07c-86e9-4daf-ac0e-ab3a53973117
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.721 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: d474ee62-26fc-4011-898f-1e9a8f12dbee
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.721 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b95c621c-7b3a-4559-a9d8-fae6d80347d7
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.721 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 61cf241f-7a40-4fb7-8ff6-5bd7d15e7658
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.721 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: cf604d38-c158-4352-89fb-10fd85ca1adf
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.722 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: d5ffa516-48b1-4708-b1ed-65e179b33859
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.722 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 9ec8136c-1740-42ff-a2b5-8d2cec940f8c
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.723 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 8f4b7529-519c-43f4-b426-327e50074725
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.723 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: cb03d909-5c03-49c8-a1fc-536a91c6ea1e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.724 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 042d04ab-04e6-4496-bd4f-aec9b4c0338e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.724 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: e2a4f9c3-1f38-4715-94bf-ebea69ef98c9
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.724 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b9097b03-f27e-4638-a8b3-208e5631cf16
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.725 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 5220414d-ac5f-445a-ae3b-6edb58466e68
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.725 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: aaa1e616-f56f-4ef7-8eb9-256574ac5305
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.725 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 6f5f6de7-6591-46de-b5df-9e68de00c659
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.726 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: ed58adbb-af5d-451e-9f2e-c8bb31b45c6c
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.726 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: d84c170c-b0dc-490a-a6ea-e3b4121026f5
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.727 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 12b80ca0-0b7d-490e-9a21-5d3e53e7f5fb
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.728 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 75043ea1-8931-4b7e-a14b-a5502d81dc55
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.728 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f2eaf414-67d6-4a80-905e-4c0d1dfd714e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.729 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: a80b9b13-f98c-413f-bd6e-baa83fb4f572
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.729 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 7edbbc78-47e9-425d-a171-eab838834db5
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.730 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: e9a0941b-3836-4b44-8607-d9dc28cd2868
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.730 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 2fc6359f-96e9-465a-866d-4a0ebae5b35a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.730 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 0257dc97-ba4a-4780-a4e0-fbc81c758214
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.731 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f67f7274-e18a-4d80-8bfc-b7dd0a012f5a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.731 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 4850c829-78b8-4127-8254-53cc539cebbf
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.731 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 47678fb8-f25f-4721-aae8-e9957a943c2a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.732 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: ce77e044-5a06-4336-9c61-da76d36874ab
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.732 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 22f47199-db6a-442a-bdd4-f37c06f6294e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.732 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: c91b6af7-dfe0-4f1d-b2cf-06c0f1e02fc1
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.733 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: d940384f-8095-48fb-817e-a512c2e2c5f8
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.733 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 3895369b-801e-4732-b08d-a441fa6c51c8
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.733 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 1bc67f27-0da9-4614-a87a-e17c0f694bc1
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.733 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 9cb7ee0e-c559-4cf3-81bd-1850b60f1567
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.734 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 65204cc6-fd6f-44ee-b6bd-e7f8f5c7b7d1
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.734 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 6e2a654a-403f-4e29-b3ba-33935a6377f1
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.734 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 132cd04c-a235-469b-8e6e-e9ad14516387
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.734 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 329ff0fd-a121-4d34-b69c-c1de5dba292d
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.735 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 0bac2c6c-1b60-4fba-9f0a-8c28f2e58cfa
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.735 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 523078b0-1a10-4c51-8ecf-53e8a9c1d0e9
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.735 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 1010f2f9-cd2d-44aa-9dd3-f828bce261a4
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.736 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b98b3165-9589-4be3-8d6c-8f44687e11ae
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.736 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 80348cbf-5791-4780-9683-f4b9996d8193
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.736 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: c9453a56-4a2f-480d-a4ec-be7b2e7f97cb
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.737 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: a5813b4f-4d0d-4bf7-98f5-debaf516d93b
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.737 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 23dac0ed-f7cb-4d2d-bcdf-7e599421ba33
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.737 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 2572d66e-221b-470c-ad65-ac33cc4098c3
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.738 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f4917529-3f20-4942-b0fe-95c61ecc8937
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.738 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: ca2a2fd4-a874-4b8f-a75f-3f9af77a2ef8
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.738 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 68c6bf54-6557-42e3-8106-327414407606
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.738 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 26dbd09b-3af4-4a36-8e0f-e7373ea5d0a0
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.739 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 0cf8320a-5243-4be9-90c6-15322e0ac6fc
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.739 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f36540a9-9420-471d-b824-4bc16c3abb00
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.739 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42fedce8-5fd2-4992-b0d3-9713ff30d53d
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.739 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 9f18a9cb-dbd8-4659-b110-f72b6afcc75e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.740 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b5722e99-f5a0-43af-8a60-0763bc6f567d
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.740 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 33a889c5-25a2-46c4-9e25-0c36aaae887e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.740 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 8a879e0f-b9ce-46f5-a0a3-eba5e0e69e7a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.740 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 70a75cce-c81f-4bff-9f27-ecd13314ddd0
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.741 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f8524a9e-ac85-434b-b55f-9d53824ff882
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.742 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: f0fd1424-2b4a-4450-be15-a0969af73145
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.742 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: af10227e-60e6-4ff9-9ff0-39e834691e4e
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.743 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 20fd4db0-71ad-427f-9d50-1f668c48767a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.743 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: dbed11a2-5571-4930-837b-795d9895269a
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.744 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 3c798e80-c879-4ad0-8844-19afcf970bec
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.744 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 7b4cd79a-b3b4-49a4-ba84-7ac4062ba7dd
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.746 [INFO] app.api.oauth_simple:875 - 🔄 Worker 458809: Final prompt decision: login
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.746 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.746 [WARNING] app.api.oauth_simple:913 - ⚠️ Worker 458809: User authenticated but no Redis session found - attempting to create one
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.748 [INFO] app.core.redis_session:92 - ✅ Session created: f7571e9b-0850-4ad4-918e-b40e3921d990 for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.749 [INFO] app.api.oauth_simple:944 - ✅ Worker 458809: Created Redis session f7571e9b-0850-4ad4-918e-b40e3921d990 for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.749 [INFO] app.api.oauth_simple:1079 - prompt=login: forcing re-authentication for client maxlab
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.749 [WARNING] app.services.user_switch_security_service:259 - 🔒 SECURITY: Force cleanup initiated - Client: maxlab, Previous User: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162, New User: None
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.750 [INFO] app.services.user_switch_security_service:338 - ✅ User switch cleanup completed - 0 items cleaned
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.750 [INFO] app.api.oauth_simple:1092 - 🔒 Security cleanup for prompt=login: {'success': True, 'cleanup_performed': False, 'stats': {'access_tokens_revoked': 0, 'refresh_tokens_revoked': 0, 'sessions_terminated': 0, 'client_tokens_cleaned': 0, 'errors': []}, 'message': 'Successfully cleaned 0 authentication items'}
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.750 [INFO] app.api.oauth_simple:1123 - Redirecting to login page with force_login=true: https://max.dwchem.co.kr/login?oauth_return=%7B%22response_type%22%3A%20%22code%22%2C%20%22client_id%22%3A%20%22maxlab%22%2C%20%22redirect_uri%22%3A%20%22https%3A//maxlab.dwchem.co.kr/oauth/callback%22%2C%20%22scope%22%3A%20%22openid%20profile%20email%20offline_access%20read%3Aprofile%20read%3Agroups%20manage%3Aworkflows%22%2C%20%22state%22%3A%20%22K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI%22%2C%20%22code_challenge%22%3A%20%22HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo%22%2C%20%22code_challenge_method%22%3A%20%22S256%22%2C%20%22prompt%22%3A%20%22login%22%2C%20%22nonce%22%3A%20%22fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU%22%7D&force_login=true
+0|maxplatform-backend-8000  | 2025-08-08T14:57:34: 2025-08-08 14:57:34.753 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=K86Dv-KBEb05dTpLFgm90Ytv-SViObNYEZrDDkEKmgI&code_challenge=HAhiB0q_bB8yrNmcSRIhOmH16cVPtADqKSgr0JufzQo&code_challenge_method=S256&prompt=login&nonce=fU2zGDPm2RhUsi6drfnvHwNvpZjqCXl0TLs7aJML3gU HTTP/1.1" 307
