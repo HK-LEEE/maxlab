@@ -486,7 +486,24 @@ function App() {
               // Validate token with server by fetching user info
               const freshUser = await authService.getCurrentUser();
               
-              // If we get here, token is valid on server side
+              // Check for user switch - compare stored user with server user
+              const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+              if (storedUser.email && freshUser.email && storedUser.email !== freshUser.email) {
+                devLog.warn('🚨 User mismatch detected!');
+                devLog.warn(`Stored: ${storedUser.email} (${storedUser.id}) vs Server: ${freshUser.email} (${freshUser.id})`);
+                
+                // Clear all local storage to prevent token confusion
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Force re-authentication
+                logout();
+                setAuthState('idle');
+                window.location.href = '/login?reason=user_switch';
+                return;
+              }
+              
+              // If we get here, token is valid on server side and user matches
               setUser(freshUser);
               devLog.info('✅ Token validated with server, user authenticated:', { 
                 email: freshUser.email,
@@ -543,6 +560,21 @@ function App() {
             try {
               devLog.info('🔍 Validating silent auth token with server...');
               const freshUser = await authService.getCurrentUser();
+              
+              // Check for user switch during silent auth
+              const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+              if (storedUser.email && freshUser.email && storedUser.email !== freshUser.email) {
+                devLog.warn('🚨 User mismatch during silent auth!');
+                devLog.warn(`Stored: ${storedUser.email} vs Server: ${freshUser.email}`);
+                
+                // Clear everything and force re-login
+                localStorage.clear();
+                sessionStorage.clear();
+                logout();
+                setAuthState('idle');
+                window.location.href = '/login?reason=user_switch';
+                return;
+              }
               
               // If we get here, token is valid
               setAuth(token, freshUser);
