@@ -52,7 +52,9 @@ def validate_redirect_uri(redirect_uri: str) -> bool:
             return False
         
         # Check against allowed patterns
+        print(f"pasred : {parsed}")
         for pattern in ALLOWED_REDIRECT_PATTERNS:
+            print(f"Pattern {pattern}")
             if re.match(pattern, redirect_uri):
                 logger.info(f"Redirect URI validated: {redirect_uri}")
                 return True
