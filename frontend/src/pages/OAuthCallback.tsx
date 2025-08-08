@@ -85,15 +85,18 @@ export const OAuthCallback: React.FC = () => {
       const inPopupMode = isPopupMode();
       const isSilentAuth = sessionStorage.getItem('silent_oauth_state') !== null;
       
-      // 🔒 CRITICAL FIX: Only redirect immediately if NOT in popup/silent mode
+      // 🔒 CRITICAL FIX: Only redirect immediately if NOT in popup/silent mode AND no authorization code
       // In popup mode, we need to send message to parent window first
+      // IMPORTANT: Always process authorization codes for session upgrades, even with existing tokens
       if (!inPopupMode && !isSilentAuth) {
         const hasValidToken = localStorage.getItem('accessToken');
+        const hasAuthorizationCode = searchParams.has('code');
         
-        // 🔒 CRITICAL: Always redirect if user has valid token on OAuth callback page
+        // 🔒 CRITICAL: Only redirect if user has valid token AND no authorization code to process
         // This prevents infinite loops when refreshing the OAuth callback page
-        if (hasValidToken) {
-          console.log('✅ User authenticated on OAuth callback page, redirecting immediately...');
+        // BUT allows session upgrades and OAuth completion to work properly
+        if (hasValidToken && !hasAuthorizationCode) {
+          console.log('✅ User authenticated on OAuth callback page with no authorization code, redirecting immediately...');
           const redirectTo = sessionStorage.getItem('oauthRedirectTo') || '/';
           sessionStorage.removeItem('oauthRedirectTo');
           sessionStorage.removeItem('oauth_flow_in_progress');
@@ -105,6 +108,8 @@ export const OAuthCallback: React.FC = () => {
           // Force immediate redirect to prevent OAuth callback loop
           window.location.replace(redirectTo);
           return;
+        } else if (hasValidToken && hasAuthorizationCode) {
+          console.log('🔄 User has existing token but authorization code present - processing OAuth completion for session upgrade...');
         }
       }
       
