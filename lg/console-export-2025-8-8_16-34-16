@@ -1,92 +1,51 @@
-16:34:12.371 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: false, authLoading: true, oauthReturn: true, forceLogin: true, oauthProcessedRef: false }
-index-C9FwpsSA.js:715:971
-16:34:12.371 🔒 force_login detected - showing login form index-C9FwpsSA.js:715:1190
-16:34:12.371 🔐 AuthContext initAuth 시작: 
-Object { hasToken: true }
-index-C9FwpsSA.js:539:65836
-16:34:12.371 📡 TRY start index-C9FwpsSA.js:539:65898
-16:34:12.371 📡 사용자 정보 로드 시작 index-C9FwpsSA.js:539:66325
-16:34:12.385 ✅ 사용자 정보 로드 성공: 
-Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
-index-C9FwpsSA.js:539:66529
-16:34:12.389 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: true, authLoading: false, oauthReturn: true, forceLogin: true, oauthProcessedRef: false }
-index-C9FwpsSA.js:715:971
-16:34:12.389 ✅ User authenticated, checking OAuth return... index-C9FwpsSA.js:715:1270
-16:34:12.389 🔄 OAuth return processing: 
-Object { isInPopup: true, oauthParams: {…} }
-index-C9FwpsSA.js:715:1403
-16:34:12.389 {"response_type":"code","client_id":"maxlab","redirect_uri":"https://maxlab.dwchem.co.kr/oauth/callback","scope":"openid profile email offline_access read:profile read:groups manage:workflows","state":"AA-ST1dvoJdrJ7m6i8e_2Cs10NsosxrKtAS8xo3n6zo","code_challenge":"vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E","code_challenge_method":"S256","prompt":"login","nonce":"qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc"} index-C9FwpsSA.js:715:1474
-16:34:12.389 🚀 User already authenticated in popup, redirecting to OAuth authorize... index-C9FwpsSA.js:715:1619
-16:34:12.389 🔄 Popup redirecting to OAuth authorize for code generation (v2 with form.submit): https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=AA-ST1dvoJdrJ7m6i8e_2Cs10NsosxrKtAS8xo3n6zo&code_challenge=vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E&code_challenge_method=S256&prompt=login&nonce=qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc index-C9FwpsSA.js:715:1834
-16:34:12.392 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: true, oauthProcessedRef: true }
-index-C9FwpsSA.js:715:971
-16:34:12.392 ⏭️ OAuth already processed, skipping... index-C9FwpsSA.js:715:1118
-
-
-
-
-S8xo3n6zo&code_challenge=vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E&code_challenge_method=S256&prompt=login&nonce=qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc HTTP/1.1" 307
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.180 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.181 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.197 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.197 [INFO] app.api.oauth_simple:776 - OAuth authorize request: client_id=maxlab, display=None, prompt=login, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.197 [INFO] app.api.oauth_simple:781 - 🔍 Worker 481450: Current user authentication status: True
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.197 [INFO] app.api.oauth_simple:783 - 🔍 Worker 481450: Authenticated user: admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.198 [INFO] app.api.oauth_simple:787 - 🔍 Worker 481450: Request cookies: ['access_token']
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.198 [INFO] app.api.oauth_simple:789 - 🔍 Worker 481450: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.198 [INFO] app.api.oauth_simple:795 - 🔍 Worker 481450: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.198 [INFO] app.api.oauth_simple:799 - 🔍 Worker 481450: Authorization header: None
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.198 [INFO] app.api.oauth_simple:802 - 🔍 Worker 481450: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.199 [INFO] app.api.oauth_simple:875 - 🔄 Worker 481450: Final prompt decision: login
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.199 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.199 [WARNING] app.api.oauth_simple:913 - ⚠️ Worker 481450: User authenticated but no Redis session found - attempting to create one
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.201 [INFO] app.core.redis_session:92 - ✅ Session created: 80170688-e503-42d9-9f21-fa88c45c946a for user admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.201 [INFO] app.api.oauth_simple:944 - ✅ Worker 481450: Created Redis session 80170688-e503-42d9-9f21-fa88c45c946a for user admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.201 [INFO] app.api.oauth_simple:1090 - prompt=login: forcing re-authentication for client maxlab
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.201 [WARNING] app.api.oauth_simple:1094 - 🔥 Worker 481450: COMPLETE SESSION INVALIDATION for prompt=login - user: admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.202 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 80170688-e503-42d9-9f21-fa88c45c946a
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.202 [INFO] app.core.redis_session:199 - ✅ Session deleted: 80170688-e503-42d9-9f21-fa88c45c946a
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.202 [INFO] app.core.redis_session:233 - ✅ Deleted 1 sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.202 [WARNING] app.api.oauth_simple:1127 - 🔥 Worker 481450: Deleted 1 Redis sessions for user admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.202 [WARNING] app.services.user_switch_security_service:259 - 🔒 SECURITY: Force cleanup initiated - Client: maxlab, Previous User: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162, New User: None
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.204 [INFO] app.services.user_switch_security_service:338 - ✅ User switch cleanup completed - 0 items cleaned
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.204 [INFO] app.api.oauth_simple:1141 - 🔒 Security cleanup for prompt=login: {'success': True, 'cleanup_performed': False, 'stats': {'access_tokens_revoked': 0, 'refresh_tokens_revoked': 0, 'sessions_terminated': 0, 'client_tokens_cleaned': 0, 'errors': []}, 'message': 'Successfully cleaned 0 authentication items'}
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.204 [INFO] app.api.oauth_simple:1172 - Redirecting to login page with force_login=true: https://max.dwchem.co.kr/login?oauth_return=%7B%22response_type%22%3A%20%22code%22%2C%20%22client_id%22%3A%20%22maxlab%22%2C%20%22redirect_uri%22%3A%20%22https%3A//maxlab.dwchem.co.kr/oauth/callback%22%2C%20%22scope%22%3A%20%22openid%20profile%20email%20offline_access%20read%3Aprofile%20read%3Agroups%20manage%3Aworkflows%22%2C%20%22state%22%3A%20%22AA-ST1dvoJdrJ7m6i8e_2Cs10NsosxrKtAS8xo3n6zo%22%2C%20%22code_challenge%22%3A%20%22vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E%22%2C%20%22code_challenge_method%22%3A%20%22S256%22%2C%20%22prompt%22%3A%20%22login%22%2C%20%22nonce%22%3A%20%22qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc%22%7D&force_login=true
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.206 [WARNING] app.api.oauth_simple:1189 - 🔥 Worker 481450: Deleting ALL authentication cookies for complete invalidation
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.207 [WARNING] app.api.oauth_simple:1212 - 🔥 Worker 481450: Complete session invalidation completed - redirecting to fresh login
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.208 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=AA-ST1dvoJdrJ7m6i8e_2Cs10NsosxrKtAS8xo3n6zo&code_challenge=vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E&code_challenge_method=S256&prompt=login&nonce=qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc HTTP/1.1" 307
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.282 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.283 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.299 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.299 [INFO] app.api.oauth_simple:776 - OAuth authorize request: client_id=maxlab, display=None, prompt=login, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:781 - 🔍 Worker 481450: Current user authentication status: True
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:783 - 🔍 Worker 481450: Authenticated user: admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:787 - 🔍 Worker 481450: Request cookies: ['access_token']
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:789 - 🔍 Worker 481450: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:795 - 🔍 Worker 481450: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:799 - 🔍 Worker 481450: Authorization header: None
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.300 [INFO] app.api.oauth_simple:802 - 🔍 Worker 481450: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.301 [INFO] app.api.oauth_simple:875 - 🔄 Worker 481450: Final prompt decision: login
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.301 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.301 [WARNING] app.api.oauth_simple:913 - ⚠️ Worker 481450: User authenticated but no Redis session found - attempting to create one
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.303 [INFO] app.core.redis_session:92 - ✅ Session created: 9568d851-48f8-4fd6-917d-cdeb9418f3e2 for user admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.303 [INFO] app.api.oauth_simple:944 - ✅ Worker 481450: Created Redis session 9568d851-48f8-4fd6-917d-cdeb9418f3e2 for user admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.303 [INFO] app.api.oauth_simple:1090 - prompt=login: forcing re-authentication for client maxlab
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.304 [WARNING] app.api.oauth_simple:1094 - 🔥 Worker 481450: COMPLETE SESSION INVALIDATION for prompt=login - user: admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.304 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 9568d851-48f8-4fd6-917d-cdeb9418f3e2
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.304 [INFO] app.core.redis_session:199 - ✅ Session deleted: 9568d851-48f8-4fd6-917d-cdeb9418f3e2
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.304 [INFO] app.core.redis_session:233 - ✅ Deleted 1 sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.304 [WARNING] app.api.oauth_simple:1127 - 🔥 Worker 481450: Deleted 1 Redis sessions for user admin@test.com
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.305 [WARNING] app.services.user_switch_security_service:259 - 🔒 SECURITY: Force cleanup initiated - Client: maxlab, Previous User: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162, New User: None
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.306 [INFO] app.services.user_switch_security_service:338 - ✅ User switch cleanup completed - 0 items cleaned
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.306 [INFO] app.api.oauth_simple:1141 - 🔒 Security cleanup for prompt=login: {'success': True, 'cleanup_performed': False, 'stats': {'access_tokens_revoked': 0, 'refresh_tokens_revoked': 0, 'sessions_terminated': 0, 'client_tokens_cleaned': 0, 'errors': []}, 'message': 'Successfully cleaned 0 authentication items'}
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.306 [INFO] app.api.oauth_simple:1172 - Redirecting to login page with force_login=true: https://max.dwchem.co.kr/login?oauth_return=%7B%22response_type%22%3A%20%22code%22%2C%20%22client_id%22%3A%20%22maxlab%22%2C%20%22redirect_uri%22%3A%20%22https%3A//maxlab.dwchem.co.kr/oauth/callback%22%2C%20%22scope%22%3A%20%22openid%20profile%20email%20offline_access%20read%3Aprofile%20read%3Agroups%20manage%3Aworkflows%22%2C%20%22state%22%3A%20%22AA-ST1dvoJdrJ7m6i8e_2Cs10NsosxrKtAS8xo3n6zo%22%2C%20%22code_challenge%22%3A%20%22vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E%22%2C%20%22code_challenge_method%22%3A%20%22S256%22%2C%20%22prompt%22%3A%20%22login%22%2C%20%22nonce%22%3A%20%22qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc%22%7D&force_login=true
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.308 [WARNING] app.api.oauth_simple:1189 - 🔥 Worker 481450: Deleting ALL authentication cookies for complete invalidation
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.309 [WARNING] app.api.oauth_simple:1212 - 🔥 Worker 481450: Complete session invalidation completed - redirecting to fresh login
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.310 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=AA-ST1dvoJdrJ7m6i8e_2Cs10NsosxrKtAS8xo3n6zo&code_challenge=vVt4_jv8qPp-xll4i9yb3-ezXqf2MyaOz7wskiuaL1E&code_challenge_method=S256&prompt=login&nonce=qUSQl-HBnfmMPkAoIjqCC3KCRpzZIl4EjmW8tNJ2BQc HTTP/1.1" 307
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.380 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatform-backend-8000  | 2025-08-08T16:34:12: 2025-08-08 16:34:12.381 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
-0|maxplatform-backend-8000  | 2025-08-08T16:34:30: 2025-08-08 16:34:30.131 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T16:50:06: 2025-08-08 16:50:06.087 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "OPTIONS /api/security/events HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:06: 2025-08-08 16:50:06.102 [INFO] app.api.security_events:276 - Processed 1 security events from 192.168.15.220 (user: admin@test.com)
+0|maxplatform-backend-8000  | 2025-08-08T16:50:06: 2025-08-08 16:50:06.103 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/security/events HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:07: 2025-08-08 16:50:07.758 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T16:50:07: 2025-08-08 16:50:07.759 [DEBUG] app.services.session_monitor:177 - Session check completed: 2 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.649 [INFO] app.api.oauth_simple:2832 - 🔐 Starting enhanced logout process - client_id: None
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.649 [INFO] app.api.oauth_simple:2862 - 🔐 Found token in cookie: access_token
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.650 [INFO] app.utils.auth:289 - Auth event: token_verification | Data: {'event_type': 'token_verification', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'jti': '32445501-0028-468c-a75f-5445855e2317'}}
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.651 [DEBUG] app.utils.auth:494 - ✅ User validated from token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.651 [INFO] app.api.oauth_simple:2866 - 🔐 User from cookie access_token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.652 [ERROR] app.api.oauth_simple:2925 - Failed to revoke direct access token: cannot import name 'generate_token_hash' from 'app.utils.auth' (/home/app-user/maxproject/maxplatform/backend/app/utils/auth.py)
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.657 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 2285a543-0ad4-438a-a2ea-b32ac5abc56e
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.657 [INFO] app.core.redis_session:199 - ✅ Session deleted: 2285a543-0ad4-438a-a2ea-b32ac5abc56e
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.658 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 80131060-912e-44ac-a8a9-2b15c0303db5
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.658 [INFO] app.core.redis_session:199 - ✅ Session deleted: 80131060-912e-44ac-a8a9-2b15c0303db5
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.659 [INFO] app.core.redis_session:233 - ✅ Deleted 2 sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.659 [INFO] app.core.oauth_redis_integration:167 - ✅ Cleaned up 2 OAuth Redis sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.659 [INFO] app.api.oauth_simple:3029 - ✅ Cleaned up 2 Redis sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.663 [INFO] app.api.oauth_simple:3078 - 🔐 Token revocation completed: {'access_tokens_revoked': 1, 'refresh_tokens_revoked': 2, 'sessions_terminated': 3, 'id_tokens_invalidated': 0, 'cookies_cleared': 0}
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.666 [INFO] app.api.oauth_simple:3118 - 🔐 Logout redirect to trusted domain: max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.666 [INFO] app.api.oauth_simple:3130 - 🔐 Enhanced OIDC Logout completed: {'access_tokens_revoked': 1, 'refresh_tokens_revoked': 2, 'sessions_terminated': 3, 'id_tokens_invalidated': 0, 'cookies_cleared': 0}
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.666 [INFO] app.api.oauth_simple:3131 - 🔐 Redirecting to: https://max.dwchem.co.kr/login?logout=success
+0|maxplatform-backend-8000  | 2025-08-08T16:50:09: 2025-08-08 16:50:09.668 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/logout?post_logout_redirect_uri=https%3A%2F%2Fmax.dwchem.co.kr%2Flogin%3Flogout%3Dsuccess HTTP/1.1" 302
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.388 [INFO] app.routers.auth:382 - 로그인 시도: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.604 [INFO] app.routers.auth:401 - 사용자 인증 성공: krn@test.com (ID: d65db892-9691-46e3-a2c6-d962980f2f51)
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.608 [INFO] app.routers.auth:408 - 로그인 기록 업데이트 완료: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.609 [INFO] app.services.auth_service:31 - ✅ AuthService initialized with Redis session store
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.609 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': 'd65db892-9691-46e3-a2c6-d962980f2f51', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-08T08:20:13.609239', 'jti': '8226f3d1-e8c2-4667-92be-441e4ce25bdd'}}
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.614 [INFO] app.core.redis_session:233 - ✅ Deleted 0 sessions for user d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.614 [INFO] app.core.redis_session:92 - ✅ Session created: 58fadea5-351e-4499-830c-47cd6e0eb92e for user krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.615 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 58fadea5-351e-4499-830c-47cd6e0eb92e
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.615 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 58fadea5-351e-4499-830c-47cd6e0eb92e
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.615 [DEBUG] app.core.redis_session:166 - ✅ Session updated: 58fadea5-351e-4499-830c-47cd6e0eb92e
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.615 [INFO] app.services.auth_service:63 - ✅ Created Redis session 58fadea5-351e-4499-830c-47cd6e0eb92e for user krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.620 [INFO] app.routers.auth:425 - JWT 토큰 생성 및 Redis 세션 동기화 완료: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.620 [DEBUG] app.core.oauth_redis_integration:264 - ✅ Session cookies set for: 58fadea5-351e-4499-830c-47cd6e0eb92e
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.620 [INFO] app.routers.auth:439 - 🔒 Redis 세션 및 쿠키 설정 완료: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.620 [INFO] app.routers.auth:451 - 로그인 성공: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.621 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/login HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.633 [INFO] app.utils.auth:235 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.636 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.648 [INFO] app.utils.auth:235 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.649 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.680 [INFO] app.utils.auth:235 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.690 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/services/mother-page HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.805 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T16:50:13: 2025-08-08 16:50:13.810 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T16:50:14: 2025-08-08 16:50:14.886 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T16:50:14: 2025-08-08 16:50:14.889 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+3|maxlab-backend-8010       | 2025-08-08T16:50:14: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
+3|maxlab-backend-8010       | 2025-08-08T16:50:15: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
