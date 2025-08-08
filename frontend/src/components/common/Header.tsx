@@ -120,13 +120,10 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onClose, onLogo
         <span>설정</span>
       </button>
       <hr className="my-1 border-gray-100" />
-      <button
-        onClick={onLogout}
-        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
-      >
-        <LogOut className="w-4 h-4" />
-        <span>로그아웃</span>
-      </button>
+      {/* 🚫 SIMPLIFIED: 로그아웃 버튼 비활성화 - max.dwchem.co.kr에서만 가능 */}
+      <div className="px-4 py-2 text-xs text-gray-500 italic">
+        로그아웃은 <a href="https://max.dwchem.co.kr" className="text-blue-600 underline">max.dwchem.co.kr</a>에서만 가능합니다
+      </div>
     </div>
   );
 };

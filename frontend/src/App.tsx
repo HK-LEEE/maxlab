@@ -21,6 +21,7 @@ import { isDevelopment, devLog } from './utils/logger';
 import AuthDiagnostics from './utils/authDiagnostics';
 import AuthInitDebugger from './utils/debugAuthInit';
 import { authSyncService } from './services/authSyncService';
+import { crossDomainLogout } from './utils/crossDomainLogout';
 import './styles/index.css';
 
 devLog.log('App.tsx loaded');
@@ -175,6 +176,30 @@ function App() {
       authSyncService.destroy();
     };
   }, [logout, setAuth, setAuthError]);
+
+  // 🚫 SIMPLIFIED: 크로스 도메인 로그아웃 리스너 초기화
+  useEffect(() => {
+    console.log('🔒 Initializing cross-domain logout listener');
+    
+    // 크로스 도메인 로그아웃 감지 시작
+    crossDomainLogout.startListening(() => {
+      console.log('🚨 Cross-domain logout detected - clearing session');
+      
+      // 모든 스토리지 클리어 및 로그아웃
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // 상태 리셋
+      logout();
+      
+      // 로그인 페이지로 리다이렉트
+      window.location.href = '/login?reason=cross_domain_logout';
+    });
+    
+    return () => {
+      crossDomainLogout.stopListening();
+    };
+  }, [logout]);
   
   // SSO: MAX Platform에서 전송한 PostMessage 수신
   useEffect(() => {

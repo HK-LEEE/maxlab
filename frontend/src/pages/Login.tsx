@@ -574,54 +574,47 @@ export const Login: React.FC = () => {
             <p className="text-gray-500 text-sm mt-1">Manufacturing AI & DX Platform</p>
           </div>
 
-          {/* SSO Login Section */}
+          {/* 🚫 SIMPLIFIED: MaxLab에서 직접 로그인 비활성화 */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <Shield className="w-6 h-6 text-blue-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">보안 로그인</h2>
-            </div>
-            <p className="text-gray-600 text-sm mb-6">
-              MAX Platform 통합 인증으로 안전하게 로그인하세요
-            </p>
-
-            {/* OAuth Login Button */}
-            {authMethods.oauth && (
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleOAuthLogin(false)}
-                  disabled={oauthLoading || isAuthenticated}
-                  className={`w-full py-4 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors flex items-center justify-center space-x-3 shadow-md ${
-                    oauthLoading || isAuthenticated 
-                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  <LogIn size={24} />
-                  <span className="text-lg">
-                    {oauthLoading ? 'MAX Platform 연결 중...' : 'MAX Platform으로 로그인'}
-                  </span>
-                </button>
-                
-                {/* Different User Login Button - Component handles own OAuth flow internally */}
-                <DifferentUserLoginButton 
-                  onLoginClick={() => handleOAuthLogin(false)} 
-                />
-                
+            {/* 중요 안내 메시지 */}
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-center mb-2">
+                <Shield className="w-6 h-6 text-yellow-600 mr-2" />
+                <h2 className="text-lg font-semibold text-yellow-800">로그인 안내</h2>
               </div>
-            )}
+              <p className="text-yellow-700 text-sm mb-3">
+                보안 강화를 위해 MaxLab에서의 직접 로그인이 비활성화되었습니다.
+              </p>
+              <p className="text-gray-700 text-sm font-medium">
+                MAX Platform에서 먼저 로그인하신 후 MaxLab으로 이동해주세요.
+              </p>
+            </div>
 
+            {/* MAX Platform으로 이동 버튼 */}
+            <a
+              href="https://max.dwchem.co.kr"
+              className="w-full py-4 font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center space-x-3 shadow-md"
+            >
+              <LogIn size={24} />
+              <span className="text-lg">MAX Platform으로 이동하여 로그인</span>
+            </a>
+
+            {/* 설명 텍스트 */}
+            <p className="text-gray-500 text-xs mt-4">
+              로그인 후 자동으로 MaxLab에 접근할 수 있습니다
+            </p>
           </div>
 
 
-          {/* Sign Up Link */}
+          {/* 🚫 SIMPLIFIED: 회원가입도 MAX Platform에서만 가능 */}
           <div className="mt-6 text-center text-sm text-gray-600 border-t border-gray-200 pt-4">
             MAX Platform 계정이 없으신가요?{' '}
-            <button 
-              onClick={handleSignupRedirect}
+            <a 
+              href="https://max.dwchem.co.kr/signup"
               className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
             >
-              회원가입하기
-            </button>
+              MAX Platform에서 회원가입
+            </a>
           </div>
         </div>
 
