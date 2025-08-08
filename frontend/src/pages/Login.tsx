@@ -9,6 +9,7 @@ import { browserSecurityCleanup } from '../utils/browserSecurityCleanup';
 import { userIsolatedTokenStorage } from '../services/userIsolatedTokenStorage';
 import { securityHeaders } from '../services/securityHeaders';
 import { OAuthReturnHandler } from '../utils/oauthReturnHandler';
+import { DifferentUserLoginButton } from '../components/DifferentUserLoginButton';
 
 const MLLogo: React.FC = () => (
   <div className="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center">
@@ -601,40 +602,10 @@ export const Login: React.FC = () => {
                   </span>
                 </button>
                 
-                {/* Different User Login Button */}
-                <button
-                  onClick={(e) => {
-                    console.log('🚪 Different user login button clicked!');
-                    console.log('🔥 Event:', e);
-                    console.log('🔥 Event target:', e.target);
-                    console.log('🔥 Event currentTarget:', e.currentTarget);
-                    console.log('🔥 Button disabled:', e.currentTarget.disabled);
-                    
-                    console.log('Current state:', {
-                      isAuthenticated,
-                      oauthLoading,
-                      hasLoggedOutRef: hasLoggedOutRef.current,
-                      authAttemptRef: authAttemptRef.current,
-                      buttonDisabled: oauthLoading
-                    });
-                    
-                    // Prevent event propagation issues
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('🔥 About to call handleOAuthLogin(true)');
-                    handleOAuthLogin(true);
-                  }}
-                  disabled={oauthLoading}
-                  className={`w-full py-2 text-sm font-medium rounded-lg border-2 border-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors flex items-center justify-center space-x-2 ${
-                    oauthLoading 
-                      ? 'border-gray-400 text-gray-400 cursor-not-allowed' 
-                      : 'text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  <Shield size={16} />
-                  <span>다른 사용자로 로그인</span>
-                </button>
+                {/* Different User Login Button - Using dedicated component */}
+                <DifferentUserLoginButton 
+                  onLoginClick={() => handleOAuthLogin(false)} 
+                />
                 
               </div>
             )}
