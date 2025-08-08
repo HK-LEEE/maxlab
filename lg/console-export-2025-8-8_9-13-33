@@ -58,3 +58,117 @@ index-CgtAsFYR.js:539:64691
 09:13:14.203 🔍 OAuth useEffect triggered: 
 Object { isAuthenticated: false, authLoading: false, oauthReturn: true, forceLogin: false, oauthProcessedRef: false }
 index-CgtAsFYR.js:715:971
+
+
+
+
+
+2|maxplatform-backend-8002  | 2025-08-08T09:16:44: 2025-08-08 09:16:44.419 [INFO] app.api.oauth_simple:766 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+2|maxplatform-backend-8002  | 2025-08-08T09:16:44: 2025-08-08 09:16:44.420 [INFO] app.api.oauth_simple:769 - 🔍 Current user authentication status: False
+2|maxplatform-backend-8002  | 2025-08-08T09:16:44: 2025-08-08 09:16:44.420 [INFO] app.api.oauth_simple:775 - 🔍 Request cookies: []
+2|maxplatform-backend-8002  | 2025-08-08T09:16:44: 2025-08-08 09:16:44.420 [INFO] app.api.oauth_simple:781 - 🔍 Authorization header: None
+2|maxplatform-backend-8002  | 2025-08-08T09:16:44: 2025-08-08 09:16:44.420 [INFO] app.api.oauth_simple:784 - 🔍 MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+2|maxplatform-backend-8002  | 2025-08-08T09:16:44: 2025-08-08 09:16:44.425 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=CPFF1RFuXCN4ILzFQ6Q39zIlw4seDCWlbuo6foPuCvk&code_challenge=0j97oPa5IckQRCO_hZbJVxEh0E8UTv3Q58v5f7sIFOE&code_challenge_method=S256&nonce=0VvbqoIMyZTQF-ZDdV8EFDvBu01pYx2pPp0vIKypb1c HTTP/1.1" 307
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.105 [INFO] app.routers.auth:378 - 로그인 시도: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.581 [INFO] app.routers.auth:397 - 사용자 인증 성공: admin@test.com (ID: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162)
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.588 [INFO] app.routers.auth:404 - 로그인 기록 업데이트 완료: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.592 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-08T00:46:47.592127', 'jti': 'c21f8773-7790-4c3b-ad3f-c78f261e3986'}}
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.592 [INFO] app.routers.auth:441 - JWT 토큰 생성 완료: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.598 [INFO] app.routers.auth:447 - Refresh Token 저장 완료: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.598 [INFO] app.routers.auth:452 - 로그인 성공: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.599 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/login HTTP/1.1" 200
+2|maxplatform-backend-8002  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.885 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+2|maxplatform-backend-8002  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.887 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.899 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.909 [INFO] app.api.oauth_simple:766 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.909 [INFO] app.api.oauth_simple:769 - 🔍 Current user authentication status: True
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.909 [INFO] app.api.oauth_simple:771 - 🔍 Authenticated user: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.909 [INFO] app.api.oauth_simple:775 - 🔍 Request cookies: ['access_token']
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.909 [INFO] app.api.oauth_simple:777 - 🔍 Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.910 [INFO] app.api.oauth_simple:781 - 🔍 Authorization header: None
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.910 [INFO] app.api.oauth_simple:784 - 🔍 MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.914 [INFO] app.services.nonce_service:49 - Stored nonce for client maxlab
+1|maxplatform-backend-8001  | 2025-08-08T09:16:47: 2025-08-08 09:16:47.923 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=CPFF1RFuXCN4ILzFQ6Q39zIlw4seDCWlbuo6foPuCvk&code_challenge=0j97oPa5IckQRCO_hZbJVxEh0E8UTv3Q58v5f7sIFOE&code_challenge_method=S256&nonce=0VvbqoIMyZTQF-ZDdV8EFDvBu01pYx2pPp0vIKypb1c HTTP/1.1" 307
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.013 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.013 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:10]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.013 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[11:29]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[30:34]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[35:78]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[79:91]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[92:144]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[145:154]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[155:161]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.014 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.015 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[162:175]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.015 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[176:219]
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.015 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.015 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.029 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-08T00:46:48.029027', 'jti': '4c0064ea-6eb8-44c4-bcea-990a3c3b9440'}}
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.035 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_created | Data: {'event_type': 'refresh_token_created', 'client_id': 'maxlab', 'user_id': UUID('21a2aaa7-444a-4038-bda3-d8bf2c4ef162'), 'scope': 'openid profile email offline_access read:profile read:groups manage:workflows', 'success': True, 'ip_address': '192.168.15.220', 'user_agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) ...'}
+2|maxplatform-backend-8002  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.037 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.089 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T09:16:48: 2025-08-08 09:16:48.098 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+3|maxlab-backend-8010       | 2025-08-08T09:16:48: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
+4|maxlab-backend-8011       | 2025-08-08T09:16:49: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
+1|maxplatform-backend-8001  | 2025-08-08T09:16:53: 2025-08-08 09:16:53.057 [INFO] app.api.security_events:276 - Processed 1 security events from 192.168.15.220 (user: admin@test.com)
+1|maxplatform-backend-8001  | 2025-08-08T09:16:53: 2025-08-08 09:16:53.058 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/security/events HTTP/1.1" 200
+5|maxlab-backend-8012       | 2025-08-08T09:16:54: 2025-08-08 09:16:54,674 - app.routers.oauth - WARNING - Redirect URI not in allowlist: http://localhost:3010/login?logout=success
+5|maxlab-backend-8012       | 2025-08-08T09:16:54: 2025-08-08 09:16:54,674 - app.routers.oauth - WARNING - Invalid post-logout redirect URI rejected: http://localhost:3010/login?logout=success
+5|maxlab-backend-8012       | 2025-08-08T09:16:54: INFO:     192.168.15.220:0 - "GET /api/oauth/logout?client_id=maxlab&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A3010%2Flogin%3Flogout%3Dsuccess HTTP/1.1" 400 Bad Request
+2|maxplatform-backend-8002  | 2025-08-08T09:17:00: 2025-08-08 09:17:00.674 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+2|maxplatform-backend-8002  | 2025-08-08T09:17:00: 2025-08-08 09:17:00.675 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T09:17:00: 2025-08-08 09:17:00.725 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T09:17:00: 2025-08-08 09:17:00.741 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/services/mother-page HTTP/1.1" 200
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.694 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.695 [ERROR] app.middleware.security:283 - Redis error in rate limiting: Error 111 connecting to localhost:6379. Connection refused.
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.695 [ERROR] app.middleware.security:308 - Redis error recording rate limit: Error 111 connecting to localhost:6379. Connection refused.
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.697 [INFO] app.middleware.security:376 - AUDIT_LOG: {"timestamp": "2025-08-08T00:17:06.697074", "action_type": "user_session_logout", "user_id": "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", "user_email": "admin@test.com", "success": false, "error_message": "(psycopg2.errors.UndefinedFunction) operator does not exist: uuid = text\nLINE 4:                 WHERE user_id = ANY(ARRAY['21a2aaa7-444a-403...\n                                      ^\nHINT:  No operator matches the given name and argument types. You might need to add explicit type casts.\n\n[SQL: \n                UPDATE oauth_access_tokens \n                SET revoked_at = NOW() \n                WHERE user_id = ANY(%(user_ids)s) \n                AND revoked_at IS NULL\n            ]\n[parameters: {'user_ids': ['21a2aaa7-444a-4038-bda3-d8bf2c4ef162']}]\n(Background on this error at: https://sqlalche.me/e/20/f405)", "execution_time": 0.001171, "request_data": {"request": {"logout_type": "all", "reason": "User requested all logout"}}}
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.698 [ERROR] app.database:99 - SQLAlchemy 오류: (psycopg2.errors.UndefinedFunction) operator does not exist: uuid = text
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: LINE 4:                 WHERE user_id = ANY(ARRAY['21a2aaa7-444a-403...
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:                                       ^
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: [SQL:
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:                 UPDATE oauth_access_tokens
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:                 SET revoked_at = NOW()
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:                 WHERE user_id = ANY(%(user_ids)s)
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:                 AND revoked_at IS NULL
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06:             ]
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: [parameters: {'user_ids': ['21a2aaa7-444a-4038-bda3-d8bf2c4ef162']}]
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: (Background on this error at: https://sqlalche.me/e/20/f405)
+1|maxplatform-backend-8001  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.699 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/user/sessions/logout HTTP/1.1" 500
+2|maxplatform-backend-8002  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.709 [INFO] app.api.oauth_simple:2682 - 🔐 Logout redirect to trusted domain: max.dwchem.co.kr
+2|maxplatform-backend-8002  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.709 [INFO] app.api.oauth_simple:2693 - 🔐 OIDC Logout completed: {'access_tokens_revoked': 0, 'refresh_tokens_revoked': 0, 'sessions_terminated': 0, 'id_tokens_invalidated': 0}
+2|maxplatform-backend-8002  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.709 [INFO] app.api.oauth_simple:2694 - 🔐 Redirecting to: https://max.dwchem.co.kr/login?logout=success
+2|maxplatform-backend-8002  | 2025-08-08T09:17:06: 2025-08-08 09:17:06.710 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/logout?post_logout_redirect_uri=https%3A%2F%2Fmax.dwchem.co.kr%2Flogin%3Flogout%3Dsuccess HTTP/1.1" 302
+0|maxplatform-backend-8000  | 2025-08-08T09:17:09: 2025-08-08 09:17:09.717 [INFO] app.api.oauth_simple:766 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T09:17:09: 2025-08-08 09:17:09.717 [INFO] app.api.oauth_simple:769 - 🔍 Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T09:17:09: 2025-08-08 09:17:09.717 [INFO] app.api.oauth_simple:775 - 🔍 Request cookies: []
+0|maxplatform-backend-8000  | 2025-08-08T09:17:09: 2025-08-08 09:17:09.718 [INFO] app.api.oauth_simple:781 - 🔍 Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T09:17:09: 2025-08-08 09:17:09.718 [INFO] app.api.oauth_simple:784 - 🔍 MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T09:17:09: 2025-08-08 09:17:09.724 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=sawN-5QIa-g_SPq-tCboH889UwszX1hOY3YxN3qU9JM&code_challenge=aLFVY-VUMJq8tjwfAkwmhwZAY48Miq-dxuWsfBEyqxs&code_challenge_method=S256&nonce=JNWPHBMdDVlY-iiHjbw8DIk_RvQPxdde_tNO7K37p2c HTTP/1.1" 307
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.288 [INFO] app.routers.auth:378 - 로그인 시도: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.505 [INFO] app.routers.auth:397 - 사용자 인증 성공: admin@test.com (ID: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162)
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.508 [INFO] app.routers.auth:404 - 로그인 기록 업데이트 완료: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.510 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-08T00:47:11.510193', 'jti': '7ebd16e5-c8b1-4939-85e2-a4529ab7e235'}}
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.510 [INFO] app.routers.auth:441 - JWT 토큰 생성 완료: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.514 [INFO] app.routers.auth:447 - Refresh Token 저장 완료: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.514 [INFO] app.routers.auth:452 - 로그인 성공: admin@test.com
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.515 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/login HTTP/1.1" 200
+2|maxplatform-backend-8002  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.522 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+2|maxplatform-backend-8002  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.523 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.524 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.525 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.542 [INFO] app.api.oauth_simple:766 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.543 [INFO] app.api.oauth_simple:769 - 🔍 Current user authentication status: False
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.543 [INFO] app.api.oauth_simple:775 - 🔍 Request cookies: []
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.543 [INFO] app.api.oauth_simple:781 - 🔍 Authorization header: None
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.543 [INFO] app.api.oauth_simple:784 - 🔍 MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+1|maxplatform-backend-8001  | 2025-08-08T09:17:11: 2025-08-08 09:17:11.546 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=sawN-5QIa-g_SPq-tCboH889UwszX1hOY3YxN3qU9JM&code_challenge=aLFVY-VUMJq8tjwfAkwmhwZAY48Miq-dxuWsfBEyqxs&code_challenge_method=S256&nonce=JNWPHBMdDVlY-iiHjbw8DIk_RvQPxdde_tNO7K37p2c HTTP/1.1" 307
