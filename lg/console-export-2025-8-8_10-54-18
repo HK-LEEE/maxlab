@@ -104,3 +104,9 @@ maxlab.dwchem.co.kr(maxlab)사이트로 들어가서, 통합 로그인하기 실
 0|maxplatform-backend-8000  | 2025-08-08T11:43:34: 2025-08-08 11:43:34.195 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
 3|maxlab-backend-8010       | 2025-08-08T11:43:34: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
 3|maxlab-backend-8010       | 2025-08-08T11:43:35: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
+
+
+
+3|maxlab-backend-8010       | 2025-08-08T11:48:17: 2025-08-08 11:48:17,975 - app.routers.oauth - WARNING - Redirect URI not in allowlist: http://localhost:3010/login?logout=success
+3|maxlab-backend-8010       | 2025-08-08T11:48:17: 2025-08-08 11:48:17,975 - app.routers.oauth - WARNING - Invalid post-logout redirect URI rejected: http://localhost:3010/login?logout=success
+3|maxlab-backend-8010       | 2025-08-08T11:48:17: INFO:     192.168.15.220:0 - "GET /api/oauth/logout?client_id=maxlab&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A3010%2Flogin%3Flogout%3Dsuccess HTTP/1.1" 400 Bad Request
