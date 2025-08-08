@@ -1788,6 +1788,27 @@ export async function exchangeCodeForToken(code: string, state?: string): Promis
         const errorMessage = errorData.error_description || `Token exchange failed: ${response.statusText}`;
         console.error('❌ Token exchange failed:', errorMessage);
         
+        // 🔒 BLACKLIST HANDLING: Check for token blacklist errors
+        if (response.status === 401 && 
+            (errorData.error === 'invalid_token' || errorMessage.includes('blacklist'))) {
+          console.warn('🚫 Token blacklisted detected, clearing authentication state');
+          
+          // Clear localStorage authentication data
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('tokenExpiresAt');
+          localStorage.removeItem('refreshExpiresAt');
+          
+          // Set logout flag to prevent silent auth
+          localStorage.setItem('hasLoggedOut', 'true');
+          localStorage.setItem('logoutTimestamp', Date.now().toString());
+          sessionStorage.setItem('preventSilentAuth', 'true');
+          
+          console.warn('🚫 Authentication state cleared due to blacklisted token');
+          throw new Error('Token has been invalidated. Please log in again.');
+        }
+        
         // 특정 에러에 대한 추가 정보
         if (response.status === 400 && errorData.error === 'invalid_grant') {
           throw new Error('Invalid or expired authorization code');
