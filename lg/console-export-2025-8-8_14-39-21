@@ -1,0 +1,206 @@
+14:39:18.118 🔥 handleOAuthLogin called with forceAccountSelection: false index-Dmbi0U-L.js:758:4396
+14:39:18.118 🔥 Current oauthLoading state: false index-Dmbi0U-L.js:758:4468
+14:39:18.118 🔥 Current isAuthenticated state: false index-Dmbi0U-L.js:758:4516
+14:39:18.118 🔥 Setting oauthLoading to true index-Dmbi0U-L.js:758:4722
+14:39:18.118 🚀 About to call loginWithPopupOAuth with forceAccountSelection: false index-Dmbi0U-L.js:758:8366
+14:39:18.118 📊 Current state: 
+Object { isAuthenticated: false, oauthLoading: false, hasAccessToken: false, hasUser: false, forceAccountSelectionFlag: null }
+index-Dmbi0U-L.js:758:8448
+14:39:18.118 🔥 About to call authService.loginWithPopupOAuth index-Dmbi0U-L.js:758:8906
+14:39:18.118 🔥 authService object: 
+Object { loginWithPopupOAuth: async loginWithPopupOAuth(e), attemptSilentLogin: async attemptSilentLogin(), getCurrentUser: async getCurrentUser(), validateToken: async validateToken(), logout: async logout(e), _secureCleanup: async _secureCleanup(), isAuthenticated: isAuthenticated(), getStoredUser: getStoredUser(), redirectToSignup: redirectToSignup(), refreshToken: async refreshToken(e), … }
+index-Dmbi0U-L.js:758:8970
+14:39:18.119 🔥 forceAccountSelection: false index-Dmbi0U-L.js:758:9011
+14:39:18.119 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
+index-Dmbi0U-L.js:227:4272
+14:39:18.119 🔐 OAuth Configuration: 
+Object { clientId: "maxlab", redirectUri: "https://maxlab.dwchem.co.kr/oauth/callback", authUrl: "https://max.dwchem.co.kr", runtimeConfig: "Not available", envAuthUrl: "https://max.dwchem.co.kr", currentOrigin: "https://maxlab.dwchem.co.kr" }
+index-Dmbi0U-L.js:228:22776
+14:39:18.119 🔐 Starting popup OAuth login (force account selection: false, type: auto)... index-Dmbi0U-L.js:265:150
+14:39:18.120 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: true, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:39:18.127 🔐 OAuth flow state created: 
+Object { flowId: "me2ebr3jzg1xusy9yfe", flowType: "popup", expiresIn: "900s", forceAccountSelection: false }
+index-Dmbi0U-L.js:228:14069
+14:39:18.127 🔄 OAuth flow status updated: 
+Object { flowId: "me2ebr3jzg1xusy9yfe", status: "in_progress", flowType: "popup" }
+index-Dmbi0U-L.js:228:16669
+14:39:18.127 🔐 OAuth Flow State Created: 
+Object { flowId: "me2ebr3jzg1xusy9yfe", flowType: "popup", state: "ZHbeSStx...", codeVerifier: "q66jAKnD...", nonce: "i-n-3rAC...", forceAccountSelection: false, expiresAt: "2025-08-08T05:54:18.127Z", timestamp: "2025-08-08T05:39:18.128Z" }
+index-Dmbi0U-L.js:228:25103
+14:39:18.127 🔐 Opening OAuth popup: https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=ZHbeSStxrenGtb_Y339OREBy9o9xvbeneyUJhhvHRVA&code_challenge=E0nye_cX3pfMNfQ4e_qg9jbHwKWuBh-k8S8XGI9hI8Q&code_challenge_method=S256&nonce=i-n-3rACSjG3tTWR8O28AhqMBwsdt9LzQtE088VQPV4 index-Dmbi0U-L.js:228:26402
+14:39:18.127 📋 Full OAuth URL params: response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=ZHbeSStxrenGtb_Y339OREBy9o9xvbeneyUJhhvHRVA&code_challenge=E0nye_cX3pfMNfQ4e_qg9jbHwKWuBh-k8S8XGI9hI8Q&code_challenge_method=S256&nonce=i-n-3rACSjG3tTWR8O28AhqMBwsdt9LzQtE088VQPV4 index-Dmbi0U-L.js:228:26443
+14:39:18.127 📡 Setting up message listeners before popup... index-Dmbi0U-L.js:228:26497
+14:39:18.241 ✅ OAuth popup opened successfully index-Dmbi0U-L.js:233:153
+14:39:18.500 📨 Parent window received message: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiaXNfYWRtaW4iOnRydWUsInVzZXJfaWQiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjMzMzU4LCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjMxNTU4LCJqdGkiOiJhZWJkNGQ4NS1lYmI4LTQ4NmUtODFmYi1mNTZiMGUxNjYxYWUiLCJuYmYiOjE3NTQ2MzE1NTgsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI5ODQ0NzBmMjA1Nzk0NGY1In0.x8cG2mA05pG-q_WAoYumwSGJZ_VipBthzM49z5Zml3U", tokenData: {…} }
+index-Dmbi0U-L.js:228:26593
+14:39:18.501 📨 OAuth message validation: 
+Object { origin: "https://maxlab.dwchem.co.kr", messageType: "OAUTH_SUCCESS", validationResult: {…}, trustedOrigins: "https://maxlab.dwchem.co.kr,https://max.dwchem.co.kr,https://maxlab.io..." }
+index-Dmbi0U-L.js:233:4457
+14:39:18.501 📨 Received OAuth message: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiaXNfYWRtaW4iOnRydWUsInVzZXJfaWQiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjMzMzU4LCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjMxNTU4LCJqdGkiOiJhZWJkNGQ4NS1lYmI4LTQ4NmUtODFmYi1mNTZiMGUxNjYxYWUiLCJuYmYiOjE3NTQ2MzE1NTgsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI5ODQ0NzBmMjA1Nzk0NGY1In0.x8cG2mA05pG-q_WAoYumwSGJZ_VipBthzM49z5Zml3U", tokenData: {…} }
+index-Dmbi0U-L.js:233:5658
+14:39:18.501 Message origin: https://maxlab.dwchem.co.kr index-Dmbi0U-L.js:233:5707
+14:39:18.501 Message type: OAUTH_SUCCESS index-Dmbi0U-L.js:233:5747
+14:39:18.501 ✅ OAUTH_SUCCESS message received, processing... index-Dmbi0U-L.js:233:8772
+14:39:18.501 📤 Sending acknowledgment to popup... index-Dmbi0U-L.js:233:8889
+14:39:18.501 ✅ Acknowledgment sent to popup index-Dmbi0U-L.js:233:9014
+14:39:18.502 🔍 Searching for OAuth flow state with state: ZHbeSStx... index-Dmbi0U-L.js:228:14242
+14:39:18.502 📋 Found total flow states: 1 index-Dmbi0U-L.js:228:14359
+14:39:18.502 ✅ Found OAuth flow state: 
+Object { flowId: "me2ebr3jzg1xusy9yfe", flowType: "popup", status: "in_progress", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+14:39:18.502 🔄 OAuth flow status updated: 
+Object { flowId: "me2ebr3jzg1xusy9yfe", status: "completed", flowType: "popup" }
+index-Dmbi0U-L.js:228:16669
+14:39:18.502 🔄 OAuth flow state updated to: 
+Object { flowId: "me2ebr3jzg1xusy9yfe", status: "completed", messageReceived: true }
+index-Dmbi0U-L.js:258:786
+14:39:18.502 ⚠️ Preserving oauth_force_account_selection due to no success result index-Dmbi0U-L.js:258:1552
+14:39:18.502 🧹 Cleanup completed index-Dmbi0U-L.js:233:9223
+14:39:18.502 📦 Resolving with full token data index-Dmbi0U-L.js:233:9272
+14:39:18.502 ✅ MaxLab OAuth success recorded, resetting failure counters index-Dmbi0U-L.js:227:6102
+14:39:18.502 📊 MaxLab OAuth attempt recorded: 
+Object { type: "auto", success: true, error: "none", aborted: false, consecutiveFailures: 0, totalAborted: 0 }
+index-Dmbi0U-L.js:227:6525
+14:39:18.502 ✅ OAuth attempt successful - recorded in loop prevention system index-Dmbi0U-L.js:265:1331
+14:39:18.502 ✅ Popup OAuth successful, getting user info... index-Dmbi0U-L.js:265:1410
+14:39:18.503 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-Dmbi0U-L.js:258:12588
+14:39:18.503 📡 Parent received OAuth message via BroadcastChannel: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiaXNfYWRtaW4iOnRydWUsInVzZXJfaWQiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjMzMzU4LCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjMxNTU4LCJqdGkiOiJhZWJkNGQ4NS1lYmI4LTQ4NmUtODFmYi1mNTZiMGUxNjYxYWUiLCJuYmYiOjE3NTQ2MzE1NTgsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI5ODQ0NzBmMjA1Nzk0NGY1In0.x8cG2mA05pG-q_WAoYumwSGJZ_VipBthzM49z5Zml3U", tokenData: {…} }
+index-Dmbi0U-L.js:228:26852
+14:39:18.504 ✅ OAuth success via BroadcastChannel index-Dmbi0U-L.js:246:117
+14:39:18.504 📤 Sending acknowledgment via BroadcastChannel... index-Dmbi0U-L.js:246:199
+14:39:18.504 ✅ Acknowledgment sent via BroadcastChannel index-Dmbi0U-L.js:246:298
+14:39:18.504 ⚠️ Preserving oauth_force_account_selection due to no success result index-Dmbi0U-L.js:258:1552
+14:39:18.548 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  8ms]
+
+14:39:18.590 🔐 Storing refresh token securely... index-Dmbi0U-L.js:263:50609
+14:39:18.591 🔐 Attempting to encrypt and store token (attempt 1/3)... index-Dmbi0U-L.js:263:26421
+14:39:18.678 ✅ Token encrypted and stored successfully index-Dmbi0U-L.js:263:26646
+14:39:18.680 🔓 Token decrypted successfully index-Dmbi0U-L.js:263:27509
+14:39:18.681 🔒 Security event logged: encryption_token_encrypted_stored (low) 
+Object { eventId: "evt_1754631558681_tiyjxpsj", timestamp: "2025-08-08T05:39:18.681Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1754631554062_q1vcbpid7qo", details: {…}, context: {…}, metadata: undefined }
+index-Dmbi0U-L.js:263:39632
+14:39:18.681 ✅ Refresh token encrypted, stored, and verified securely index-Dmbi0U-L.js:263:50947
+14:39:18.681 💾 Tokens stored successfully (including refresh token) index-Dmbi0U-L.js:263:49558
+14:39:18.681 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-Dmbi0U-L.js:263:29977
+14:39:18.681 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-Dmbi0U-L.js:263:31806
+14:39:18.681 ✅ Cleared tokens for 0 other users index-Dmbi0U-L.js:263:31969
+14:39:18.681 🔐 Attempting to encrypt and store token (attempt 1/3)... index-Dmbi0U-L.js:263:26421
+14:39:18.762 ✅ Token encrypted and stored successfully index-Dmbi0U-L.js:263:26646
+14:39:18.763 ✅ Tokens saved successfully for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-Dmbi0U-L.js:263:30547
+14:39:18.763 📋 User info received: 
+Object { sub: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", email: "admin@test.com", name: "admin", groups: (1) […], is_admin: true, group_id: "932d657e-55df-49d7-9cc5-d86e7623df8e", group_name: "개발팀", role_id: "1", role_name: "admin" }
+index-Dmbi0U-L.js:265:2179
+14:39:18.763 📤 Broadcasting auth event: LOGIN index-Dmbi0U-L.js:263:85286
+14:39:18.763 👤 Mapped user: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", email: "admin@test.com", username: "admin", full_name: "admin", is_active: true, is_admin: true, role: "admin", groups: (1) […] }
+index-Dmbi0U-L.js:265:2848
+14:39:18.763 🔓 Cleared logout flags after successful login index-Dmbi0U-L.js:265:3119
+14:39:18.763 ✅ MaxLab OAuth success recorded, resetting failure counters index-Dmbi0U-L.js:227:6102
+14:39:18.764 📊 MaxLab OAuth attempt recorded: 
+Object { type: "auto", success: true, error: "none", aborted: false, consecutiveFailures: 0, totalAborted: 0 }
+index-Dmbi0U-L.js:227:6525
+14:39:18.764 ⚠️ Preserving oauth_force_account_selection due to no success result index-Dmbi0U-L.js:258:1552
+14:39:18.764 🔥 authService.loginWithPopupOAuth completed successfully index-Dmbi0U-L.js:758:9089
+14:39:18.764 🔥 user result: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", email: "admin@test.com", username: "admin", full_name: "admin", is_active: true, is_admin: true, role: "admin", groups: (1) […] }
+index-Dmbi0U-L.js:758:9162
+14:39:18.764 ✅ MaxLab OAuth success recorded, resetting failure counters index-Dmbi0U-L.js:227:6102
+14:39:18.764 📊 MaxLab OAuth attempt recorded: 
+Object { type: "manual", success: true, error: "none", aborted: false, consecutiveFailures: 0, totalAborted: 0 }
+index-Dmbi0U-L.js:227:6525
+14:39:18.764 ✅ OAuth success recorded in loop prevention system index-Dmbi0U-L.js:228:685
+14:39:18.764 ✅ User authenticated successfully index-Dmbi0U-L.js:228:832
+14:39:18.765 🔥 Finally block executed index-Dmbi0U-L.js:774:388
+14:39:18.765 🔥 mountedRef.current: true index-Dmbi0U-L.js:774:429
+14:39:18.765 🔥 About to set oauthLoading to false index-Dmbi0U-L.js:774:477
+14:39:18.765 🔥 oauthLoading set to false index-Dmbi0U-L.js:774:536
+14:39:18.766 🔥 Login component render - current state: 
+Object { isAuthenticated: true, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-Dmbi0U-L.js:758:2032
+14:39:18.772 🔐 Page not safe for token refresh, disabling auto refresh: /login index-Dmbi0U-L.js:265:18131
+14:39:18.779 🔍 Found refresh token metadata, will verify encrypted token exists index-Dmbi0U-L.js:263:52244
+14:39:18.779 🔍 Verifying token consistency... index-Dmbi0U-L.js:263:56960
+14:39:18.781 📡 API: Getting workspace tree, parentId: undefined index-Dmbi0U-L.js:796:27426
+14:39:18.789 🔓 Token decrypted successfully index-Dmbi0U-L.js:263:27509
+14:39:18.790 🔓 Retrieved encrypted refresh token index-Dmbi0U-L.js:263:50110
+14:39:18.790 ✅ Token consistency verified - metadata and token both exist index-Dmbi0U-L.js:263:57531
+14:39:18.793 XHRGET
+https://maxlab.dwchem.co.kr/api/api/v1/workspaces/tree
+[HTTP/2 404  2ms]
+
+14:39:18.798 📡 API: Workspace tree error: 
+Object { status: 404, statusText: "", data: {…}, message: "Request failed with status code 404", config: {…} }
+index-Dmbi0U-L.js:796:27653
+14:39:19.799 📡 API: Getting workspace tree, parentId: undefined index-Dmbi0U-L.js:796:27426
+14:39:19.802 XHRGET
+https://maxlab.dwchem.co.kr/api/api/v1/workspaces/tree
+[HTTP/2 404  1ms]
+
+14:39:19.806 📡 API: Workspace tree error: 
+Object { status: 404, statusText: "", data: {…}, message: "Request failed with status code 404", config: {…} }
+index-Dmbi0U-L.js:796:27653
+14:39:19.807 🚨 Workspace query error: 
+Object { message: "Request failed with status code 404", name: "AxiosError", code: "ERR_BAD_REQUEST", config: {…}, request: XMLHttpRequest, response: {…}, status: 404, stack: "", … }
+index-Dmbi0U-L.js:796:28584
+
+
+
+
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.320 [DEBUG] app.utils.auth:425 - ✅ User authenticated via JWT token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.320 [INFO] app.api.oauth_simple:776 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:781 - 🔍 Worker 455393: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:783 - 🔍 Worker 455393: Authenticated user: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:787 - 🔍 Worker 455393: Request cookies: ['access_token', 'user_id']
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:789 - 🔍 Worker 455393: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:795 - 🔍 Worker 455393: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:795 - 🔍 Worker 455393: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:799 - 🔍 Worker 455393: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.321 [INFO] app.api.oauth_simple:802 - 🔍 Worker 455393: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.322 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.322 [WARNING] app.api.oauth_simple:847 - ⚠️ Worker 455393: User authenticated but no Redis session found - attempting to create one
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.325 [INFO] app.core.redis_session:92 - ✅ Session created: 9f260932-99f9-4dd9-847c-e4d4813acb22 for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.326 [INFO] app.api.oauth_simple:878 - ✅ Worker 455393: Created Redis session 9f260932-99f9-4dd9-847c-e4d4813acb22 for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.329 [INFO] app.services.nonce_service:49 - Stored nonce for client maxlab
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.338 [INFO] app.api.oauth_simple:1630 - ✅ Worker 455393: Preserved access_token cookie in OAuth redirect
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.338 [INFO] app.api.oauth_simple:1644 - ✅ Worker 455393: Preserved session cookies in OAuth redirect
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.339 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=ZHbeSStxrenGtb_Y339OREBy9o9xvbeneyUJhhvHRVA&code_challenge=E0nye_cX3pfMNfQ4e_qg9jbHwKWuBh-k8S8XGI9hI8Q&code_challenge_method=S256&nonce=i-n-3rACSjG3tTWR8O28AhqMBwsdt9LzQtE088VQPV4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.476 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.476 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:10]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[11:29]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[30:34]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[35:78]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[79:91]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[92:144]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[145:154]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.477 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[155:161]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.478 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.478 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.478 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[162:175]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.478 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[176:219]
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.478 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.478 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.481 [INFO] app.api.oauth_simple:127 - Cleaned up 4 expired/revoked tokens
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.485 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-08T06:09:18.485341', 'jti': 'aebd4d85-ebb8-486e-81fb-f56b0e1661ae'}}
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.490 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_created | Data: {'event_type': 'refresh_token_created', 'client_id': 'maxlab', 'user_id': UUID('21a2aaa7-444a-4038-bda3-d8bf2c4ef162'), 'scope': 'openid profile email offline_access read:profile read:groups manage:workflows', 'success': True, 'ip_address': '192.168.15.220', 'user_agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) ...'}
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.492 [INFO] app.core.redis_session:92 - ✅ Session created: c8232d5c-b917-4a6d-9bf3-5a064b440fac for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.493 [INFO] app.core.oauth_redis_integration:74 - ✅ OAuth Redis session created: c8232d5c-b917-4a6d-9bf3-5a064b440fac for user admin@test.com client maxlab
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.493 [INFO] app.api.oauth_simple:1988 - ✅ Redis session created for OAuth token: c8232d5c-b917-4a6d-9bf3-5a064b440fac (user: admin@test.com, client: maxlab)
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.494 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.554 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T14:39:18: 2025-08-08 14:39:18.557 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+3|maxlab-backend-8010       | 2025-08-08T14:39:18: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
+3|maxlab-backend-8010       | 2025-08-08T14:39:19: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
