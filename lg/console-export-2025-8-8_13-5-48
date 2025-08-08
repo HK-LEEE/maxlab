@@ -1,0 +1,309 @@
+13:05:27.044 백엔드 로그아웃 API 오류: Error: 데이터베이스 연결 오류가 발생했습니다.
+    o useSessionLogout.ts:92
+    f MainLayout.tsx:61
+    p SessionLogoutModal.tsx:48
+    React 16
+    <anonymous> main.tsx:18
+index-C9FwpsSA.js:722:15126
+13:05:27.045 🔄 SSO: Syncing logout to MAX Lab... index-C9FwpsSA.js:539:65294
+13:05:27.056 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-C9FwpsSA.js:539:65836
+13:05:27.056 📡 TRY start index-C9FwpsSA.js:539:65898
+13:05:27.056 ❌ 토큰이 없어 인증되지 않은 상태 index-C9FwpsSA.js:539:66583
+13:05:27.063 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:05:27.073 GET
+https://maxlab.dwchem.co.kr/oauth/logout-sync
+NS_BINDING_ABORTED
+
+13:05:27.092 GET
+https://max.dwchem.co.kr/api/oauth/logout?post_logout_redirect_uri=https://max.dwchem.co.kr/login?logout=success
+[HTTP/2 302  8ms]
+
+13:05:27.110 GET
+https://max.dwchem.co.kr/login?logout=success
+[HTTP/2 200  0ms]
+
+13:05:27.134 GET
+https://max.dwchem.co.kr/assets/index-DHTf0g6U.css
+[HTTP/2 200 OK 0ms]
+
+13:05:27.170 GET
+https://max.dwchem.co.kr/assets/index-C9FwpsSA.js
+[HTTP/2 200  0ms]
+
+13:05:27.258 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+13:05:27.263 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:05:27.265 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-C9FwpsSA.js:539:65836
+13:05:27.265 📡 TRY start index-C9FwpsSA.js:539:65898
+13:05:27.265 ❌ 토큰이 없어 인증되지 않은 상태 index-C9FwpsSA.js:539:66583
+13:05:27.269 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:05:42.857 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  240ms]
+
+13:05:43.107 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-C9FwpsSA.js:539:65836
+13:05:43.108 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  4ms]
+
+13:05:43.108 📡 TRY start index-C9FwpsSA.js:539:65898
+13:05:43.108 📡 사용자 정보 로드 시작 index-C9FwpsSA.js:539:66325
+13:05:43.115 🔄 SSO: Syncing login to MAX Lab... index-C9FwpsSA.js:539:64721
+13:05:43.118 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  5ms]
+
+13:05:43.118 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:05:43.119 ✅ User authenticated, checking OAuth return... index-C9FwpsSA.js:715:1270
+13:05:43.134 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJ1c2VyX2lkIjoiMjFhMmFhYTctNDQ0YS00MDM4LWJkYTMtZDhiZjJjNGVmMTYyIiwiZW1haWwiOiJhZG1pbkB0ZXN0LmNvbSIsImlzX2FkbWluIjp0cnVlLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjI3NzQzLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjI1OTQzLCJqdGkiOiJlYmY2YWY2OC01YTljLTQxMmMtODhkMi04MzljODE3ZTNjMGIiLCJuYmYiOjE3NTQ2MjU5NDMsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiIxOTBjNjI5NTU4ZjY0YjAzIn0.fvNqmo1QArz2XfHEMDnO8j_mSfrarvHGOdaMRRlxdKc&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-08T04:05:43.081243","login_count":507,"roles":[],"groups":[]}
+[HTTP/2 200  1ms]
+
+13:05:43.138 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-C9FwpsSA.js:539:66529
+13:05:43.157 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  14ms]
+
+13:05:43.191 GET
+https://maxlab.dwchem.co.kr/assets/index-DJbLVEIk.css
+[HTTP/2 200 OK 0ms]
+
+13:05:43.198 Features response: 
+Object { user_info: {…}, services: (8) […], categories: (5) […] }
+index-C9FwpsSA.js:722:42370
+13:05:43.199 Features data: 
+Array(8) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-C9FwpsSA.js:722:42411
+13:05:43.231 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  0ms]
+
+13:05:43.275 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+13:05:43.277 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+13:05:43.280 🛡️ New CSRF token generated index-Dmbi0U-L.js:263:6222
+13:05:43.280 🛡️ CSRF protection initialized with new token index-Dmbi0U-L.js:263:5768
+13:05:43.286 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+13:05:43.296 ✅ SSO: MAX Lab sync iframe loaded index-C9FwpsSA.js:539:64983
+13:05:43.298 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+13:05:43.298 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:05:43.298 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+13:05:43.299 ✅ Silent auth conditions met, starting... index-Dmbi0U-L.js:258:17410
+13:05:43.300 🔇 Starting silent authentication... index-Dmbi0U-L.js:258:13918
+13:05:43.320 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+read:profile+read:groups+manage:workflows&state=RaDk8eo5Qm-JTuVkPSlqXePNd-SVXHnoL8HZStGNTfo&code_challenge=shYFsKW6DVEzu6S5rHqLw-EuaCQx7ve9y5FdZjEHs08&code_challenge_method=S256&prompt=none&nonce=0d996d9ae99e1049e3f3a03ff95f1b5d6850167e31e0266f3f6f76859a65553d
+[HTTP/2 307  24ms]
+
+13:05:43.353 GET
+https://maxlab.dwchem.co.kr/oauth/callback?code=ahu0Kss_vxC_OomrhH4MehVAoINsGN0U65NUWkYY0dw&state=RaDk8eo5Qm-JTuVkPSlqXePNd-SVXHnoL8HZStGNTfo
+[HTTP/2 200  0ms]
+
+13:05:43.359 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  0ms]
+
+13:05:43.432 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+13:05:43.434 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+13:05:43.436 🛡️ CSRF protection initialized with existing token index-Dmbi0U-L.js:263:5675
+13:05:43.442 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+13:05:43.454 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+13:05:43.454 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:05:43.454 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+13:05:43.455 🚫 Unsafe path for token refresh: /oauth/callback index-Dmbi0U-L.js:258:18589
+13:05:43.455 🚫 Silent auth not allowed on current page: /oauth/callback index-Dmbi0U-L.js:258:16610
+13:05:43.455 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-Dmbi0U-L.js:265:5993
+13:05:43.455 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:05:43.456 🚫 Unsafe path for token refresh: /oauth/callback index-Dmbi0U-L.js:258:18589
+13:05:43.458 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:05:43.458 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.459 📋 Found total flow states: 0 index-Dmbi0U-L.js:228:14359
+13:05:43.459 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-Dmbi0U-L.js:228:14447
+13:05:43.459 🚨 OAuth flow state not found for state: RaDk8eo5... 
+Object { searchedFlows: 0, sessionStorageKeys: (5) […] }
+index-Dmbi0U-L.js:228:16290
+13:05:43.459 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:05:43.460 🛑 User not authenticated, stopping token refresh index-Dmbi0U-L.js:265:18223
+13:05:43.460 🔄 Migrating legacy OAuth state to new state manager index-Dmbi0U-L.js:228:21184
+13:05:43.461 🔐 OAuth flow state created: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-Dmbi0U-L.js:228:14069
+13:05:43.461 ✅ Legacy OAuth state migrated: me2azesls33i3hhg6c9 index-Dmbi0U-L.js:228:21759
+13:05:43.461 🔄 Legacy OAuth state migrated: 
+Object { migrated: 1, removed: 3, errors: 0 }
+index-Dmbi0U-L.js:774:8206
+13:05:43.461 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:05:43.461 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.461 📋 Found total flow states: 1 index-Dmbi0U-L.js:228:14359
+13:05:43.461 ✅ Found OAuth flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:05:43.461 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:05:43.461 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (3) […] }
+index-Dmbi0U-L.js:774:9042
+13:05:43.461 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=ahu0Kss_vxC_OomrhH4MehVAoINsGN0U65NUWkYY0dw&state=RaDk8eo5Qm-JTuVkPSlqXePNd-SVXHnoL8HZStGNTfo", pathname: "/oauth/callback", search: "?code=ahu0Kss_vxC_OomrhH4MehVAoINsGN0U65NUWkYY0dw&state=RaDk8eo5Qm-JTuVkPSlqXePNd-SVXHnoL8HZStGNTfo", code: "ahu0Kss_...", state: "RaDk8eo5...", error: null, errorDescription: null, allParams: {…} }
+index-Dmbi0U-L.js:774:10043
+13:05:43.461 🎯 OAuth Callback - Popup Mode Processing Started index-Dmbi0U-L.js:774:13212
+13:05:43.462 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.462 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
+13:05:43.462 ✅ Found OAuth flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:05:43.462 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.462 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
+13:05:43.462 ✅ Found OAuth flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:05:43.462 🔐 OAuth State Validation Debug: 
+Object { urlState: "RaDk8eo5...", fullState: "RaDk8eo5Qm-JTuVkPSlqXePNd-SVXHnoL8HZStGNTfo", isForceAccountSelection: false, validationResult: {…}, flowState: {…}, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (5) […] }
+index-Dmbi0U-L.js:774:14492
+13:05:43.462 ✅ OAuth State Validation Passed index-Dmbi0U-L.js:774:19160
+13:05:43.462 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me2azesls33i3hhg6c9", currentStatus: "created", requestedStatus: "token_exchange" }
+index-Dmbi0U-L.js:228:16838
+13:05:43.462 💱 Starting token exchange for code: ahu0Kss_... index-Dmbi0U-L.js:774:19237
+13:05:43.462 💱 Token exchange debug info: 
+Object { hasState: true, stateValue: "RaDk8eo5...", codeValue: "ahu0Kss_..." }
+index-Dmbi0U-L.js:258:6192
+13:05:43.462 🔍 Validating OAuth flow state... index-Dmbi0U-L.js:258:6340
+13:05:43.462 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.462 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
+13:05:43.462 ✅ Found OAuth flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:05:43.462 🔐 OAuth flow validation result: 
+Object { isValid: true, reason: "Flow state valid", securityLevel: "low", canProceed: true }
+index-Dmbi0U-L.js:258:6406
+13:05:43.462 ✅ OAuth flow validation passed, getting flow state... index-Dmbi0U-L.js:258:6908
+13:05:43.462 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.462 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
+13:05:43.462 ✅ Found OAuth flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:05:43.463 🔍 Retrieved flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", hasCodeVerifier: true, codeVerifierLength: 43, status: "created", flowType: "silent" }
+index-Dmbi0U-L.js:258:6985
+13:05:43.463 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me2azesls33i3hhg6c9", currentStatus: "created", requestedStatus: "token_exchange" }
+index-Dmbi0U-L.js:228:16838
+13:05:43.463 🔐 Using code verifier from flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", codeVerifierFound: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:258:7216
+13:05:43.463 🔐 Starting token exchange with code: ahu0Kss_... index-Dmbi0U-L.js:258:8874
+13:05:43.463 🔄 Calling OAuth token endpoint: https://max.dwchem.co.kr/api/oauth/token index-Dmbi0U-L.js:258:9053
+13:05:43.465 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:05:43.466 XHRPOST
+https://max.dwchem.co.kr/api/oauth/token
+
+13:05:43.466 🔍 Searching for OAuth flow state with state: RaDk8eo5... index-Dmbi0U-L.js:228:14242
+13:05:43.466 📋 Found total flow states: 2 index-Dmbi0U-L.js:228:14359
+13:05:43.466 ✅ Found OAuth flow state: 
+Object { flowId: "me2azesls33i3hhg6c9", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:05:43.466 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:05:43.550 ✅ Token exchange successful index-Dmbi0U-L.js:258:9632
+13:05:43.551 📋 Token response details: 
+Object { hasAccessToken: true, hasRefreshToken: true, refreshExpiresIn: 2592000, tokenType: "Bearer", scope: "openid profile email read:profile read:groups manage:workflows" }
+index-Dmbi0U-L.js:258:9705
+13:05:43.551 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me2azesls33i3hhg6c9", currentStatus: "created", requestedStatus: "completed" }
+index-Dmbi0U-L.js:228:16838
+13:05:43.551 ✅ OAuth flow completed: me2azesls33i3hhg6c9 index-Dmbi0U-L.js:258:9919
+13:05:43.551 ✅ Token exchange successful: 
+Object { hasAccessToken: true, hasRefreshToken: true, tokenType: "Bearer" }
+index-Dmbi0U-L.js:774:19342
+13:05:43.551 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me2azesls33i3hhg6c9", currentStatus: "created", requestedStatus: "completed" }
+index-Dmbi0U-L.js:228:16838
+13:05:43.552 📤 Preparing to send OAUTH_SUCCESS message... index-Dmbi0U-L.js:774:20032
+13:05:43.552 Window opener exists: false index-Dmbi0U-L.js:774:20093
+13:05:43.552 Window parent exists: true index-Dmbi0U-L.js:774:20146
+13:05:43.552 Window top exists: true index-Dmbi0U-L.js:774:20199
+13:05:43.552 Target origin: https://maxlab.dwchem.co.kr index-Dmbi0U-L.js:774:20246
+13:05:43.552 Message payload: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiaXNfYWRtaW4iOnRydWUsInVzZXJfaWQiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjI3NzQzLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjI1OTQzLCJqdGkiOiIxOTBlYjBmMC1iNzA1LTQ5YTctOGE4NC02NGMxZmNjMzU3MDkiLCJuYmYiOjE3NTQ2MjU5NDMsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI5ZWRhODQ3MzM3OGUyZjQ0In0.AKHfwI9-mSavcW1pj43Xb8K-3HGgzTHHu_c2ivZrDKQ", tokenData: {…} }
+index-Dmbi0U-L.js:774:20299
+13:05:43.552 ✅ OAuth result pre-stored in sessionStorage for immediate detection index-Dmbi0U-L.js:774:20887
+13:05:43.552 ✅ PostMessage sent to window.parent with wildcard origin index-Dmbi0U-L.js:774:21753
+13:05:43.552 ✅ BroadcastChannel message sent (attempt 1/3) index-Dmbi0U-L.js:774:22005
+13:05:43.554 ✅ Silent SSO login successful index-Dmbi0U-L.js:265:4500
+13:05:43.554 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-Dmbi0U-L.js:258:12588
+13:05:43.557 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+13:05:43.563 XHROPTIONS
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  1ms]
+
+13:05:43.584 🔐 Storing refresh token securely... index-Dmbi0U-L.js:263:50609
+13:05:43.584 🔐 Attempting to encrypt and store token (attempt 1/3)... index-Dmbi0U-L.js:263:26421
+13:05:43.675 ✅ Token encrypted and stored successfully index-Dmbi0U-L.js:263:26646
+13:05:43.677 🔓 Token decrypted successfully index-Dmbi0U-L.js:263:27509
+13:05:43.677 🔒 Security event logged: encryption_token_encrypted_stored (low) 
+Object { eventId: "evt_1754625943678_zrb6sp9p", timestamp: "2025-08-08T04:05:43.678Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1754625943287_3kmzba9agl9", details: {…}, context: {…}, metadata: undefined }
+index-Dmbi0U-L.js:263:39632
+13:05:43.678 ✅ Refresh token encrypted, stored, and verified securely index-Dmbi0U-L.js:263:50947
+13:05:43.678 💾 Tokens stored successfully (including refresh token) index-Dmbi0U-L.js:263:49558
+13:05:43.678 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-Dmbi0U-L.js:263:29977
+13:05:43.678 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-Dmbi0U-L.js:263:31806
+13:05:43.678 ✅ Cleared tokens for 0 other users index-Dmbi0U-L.js:263:31969
+13:05:43.678 🔐 Attempting to encrypt and store token (attempt 1/3)... index-Dmbi0U-L.js:263:26421
+13:05:43.761 ✅ Token encrypted and stored successfully index-Dmbi0U-L.js:263:26646
+13:05:43.762 ✅ Tokens saved successfully for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-Dmbi0U-L.js:263:30547
+13:05:43.762 🔓 Cleared logout flags after successful silent login index-Dmbi0U-L.js:265:5892
+13:05:43.762 ✅ MaxLab OAuth success recorded, resetting failure counters index-Dmbi0U-L.js:227:6102
+13:05:43.762 📊 MaxLab OAuth attempt recorded: 
+Object { type: "manual", success: true, error: "none", aborted: false, consecutiveFailures: 0, totalAborted: 0 }
+index-Dmbi0U-L.js:227:6525
+13:05:43.762 ✅ OAuth success recorded in loop prevention system index-Dmbi0U-L.js:228:685
+13:05:43.762 ✅ User authenticated successfully index-Dmbi0U-L.js:228:832
+13:05:43.762 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-Dmbi0U-L.js:258:12588
+13:05:43.765 No routes matched location "/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJ1c2VyX2lkIjoiMjFhMmFhYTctNDQ0YS00MDM4LWJkYTMtZDhiZjJjNGVmMTYyIiwiZW1haWwiOiJhZG1pbkB0ZXN0LmNvbSIsImlzX2FkbWluIjp0cnVlLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjI3NzQzLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjI1OTQzLCJqdGkiOiJlYmY2YWY2OC01YTljLTQxMmMtODhkMi04MzljODE3ZTNjMGIiLCJuYmYiOjE3NTQ2MjU5NDMsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiIxOTBjNjI5NTU4ZjY0YjAzIn0.fvNqmo1QArz2XfHEMDnO8j_mSfrarvHGOdaMRRlxdKc&user=%7B%22id%22%3A%2221a2aaa7-444a-4038-bda3-d8bf2c4ef162%22%2C%22real_name%22%3A%22%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22display_name%22%3A%22admin%22%2C%22email%22%3A%22admin%40test.com%22%2C%22phone_number%22%3A%22010-1234-5678%22%2C%22department%22%3A%22%EA%B4%80%EB%A6%AC%EB%B6%80%22%2C%22position%22%3A%22%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Atrue%2C%22is_verified%22%3Atrue%2C%22created_at%22%3A%222025-06-19T16%3A50%3A56.017084%22%2C%22last_login_at%22%3A%222025-08-08T04%3A05%3A43.081243%22%2C%22login_count%22%3A507%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D" index-Dmbi0U-L.js:49:38912
+13:05:43.766 🔍 Found refresh token metadata, will verify encrypted token exists index-Dmbi0U-L.js:263:52244
+13:05:43.766 🔍 Verifying token consistency... index-Dmbi0U-L.js:263:56960
+13:05:43.767 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  7ms]
+
+13:05:43.770 🔓 Token decrypted successfully index-Dmbi0U-L.js:263:27509
+13:05:43.770 🔓 Retrieved encrypted refresh token index-Dmbi0U-L.js:263:50110
+13:05:43.770 ✅ Token consistency verified - metadata and token both exist index-Dmbi0U-L.js:263:57531
+13:05:43.776 🔄 Auth state change: ready → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:05:43.778 No routes matched location "/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJ1c2VyX2lkIjoiMjFhMmFhYTctNDQ0YS00MDM4LWJkYTMtZDhiZjJjNGVmMTYyIiwiZW1haWwiOiJhZG1pbkB0ZXN0LmNvbSIsImlzX2FkbWluIjp0cnVlLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0NjI3NzQzLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjI1OTQzLCJqdGkiOiJlYmY2YWY2OC01YTljLTQxMmMtODhkMi04MzljODE3ZTNjMGIiLCJuYmYiOjE3NTQ2MjU5NDMsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiIxOTBjNjI5NTU4ZjY0YjAzIn0.fvNqmo1QArz2XfHEMDnO8j_mSfrarvHGOdaMRRlxdKc&user=%7B%22id%22%3A%2221a2aaa7-444a-4038-bda3-d8bf2c4ef162%22%2C%22real_name%22%3A%22%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22display_name%22%3A%22admin%22%2C%22email%22%3A%22admin%40test.com%22%2C%22phone_number%22%3A%22010-1234-5678%22%2C%22department%22%3A%22%EA%B4%80%EB%A6%AC%EB%B6%80%22%2C%22position%22%3A%22%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Atrue%2C%22is_verified%22%3Atrue%2C%22created_at%22%3A%222025-06-19T16%3A50%3A56.017084%22%2C%22last_login_at%22%3A%222025-08-08T04%3A05%3A43.081243%22%2C%22login_count%22%3A507%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D" index-Dmbi0U-L.js:49:38912
