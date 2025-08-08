@@ -39,7 +39,13 @@ export class OAuthInfiniteLoopPrevention {
   private static readonly CIRCUIT_BREAKER_TIMEOUT = 30000; // 30 seconds
   private static readonly MAX_ABORTED_REQUESTS = 3;
   
-  private state: OAuthLoopState;
+  private state: OAuthLoopState = {
+    attempts: [],
+    lastSuccessfulAuth: null,
+    circuitBreakerOpen: false,
+    consecutiveFailures: 0,
+    totalAbortedRequests: 0
+  };
 
   constructor() {
     this.loadState();
