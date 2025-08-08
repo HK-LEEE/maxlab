@@ -98,6 +98,47 @@ function App() {
     getRecommendedAction
   } = useAuthStore();
   
+  // SSO: 초기 로드 시 SSO 동기화 토큰 체크
+  useEffect(() => {
+    const checkSSOSync = async () => {
+      // 이미 인증된 상태면 스킵
+      if (isAuthenticated) {
+        return;
+      }
+      
+      // localStorage에서 SSO 동기화 토큰 확인
+      const ssoToken = localStorage.getItem('sso_sync_token');
+      const ssoUser = localStorage.getItem('sso_sync_user');
+      
+      if (ssoToken && ssoUser) {
+        console.log('🔄 SSO: Found sync token from MAX Platform');
+        
+        try {
+          const userData = JSON.parse(ssoUser);
+          
+          // 토큰과 사용자 정보로 자동 로그인
+          setAuth(ssoToken, userData);
+          setUser(userData);
+          setAuthState('ready');
+          
+          // 동기화 토큰 정리 (일회성)
+          localStorage.removeItem('sso_sync_token');
+          localStorage.removeItem('sso_sync_user');
+          
+          console.log('✅ SSO: Auto login from stored sync token successful');
+          
+        } catch (error) {
+          console.error('❌ SSO: Failed to parse stored sync data:', error);
+          // 파싱 실패 시 정리
+          localStorage.removeItem('sso_sync_token');
+          localStorage.removeItem('sso_sync_user');
+        }
+      }
+    };
+    
+    checkSSOSync();
+  }, []);
+  
   // 기존 isInitializing 대신 authStore의 상태 사용
   const isInitializing = initState !== 'ready' && initState !== 'error';
   
@@ -134,6 +175,92 @@ function App() {
       authSyncService.destroy();
     };
   }, [logout, setAuth, setAuthError]);
+  
+  // SSO: MAX Platform에서 전송한 PostMessage 수신
+  useEffect(() => {
+    const handleSSOMessage = async (event: MessageEvent) => {
+      // 보안: 신뢰할 수 있는 오리진에서만 메시지 수락
+      const trustedOrigins = [
+        'https://max.dwchem.co.kr',
+        'https://maxplatform.dwchem.co.kr',
+        'http://localhost:3000', // 개발 환경
+        'http://localhost:3001', // 개발 환경 대체 포트
+      ];
+      
+      if (!trustedOrigins.includes(event.origin)) {
+        console.warn('⚠️ SSO: Received message from untrusted origin:', event.origin);
+        return;
+      }
+      
+      // SSO 동기화 메시지 처리
+      if (event.data.type === 'SSO_SYNC_SUCCESS') {
+        console.log('🔄 SSO: Received sync success from MAX Platform');
+        
+        try {
+          const { sessionData, token } = event.data;
+          
+          // 토큰과 사용자 정보 저장
+          localStorage.setItem('accessToken', token);
+          localStorage.setItem('user', JSON.stringify(sessionData));
+          
+          // Auth Store 업데이트
+          setAuth(token, sessionData);
+          setUser(sessionData);
+          
+          // 인증 상태 업데이트
+          setAuthState('ready');
+          resetRetry();
+          
+          console.log('✅ SSO: Auto login successful via MAX Platform');
+          
+          // Auth Sync Service를 통해 다른 탭에도 알림
+          authSyncService.broadcast({
+            type: 'LOGIN',
+            user: sessionData,
+            token: token
+          });
+          
+        } catch (error) {
+          console.error('❌ SSO: Failed to process sync message:', error);
+          setAuthError({
+            type: 'sso_sync',
+            message: 'Failed to sync with MAX Platform',
+            recoverable: true
+          });
+        }
+      }
+      
+      // SSO 동기화 에러 처리
+      if (event.data.type === 'SSO_SYNC_ERROR') {
+        console.error('❌ SSO: Sync error from MAX Platform:', event.data.error);
+        // 에러 로깅만 하고 현재 세션에는 영향을 주지 않음
+      }
+      
+      // SSO 로그아웃 동기화 처리
+      if (event.data.type === 'SSO_LOGOUT_SYNC') {
+        console.log('🔄 SSO: Received logout sync from MAX Platform');
+        
+        // 로컬 세션 종료
+        logout();
+        
+        // Auth Sync Service를 통해 다른 탭에도 알림
+        authSyncService.broadcast({
+          type: 'LOGOUT',
+          reason: 'SSO logout from MAX Platform'
+        });
+        
+        console.log('✅ SSO: Auto logout completed via MAX Platform');
+      }
+    };
+    
+    // PostMessage 리스너 등록
+    window.addEventListener('message', handleSSOMessage);
+    console.log('📡 SSO: PostMessage listener registered');
+    
+    return () => {
+      window.removeEventListener('message', handleSSOMessage);
+    };
+  }, [setAuth, setUser, setAuthState, resetRetry, setAuthError]);
   
   // 통합 인증 상태 관리 및 리다이렉트 시스템
   useEffect(() => {

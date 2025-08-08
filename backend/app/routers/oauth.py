@@ -667,3 +667,184 @@ async def oauth_logout_post(
                 "redirect_uri": post_logout_redirect_uri
             }
         )
+
+
+@router.get("/sync")
+async def oauth_sync(
+    token: str = Query(..., description="Access token from MAX Platform"),
+    user: Optional[str] = Query(None, description="User data JSON string"),
+    request: Request = None
+):
+    """
+    SSO: MAX Platform에서 로그인 시 MAX Lab 세션 동기화
+    
+    MAX Platform에서 iframe을 통해 이 엔드포인트를 호출하여
+    자동으로 MAX Lab에 로그인 세션을 생성합니다.
+    """
+    try:
+        import json
+        from ..core.database import get_db
+        from sqlalchemy.orm import Session
+        
+        logger.info(f"🔄 SSO Sync request received with token: {token[:20]}...")
+        
+        # 1. MAX Platform OAuth 서버에서 토큰 검증
+        userinfo_endpoint = f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo"
+        
+        async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
+            response = await client.get(
+                userinfo_endpoint,
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Accept": "application/json"
+                }
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"❌ SSO Sync: Token validation failed: {response.status_code}")
+                return HTMLResponse(
+                    content=f"""
+                    <script>
+                        console.error('SSO Sync failed: Invalid token');
+                        if (window.parent) {{
+                            window.parent.postMessage({{
+                                type: 'SSO_SYNC_ERROR',
+                                error: 'Invalid token'
+                            }}, '*');
+                        }}
+                    </script>
+                    """,
+                    status_code=200
+                )
+            
+            user_info = response.json()
+            logger.info(f"✅ SSO Sync: Token validated for user: {user_info.get('email', 'unknown')}")
+        
+        # 2. 세션 데이터 생성
+        session_data = {
+            "user_id": user_info.get("sub"),
+            "email": user_info.get("email"),
+            "name": user_info.get("name"),
+            "groups": user_info.get("groups", []),
+            "permissions": user_info.get("permissions", []),
+            "is_admin": user_info.get("is_admin", False),
+            "access_token": token,
+            "sync_source": "max_platform",
+            "sync_time": time.time()
+        }
+        
+        # 3. PostMessage로 프론트엔드에 세션 데이터 전송
+        # iframe이므로 parent window에 메시지 전송
+        return HTMLResponse(
+            content=f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>SSO Sync</title>
+            </head>
+            <body>
+                <script>
+                    // SSO 동기화 성공 메시지를 부모 창에 전송
+                    const sessionData = {json.dumps(session_data)};
+                    console.log('🔄 SSO Sync: Sending session data to parent window');
+                    
+                    if (window.parent && window.parent !== window) {{
+                        window.parent.postMessage({{
+                            type: 'SSO_SYNC_SUCCESS',
+                            sessionData: sessionData,
+                            token: '{token}'
+                        }}, '*');
+                    }}
+                    
+                    // localStorage에도 저장 (같은 도메인인 경우)
+                    try {{
+                        localStorage.setItem('sso_sync_token', '{token}');
+                        localStorage.setItem('sso_sync_user', JSON.stringify(sessionData));
+                        console.log('✅ SSO Sync: Data saved to localStorage');
+                    }} catch (e) {{
+                        console.warn('⚠️ SSO Sync: Could not access localStorage:', e);
+                    }}
+                </script>
+            </body>
+            </html>
+            """,
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ SSO Sync error: {e}")
+        return HTMLResponse(
+            content=f"""
+            <script>
+                console.error('SSO Sync error: {str(e)}');
+                if (window.parent) {{
+                    window.parent.postMessage({{
+                        type: 'SSO_SYNC_ERROR',
+                        error: '{str(e)}'
+                    }}, '*');
+                }}
+            </script>
+            """,
+            status_code=200
+        )
+
+
+@router.get("/logout-sync")
+async def oauth_logout_sync(request: Request = None):
+    """
+    SSO: MAX Platform에서 로그아웃 시 MAX Lab 세션 종료
+    
+    MAX Platform에서 iframe을 통해 이 엔드포인트를 호출하여
+    자동으로 MAX Lab의 로그인 세션을 종료합니다.
+    """
+    try:
+        logger.info("🔄 SSO Logout sync request received from MAX Platform")
+        
+        # PostMessage로 프론트엔드에 로그아웃 알림 전송
+        return HTMLResponse(
+            content="""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>SSO Logout Sync</title>
+            </head>
+            <body>
+                <script>
+                    // SSO 로그아웃 동기화 메시지를 부모 창에 전송
+                    console.log('🔄 SSO Logout Sync: Sending logout signal to parent window');
+                    
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'SSO_LOGOUT_SYNC',
+                            source: 'max_platform'
+                        }, '*');
+                    }
+                    
+                    // localStorage 정리 (같은 도메인인 경우)
+                    try {
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('sso_sync_token');
+                        localStorage.removeItem('sso_sync_user');
+                        localStorage.setItem('sso_logout_sync', 'true');
+                        console.log('✅ SSO Logout Sync: Local storage cleared');
+                    } catch (e) {
+                        console.warn('⚠️ SSO Logout Sync: Could not access localStorage:', e);
+                    }
+                </script>
+            </body>
+            </html>
+            """,
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ SSO Logout sync error: {e}")
+        return HTMLResponse(
+            content=f"""
+            <script>
+                console.error('SSO Logout sync error: {str(e)}');
+            </script>
+            """,
+            status_code=200
+        )
