@@ -159,3 +159,62 @@ index-C9FwpsSA.js:715:971
 3|maxlab-backend-8010       | 2025-08-08T15:59:36: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
 3|maxlab-backend-8010       | 2025-08-08T15:59:37: INFO:     192.168.15.220:0 - "GET /api/api/v1/workspaces/tree HTTP/1.1" 404 Not Found
 
+
+
+
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11: Traceback (most recent call last):
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen runpy>", line 198, in _run_module_as_main
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen runpy>", line 88, in _run_code
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/__main__.py", line 4, in <module>
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     uvicorn.main()
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 1161, in __call__
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return self.main(*args, **kwargs)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 1082, in main
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     rv = self.invoke(ctx)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:          ^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 1443, in invoke
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return ctx.invoke(self.callback, **ctx.params)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 788, in invoke
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return __callback(*args, **kwargs)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/main.py", line 416, in main
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     run(
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/main.py", line 587, in run
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     server.run()
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 61, in run
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return asyncio.run(self.serve(sockets=sockets))
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return runner.run(main)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return self._loop.run_until_complete(task)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     config.load()
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/config.py", line 467, in load
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     self.loaded_app = import_from_string(self.app)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     module = importlib.import_module(module_str)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     return _bootstrap._gcd_import(name[level:], package, level)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/app/main.py", line 43, in <module>
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     from .api import oauth_simple, oauth_compatibility, llm_models, security_events
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:   File "/home/app-user/maxproject/maxplatform/backend/app/api/oauth_simple.py", line 1109
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:     wait_result = await coordinator.wait_for_oauth_sync_completion(user_id, max_wait_seconds=8)
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11:                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-08T16:23:11: SyntaxError: 'await' outside async function
+2|maxplatform-backend-8002  | 2025-08-08T16:23:11: INFO:app.llmops.flow_provider:FlowProvider 초기화 완료
+2|maxplatform-backend-8002  | 2025-08-08T16:23:11: INFO:app.llmops.worker_manager:WorkerPoolManager 초기화 완료 - 최대 워커: 10, 타임아웃: 1800초
