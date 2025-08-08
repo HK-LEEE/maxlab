@@ -261,3 +261,92 @@ index-C9FwpsSA.js:722:43950
 0|maxplatf | 2025-08-08T14:07:03:               ^^^^^^^^^^^^^^^^^
 0|maxplatf | 2025-08-08T14:07:03: AttributeError: module 'bcrypt' has no attribute '__about__'
 0|maxplatf | 2025-08-08T14:07:03: INFO:app.routers.auth:bcrypt 해싱 시스템 정상 작동 확인
+
+
+
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.100 [INFO] app.main:103 - MAX Platform backend API starting up
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.101 [INFO] app.middleware.session_middleware:255 - ✅ SessionMiddleware added to application
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.101 [INFO] app.main:139 - Session middleware configured for JWT-Redis synchronization
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.101 [INFO] app.main:142 - Creating database tables
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.121 [INFO] app.database:159 - ✅ 데이터베이스 테이블 생성 완료
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.121 [INFO] app.main:144 - Database tables created successfully
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.217 [INFO] uvicorn.error:76 - Started server process [450029]
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.217 [INFO] uvicorn.error:46 - Waiting for application startup.
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.217 [WARNING] app.middleware.session_middleware:41 - ⚠️ Redis not available - SessionMiddleware in JWT-only mode
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.218 [INFO] app.main:69 - Initializing application services...
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.218 [INFO] app.core.session_init:26 - 🔧 Initializing session management with Redis: redis://localhost:6379
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.219 [INFO] app.core.redis_session:37 - ✅ Redis connection established: redis://localhost:6379
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.219 [INFO] app.core.oauth_redis_integration:32 - ✅ OAuth Redis session manager initialized
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.219 [INFO] app.core.session_init:34 - ✅ Session management initialized with Redis backing
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.219 [INFO] app.core.session_init:35 - 📊 Session configuration: timeout=3600s, redis=redis://localhost:6379
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.219 [INFO] app.core.session_init:60 - 🚀 Session management startup completed with Redis
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.219 [INFO] app.services.session_monitor:53 - ✅ SessionMonitor initialized with Redis
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.220 [INFO] app.services.session_monitor:72 - ✅ SessionMonitor started
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.220 [INFO] app.main:76 - Session monitoring service started
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.223 [INFO] app.tasks.key_rotation:78 - Key rotation background task started
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.223 [INFO] app.tasks.nonce_cleanup:43 - Nonce cleanup background task started
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.223 [INFO] app.main:82 - Application services initialized
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.223 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.223 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.227 [INFO] uvicorn.error:60 - Application startup complete.
+2|maxplatform-backend-8002  | 2025-08-08T14:13:01: 2025-08-08 14:13:01.227 [INFO] uvicorn.error:218 - Uvicorn running on http://127.0.0.1:8002 (Press CTRL+C to quit)
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.416 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.417 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.417 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.417 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.417 [INFO] app.api.oauth_simple:779 - 🔍 Worker 450011: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.418 [INFO] app.api.oauth_simple:785 - 🔍 Worker 450011: Request cookies: []
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.418 [INFO] app.api.oauth_simple:789 - 🔍 Worker 450011: No access_token cookie found
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.418 [INFO] app.api.oauth_simple:797 - 🔍 Worker 450011: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.418 [ERROR] app.api.oauth_simple:1639 - Authorization error: cannot access local variable 'settings' where it is not associated with a value
+0|maxplatform-backend-8000  | 2025-08-08T14:13:06: 2025-08-08 14:13:06.425 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=S0VnyiYVJjIrKG-yDkxIloMy74DIA84M2qCSODD7iJU&code_challenge=XA9JfDFV2ofibZLQv7oGncGJQd3xi261Iw3Fw6vQJbA&code_challenge_method=S256&nonce=o5OpSVh7jdcWrXb7eqcr3424NARjcs6MFRD-3Fpnm4M HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.850 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.851 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.851 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.851 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.852 [INFO] app.api.oauth_simple:779 - 🔍 Worker 450011: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.852 [INFO] app.api.oauth_simple:785 - 🔍 Worker 450011: Request cookies: []
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.852 [INFO] app.api.oauth_simple:789 - 🔍 Worker 450011: No access_token cookie found
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.852 [INFO] app.api.oauth_simple:797 - 🔍 Worker 450011: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.852 [ERROR] app.api.oauth_simple:1639 - Authorization error: cannot access local variable 'settings' where it is not associated with a value
+0|maxplatform-backend-8000  | 2025-08-08T14:13:50: 2025-08-08 14:13:50.856 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=vQdQh2h_ni2CQ1y5m6-44m58HV6uoH_vvymoKa9KjRI&code_challenge=MO5zzuQYGyO-kYkB6BHMBC_FZ9HUMB7Hb4pKLNbDw9M&code_challenge_method=S256&nonce=8RujfeHaklPbykuzlhugCBUh9RlWj6L2WjVSCh2ky2w HTTP/1.1" 307
+1|maxplatform-backend-8001  | 2025-08-08T14:13:59: 2025-08-08 14:13:59.813 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-08T14:13:59: 2025-08-08 14:13:59.813 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T14:14:00: 2025-08-08 14:14:00.134 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T14:14:00: 2025-08-08 14:14:00.135 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T14:14:01: 2025-08-08 14:14:01.224 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T14:14:01: 2025-08-08 14:14:01.224 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.699 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.699 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.699 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.701 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.701 [INFO] app.api.oauth_simple:779 - 🔍 Worker 450011: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.701 [INFO] app.api.oauth_simple:785 - 🔍 Worker 450011: Request cookies: []
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.701 [INFO] app.api.oauth_simple:789 - 🔍 Worker 450011: No access_token cookie found
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.701 [INFO] app.api.oauth_simple:797 - 🔍 Worker 450011: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.701 [ERROR] app.api.oauth_simple:1639 - Authorization error: cannot access local variable 'settings' where it is not associated with a value
+0|maxplatform-backend-8000  | 2025-08-08T14:14:09: 2025-08-08 14:14:09.705 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=cpxoCacXz9vT04okmDo9K5JMU-dCALlKBVUrP4im5IA&code_challenge=9_jtB5MgQe4wdscttrGPNSW8BCQ6XscHIuXLtVcQKTg&code_challenge_method=S256&nonce=h8IyhvAgCyCDqdo83kjwFXLDqrbuiFyQIidnYDU80Yw HTTP/1.1" 307
+1|maxplatform-backend-8001  | 2025-08-08T14:14:59: 2025-08-08 14:14:59.813 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-08T14:14:59: 2025-08-08 14:14:59.814 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T14:15:00: 2025-08-08 14:15:00.134 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T14:15:00: 2025-08-08 14:15:00.134 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T14:15:01: 2025-08-08 14:15:01.224 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T14:15:01: 2025-08-08 14:15:01.225 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+1|maxplatform-backend-8001  | 2025-08-08T14:15:59: 2025-08-08 14:15:59.813 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-08T14:15:59: 2025-08-08 14:15:59.814 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T14:16:00: 2025-08-08 14:16:00.134 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T14:16:00: 2025-08-08 14:16:00.134 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T14:16:01: 2025-08-08 14:16:01.225 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T14:16:01: 2025-08-08 14:16:01.226 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+1|maxplatform-backend-8001  | 2025-08-08T14:16:59: 2025-08-08 14:16:59.814 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-08T14:16:59: 2025-08-08 14:16:59.814 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T14:17:00: 2025-08-08 14:17:00.134 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T14:17:00: 2025-08-08 14:17:00.135 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T14:17:01: 2025-08-08 14:17:01.225 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T14:17:01: 2025-08-08 14:17:01.226 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+1|maxplatform-backend-8001  | 2025-08-08T14:17:59: 2025-08-08 14:17:59.814 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-08T14:17:59: 2025-08-08 14:17:59.815 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T14:18:00: 2025-08-08 14:18:00.134 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T14:18:00: 2025-08-08 14:18:00.134 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T14:18:01: 2025-08-08 14:18:01.225 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T14:18:01: 2025-08-08 14:18:01.226 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
