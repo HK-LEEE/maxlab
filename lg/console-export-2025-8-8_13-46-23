@@ -1,0 +1,663 @@
+13:45:56.797 GET
+https://max.dwchem.co.kr/login
+[HTTP/2 200  4ms]
+
+13:45:56.847 GET
+https://max.dwchem.co.kr/assets/index-C9FwpsSA.js
+[HTTP/2 200  4ms]
+
+13:45:56.848 GET
+https://max.dwchem.co.kr/assets/index-DHTf0g6U.css
+[HTTP/2 200  29ms]
+
+13:45:56.886 GET
+https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+[HTTP/2 200  148ms]
+
+13:45:56.893 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
+13:45:57.082 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:45:57.083 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  483ms]
+
+13:45:57.083 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-C9FwpsSA.js:539:65836
+13:45:57.083 📡 TRY start index-C9FwpsSA.js:539:65898
+13:45:57.083 ❌ 토큰이 없어 인증되지 않은 상태 index-C9FwpsSA.js:539:66583
+13:45:57.085 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  414ms]
+
+13:45:57.086 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  426ms]
+
+13:45:57.087 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:45:57.384 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  1ms]
+
+13:45:59.702 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  526ms]
+
+13:46:00.235 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-C9FwpsSA.js:539:65836
+13:46:00.236 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  7ms]
+
+13:46:00.236 📡 TRY start index-C9FwpsSA.js:539:65898
+13:46:00.236 📡 사용자 정보 로드 시작 index-C9FwpsSA.js:539:66325
+13:46:00.239 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  19ms]
+
+13:46:00.245 🔄 SSO: Syncing login to MAX Lab... index-C9FwpsSA.js:539:64721
+13:46:00.248 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-C9FwpsSA.js:715:971
+13:46:00.249 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU0NjMwMTYwLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0NjI4MzYwLCJqdGkiOiI0MmVmYzVlZS1mNzk5LTQ3N2ItOWNiMC04YjllZWI3MmEwNmMiLCJuYmYiOjE3NTQ2MjgzNjAsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiIxYjk4OGFlZTJjNjU2YTU0In0.ecuTHDVBWYMQ2tpHFdua929eUDwmVJ0hHIEfwU04378&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-08T04:46:00.213004","login_count":509,"roles":[],"groups":[]}
+[HTTP/2 200  1ms]
+
+13:46:00.249 ✅ User authenticated, checking OAuth return... index-C9FwpsSA.js:715:1270
+13:46:00.267 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-C9FwpsSA.js:539:66529
+13:46:00.275 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  24ms]
+
+13:46:00.331 Features response: 
+Object { user_info: {…}, services: (8) […], categories: (5) […] }
+index-C9FwpsSA.js:722:42370
+13:46:00.332 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  4ms]
+
+13:46:00.332 Features data: 
+Array(8) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-C9FwpsSA.js:722:42411
+13:46:00.333 GET
+https://maxlab.dwchem.co.kr/assets/index-DJbLVEIk.css
+[HTTP/2 200  30ms]
+
+13:46:00.446 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+13:46:00.447 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+13:46:00.449 🛡️ CSRF protection initialized with existing token index-Dmbi0U-L.js:263:5675
+13:46:00.454 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+13:46:00.465 ✅ SSO: MAX Lab sync iframe loaded index-C9FwpsSA.js:539:64983
+13:46:00.466 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+13:46:00.466 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:46:00.466 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+13:46:00.466 ✅ Silent auth conditions met, starting... index-Dmbi0U-L.js:258:17410
+13:46:00.467 🔇 Starting silent authentication... index-Dmbi0U-L.js:258:13918
+13:46:00.472 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+read:profile+read:groups+manage:workflows&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&code_challenge=-efcpAQDTM-4axu5-y1gRZx7rOd2qfJVaaeVmNJKPy8&code_challenge_method=S256&prompt=none&nonce=6f8445fc2980bcca71d5080f8070901b3e34c89e33f1ef4af39e82f46e6a536a
+[HTTP/2 307  13ms]
+
+13:46:00.516 GET
+https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&error_description=User+not+logged+in
+[HTTP/2 200  0ms]
+
+13:46:00.526 GET
+https://maxlab.dwchem.co.kr/assets/index-Dmbi0U-L.js
+[HTTP/2 200  0ms]
+
+13:46:00.616 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-Dmbi0U-L.js:228:5243
+13:46:00.618 🆕 New or unauthenticated user, preparing for silent auth attempt index-Dmbi0U-L.js:228:5990
+13:46:00.620 🛡️ CSRF protection initialized with existing token index-Dmbi0U-L.js:263:5675
+13:46:00.625 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-Dmbi0U-L.js:263:20427
+13:46:00.639 ✅ Auth sync initialized with BroadcastChannel index-Dmbi0U-L.js:263:84158
+13:46:00.639 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:46:00.639 🔇 Attempting silent SSO login... index-Dmbi0U-L.js:265:4409
+13:46:00.639 🚫 Unsafe path for token refresh: /oauth/callback index-Dmbi0U-L.js:258:18589
+13:46:00.640 🚫 Silent auth not allowed on current page: /oauth/callback index-Dmbi0U-L.js:258:16610
+13:46:00.640 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-Dmbi0U-L.js:265:5993
+13:46:00.640 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-Dmbi0U-L.js:227:10583
+13:46:00.641 🚫 Unsafe path for token refresh: /oauth/callback index-Dmbi0U-L.js:258:18589
+13:46:00.642 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:46:00.643 🔍 Searching for OAuth flow state with state: 7DsVpkWM... index-Dmbi0U-L.js:228:14242
+13:46:00.643 📋 Found total flow states: 0 index-Dmbi0U-L.js:228:14359
+13:46:00.643 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-Dmbi0U-L.js:228:14447
+13:46:00.643 🔍 Checking stored flow: 
+Object { key: "oauth_flow_me2b0v3q2nbbqevc9wv", flowId: "me2b0v3q2nbbqevc9wv", storedState: "u6m5t2lw...", matchesSearch: false }
+index-Dmbi0U-L.js:228:14730
+13:46:00.643 🔍 Checking stored flow: 
+Object { key: "oauth_flow_me2azesls33i3hhg6c9", flowId: "me2azesls33i3hhg6c9", storedState: "RaDk8eo5...", matchesSearch: false }
+index-Dmbi0U-L.js:228:14730
+13:46:00.643 🚨 OAuth flow state not found for state: 7DsVpkWM... 
+Object { searchedFlows: 0, sessionStorageKeys: (12) […] }
+index-Dmbi0U-L.js:228:16290
+13:46:00.643 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:46:00.644 🛑 User not authenticated, stopping token refresh index-Dmbi0U-L.js:265:18223
+13:46:00.644 🔄 Migrating legacy OAuth state to new state manager index-Dmbi0U-L.js:228:21184
+13:46:00.644 🔐 OAuth flow state created: 
+Object { flowId: "me2cf7wkmtf5qs6mz2", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-Dmbi0U-L.js:228:14069
+13:46:00.644 ✅ Legacy OAuth state migrated: me2cf7wkmtf5qs6mz2 index-Dmbi0U-L.js:228:21759
+13:46:00.644 🔄 Legacy OAuth state migrated: 
+Object { migrated: 1, removed: 3, errors: 0 }
+index-Dmbi0U-L.js:774:8206
+13:46:00.644 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-Dmbi0U-L.js:258:10136
+13:46:00.644 🔍 Searching for OAuth flow state with state: 7DsVpkWM... index-Dmbi0U-L.js:228:14242
+13:46:00.644 📋 Found total flow states: 1 index-Dmbi0U-L.js:228:14359
+13:46:00.644 ✅ Found OAuth flow state: 
+Object { flowId: "me2cf7wkmtf5qs6mz2", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-Dmbi0U-L.js:228:15896
+13:46:00.644 🎯 Popup mode detected via window.parent index-Dmbi0U-L.js:258:11607
+13:46:00.644 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: false, hasError: true, sessionKeys: (10) […] }
+index-Dmbi0U-L.js:774:9042
+13:46:00.645 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&error_description=User+not+logged+in", pathname: "/oauth/callback", search: "?error=login_required&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&error_description=User+not+logged+in", code: "null", state: "7DsVpkWM...", error: "login_required", errorDescription: "User not logged in", allParams: {…} }
+index-Dmbi0U-L.js:774:10043
+13:46:00.645 🚨 OAuth Server Error: 
+Object { error: "login_required", errorDescription: "User not logged in", fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&error_description=User+not+logged+in", allParams: {…} }
+index-Dmbi0U-L.js:774:10366
+
+
+
+
+
+
+
+
+
+0|maxplatform-backend-8000  | 2025-08-08T13:45:59: 2025-08-08 13:45:59.707 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:45:59: 2025-08-08 13:45:59.713 [INFO] app.routers.auth:382 - 로그인 시도: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.212 [INFO] app.routers.auth:401 - 사용자 인증 성공: admin@test.com (ID: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162)
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.220 [INFO] app.routers.auth:408 - 로그인 기록 업데이트 완료: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.220 [INFO] app.services.auth_service:31 - ✅ AuthService initialized with Redis session store
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.220 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-08T05:16:00.220665', 'jti': '42efc5ee-f799-477b-9cb0-8b9eeb72a06c'}}
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.221 [ERROR] app.services.auth_service:145 - Failed to create Redis session: 'User' object has no attribute 'groups'
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.221 [INFO] app.services.auth_service:63 - ✅ Created Redis session None for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.227 [INFO] app.routers.auth:425 - JWT 토큰 생성 및 Redis 세션 동기화 완료: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.227 [WARNING] app.routers.auth:443 - ⚠️ Redis 세션 생성 실패 (JWT만 사용): admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.227 [INFO] app.routers.auth:451 - 로그인 성공: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.228 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/login HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.241 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.243 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.256 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.258 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.296 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.317 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/services/mother-page HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.473 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.474 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.475 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.475 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.475 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.475 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.476 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.477 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.483 [INFO] app.api.oauth_simple:868 - prompt=none login_required: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&error_description=User+not+logged+in
+0|maxplatform-backend-8000  | 2025-08-08T13:46:00: 2025-08-08 13:46:00.484 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=7DsVpkWMhvShZ2AdJOMBP_fRN4pxG06QFM_3zJIS_7k&code_challenge=-efcpAQDTM-4axu5-y1gRZx7rOd2qfJVaaeVmNJKPy8&code_challenge_method=S256&prompt=none&nonce=6f8445fc29... HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.011 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.013 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.013 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.013 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.013 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.013 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.014 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.014 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.014 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.014 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.014 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.014 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.015 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.015 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.015 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.015 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.018 [INFO] app.api.oauth_simple:868 - prompt=none login_required: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=CVwoy_lPv8fNYnVIBimFkVTOIc7bBkt8RMqZrHtut7U&error_description=User+not+logged+in
+0|maxplatform-backend-8000  | 2025-08-08T13:46:29: 2025-08-08 13:46:29.019 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=CVwoy_lPv8fNYnVIBimFkVTOIc7bBkt8RMqZrHtut7U&code_challenge=ko4zKT5mt2lhGfSQrYQsSUD4bAGu1SskP37LLw9m78o&code_challenge_method=S256&prompt=none&nonce=9ff07dae54... HTTP/1.1" 307
+1|maxplatform-backend-8001  | 2025-08-08T13:46:46: 2025-08-08 13:46:46.665 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-08T13:46:46: 2025-08-08 13:46:46.665 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T13:46:46: 2025-08-08 13:46:46.761 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-08T13:46:46: 2025-08-08 13:46:46.762 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+2|maxplatform-backend-8002  | 2025-08-08T13:46:47: 2025-08-08 13:46:47.783 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-08T13:46:47: 2025-08-08 13:46:47.784 [DEBUG] app.services.session_monitor:177 - Session check completed: 0 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.563 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.565 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.565 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.565 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.565 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.565 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.566 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.566 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.566 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.567 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.573 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.720 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.721 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.736 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.737 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.738 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.738 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.738 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.738 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.739 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.739 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.739 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.739 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.739 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.739 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.740 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.740 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.740 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.740 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.744 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.860 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.862 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.875 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.876 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.877 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.878 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.878 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.878 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.879 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.879 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.879 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.880 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:55: 2025-08-08 13:46:55.884 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.046 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.048 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.093 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.097 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.099 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.099 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.099 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.100 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.101 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.102 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.105 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.189 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.190 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.206 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.207 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.208 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.208 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.208 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.208 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.209 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.210 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.213 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.283 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.285 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.302 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.304 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.304 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.304 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.304 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.304 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.305 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.305 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.306 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.310 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.382 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.383 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.398 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.399 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.399 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.399 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.399 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.400 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.400 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.400 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.400 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.400 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.400 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.401 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.401 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.401 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.401 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.401 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.406 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.474 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.475 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.491 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.492 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.493 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.493 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.493 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.494 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.494 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.495 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.495 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.495 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.495 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.495 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.495 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.496 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.496 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.496 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.500 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.570 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.571 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.587 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.588 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.589 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.589 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.589 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.589 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.590 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.595 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.665 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.665 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.680 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.681 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.682 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.682 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.682 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.682 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.683 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.684 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.687 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.758 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.759 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.776 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.778 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.778 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.778 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.778 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.778 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.779 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.779 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.779 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.779 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.779 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.780 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.780 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.780 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.780 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.780 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.783 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.849 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.850 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.866 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.867 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.868 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.868 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.868 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.868 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.869 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.873 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.945 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.947 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.963 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.964 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.964 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.964 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.965 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.965 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.965 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.965 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.966 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:56: 2025-08-08 13:46:56.969 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.040 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.041 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.054 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.055 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.056 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.056 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.056 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.056 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.057 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.061 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.132 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.133 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.151 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.153 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.153 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.153 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.154 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.154 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.154 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.154 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.155 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.159 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.228 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.229 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.242 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.243 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.244 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.244 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.244 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.244 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.245 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.249 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.314 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.316 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.331 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.333 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.333 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.333 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.333 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.334 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.335 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.335 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.335 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.335 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.336 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.336 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.336 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.336 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.336 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.336 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.340 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.408 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.409 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.426 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.428 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.428 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.428 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.428 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.428 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.429 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.429 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.429 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.429 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.429 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.430 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.430 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.430 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.430 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.430 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.433 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.505 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.506 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.518 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.520 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.520 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.520 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.520 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.520 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.521 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.521 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.522 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.526 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.596 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.597 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.612 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.613 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.614 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.614 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.614 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.614 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.615 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.616 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.619 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.689 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.690 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.703 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.704 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.704 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.704 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.704 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.704 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.705 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.706 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.706 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.706 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.711 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.781 [INFO] app.utils.auth:235 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.782 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.799 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.801 [WARNING] app.utils.auth:401 - JWT verification failed: Signature has expired.
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.801 [DEBUG] app.core.redis_session:130 - 🔍 Session not found: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.801 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.801 [DEBUG] app.utils.auth:451 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.801 [DEBUG] app.utils.auth:458 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.802 [INFO] app.api.oauth_simple:774 - OAuth authorize request: client_id=maxlab, display=None, prompt=None, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.802 [INFO] app.api.oauth_simple:779 - 🔍 Worker 443556: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.802 [INFO] app.api.oauth_simple:785 - 🔍 Worker 443556: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.802 [INFO] app.api.oauth_simple:787 - 🔍 Worker 443556: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.802 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_id': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.803 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'session_token': 8f5bc873-e74b-4c3e-8a4b-6912de12f6de...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.803 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.803 [INFO] app.api.oauth_simple:793 - 🔍 Worker 443556: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyM...
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.803 [INFO] app.api.oauth_simple:797 - 🔍 Worker 443556: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.803 [INFO] app.api.oauth_simple:800 - 🔍 Worker 443556: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-08T13:46:57: 2025-08-08 13:46:57.807 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=D9luqXdY0zsLIZUmGpTNQmwe_9krE4AnFMEPu2QemMI&code_challenge=eNyPYl3HnnEjh2t28Jqs6qsMtluvAgMTJ_yXJFhYT64&code_challenge_method=S256&nonce=FytPsyBg_eI1o4B6UBYuAajVJkdrVegIXaxTN-8Klk4 HTTP/1.1" 307
