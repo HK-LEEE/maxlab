@@ -408,7 +408,31 @@ export const authService = {
     try {
       const accessToken = localStorage.getItem('accessToken');
       
-      // Step 1: Blacklist token on our backend
+      // Step 1: 🔥 CRITICAL: Call backend logout API first (Redis 세션 정리)
+      if (accessToken) {
+        try {
+          const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+          const response = await fetch(`${authUrl}/api/auth/logout`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Backend logout successful:', result.stats);
+          } else {
+            console.warn('⚠️ Backend logout failed:', response.status, response.statusText);
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to call backend logout API:', error);
+          // Continue with logout even if backend call fails
+        }
+      }
+      
+      // Step 2: Blacklist token on our backend (legacy)
       if (accessToken) {
         try {
           await tokenBlacklistService.blacklistCurrentToken('user_logout');
@@ -419,7 +443,7 @@ export const authService = {
         }
       }
       
-      // Step 2: 🔒 OAuth Provider Token Revocation (조건부)
+      // Step 3: 🔒 OAuth Provider Token Revocation (조건부)
       // OAuth 서버에 /api/oauth/logout 엔드포인트가 없으므로 토큰 revocation만 수행
       if (options.useProviderLogout !== false) { // 기본값은 true (하위 호환성)
         try {
@@ -495,7 +519,7 @@ export const authService = {
         }
       }
       
-      // Step 3: Enhanced logout with refresh token revocation
+      // Step 4: Enhanced logout with refresh token revocation
       await refreshTokenService.secureLogout();
       
     } catch (error) {

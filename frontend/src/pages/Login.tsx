@@ -602,7 +602,7 @@ export const Login: React.FC = () => {
                   </span>
                 </button>
                 
-                {/* Different User Login Button - Using dedicated component */}
+                {/* Different User Login Button - Component handles own OAuth flow internally */}
                 <DifferentUserLoginButton 
                   onLoginClick={() => handleOAuthLogin(false)} 
                 />
