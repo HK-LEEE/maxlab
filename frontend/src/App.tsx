@@ -469,32 +469,61 @@ function App() {
           return;
         }
         
-        // 🔧 CRITICAL FIX: Handle authenticated users with valid tokens
+        // 🔧 CRITICAL FIX: Handle authenticated users with server-side validation
         if (currentIsAuthenticated) {
           const cachedToken = localStorage.getItem('accessToken');
           const tokenExpiry = localStorage.getItem('tokenExpiryTime');
           const currentTime = Date.now();
           
-          // Check if token is actually valid
+          // Check if token is locally valid first
           if (cachedToken && tokenExpiry && currentTime < parseInt(tokenExpiry)) {
-            devLog.info('✅ User has valid cached token, fetching fresh user info...');
+            devLog.info('✅ User has locally valid token, validating with server...');
             
-            // Fetch fresh user info to restore admin status (stripped by partialize for security)
+            // 🚨 CRITICAL: Server-side token validation to prevent isAuthenticated mismatch
             try {
               setAuthState('syncing');
+              
+              // Validate token with server by fetching user info
               const freshUser = await authService.getCurrentUser();
+              
+              // If we get here, token is valid on server side
               setUser(freshUser);
-              devLog.info('✅ Admin status restored from server:', { is_admin: freshUser.is_admin });
+              devLog.info('✅ Token validated with server, user authenticated:', { 
+                email: freshUser.email,
+                is_admin: freshUser.is_admin 
+              });
               setAuthState('ready');
               return;
-            } catch (error) {
-              devLog.warn('Failed to fetch fresh user info, continuing with cached data:', error);
-              setAuthState('ready');
-              return;
+              
+            } catch (error: any) {
+              devLog.error('❌ Server-side token validation failed:', error);
+              
+              // 🚨 CRITICAL FIX: Token invalid on server side - clear auth state
+              console.log('🧹 Clearing invalid token and auth state');
+              
+              // Clear all auth-related data
+              const keysToRemove = [
+                'accessToken', 'tokenExpiryTime', 'tokenType', 'expiresIn', 
+                'refreshToken', 'refreshTokenExpiry', 'user'
+              ];
+              keysToRemove.forEach(key => localStorage.removeItem(key));
+              
+              // Clear auth store state
+              logout();
+              setAuthState('idle');
+              
+              // Set specific error for UI feedback
+              setAuthError({
+                type: 'server_error',
+                message: 'Your session has expired. Please log in again.',
+                recoverable: true
+              });
+              
+              // Continue to silent auth attempt below instead of stopping
             }
           } else {
-            devLog.warn('❌ Cached token invalid or expired, clearing auth');
-            logout();  // Use the logout function from useAuthStore
+            devLog.warn('❌ Cached token locally invalid or expired, clearing auth');
+            logout();
             setAuthState('idle');
             // Continue to silent auth attempt below
           }
@@ -509,19 +538,41 @@ function App() {
           
           if (result.success && result.user) {
             const token = localStorage.getItem('accessToken') || '';
-            setAuth(token, result.user);
             
-            // Fetch fresh user info to restore admin status
+            // 🚨 CRITICAL: Validate silent auth token with server
             try {
+              devLog.info('🔍 Validating silent auth token with server...');
               const freshUser = await authService.getCurrentUser();
+              
+              // If we get here, token is valid
+              setAuth(token, freshUser);
               setUser(freshUser);
-              devLog.info('✅ Admin status restored:', { is_admin: freshUser.is_admin });
-            } catch (error) {
-              devLog.warn('Failed to fetch fresh user info:', error);
+              resetRetry();
+              devLog.info('✅ Silent auth validated with server:', { 
+                email: freshUser.email,
+                is_admin: freshUser.is_admin 
+              });
+              
+            } catch (validationError: any) {
+              devLog.error('❌ Silent auth token validation failed:', validationError);
+              
+              // Silent auth succeeded but token is invalid on server - clear everything
+              const keysToRemove = [
+                'accessToken', 'tokenExpiryTime', 'tokenType', 'expiresIn', 
+                'refreshToken', 'refreshTokenExpiry', 'user'
+              ];
+              keysToRemove.forEach(key => localStorage.removeItem(key));
+              
+              logout();
+              
+              setAuthError({
+                type: 'server_error',
+                message: 'Authentication validation failed. Please log in manually.',
+                recoverable: true
+              });
+              
+              devLog.info('🚨 Silent auth token invalid - user needs manual login');
             }
-            
-            resetRetry();
-            devLog.info('✅ App initialized with silent login');
           } else {
             devLog.info('ℹ️ Silent login not available, user needs to login manually');
             

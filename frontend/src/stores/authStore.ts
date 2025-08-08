@@ -432,39 +432,45 @@ export const useAuthStore = create<AuthState>()(
       onRehydrateStorage: () => (state) => {
         console.log('🔄 Rehydrating auth state for initialization', { state });
         
-        // 🔧 CRITICAL FIX: Check actual token validity during rehydration
+        // 🔧 CRITICAL FIX: Enhanced token validity checking with server validation
         const accessToken = localStorage.getItem('accessToken');
         const tokenExpiryTime = localStorage.getItem('tokenExpiryTime');
         const currentTime = Date.now();
         
-        const isTokenValid = accessToken && tokenExpiryTime && currentTime < parseInt(tokenExpiryTime);
+        // 🚨 SECURITY FIX: More strict token validation
+        const hasTokenData = accessToken && tokenExpiryTime;
+        const isLocallyValid = hasTokenData && currentTime < parseInt(tokenExpiryTime);
         
-        if (state?.isAuthenticated && state?.user && isTokenValid) {
-          console.log('📋 Authenticated user with valid token detected');
+        if (state?.isAuthenticated && state?.user && hasTokenData) {
+          // 🔍 Enhanced validation: Check both local and potential server issues
+          if (!isLocallyValid) {
+            console.log('⚠️ Authenticated user but token expired locally, clearing auth');
+            // Clear expired auth data immediately
+            const keysToRemove = ['accessToken', 'tokenExpiryTime', 'tokenType', 'expiresIn', 'refreshToken', 'refreshTokenExpiry'];
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            
+            return {
+              ...state,
+              initState: 'idle' as AuthInitState,
+              error: null,
+              retryCount: 0,
+              isAuthenticated: false,
+              user: null
+            };
+          }
+          
+          // 🔧 CRITICAL: Set to syncing state to trigger server validation  
+          console.log('📋 Authenticated user detected - will validate with server');
           const rehydratedState = {
             ...state,
-            initState: 'hydrating' as AuthInitState,
-            error: null,
-            retryCount: 0
-          };
-          console.log('📋 Rehydrated state:', rehydratedState);
-          return rehydratedState;
-        } else if (state?.isAuthenticated && state?.user && !isTokenValid) {
-          console.log('⚠️ Authenticated user but token expired, clearing auth');
-          // Clear expired auth data
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('tokenExpiryTime');
-          localStorage.removeItem('tokenType');
-          localStorage.removeItem('expiresIn');
-          
-          return {
-            ...state,
-            initState: 'idle' as AuthInitState,
+            initState: 'syncing' as AuthInitState, // Changed from 'hydrating' to 'syncing'
             error: null,
             retryCount: 0,
-            isAuthenticated: false,
-            user: null
+            // 🚨 CRITICAL: Keep authenticated true temporarily for App.tsx validation logic
+            isAuthenticated: true  // Keep true so App initialization validates the token
           };
+          console.log('📋 Rehydrated state (pending server validation):', rehydratedState);
+          return rehydratedState;
         } else {
           console.log('🆕 New or unauthenticated user, preparing for silent auth attempt');
           return {

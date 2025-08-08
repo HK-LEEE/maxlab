@@ -854,22 +854,54 @@ class RefreshTokenService {
     options: RequestInit, 
     maxRetries: number = 3,
     baseDelay: number = 1000,
-    timeout: number = 10000
+    timeout: number = 15000  // 🔧 ENHANCED: Increased timeout for OAuth requests
   ): Promise<Response> {
     let lastError: Error | null = null;
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        // 타임아웃을 적용한 fetch
+        // 🚨 ENHANCED: Better abort controller handling for OAuth sync
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        const timeoutId = setTimeout(() => {
+          console.warn(`⏰ OAuth request timeout after ${timeout}ms, aborting...`);
+          controller.abort();
+        }, timeout);
         
+        // 🔧 CRITICAL: Add additional abort handling for existing requests
+        const existingSignal = options.signal;
+        if (existingSignal?.aborted) {
+          clearTimeout(timeoutId);
+          throw new Error('Request was aborted before starting');
+        }
+        
+        // Combine signals if there's an existing one
+        let combinedSignal = controller.signal;
+        if (existingSignal) {
+          // Create a combined abort signal
+          const combinedController = new AbortController();
+          const cleanup = () => {
+            clearTimeout(timeoutId);
+            combinedController.abort();
+          };
+          
+          controller.signal.addEventListener('abort', cleanup, { once: true });
+          existingSignal.addEventListener('abort', cleanup, { once: true });
+          combinedSignal = combinedController.signal;
+        }
+        
+        const startTime = Date.now();
         const response = await fetch(url, {
           ...options,
-          signal: controller.signal
+          signal: combinedSignal
         });
         
+        const requestDuration = Date.now() - startTime;
         clearTimeout(timeoutId);
+        
+        // Log successful request timing
+        if (response.ok) {
+          console.log(`✅ OAuth request completed in ${requestDuration}ms`);
+        }
         
         // 성공적인 응답 또는 재시도 불가능한 오류의 경우 즉시 반환
         if (response.ok || 
@@ -883,6 +915,16 @@ class RefreshTokenService {
         if (response.status >= 500 && attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt);
           console.warn(`🔄 Request failed with status ${response.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          
+          // Log server error for debugging
+          this.logSecurityEvent('oauth_server_error', {
+            attempt: attempt + 1,
+            status: response.status,
+            statusText: response.statusText,
+            requestDuration,
+            url: url.replace(/refresh_token=[^&]+/, 'refresh_token=***')
+          });
+          
           await this.delay(delay);
           continue;
         }
@@ -892,17 +934,57 @@ class RefreshTokenService {
       } catch (error: any) {
         lastError = error;
         
-        // 네트워크 오류나 타임아웃인 경우 재시도
+        // 🚨 ENHANCED: Better OAuth sync error handling for NS_BINDING_ABORTED
+        const isAbortError = error.name === 'AbortError' || 
+                            error.message.includes('aborted') || 
+                            error.message.includes('NS_BINDING_ABORTED');
         const isNetworkError = error.name === 'TypeError' || 
-                              error.name === 'AbortError' ||
-                              error.message.includes('fetch');
+                              error.message.includes('fetch') ||
+                              error.message.includes('NetworkError');
+        const isCancelledError = error.message.includes('cancelled') || 
+                                error.message.includes('Request was cancelled');
+        
+        // 🔧 CRITICAL: Handle different types of OAuth sync failures
+        if (isAbortError && attempt < maxRetries) {
+          const delay = Math.min(baseDelay * Math.pow(1.5, attempt), 3000); // Cap delay at 3s
+          console.warn(`🚫 OAuth request aborted (${error.name}: ${error.message}), retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          
+          // Specific logging for abort errors
+          this.logSecurityEvent('oauth_request_aborted', {
+            attempt: attempt + 1,
+            errorName: error.name,
+            errorMessage: error.message,
+            isNSBindingAborted: error.message.includes('NS_BINDING_ABORTED'),
+            url: url.replace(/refresh_token=[^&]+/, 'refresh_token=***'),
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+          });
+          
+          await this.delay(delay);
+          continue;
+        }
         
         if (isNetworkError && attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt);
-          console.warn(`🔄 Network error: ${error.message}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          console.warn(`🌐 Network error: ${error.message}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
           
           // 보안 이벤트 로그
           this.logSecurityEvent('network_retry', {
+            attempt: attempt + 1,
+            error: error.message,
+            errorType: 'network',
+            url: url.replace(/refresh_token=[^&]+/, 'refresh_token=***')
+          });
+          
+          await this.delay(delay);
+          continue;
+        }
+        
+        if (isCancelledError && attempt < maxRetries) {
+          const delay = baseDelay * attempt; // Linear backoff for cancellation
+          console.warn(`🛑 Request cancelled: ${error.message}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          
+          this.logSecurityEvent('oauth_request_cancelled', {
             attempt: attempt + 1,
             error: error.message,
             url: url.replace(/refresh_token=[^&]+/, 'refresh_token=***')
@@ -917,9 +999,41 @@ class RefreshTokenService {
       }
     }
     
-    // 모든 재시도 실패
-    console.error('❌ All retry attempts failed');
-    throw new Error(TokenRefreshError.NETWORK_ERROR + (lastError ? ': ' + lastError.message : ''));
+    // 🚨 ENHANCED: More detailed error reporting for OAuth sync failures
+    console.error('❌ All OAuth retry attempts failed after', maxRetries + 1, 'attempts');
+    
+    if (lastError) {
+      // Enhanced error context for OAuth sync issues
+      const isNSBindingAborted = lastError.message.includes('NS_BINDING_ABORTED');
+      const isAbortError = lastError.name === 'AbortError' || lastError.message.includes('aborted');
+      const isNetworkError = lastError.name === 'TypeError' || lastError.message.includes('fetch');
+      
+      // Log final failure with detailed context
+      this.logSecurityEvent('oauth_request_final_failure', {
+        totalAttempts: maxRetries + 1,
+        lastError: lastError.message,
+        errorName: lastError.name,
+        isNSBindingAborted,
+        isAbortError,
+        isNetworkError,
+        url: url.replace(/refresh_token=[^&]+/, 'refresh_token=***'),
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Provide user-friendly error message based on error type
+      if (isNSBindingAborted) {
+        throw new Error('OAuth synchronization failed due to request cancellation. Please try logging in manually.');
+      } else if (isAbortError) {
+        throw new Error('OAuth request was cancelled. This may be due to network issues or page navigation.');
+      } else if (isNetworkError) {
+        throw new Error(TokenRefreshError.NETWORK_ERROR + ': ' + lastError.message);
+      } else {
+        throw new Error('OAuth request failed: ' + lastError.message);
+      }
+    } else {
+      throw new Error(TokenRefreshError.NETWORK_ERROR + ': All retry attempts exhausted');
+    }
   }
 
   /**
