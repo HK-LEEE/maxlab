@@ -64,13 +64,32 @@ export class SilentAuth {
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
   }
 
-  async attemptSilentAuth(maxAge?: number): Promise<SilentAuthResult> {
+  async attemptSilentAuth(maxAge?: number, abortSignal?: AbortSignal): Promise<SilentAuthResult> {
+    // 🔧 RACE CONDITION FIX: Check if request was aborted before starting
+    if (abortSignal?.aborted) {
+      throw new Error('Silent auth request was aborted before starting');
+    }
+    
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
     const nonce = this.generateNonce(); // OIDC nonce
     
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      // 🔧 RACE CONDITION FIX: Setup abort handling
+      const abortHandler = () => {
+        console.log('🚫 Silent auth request aborted by coordinator');
+        this.cleanup();
+        reject(new Error('Silent auth request was aborted by request coordinator'));
+      };
+      
+      abortSignal?.addEventListener('abort', abortHandler, { once: true });
+      
       try {
+        // 🔧 RACE CONDITION FIX: Check abort status before proceeding
+        if (abortSignal?.aborted) {
+          throw new Error('Silent auth request was aborted before iframe creation');
+        }
+        
         console.log('🔇 Starting silent authentication...');
 
         // PKCE 파라미터 생성
@@ -157,6 +176,10 @@ export class SilentAuth {
 
       } catch (error) {
         this.cleanup();
+        // 🔧 RACE CONDITION FIX: Remove abort handler on error
+        if (abortSignal && abortHandler) {
+          abortSignal.removeEventListener('abort', abortHandler);
+        }
         resolve({
           success: false,
           error: error instanceof Error ? error.message : 'Silent authentication setup failed'
@@ -193,7 +216,11 @@ export class SilentAuth {
 }
 
 // 편의 함수
-export async function attemptSilentLogin(): Promise<SilentAuthResult> {
+export async function attemptSilentLogin(abortSignal?: AbortSignal): Promise<SilentAuthResult> {
+  // 🔧 RACE CONDITION FIX: Check if request was aborted before starting
+  if (abortSignal?.aborted) {
+    return { success: false, error: 'Silent auth request was aborted before starting' };
+  }
   // 🔒 CRITICAL: Check if user has logged out recently
   const hasLoggedOut = localStorage.getItem('hasLoggedOut');
   const preventSilentAuth = sessionStorage.getItem('preventSilentAuth');
@@ -256,7 +283,8 @@ export async function attemptSilentLogin(): Promise<SilentAuthResult> {
   try {
     // You can pass maxAge parameter to enforce fresh authentication
     // e.g., maxAge: 300 = require auth within last 5 minutes
-    return await silentAuth.attemptSilentAuth();
+    // 🔧 RACE CONDITION FIX: Pass abortSignal to silent auth
+    return await silentAuth.attemptSilentAuth(undefined, abortSignal);
   } finally {
     silentAuth.forceCleanup();
   }

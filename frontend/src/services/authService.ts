@@ -18,6 +18,7 @@ import { oidcService } from './oidcService';
 import { authSyncService } from './authSyncService';
 import { useOAuthLoopPrevention, oauthLoopPrevention } from '../utils/oauthInfiniteLoopPrevention';
 import { useAuthStore } from '../stores/authStore';
+import { oauthRequestCoordinator } from './oauthRequestCoordinator';
 
 // Re-export for backward compatibility
 export type IDTokenClaims = MAXPlatformClaims;
@@ -109,7 +110,15 @@ export const authService = {
         console.log('✅ Complete session cleanup finished for different user login');
       }
       
-      const tokenResponse = await oauthInstance.startAuth(forceAccountSelection);
+      // 🔧 RACE CONDITION FIX: Queue OAuth popup request through coordinator
+      const tokenResponse = await oauthRequestCoordinator.queueRequest(
+        'authorize',
+        'popup_oauth_auth',
+        async (abortSignal) => {
+          return await oauthInstance.startAuth(forceAccountSelection, abortSignal);
+        },
+        forceAccountSelection ? 1 : 0 // Higher priority for manual logins
+      );
       
       // Record successful OAuth attempt
       oauthLoopPrevention.recordAttempt(attemptType, true);
@@ -257,7 +266,14 @@ export const authService = {
     try {
       console.log('🔇 Attempting silent SSO login...');
       
-      const result = await attemptSilentLogin();
+      // 🔧 RACE CONDITION FIX: Queue silent login request through coordinator
+      const result = await oauthRequestCoordinator.queueRequest(
+        'silent_login',
+        'silent_oauth_auth',
+        async (abortSignal) => {
+          return await attemptSilentLogin(abortSignal);
+        }
+      );
       
       if (result.success && result.token) {
         console.log('✅ Silent SSO login successful');

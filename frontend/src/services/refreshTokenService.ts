@@ -8,6 +8,7 @@ import { apiClient } from '../api/client';
 import { secureTokenStorage } from './secureTokenStorage';
 import { securityEventLogger } from './securityEventLogger';
 import { userIsolatedTokenStorage } from './userIsolatedTokenStorage';
+import { oauthRequestCoordinator } from './oauthRequestCoordinator';
 
 // 로컬 인터페이스 정의 (import 문제 해결)
 export interface TokenResponse {
@@ -92,19 +93,27 @@ class RefreshTokenService {
       console.log('🎟️ Refresh Token Available:', !!refreshToken);
       console.log('🎟️ Refresh Token Prefix:', refreshToken.substring(0, 10) + '...');
       
-      // 네트워크 요청에 타임아웃 및 재시도 로직 추가
-      const response = await this.fetchWithRetry(`${authUrl}/api/oauth/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      // 🔧 RACE CONDITION FIX: Queue OAuth sync request through coordinator
+      const response = await oauthRequestCoordinator.queueRequest(
+        'sync',
+        `${authUrl}/api/oauth/token`,
+        async (abortSignal) => {
+          return await this.fetchWithRetry(`${authUrl}/api/oauth/token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              grant_type: 'refresh_token',
+              refresh_token: refreshToken,
+              client_id: this.clientId,
+              ...(this.clientSecret && { client_secret: this.clientSecret })
+            }),
+            signal: abortSignal
+          });
         },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-          client_id: this.clientId,
-          ...(this.clientSecret && { client_secret: this.clientSecret })
-        })
-      });
+        1 // High priority for token refresh
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

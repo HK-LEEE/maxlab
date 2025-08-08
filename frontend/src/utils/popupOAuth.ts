@@ -116,7 +116,11 @@ export class PopupOAuthLogin {
   }
 
   // OAuth 시작
-  async startAuth(forceAccountSelection = false): Promise<TokenResponse> {
+  async startAuth(forceAccountSelection = false, abortSignal?: AbortSignal): Promise<TokenResponse> {
+    // 🔧 RACE CONDITION FIX: Check if request was aborted before starting
+    if (abortSignal?.aborted) {
+      throw new Error('OAuth request was aborted before starting');
+    }
     // 🚨 CRITICAL: Complete OAuth state cleanup for different user login
     if (forceAccountSelection) {
       console.log('🧹 Performing complete OAuth state cleanup for different user login...');
@@ -163,7 +167,21 @@ export class PopupOAuthLogin {
     this.authInProgress = true;
 
     return new Promise(async (resolve, reject) => {
+      // 🔧 RACE CONDITION FIX: Setup abort handling
+      const abortHandler = () => {
+        console.log('🚫 OAuth request aborted by coordinator');
+        this.cleanup();
+        reject(new Error('OAuth request was aborted by request coordinator'));
+      };
+      
+      abortSignal?.addEventListener('abort', abortHandler, { once: true });
+      
       try {
+        // 🔧 RACE CONDITION FIX: Check abort status before proceeding
+        if (abortSignal?.aborted) {
+          throw new Error('OAuth request was aborted before PKCE generation');
+        }
+        
         // PKCE 파라미터 생성
         const state = this.generateCodeVerifier();
         const codeVerifier = this.generateCodeVerifier();
@@ -797,7 +815,16 @@ export class PopupOAuthLogin {
 
       } catch (error) {
         this.cleanup();
+        // 🔧 RACE CONDITION FIX: Remove abort handler on error
+        if (abortSignal && abortHandler) {
+          abortSignal.removeEventListener('abort', abortHandler);
+        }
         reject(error);
+      } finally {
+        // 🔧 RACE CONDITION FIX: Always clean up abort handler
+        if (abortSignal && abortHandler) {
+          abortSignal.removeEventListener('abort', abortHandler);
+        }
       }
     });
   }
