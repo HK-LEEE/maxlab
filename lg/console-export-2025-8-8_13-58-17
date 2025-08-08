@@ -242,3 +242,22 @@ index-C9FwpsSA.js:722:43950
 0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.760 [DEBUG] app.core.oauth_redis_integration:230 - 🔍 Session not found or expired: 8f5bc873-e74b-4c3e-8a4b-6912de12f6de
 0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.760 [WARNING] app.api.oauth_simple:844 - ⚠️ Worker 446038: User authenticated but no Redis session found - forcing re-authentication
 0|maxplatform-backend-8000  | 2025-08-08T13:58:26: 2025-08-08 13:58:26.763 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+offline_access+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=z_v86jv4MmnXNZ35atn13SWIB7Wjgg_EV1tBo22HgyY&code_challenge=zly1lBBoJRLySRM-s66-uC-FnbQQdJooXK-A_IzMkdw&code_challenge_method=S256&nonce=9zyC_bC7aC0BZOOF3nENSvzgs3imMSTZoTj6dBLbkbE HTTP/1.1" 307
+
+
+
+/home/app-user/maxproject/maxplatform/backend/logs/pm2-error-0.log last 15 lines:
+0|maxplatf | 2025-08-08T14:07:01:   File "/home/app-user/maxproject/maxplatform/backend/app/main.py", line 43, in <module>
+0|maxplatf | 2025-08-08T14:07:01:     from .api import oauth_simple, oauth_compatibility, llm_models, security_events
+0|maxplatf | 2025-08-08T14:07:01:   File "/home/app-user/maxproject/maxplatform/backend/app/api/oauth_simple.py", line 855
+0|maxplatf | 2025-08-08T14:07:01:     session_id = await auth_service.create_redis_session(current_user, access_token)
+0|maxplatf | 2025-08-08T14:07:01:                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatf | 2025-08-08T14:07:01: SyntaxError: 'await' outside async function
+0|maxplatf | 2025-08-08T14:07:03: INFO:app.database:PostgreSQL 데이터베이스 연결 시도: 192.168.15.220:5432/platform_integration
+0|maxplatf | 2025-08-08T14:07:03: INFO:app.database:✅ PostgreSQL 데이터베이스 연결 성공
+0|maxplatf | 2025-08-08T14:07:03: WARNING:passlib.handlers.bcrypt:(trapped) error reading bcrypt version
+0|maxplatf | 2025-08-08T14:07:03: Traceback (most recent call last):
+0|maxplatf | 2025-08-08T14:07:03:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+0|maxplatf | 2025-08-08T14:07:03:     version = _bcrypt.__about__.__version__
+0|maxplatf | 2025-08-08T14:07:03:               ^^^^^^^^^^^^^^^^^
+0|maxplatf | 2025-08-08T14:07:03: AttributeError: module 'bcrypt' has no attribute '__about__'
+0|maxplatf | 2025-08-08T14:07:03: INFO:app.routers.auth:bcrypt 해싱 시스템 정상 작동 확인
