@@ -191,14 +191,14 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
           pathname: window.location.pathname,
           pathPartsLength: pathParts.length,
           pathPartsDetail: pathParts.map((p, i) => `[${i}]="${p}"`).join(', '),
-          endpoint: `/v1/personal-test/process-flow/public/${publishToken}/data-sources/${data.queryConfig.dataSourceId}/execute-query`
+          endpoint: `/api/v1/personal-test/process-flow/public/${publishToken}/data-sources/${data.queryConfig.dataSourceId}/execute-query`
         });
         
         if (!publishToken) {
           throw new Error('Failed to extract publish token from URL');
         }
         
-        response = await fetch(`/v1/personal-test/process-flow/public/${publishToken}/data-sources/${data.queryConfig.dataSourceId}/execute-query`, {
+        response = await fetch(`/api/v1/personal-test/process-flow/public/${publishToken}/data-sources/${data.queryConfig.dataSourceId}/execute-query`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
