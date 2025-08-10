@@ -17,7 +17,7 @@ DB_SSL_MODE=require
 DB_SSL_CERT_PATH=/home/app-user/docker_space/maxdb_postgress/config/certs/server.crt
 DB_SSL_KEY_PATH=/home/app-user/docker_space/maxdb_postgress/config/certs/server.key
 # DB_SSL_CA_PATH=/path/to/ca-cert.pem
-e
+
 # 보안 키 (반드시 강력한 랜덤 값으로 변경)
 SECRET_KEY=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
 JWT_SECRET_KEY=CHANGE_THIS_TO_STRONG_RANDOM_VALUE
