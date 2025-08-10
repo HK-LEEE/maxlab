@@ -179,27 +179,39 @@ function App() {
 
   // 🚫 SIMPLIFIED: 크로스 도메인 로그아웃 리스너 초기화
   useEffect(() => {
+    // SAFETY: 로그아웃 진행 중이면 리스너 초기화 건너뛰기
+    const logoutInProgress = sessionStorage.getItem('logout_in_progress');
+    if (logoutInProgress && Date.now() - parseInt(logoutInProgress) < 10000) {
+      console.log('🛑 Logout in progress, skipping cross-domain listener initialization');
+      return;
+    }
+    
     console.log('🔒 Initializing cross-domain logout listener');
     
     // 크로스 도메인 로그아웃 감지 시작
     crossDomainLogout.startListening(() => {
       console.log('🚨 Cross-domain logout detected - clearing session');
       
+      // 로그아웃 진행 상태 표시 (10초간)
+      sessionStorage.setItem('logout_in_progress', Date.now().toString());
+      
       // 모든 스토리지 클리어 및 로그아웃
       localStorage.clear();
-      sessionStorage.clear();
+      // sessionStorage는 logout_in_progress를 남겨둠
       
       // 상태 리셋
       logout();
       
-      // 로그인 페이지로 리다이렉트
-      window.location.href = '/login?reason=cross_domain_logout';
+      // 짧은 지연 후 리다이렉트 (cleanup 시간 확보)
+      setTimeout(() => {
+        window.location.href = '/login?reason=cross_domain_logout';
+      }, 100);
     });
     
     return () => {
       crossDomainLogout.stopListening();
     };
-  }, [logout]);
+  }, []); // FIXED: Remove logout dependency to prevent infinite loops
   
   // SSO: MAX Platform에서 전송한 PostMessage 수신
   useEffect(() => {

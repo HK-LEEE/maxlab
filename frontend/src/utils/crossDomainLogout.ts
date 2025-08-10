@@ -12,6 +12,9 @@ export class CrossDomainLogoutManager {
   private static instance: CrossDomainLogoutManager;
   private checkInterval: NodeJS.Timeout | null = null;
   private lastLogoutTime: number = 0;
+  private logoutCount: number = 0;
+  private logoutCountResetTime: number = 0;
+  private readonly MAX_LOGOUTS_PER_MINUTE = 3;
 
   private constructor() {}
 
@@ -67,17 +70,17 @@ export class CrossDomainLogoutManager {
       await this.checkMaxPlatformSession(onLogoutDetected);
     }, LOGOUT_CHECK_INTERVAL);
 
-    // 3. BroadcastChannel API (동일 origin만 지원)
+    // 3. BroadcastChannel API (동일 origin만 지원) - FIXED: 전용 채널 사용
     if ('BroadcastChannel' in window) {
-      const channel = new BroadcastChannel('maxlab_auth_sync');
+      const channel = new BroadcastChannel('maxlab_cross_domain_logout');
       channel.onmessage = (event) => {
         if (event.data.type === 'logout' || event.data.type === 'LOGOUT') {
-          devLog.warn('🚨 Logout broadcast received');
+          devLog.warn('🚨 Cross-domain logout broadcast received');
           this.handleLogout(onLogoutDetected);
         }
       };
       
-      // MAX Platform 채널도 수신
+      // MAX Platform 채널도 수신 (외부 시스템과의 호환성)
       const maxPlatformChannel = new BroadcastChannel('max_platform_auth');
       maxPlatformChannel.onmessage = (event) => {
         if (event.data.type === 'logout') {
@@ -165,22 +168,38 @@ export class CrossDomainLogoutManager {
   private handleLogout(onLogoutDetected: () => void) {
     devLog.warn('🔒 Executing cross-domain logout cleanup');
     
-    // 중복 실행 방지
     const now = Date.now();
-    if (now - this.lastLogoutTime < 500) { // 500ms 내 중복 실행 방지
+    
+    // ENHANCED: 5초 쿨다운으로 증가 (기존 500ms에서)
+    if (now - this.lastLogoutTime < 5000) {
+      devLog.debug('🔄 Logout cooldown active, ignoring duplicate logout');
       return;
     }
+    
+    // Circuit Breaker: 1분당 최대 3회 로그아웃만 허용
+    if (now - this.logoutCountResetTime > 60000) {
+      this.logoutCount = 0;
+      this.logoutCountResetTime = now;
+    }
+    
+    if (this.logoutCount >= this.MAX_LOGOUTS_PER_MINUTE) {
+      devLog.warn('🚫 Circuit breaker: Too many logout attempts, stopping');
+      return;
+    }
+    
+    this.logoutCount++;
     this.lastLogoutTime = now;
     
     // 모든 스토리지 클리어
     this.clearAllStorage();
     
-    // 다른 탭에도 로그아웃 브로드캐스트
+    // 다른 탭에도 로그아웃 브로드캐스트 (FIXED: 고유한 채널명 사용)
     if ('BroadcastChannel' in window) {
       try {
-        const channel = new BroadcastChannel('maxlab_auth_sync');
+        const channel = new BroadcastChannel('maxlab_cross_domain_logout');
         channel.postMessage({ type: 'LOGOUT', reason: 'cross_domain_logout' });
         channel.close();
+        devLog.info('📡 Logout broadcast sent on dedicated channel');
       } catch (e) {
         devLog.error('Failed to broadcast logout:', e);
       }
