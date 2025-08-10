@@ -67,7 +67,11 @@ https://max.dwchem.co.kr/api/oauth/userinfo
 
 
 
-3|maxlab-backend-8010       | 2025-08-10T14:45:16: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs?_t=1754804716025&_r=eegief6fl7o HTTP/1.1" 200 OK
-3|maxlab-backend-8010       | 2025-08-10T14:45:16: 2025-08-10 14:45:16,038 - app.core.security - WARNING - Decryption failed, returning original value:
-3|maxlab-backend-8010       | 2025-08-10T14:45:16: 2025-08-10 14:45:16,039 - app.core.security - WARNING - Decryption failed, returning original value:
-3|maxlab-backend-8010       | 2025-08-10T14:45:16: 2025-08-10 14:45:16,060 - app.services.status_normalizer - ERROR - Failed to load custom status mappings for workspace 21ee03db-90c4-4592-b00f-c44801e0b164: 'asyncpg.pgproto.pgproto.UUID' object has no attribute 'replace'
+3|maxlab-backend-8010       | 2025-08-10T14:45:46: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs?_t=1754804746088&_r=y4unk0p0o77 HTTP/1.1" 200 OK
+0|maxplatform-backend-8000  | 2025-08-10T14:45:46: 2025-08-10 14:45:46.105 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+3|maxlab-backend-8010       | 2025-08-10T14:45:46: 2025-08-10 14:45:46,109 - app.core.security - WARNING - Decryption failed, returning original value:
+3|maxlab-backend-8010       | 2025-08-10T14:45:46: 2025-08-10 14:45:46,111 - app.core.security - WARNING - Decryption failed, returning original value:
+0|maxplatform-backend-8000  | 2025-08-10T14:45:46: 2025-08-10 14:45:46.121 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+3|maxlab-backend-8010       | 2025-08-10T14:45:46: 2025-08-10 14:45:46,136 - app.services.status_normalizer - ERROR - Failed to load custom status mappings for workspace 21ee03db-90c4-4592-b00f-c44801e0b164: 'asyncpg.pgproto.pgproto.UUID' object has no attribute 'replace'
+3|maxlab-backend-8010       | 2025-08-10T14:45:46: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs/equipment/status?_t=1754804746101 HTTP/1.1" 200 OK
+3|maxlab-backend-8010       | 2025-08-10T14:45:46: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs/measurements?_t=1754804746103 HTTP/1.1" 200 OK
