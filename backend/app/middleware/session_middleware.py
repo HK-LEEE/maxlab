@@ -10,8 +10,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 import logging
 from datetime import datetime
+import asyncio
 
 from ..services.session_manager import session_manager, SessionConfig, SessionData
+from .sso_session_validator import validate_sso_session, invalidate_sso_session
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +56,7 @@ class SecureSessionMiddleware(BaseHTTPMiddleware):
         
         # Validate session security
         if session_data:
-            security_check = self._validate_session_security(request, session_data)
+            security_check = await self._validate_session_security(request, session_data)
             if not security_check["valid"]:
                 logger.warning(f"Session security validation failed: {security_check['reason']}")
                 
@@ -98,8 +100,8 @@ class SecureSessionMiddleware(BaseHTTPMiddleware):
         
         return session_data
 
-    def _validate_session_security(self, request: Request, session: SessionData) -> Dict[str, Any]:
-        """Validate session security characteristics"""
+    async def _validate_session_security(self, request: Request, session: SessionData) -> Dict[str, Any]:
+        """Validate session security characteristics including SSO validation"""
         
         # Get request info
         client_ip = self._get_client_ip(request)
@@ -136,6 +138,53 @@ class SecureSessionMiddleware(BaseHTTPMiddleware):
                 "reason": "session_too_old",
                 "suspicious": False
             }
+        
+        # SSO Session Validation - Check with auth server every 5 minutes
+        # This ensures that if user logs out from auth server, the session is invalidated here too
+        try:
+            # Only validate with SSO if session is older than 5 minutes since last check
+            last_sso_check = getattr(session, 'last_sso_validation', None)
+            should_validate = False
+            
+            if last_sso_check is None:
+                should_validate = True
+            else:
+                time_since_check = (now - last_sso_check).total_seconds()
+                if time_since_check > 300:  # 5 minutes
+                    should_validate = True
+            
+            if should_validate:
+                # Extract token from request if available
+                token = None
+                auth_header = request.headers.get("Authorization", "")
+                if auth_header.startswith("Bearer "):
+                    token = auth_header[7:]
+                
+                # Validate with SSO
+                user_id = session.user_id or session.data.get("user_id") if hasattr(session, 'data') else None
+                if user_id:
+                    is_valid = await validate_sso_session(
+                        session_id=session.session_id,
+                        user_id=user_id,
+                        token=token
+                    )
+                    
+                    if not is_valid:
+                        logger.warning(f"SSO validation failed for session {session.session_id[:8]}...")
+                        return {
+                            "valid": False,
+                            "reason": "sso_validation_failed",
+                            "suspicious": False
+                        }
+                    
+                    # Update last SSO validation time
+                    session.last_sso_validation = now
+                    logger.debug(f"SSO validation successful for session {session.session_id[:8]}...")
+                
+        except Exception as e:
+            logger.error(f"Error during SSO validation: {e}")
+            # On SSO validation error, continue with local validation only
+            # This ensures the system remains functional even if auth server is down
         
         return {"valid": True, "reason": "valid"}
 

@@ -11,6 +11,7 @@ import logging
 from ....core.auth import get_current_user
 from ....services.token_blacklist import get_token_blacklist
 from ....middleware.session_middleware import logout_session, logout_all_user_sessions
+from ....middleware.sso_session_validator import invalidate_sso_session, clear_sso_cache
 
 logger = logging.getLogger(__name__)
 
@@ -98,14 +99,49 @@ async def enhanced_logout(
             sessions_logged_out = 1 if success else 0
             logger.info(f"Logged out current session for user {user_id}")
         
-        # Step 3: Additional security cleanup
+        # Step 2.5: Notify auth server about logout (SSO synchronization)
         try:
-            # Clear any user-specific cache entries
-            # This could include cached API responses, temporary data, etc.
-            cleanup_performed = True
-            logger.debug(f"Security cleanup performed for user {user_id}")
+            # Get session ID from cookies or state
+            session_id = http_request.cookies.get("session_id")
+            if session_id:
+                # Invalidate session on auth server
+                sso_invalidated = await invalidate_sso_session(session_id, user_id)
+                if sso_invalidated:
+                    logger.info(f"SSO session invalidated for user {user_id}")
+                else:
+                    logger.warning(f"Failed to invalidate SSO session for user {user_id}")
+            
+            # Clear SSO validation cache for this user
+            clear_sso_cache(user_id)
+            
         except Exception as e:
-            logger.warning(f"Security cleanup failed for user {user_id}: {e}")
+            logger.error(f"Error notifying auth server about logout: {e}")
+            # Continue with logout even if SSO notification fails
+        
+        # Step 3: Clear cookies properly for cross-domain SSO
+        try:
+            # Clear cookies with proper domain for SSO
+            cookie_domain = ".dwchem.co.kr"  # This covers all subdomains
+            
+            # Clear session cookies
+            response.delete_cookie(key="session_id", domain=cookie_domain, path="/")
+            response.delete_cookie(key="session_token", domain=cookie_domain, path="/")
+            response.delete_cookie(key="access_token", domain=cookie_domain, path="/")
+            response.delete_cookie(key="user_id", domain=cookie_domain, path="/")
+            response.delete_cookie(key="oauth_session", domain=cookie_domain, path="/")
+            
+            # Also clear without domain for local development
+            response.delete_cookie(key="session_id", path="/")
+            response.delete_cookie(key="session_token", path="/")
+            response.delete_cookie(key="access_token", path="/")
+            response.delete_cookie(key="user_id", path="/")
+            
+            logger.info(f"Cookies cleared for user {user_id} with domain {cookie_domain}")
+            cleanup_performed = True
+            
+        except Exception as e:
+            logger.warning(f"Cookie cleanup failed for user {user_id}: {e}")
+            cleanup_performed = False
         
         # Step 4: Log logout event for security monitoring
         logger.info(
