@@ -83,11 +83,13 @@ class StatusNormalizer:
         
         # 사용자 정의 매핑 확인 (우선순위 높음)
         if workspace_id and self.db_session:
-            await self._load_custom_mappings(workspace_id)
-            custom_mapping = self._custom_mappings.get(workspace_id, {})
+            # workspace_id를 문자열로 변환 (asyncpg UUID 객체 처리)
+            workspace_id_str = str(workspace_id)
+            await self._load_custom_mappings(workspace_id_str)
+            custom_mapping = self._custom_mappings.get(workspace_id_str, {})
             if normalized_input in custom_mapping:
                 result = custom_mapping[normalized_input]
-                logger.debug(f"Status normalized using custom mapping: {raw_status} -> {result} (workspace: {workspace_id})")
+                logger.debug(f"Status normalized using custom mapping: {raw_status} -> {result} (workspace: {workspace_id_str})")
                 return result
         
         # 기본 매핑 테이블 확인
@@ -143,21 +145,24 @@ class StatusNormalizer:
         Args:
             workspace_id: 워크스페이스 ID
         """
-        if workspace_id in self._cache_loaded:
+        # workspace_id를 문자열로 변환 (asyncpg UUID 객체 처리)
+        workspace_id_str = str(workspace_id)
+        
+        if workspace_id_str in self._cache_loaded:
             return
         
         try:
             # workspace_id가 UUID 형식인지 확인
             import uuid
             try:
-                uuid.UUID(workspace_id)
+                uuid.UUID(workspace_id_str)
                 # UUID인 경우 직접 사용
                 query = text("""
                     SELECT source_status, target_status
                     FROM status_mappings
                     WHERE workspace_id = :workspace_id AND is_active = true
                 """)
-                result = await self.db_session.execute(query, {"workspace_id": workspace_id})
+                result = await self.db_session.execute(query, {"workspace_id": workspace_id_str})
             except ValueError:
                 # UUID가 아닌 경우 workspace lookup
                 query = text("""
@@ -166,7 +171,7 @@ class StatusNormalizer:
                     INNER JOIN workspaces w ON sm.workspace_id = w.id
                     WHERE (w.slug = :workspace_id OR w.name = :workspace_id) AND sm.is_active = true
                 """)
-                result = await self.db_session.execute(query, {"workspace_id": workspace_id})
+                result = await self.db_session.execute(query, {"workspace_id": workspace_id_str})
             mappings = {}
             
             for row in result:
@@ -174,16 +179,16 @@ class StatusNormalizer:
                 target_status = row.target_status.upper().strip()
                 mappings[source_status] = target_status
             
-            self._custom_mappings[workspace_id] = mappings
-            self._cache_loaded.add(workspace_id)
+            self._custom_mappings[workspace_id_str] = mappings
+            self._cache_loaded.add(workspace_id_str)
             
-            logger.info(f"Loaded {len(mappings)} custom status mappings for workspace {workspace_id}")
+            logger.info(f"Loaded {len(mappings)} custom status mappings for workspace {workspace_id_str}")
             
         except Exception as e:
-            logger.error(f"Failed to load custom status mappings for workspace {workspace_id}: {e}")
+            logger.error(f"Failed to load custom status mappings for workspace {workspace_id_str}: {e}")
             # 실패 시 빈 매핑으로 설정
-            self._custom_mappings[workspace_id] = {}
-            self._cache_loaded.add(workspace_id)
+            self._custom_mappings[workspace_id_str] = {}
+            self._cache_loaded.add(workspace_id_str)
     
     async def add_custom_mapping(
         self,
