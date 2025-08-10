@@ -192,6 +192,9 @@ function App() {
     crossDomainLogout.startListening(() => {
       console.log('🚨 Cross-domain logout detected - clearing session');
       
+      const currentPath = window.location.pathname;
+      const isPublicPage = currentPath.startsWith('/public/flow/') || currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+      
       // 로그아웃 진행 상태 표시 (10초간)
       sessionStorage.setItem('logout_in_progress', Date.now().toString());
       
@@ -202,10 +205,15 @@ function App() {
       // 상태 리셋
       logout();
       
-      // 짧은 지연 후 리다이렉트 (cleanup 시간 확보)
-      setTimeout(() => {
-        window.location.href = '/login?reason=cross_domain_logout';
-      }, 100);
+      // Public 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
+      if (!isPublicPage) {
+        // 짧은 지연 후 리다이렉트 (cleanup 시간 확보)
+        setTimeout(() => {
+          window.location.href = '/login?reason=cross_domain_logout';
+        }, 100);
+      } else {
+        console.log('🔄 Cross-domain logout detected on public page, staying on current page');
+      }
     });
     
     return () => {
