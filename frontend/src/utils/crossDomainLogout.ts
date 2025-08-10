@@ -6,7 +6,7 @@
 import { devLog } from './logger';
 
 const LOGOUT_EVENT_KEY = 'max_platform_logout';
-const LOGOUT_CHECK_INTERVAL = 1000; // 1초마다 체크
+const LOGOUT_CHECK_INTERVAL = 30000; // 30초마다 체크 (성능 최적화)
 
 export class CrossDomainLogoutManager {
   private static instance: CrossDomainLogoutManager;
