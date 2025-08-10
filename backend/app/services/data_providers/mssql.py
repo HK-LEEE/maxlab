@@ -766,3 +766,62 @@ class MSSQLProvider(IDataProvider):
             "pool_active": self.pool is not None,
             "pool_settings": self.pool_settings
         }
+    
+    async def execute_sql(self, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """
+        Execute arbitrary SQL query and return results
+        
+        Args:
+            query: SQL query string
+            params: Optional query parameters for parameterized queries
+            
+        Returns:
+            List[Dict[str, Any]]: Query results as list of dictionaries
+        """
+        try:
+            async with self.get_connection() as cursor:
+                # Build parameters list for pyodbc from dict
+                param_values = []
+                if params:
+                    # Replace named parameters with ? for pyodbc
+                    for key, value in params.items():
+                        # Replace :key or @key with ?
+                        query = query.replace(f":{key}", "?")
+                        query = query.replace(f"@{key}", "?")
+                        param_values.append(value)
+                
+                logger.debug(f"Executing SQL query: {query[:500]}...")  # Log first 500 chars
+                
+                # Execute query with parameters
+                if param_values:
+                    await cursor.execute(query, param_values)
+                else:
+                    await cursor.execute(query)
+                
+                # Check if this is a SELECT query
+                if cursor.description:
+                    # It's a SELECT query, fetch results
+                    columns = [column[0] for column in cursor.description]
+                    results = []
+                    
+                    async for row in cursor:
+                        row_dict = dict(zip(columns, row))
+                        # Convert datetime objects to ISO format strings
+                        for key, value in row_dict.items():
+                            if isinstance(value, datetime):
+                                row_dict[key] = value.isoformat()
+                        results.append(row_dict)
+                    
+                    logger.info(f"Query returned {len(results)} rows")
+                    return results
+                else:
+                    # It's a non-SELECT query (INSERT, UPDATE, DELETE)
+                    rows_affected = cursor.rowcount
+                    logger.info(f"Query affected {rows_affected} rows")
+                    return [{"rows_affected": rows_affected}]
+                    
+        except Exception as e:
+            logger.error(f"Error executing SQL query: {e}")
+            logger.error(f"Query was: {query[:500]}...")
+            raise RuntimeError(f"SQL execution failed: {str(e)}")
+            

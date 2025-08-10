@@ -3255,43 +3255,105 @@ async def execute_table_query(
     db: AsyncSession = None,
     is_public: bool = False
 ) -> Dict[str, Any]:
-    """Execute a table query and return results"""
+    """Execute a table query using DynamicProvider to query actual data sources"""
     try:
-        # Get data source configuration
-        config_query = """
-            SELECT source_type, api_url, mssql_connection_string, 
-                   custom_queries, api_key, api_headers
-            FROM data_source_configs
-            WHERE id = :data_source_id
-        """
-        result = await db.execute(text(config_query), {"data_source_id": data_source_id})
-        config = result.fetchone()
+        # Security: Basic SQL injection prevention for public endpoints
+        if is_public:
+            # Check for dangerous SQL keywords in public queries
+            dangerous_keywords = [
+                "DROP", "DELETE", "INSERT", "UPDATE", "ALTER", "CREATE",
+                "TRUNCATE", "EXEC", "EXECUTE", "GRANT", "REVOKE"
+            ]
+            query_upper_check = sql_query.upper()
+            for keyword in dangerous_keywords:
+                if keyword in query_upper_check:
+                    logger.warning(f"Blocked potentially dangerous SQL keyword '{keyword}' in public query")
+                    return {"columns": [], "data": [], "error": "Query not allowed"}
+            
+            # Limit query length for public endpoints
+            if len(sql_query) > 5000:
+                logger.warning(f"Query too long for public endpoint: {len(sql_query)} chars")
+                return {"columns": [], "data": [], "error": "Query too long"}
         
-        if not config:
-            return {"columns": [], "data": [], "error": "Data source not found"}
+        # Import DynamicProvider
+        from app.services.data_providers.dynamic import DynamicProvider
         
-        # For now, return mock data for demonstration
-        # In production, you would execute the actual SQL query against the data source
-        mock_columns = ["id", "name", "value", "status", "timestamp"]
-        mock_data = []
+        # Create DynamicProvider instance with the specific data source ID
+        provider = DynamicProvider(
+            db_session=db,
+            workspace_id="",  # Not needed when data_source_id is provided
+            data_source_id=data_source_id
+        )
         
-        for i in range(min(limit, 10)):  # Generate some mock data
-            mock_data.append({
-                "id": i + 1,
-                "name": f"Item {i + 1}",
-                "value": round(50 + (i * 10) + (hash(sql_query) % 50), 2),
-                "status": "OK" if i % 3 != 0 else "WARN",
-                "timestamp": datetime.now().isoformat()
-            })
+        # Apply limit to the query if not already present
+        query_upper = sql_query.upper()
+        if "LIMIT" not in query_upper and "TOP" not in query_upper and "FETCH" not in query_upper:
+            # Add limit based on SQL dialect (will be handled by the provider)
+            # For now, append LIMIT as it's most common
+            sql_query = f"{sql_query} LIMIT {limit}"
         
-        return {
-            "columns": mock_columns,
-            "data": mock_data,
-            "error": None
-        }
+        # Enforce maximum limit for public endpoints
+        if is_public and limit > 1000:
+            limit = 1000
+        
+        logger.info(f"Executing table query for data source {data_source_id}")
+        logger.debug(f"Query: {sql_query[:500]}...")  # Log first 500 chars
+        
+        # Execute the SQL query using the DynamicProvider
+        results = await provider.execute_sql(sql_query)
+        
+        # Process results
+        if results:
+            # Get column names from the first result
+            columns = list(results[0].keys()) if results else []
+            
+            # Limit results if needed (in case the query didn't apply limit)
+            if len(results) > limit:
+                results = results[:limit]
+            
+            return {
+                "columns": columns,
+                "data": results,
+                "error": None
+            }
+        else:
+            # No results, but not an error
+            return {
+                "columns": [],
+                "data": [],
+                "error": None
+            }
+        
+    except RuntimeError as e:
+        # Specific error from SQL execution
+        logger.error(f"SQL execution error for table query: {e}")
+        # For public endpoints, sanitize error messages
+        if is_public:
+            error_msg = "Query execution failed"
+            # Check for common issues that are safe to expose
+            if "decryption failed" in str(e).lower():
+                error_msg = "Data source configuration error"
+            elif "connection" in str(e).lower():
+                error_msg = "Database connection error"
+            elif "timeout" in str(e).lower():
+                error_msg = "Query timeout"
+        else:
+            error_msg = str(e)
+        
+        return {"columns": [], "data": [], "error": error_msg}
         
     except Exception as e:
-        logger.error(f"Error executing table query: {e}")
-        return {"columns": [], "data": [], "error": str(e)}
+        logger.error(f"Unexpected error executing table query: {e}")
+        # Generic error handling
+        error_msg = "Query execution failed" if is_public else str(e)
+        return {"columns": [], "data": [], "error": error_msg}
+    
+    finally:
+        # Clean up provider connection if needed
+        if 'provider' in locals():
+            try:
+                await provider.disconnect()
+            except:
+                pass  # Ignore cleanup errors
 
 

@@ -439,3 +439,74 @@ class APIProvider(IDataProvider):
                 "base_url": self.base_url,
                 "message": str(e)
             }
+    
+    async def execute_sql(self, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """
+        Execute arbitrary SQL query via API endpoint
+        
+        For API providers, this translates SQL queries to API calls if possible,
+        or sends them to a SQL execution endpoint if available.
+        
+        Args:
+            query: SQL query string
+            params: Optional query parameters for parameterized queries
+            
+        Returns:
+            List[Dict[str, Any]]: Query results as list of dictionaries
+        """
+        try:
+            # For API providers, we can either:
+            # 1. Send the SQL to a SQL execution endpoint if available
+            # 2. Parse the SQL and translate to API calls
+            # 3. Return empty results if SQL execution is not supported
+            
+            # Check if the API has a SQL execution endpoint
+            if "/execute-sql" in self.base_url or "/sql" in self.base_url:
+                # Send SQL to execution endpoint
+                payload = {
+                    "query": query,
+                    "params": params or {}
+                }
+                
+                response = await self._make_request("POST", "/execute-sql", json=payload)
+                
+                if isinstance(response, list):
+                    return response
+                elif isinstance(response, dict) and "results" in response:
+                    return response["results"]
+                elif isinstance(response, dict) and "data" in response:
+                    return response["data"]
+                else:
+                    return [response]
+            else:
+                # API doesn't support SQL execution
+                logger.warning(f"API provider at {self.base_url} does not support SQL execution")
+                
+                # Try to parse simple SELECT queries and convert to API calls
+                query_lower = query.lower().strip()
+                
+                if query_lower.startswith("select") and "from equipment" in query_lower:
+                    # Try to fetch equipment data
+                    equipment_data = await self.get_equipment_status(limit=100)
+                    results = []
+                    for item in equipment_data.items:
+                        results.append(item.dict())
+                    return results
+                
+                elif query_lower.startswith("select") and "from measurement" in query_lower:
+                    # Try to fetch measurement data
+                    measurement_data = await self.get_measurement_data(limit=1000)
+                    results = []
+                    for item in measurement_data:
+                        results.append(item.dict())
+                    return results
+                
+                else:
+                    # Cannot execute this SQL query via API
+                    logger.warning(f"Cannot execute SQL query via API: {query[:100]}...")
+                    return []
+                
+        except Exception as e:
+            logger.error(f"Error executing SQL query via API: {e}")
+            logger.error(f"Query was: {query[:500]}...")
+            raise RuntimeError(f"API SQL execution failed: {str(e)}")

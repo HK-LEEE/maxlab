@@ -179,3 +179,17 @@ class IDataProvider(ABC):
     async def disconnect(self) -> None:
         """연결 종료"""
         pass
+    
+    @abstractmethod
+    async def execute_sql(self, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """
+        Execute arbitrary SQL query and return results
+        
+        Args:
+            query: SQL query string
+            params: Optional query parameters for parameterized queries
+            
+        Returns:
+            List[Dict[str, Any]]: Query results as list of dictionaries
+        """
+        pass

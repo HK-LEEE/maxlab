@@ -354,3 +354,84 @@ class PostgreSQLProvider(IDataProvider):
                 "provider": "PostgreSQL",
                 "message": str(e)
             }
+    
+    async def execute_sql(self, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """
+        Execute arbitrary SQL query and return results
+        
+        Args:
+            query: SQL query string
+            params: Optional query parameters for parameterized queries
+            
+        Returns:
+            List[Dict[str, Any]]: Query results as list of dictionaries
+        """
+        try:
+            # Convert dict params to values for PostgreSQL
+            param_values = []
+            if params:
+                # Replace named parameters with $1, $2, etc. for PostgreSQL
+                for i, (key, value) in enumerate(params.items(), start=1):
+                    # Replace :key with $i
+                    query = query.replace(f":{key}", f"${i}")
+                    param_values.append(value)
+            
+            logger.debug(f"Executing SQL query: {query[:500]}...")  # Log first 500 chars
+            
+            if self.connection_pool:
+                # Use asyncpg pool
+                async with self.connection_pool.acquire() as conn:
+                    # Execute query with parameters
+                    if param_values:
+                        result = await conn.fetch(query, *param_values)
+                    else:
+                        result = await conn.fetch(query)
+                    
+                    # Convert Record objects to dictionaries
+                    results = []
+                    for row in result:
+                        row_dict = dict(row)
+                        # Convert datetime objects to ISO format strings
+                        for key, value in row_dict.items():
+                            if isinstance(value, datetime):
+                                row_dict[key] = value.isoformat()
+                        results.append(row_dict)
+                    
+                    logger.info(f"Query returned {len(results)} rows")
+                    return results
+            else:
+                # Use SQLAlchemy session
+                from sqlalchemy import text
+                
+                # For SQLAlchemy, use named parameters
+                if params:
+                    result = await self.db_session.execute(text(query), params)
+                else:
+                    result = await self.db_session.execute(text(query))
+                
+                # Check if this is a SELECT query
+                if result.returns_rows:
+                    rows = result.fetchall()
+                    columns = result.keys()
+                    
+                    results = []
+                    for row in rows:
+                        row_dict = dict(zip(columns, row))
+                        # Convert datetime objects to ISO format strings
+                        for key, value in row_dict.items():
+                            if isinstance(value, datetime):
+                                row_dict[key] = value.isoformat()
+                        results.append(row_dict)
+                    
+                    logger.info(f"Query returned {len(results)} rows")
+                    return results
+                else:
+                    # Non-SELECT query
+                    rows_affected = result.rowcount
+                    logger.info(f"Query affected {rows_affected} rows")
+                    return [{"rows_affected": rows_affected}]
+                
+        except Exception as e:
+            logger.error(f"Error executing SQL query: {e}")
+            logger.error(f"Query was: {query[:500]}...")
+            raise RuntimeError(f"SQL execution failed: {str(e)}")

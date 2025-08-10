@@ -422,3 +422,17 @@ class DynamicProvider(IDataProvider):
         if self._provider:
             await self._provider.disconnect()
             self._provider = None
+    
+    async def execute_sql(self, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """
+        Execute arbitrary SQL query using the configured provider
+        
+        Args:
+            query: SQL query string
+            params: Optional query parameters for parameterized queries
+            
+        Returns:
+            List[Dict[str, Any]]: Query results as list of dictionaries
+        """
+        provider = await self._get_provider()
+        return await provider.execute_sql(query, params)
