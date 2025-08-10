@@ -1568,8 +1568,24 @@ async def execute_public_query(
         try:
             if config.source_type == 'POSTGRESQL' and config.mssql_connection_string:
                 connection_string = decrypt_connection_string(config.mssql_connection_string)
+                if connection_string is None:
+                    logger.error("PostgreSQL connection string decryption returned None")
+                    return QueryExecutionResponse(
+                        columns=[],
+                        sample_data=[],
+                        row_count=0,
+                        error="Failed to decrypt PostgreSQL connection string - invalid encryption key or corrupted data"
+                    )
             elif config.source_type == 'MSSQL' and config.mssql_connection_string:
                 connection_string = decrypt_connection_string(config.mssql_connection_string)
+                if connection_string is None:
+                    logger.error("MSSQL connection string decryption returned None")
+                    return QueryExecutionResponse(
+                        columns=[],
+                        sample_data=[],
+                        row_count=0,
+                        error="Failed to decrypt MSSQL connection string - invalid encryption key or corrupted data"
+                    )
             elif config.source_type == 'API' and config.api_url:
                 # For API, we can't execute SQL queries
                 return QueryExecutionResponse(
@@ -2442,8 +2458,24 @@ async def execute_query(
         try:
             if config.source_type == 'POSTGRESQL' and config.mssql_connection_string:
                 connection_string = decrypt_connection_string(config.mssql_connection_string)
+                if connection_string is None:
+                    logger.error("PostgreSQL connection string decryption returned None")
+                    return QueryExecutionResponse(
+                        columns=[],
+                        sample_data=[],
+                        row_count=0,
+                        error="Failed to decrypt PostgreSQL connection string - invalid encryption key or corrupted data"
+                    )
             elif config.source_type == 'MSSQL' and config.mssql_connection_string:
                 connection_string = decrypt_connection_string(config.mssql_connection_string)
+                if connection_string is None:
+                    logger.error("MSSQL connection string decryption returned None")
+                    return QueryExecutionResponse(
+                        columns=[],
+                        sample_data=[],
+                        row_count=0,
+                        error="Failed to decrypt MSSQL connection string - invalid encryption key or corrupted data"
+                    )
             elif config.source_type == 'API' and config.api_url:
                 # For API, we can't execute SQL queries
                 return QueryExecutionResponse(

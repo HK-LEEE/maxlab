@@ -1143,6 +1143,15 @@ def decrypt_connection_string(encrypted_value: Optional[str]) -> Optional[str]:
         decrypted = f.decrypt(encrypted_bytes)
         return decrypted.decode()
     except Exception as e:
-        logger.warning(f"Decryption failed, returning original value: {e}")
-        # If decryption fails, assume it's not encrypted (for backward compatibility)
-        return encrypted_value
+        logger.error(f"Decryption failed for connection string: {e}")
+        # For public endpoints, we need to be more strict about encryption failures
+        # Check if it looks like an encrypted value (base64 encoded)
+        try:
+            # If it's base64 encoded, it's likely encrypted but decryption failed
+            base64.b64decode(encrypted_value.encode())
+            logger.error(f"Connection string appears encrypted but decryption failed: {str(e)[:100]}")
+            return None  # Return None to indicate failure rather than corrupted data
+        except:
+            # If base64 decode fails, it might be plain text (backward compatibility)
+            logger.warning(f"Connection string appears to be plain text, using as-is for backward compatibility")
+            return encrypted_value
