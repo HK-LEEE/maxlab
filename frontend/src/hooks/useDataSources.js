@@ -18,7 +18,7 @@ export function useDataSources(workspaceId = 'personaltest') {
       setError(null);
 
       const response = await fetch(
-        `/api/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`,
+        `/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -65,7 +65,7 @@ export function useDataSources(workspaceId = 'personaltest') {
   const fetchDefaultDataSource = useCallback(async () => {
     try {
       const response = await fetch(
-        `/api/v1/personal-test/process-flow/default-data-source?workspace_id=${workspaceId}`,
+        `/v1/personal-test/process-flow/default-data-source?workspace_id=${workspaceId}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

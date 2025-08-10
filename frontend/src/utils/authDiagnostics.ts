@@ -207,7 +207,7 @@ export class AuthDiagnostics {
 
     const [authResult, apiResult] = await Promise.all([
       testConnection(authServerUrl, '/api/health', ['/api/oauth/authorize', '/health']), // Auth server endpoints
-      testConnection(apiServerUrl, '/api/v1/health/', ['/health', '/api/health']) // MAX Lab backend endpoints
+      testConnection(apiServerUrl, '/v1/health/', ['/health', '/api/health']) // MAX Lab backend endpoints
     ]);
 
     return {

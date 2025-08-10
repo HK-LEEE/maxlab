@@ -82,7 +82,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
 
   // Load available equipment
   useEffect(() => {
-    apiClient.get('/api/v1/personal-test/process-flow/equipment/status?workspace_id=personal_test&limit=100')
+    apiClient.get('/v1/personal-test/process-flow/equipment/status?workspace_id=personal_test&limit=100')
       .then((response) => {
         const equipmentList = response.data.items || response.data;
         setAvailableEquipment(equipmentList);
@@ -93,7 +93,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   // Load all available measurements (equipment code independent)
   useEffect(() => {
     // Load all measurements from the workspace
-    apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=personal_test&limit=1000`)
+    apiClient.get(`/v1/personal-test/process-flow/measurements?workspace_id=personal_test&limit=1000`)
       .then((response) => {
         const measurements = response.data || [];
         setAvailableMeasurements(measurements);
@@ -120,7 +120,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
   // Load available data sources for table node
   useEffect(() => {
     if (isTableNode) {
-      apiClient.get('/api/v1/personal-test/process-flow/data-sources?workspace_id=personal_test')
+      apiClient.get('/v1/personal-test/process-flow/data-sources?workspace_id=personal_test')
         .then((response) => {
           setAvailableDataSources(response.data);
         })
@@ -174,7 +174,7 @@ export const NodeConfigDialog: React.FC<NodeConfigDialogProps> = ({
     
     try {
       const response = await apiClient.post(
-        `/api/v1/personal-test/process-flow/data-sources/${formData.queryConfig.dataSourceId}/execute-query`,
+        `/v1/personal-test/process-flow/data-sources/${formData.queryConfig.dataSourceId}/execute-query`,
         {
           query_type: 'custom',
           custom_query: formData.queryConfig.sql,

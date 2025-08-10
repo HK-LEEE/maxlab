@@ -62,7 +62,7 @@ export const useSecureSession = () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const response = await apiClient.get('/api/v1/session/current');
+      const response = await apiClient.get('/v1/session/current');
       const sessionData = response.data;
       
       if (sessionData) {
@@ -97,7 +97,7 @@ export const useSecureSession = () => {
    */
   const fetchSecurityInfo = useCallback(async () => {
     try {
-      const response = await apiClient.get('/api/v1/session/security-info');
+      const response = await apiClient.get('/v1/session/security-info');
       setState(prev => ({
         ...prev,
         securityInfo: response.data
@@ -115,7 +115,7 @@ export const useSecureSession = () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const response = await apiClient.post('/api/v1/session/regenerate');
+      const response = await apiClient.post('/v1/session/regenerate');
       const newSession = response.data;
       
       setState(prev => ({
@@ -144,7 +144,7 @@ export const useSecureSession = () => {
    */
   const logoutSession = useCallback(async (): Promise<boolean> => {
     try {
-      await apiClient.post('/api/v1/session/logout');
+      await apiClient.post('/v1/session/logout');
       
       setState({
         session: null,
@@ -172,7 +172,7 @@ export const useSecureSession = () => {
    */
   const logoutAllSessions = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await apiClient.post('/api/v1/session/logout-all');
+      const response = await apiClient.post('/v1/session/logout-all');
       
       setState({
         session: null,
@@ -200,7 +200,7 @@ export const useSecureSession = () => {
    */
   const getUserSessions = useCallback(async (): Promise<SessionInfo[]> => {
     try {
-      const response = await apiClient.get('/api/v1/session/list');
+      const response = await apiClient.get('/v1/session/list');
       return response.data.sessions;
     } catch (error: any) {
       console.error('Failed to get user sessions:', error);

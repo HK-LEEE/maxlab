@@ -41,7 +41,7 @@ export interface GroupsListResponse {
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     // Send as JSON, not form data - now using Max Lab backend proxy
-    const response = await authClient.post<LoginResponse>('/api/v1/auth/login', {
+    const response = await authClient.post<LoginResponse>('/v1/auth/login', {
       email: credentials.username, // maxplatform expects 'email' field
       password: credentials.password,
     });
@@ -50,7 +50,7 @@ export const authApi = {
 
   me: async (): Promise<any> => {
     // Get current user info through Max Lab backend proxy
-    const response = await authClient.get('/api/v1/auth/me');
+    const response = await authClient.get('/v1/auth/me');
     return response.data;
   },
 
@@ -63,7 +63,7 @@ export const authApi = {
     if (search) {
       params.append('search', search);
     }
-    const response = await authClient.get<UsersListResponse>(`/api/v1/admin/users?${params}`);
+    const response = await authClient.get<UsersListResponse>(`/v1/admin/users?${params}`);
     return response.data;
   },
 
@@ -78,7 +78,7 @@ export const authApi = {
         return [];
       }
       
-      //const response = await authClient.get<User[]>(`/api/v1/external/users/search?q=${encodeURIComponent(query.trim())}`);
+      //const response = await authClient.get<User[]>(`/v1/external/users/search?q=${encodeURIComponent(query.trim())}`);
       const response = await authClient.get<User[]>(`/api/users/search?q=${encodeURIComponent(query.trim())}`);
       console.log(`✅ Frontend: Found ${response.data?.length || 0} users`);
       return Array.isArray(response.data) ? response.data : [];

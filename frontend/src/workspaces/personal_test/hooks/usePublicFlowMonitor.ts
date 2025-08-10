@@ -113,7 +113,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
 
       // Get the published flow with aggressive cache-busting
       const flowResponse = await publicClient.get(
-        `/api/v1/personal-test/process-flow/public/${publishToken}?_t=${Date.now()}&_r=${Math.random().toString(36).substring(2)}`
+        `/v1/personal-test/process-flow/public/${publishToken}?_t=${Date.now()}&_r=${Math.random().toString(36).substring(2)}`
       );
       const flowData = flowResponse.data;
       
@@ -173,8 +173,8 @@ export const usePublicFlowMonitor = (publishToken: string) => {
 
       // Fetch equipment status and measurement data individually for published flows
       const [equipmentResponse, measurementResponse] = await Promise.all([
-        publicClient.get(`/api/v1/personal-test/process-flow/public/${publishToken}/equipment/status?_t=${Date.now()}`),
-        publicClient.get(`/api/v1/personal-test/process-flow/public/${publishToken}/measurements?_t=${Date.now()}`)
+        publicClient.get(`/v1/personal-test/process-flow/public/${publishToken}/equipment/status?_t=${Date.now()}`),
+        publicClient.get(`/v1/personal-test/process-flow/public/${publishToken}/measurements?_t=${Date.now()}`)
       ]);
       
       const validStatuses = equipmentResponse.data.items || [];

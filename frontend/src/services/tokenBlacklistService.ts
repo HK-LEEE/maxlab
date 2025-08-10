@@ -56,7 +56,7 @@ class TokenBlacklistService {
    */
   async blacklistCurrentToken(reason: string = 'user_logout'): Promise<BlacklistTokenResponse> {
     try {
-      const response = await apiClient.post<BlacklistTokenResponse>('/api/v1/token-blacklist/blacklist', {
+      const response = await apiClient.post<BlacklistTokenResponse>('/v1/token-blacklist/blacklist', {
         reason
       });
       
@@ -73,7 +73,7 @@ class TokenBlacklistService {
    */
   async blacklistToken(request: BlacklistTokenRequest): Promise<BlacklistTokenResponse> {
     try {
-      const response = await apiClient.post<BlacklistTokenResponse>('/api/v1/token-blacklist/blacklist', request);
+      const response = await apiClient.post<BlacklistTokenResponse>('/v1/token-blacklist/blacklist', request);
       
       console.log('🚫 Token blacklisted:', request.reason);
       return response.data;
@@ -88,7 +88,7 @@ class TokenBlacklistService {
    */
   async checkCurrentToken(): Promise<TokenInfoResponse> {
     try {
-      const response = await apiClient.get<TokenInfoResponse>('/api/v1/token-blacklist/check');
+      const response = await apiClient.get<TokenInfoResponse>('/v1/token-blacklist/check');
       return response.data;
     } catch (error: any) {
       console.error('Failed to check current token:', error);
@@ -101,7 +101,7 @@ class TokenBlacklistService {
    */
   async checkToken(token: string): Promise<TokenInfoResponse> {
     try {
-      const response = await apiClient.get<TokenInfoResponse>('/api/v1/token-blacklist/check', {
+      const response = await apiClient.get<TokenInfoResponse>('/v1/token-blacklist/check', {
         params: { token }
       });
       return response.data;
@@ -124,7 +124,7 @@ class TokenBlacklistService {
         throw new Error('No current user ID available');
       }
 
-      const response = await apiClient.get(`/api/v1/token-blacklist/user/${userId}`);
+      const response = await apiClient.get(`/v1/token-blacklist/user/${userId}`);
       return response.data;
     } catch (error: any) {
       console.error('Failed to get user blacklisted tokens:', error);
@@ -137,7 +137,7 @@ class TokenBlacklistService {
    */
   async getUserBlacklistedTokens(userId: string): Promise<any[]> {
     try {
-      const response = await apiClient.get(`/api/v1/token-blacklist/user/${userId}`);
+      const response = await apiClient.get(`/v1/token-blacklist/user/${userId}`);
       return response.data;
     } catch (error: any) {
       console.error('Failed to get user blacklisted tokens:', error);
@@ -151,7 +151,7 @@ class TokenBlacklistService {
   async blacklistUserTokens(userId: string, reason: string = 'admin_action'): Promise<BlacklistTokenResponse> {
     try {
       const response = await apiClient.post<BlacklistTokenResponse>(
-        `/api/v1/token-blacklist/blacklist-user/${userId}`,
+        `/v1/token-blacklist/blacklist-user/${userId}`,
         null,
         { params: { reason } }
       );
@@ -169,7 +169,7 @@ class TokenBlacklistService {
    */
   async unblockToken(token: string): Promise<BlacklistTokenResponse> {
     try {
-      const response = await apiClient.delete<BlacklistTokenResponse>('/api/v1/token-blacklist/unblock', {
+      const response = await apiClient.delete<BlacklistTokenResponse>('/v1/token-blacklist/unblock', {
         params: { token }
       });
       
@@ -186,7 +186,7 @@ class TokenBlacklistService {
    */
   async getBlacklistStats(): Promise<BlacklistStatsResponse> {
     try {
-      const response = await apiClient.get<BlacklistStatsResponse>('/api/v1/token-blacklist/stats');
+      const response = await apiClient.get<BlacklistStatsResponse>('/v1/token-blacklist/stats');
       return response.data;
     } catch (error: any) {
       console.error('Failed to get blacklist stats:', error);
@@ -199,7 +199,7 @@ class TokenBlacklistService {
    */
   async cleanupExpiredEntries(): Promise<{ message: string; cleaned_count: number }> {
     try {
-      const response = await apiClient.post('/api/v1/token-blacklist/cleanup');
+      const response = await apiClient.post('/v1/token-blacklist/cleanup');
       
       console.log('🧹 Blacklist cleanup completed:', response.data);
       return response.data;

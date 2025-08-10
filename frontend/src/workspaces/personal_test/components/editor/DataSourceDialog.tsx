@@ -71,7 +71,7 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
     setIsLoading(true);
     try {
       const response = await apiClient.get(
-        `/api/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`
+        `/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`
       );
       setDataSources(response.data);
     } catch (error) {
@@ -136,7 +136,7 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
     }
 
     try {
-      await apiClient.delete(`/api/v1/personal-test/process-flow/data-sources/${id}`, {
+      await apiClient.delete(`/v1/personal-test/process-flow/data-sources/${id}`, {
         params: { workspace_id: workspaceId }
       });
       await loadDataSources();
@@ -208,12 +208,12 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
 
       if (editingSource) {
         await apiClient.put(
-          `/api/v1/personal-test/process-flow/data-sources/${editingSource.id}`,
+          `/v1/personal-test/process-flow/data-sources/${editingSource.id}`,
           payload
         );
       } else {
         await apiClient.post(
-          '/api/v1/personal-test/process-flow/data-sources',
+          '/v1/personal-test/process-flow/data-sources',
           payload
         );
       }
@@ -234,7 +234,7 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
   const handleTestConnection = async (source: DataSource) => {
     try {
       const response = await apiClient.post(
-        `/api/v1/personal-test/process-flow/data-sources/${source.id}/test`
+        `/v1/personal-test/process-flow/data-sources/${source.id}/test`
       );
       alert(`Connection test ${response.data.success ? 'successful' : 'failed'}: ${response.data.message}`);
     } catch (error) {
@@ -248,7 +248,7 @@ export const DataSourceDialog: React.FC<DataSourceDialogProps> = ({
     
     try {
       const response = await apiClient.post(
-        `/api/v1/personal-test/process-flow/data-sources/${editingSource.id}/execute-query`,
+        `/v1/personal-test/process-flow/data-sources/${editingSource.id}/execute-query`,
         {
           query_type: queryType,
           custom_query: formData.custom_queries[queryType]?.query,

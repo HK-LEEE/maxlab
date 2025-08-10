@@ -45,7 +45,7 @@ const PublicWorkspace: React.FC = () => {
   const { data: features, isLoading, error } = useQuery<TotalMonitoringFeature[]>({
     queryKey: ['totalMonitoringFeatures'],
     queryFn: async () => {
-      const response = await fetch('/api/v1/total-monitoring/features');
+      const response = await fetch('/v1/total-monitoring/features');
       if (!response.ok) {
         throw new Error('Failed to load features');
       }

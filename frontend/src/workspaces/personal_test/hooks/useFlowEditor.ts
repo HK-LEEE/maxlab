@@ -167,7 +167,7 @@ export const useFlowEditor = (workspaceId: string) => {
       
       // Check if this is an imported flow that needs to be created instead of updated
       if (currentFlow && !currentFlow._isImported) {
-        const response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
+        const response = await apiClient.put(`/v1/personal-test/process-flow/flows/${currentFlow.id}`, {
           name: finalFlowName,
           flow_data: { nodes, edges, nodeSize },
           data_source_id: selectedDataSourceId,
@@ -192,7 +192,7 @@ export const useFlowEditor = (workspaceId: string) => {
           log.debug('Creating imported flow without pre-generated ID');
         }
         
-        const response = await apiClient.post('/api/v1/personal-test/process-flow/flows', createFlowData);
+        const response = await apiClient.post('/v1/personal-test/process-flow/flows', createFlowData);
         // Don't set _isImported flag on the saved flow - it's now a real flow in the database
         savedFlow = response.data;
         setCurrentFlow(savedFlow);
@@ -365,10 +365,10 @@ export const useFlowEditor = (workspaceId: string) => {
       let response;
       if (versionId) {
         // Publish specific version
-        response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${targetFlowId}/versions/${versionId}/publish`);
+        response = await apiClient.put(`/v1/personal-test/process-flow/flows/${targetFlowId}/versions/${versionId}/publish`);
       } else {
         // Publish current version
-        response = await apiClient.put(`/api/v1/personal-test/process-flow/flows/${targetFlowId}/publish`);
+        response = await apiClient.put(`/v1/personal-test/process-flow/flows/${targetFlowId}/publish`);
       }
       
       if (targetFlowId === currentFlow?.id) {
@@ -393,7 +393,7 @@ export const useFlowEditor = (workspaceId: string) => {
     if (!currentFlow) return;
     
     try {
-      await apiClient.put(`/api/v1/personal-test/process-flow/flows/${currentFlow.id}/unpublish`);
+      await apiClient.put(`/v1/personal-test/process-flow/flows/${currentFlow.id}/unpublish`);
       setCurrentFlow({
         ...currentFlow,
         is_published: false,
@@ -410,7 +410,7 @@ export const useFlowEditor = (workspaceId: string) => {
 
   const deleteFlow = async (flowId: string) => {
     try {
-      await apiClient.delete(`/api/v1/personal-test/process-flow/flows/${flowId}`);
+      await apiClient.delete(`/v1/personal-test/process-flow/flows/${flowId}`);
       
       // Update flows list
       setFlows((prevFlows) => prevFlows.filter(f => f.id !== flowId));
@@ -722,8 +722,8 @@ export const useFlowEditor = (workspaceId: string) => {
   useEffect(() => {
     // Load all equipment and measurements
     Promise.all([
-      apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?limit=100`),
-      apiClient.get(`/api/v1/personal-test/process-flow/measurements?limit=100`),
+      apiClient.get(`/v1/personal-test/process-flow/equipment/status?limit=100`),
+      apiClient.get(`/v1/personal-test/process-flow/measurements?limit=100`),
     ]).then(([equipmentRes, measurementsRes]) => {
       const items = equipmentRes.data.items || equipmentRes.data;
       setEquipmentList(items);
@@ -735,7 +735,7 @@ export const useFlowEditor = (workspaceId: string) => {
     });
 
     // Load available flows
-    apiClient.get(`/api/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}`)
+    apiClient.get(`/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}`)
       .then((response) => {
         setFlows(response.data);
       })
@@ -746,7 +746,7 @@ export const useFlowEditor = (workspaceId: string) => {
     // Load existing flow if ID is provided
     const flowId = new URLSearchParams(window.location.search).get('flowId');
     if (flowId) {
-      apiClient.get(`/api/v1/personal-test/process-flow/flows/${flowId}`)
+      apiClient.get(`/v1/personal-test/process-flow/flows/${flowId}`)
         .then((response) => {
           loadFlow(response.data);
         })

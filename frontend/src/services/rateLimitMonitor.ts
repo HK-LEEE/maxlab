@@ -96,7 +96,7 @@ class RateLimitMonitor {
    */
   async getCurrentStatus(): Promise<RateLimitInfo | null> {
     try {
-      const response = await apiClient.get('/api/v1/rate-limit/current');
+      const response = await apiClient.get('/v1/rate-limit/current');
       this.currentStatus = response.data;
       return this.currentStatus;
     } catch (error: any) {
@@ -121,7 +121,7 @@ class RateLimitMonitor {
     userRole?: string
   ): Promise<RateLimitInfo | null> {
     try {
-      const response = await apiClient.post('/api/v1/rate-limit/check', {
+      const response = await apiClient.post('/v1/rate-limit/check', {
         identifier: 'current', // Server will determine actual identifier
         endpoint,
         method,
@@ -140,7 +140,7 @@ class RateLimitMonitor {
    */
   async getRules(): Promise<RateLimitRule[]> {
     try {
-      const response = await apiClient.get('/api/v1/rate-limit/rules');
+      const response = await apiClient.get('/v1/rate-limit/rules');
       return response.data;
     } catch (error: any) {
       console.warn('Failed to get rate limit rules:', error);
@@ -153,7 +153,7 @@ class RateLimitMonitor {
    */
   async getSystemStatus(): Promise<any> {
     try {
-      const response = await apiClient.get('/api/v1/rate-limit/status');
+      const response = await apiClient.get('/v1/rate-limit/status');
       return response.data;
     } catch (error: any) {
       console.warn('Failed to get rate limit system status:', error);

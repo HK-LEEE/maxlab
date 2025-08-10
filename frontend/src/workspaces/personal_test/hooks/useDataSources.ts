@@ -60,7 +60,7 @@ export const useDataSources = (workspaceId: string) => {
         setError(null);
         
         const response = await apiClient.get(
-          `/api/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`
+          `/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`
         );
         
         setDataSources(response.data);
@@ -99,7 +99,7 @@ export const useDataSourceStatus = (dataSourceId: string | null) => {
       setError(null);
       
       const response = await apiClient.get(
-        `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/status`
+        `/v1/personal-test/process-flow/data-sources/${dataSourceId}/status`
       );
       
       setStatus(response.data);

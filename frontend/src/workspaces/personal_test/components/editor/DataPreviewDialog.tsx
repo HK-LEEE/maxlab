@@ -31,7 +31,7 @@ export const DataPreviewDialog: React.FC<DataPreviewDialogProps> = ({
     setIsLoading(true);
     try {
       const response = await apiClient.post(
-        `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/preview-mapping`,
+        `/v1/personal-test/process-flow/data-sources/${dataSourceId}/preview-mapping`,
         {
           data_type: dataType,
           limit: limit

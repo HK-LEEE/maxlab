@@ -49,7 +49,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     queryKey: ['workspace-groups', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/groups/`);
+      const response = await apiClient.get(`/v1/workspaces/${workspace.id}/groups/`);
       return response.data;
     },
     enabled: !!workspace && isOpen,
@@ -60,7 +60,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     queryKey: ['workspace-users', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/users/`);
+      const response = await apiClient.get(`/v1/workspaces/${workspace.id}/users/`);
       return response.data;
     },
     enabled: !!workspace && isOpen,
@@ -90,7 +90,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
     mutationFn: async (data: { user_id: string; permission_level: string }) => {
       console.log('Adding user:', data);
       try {
-        const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/users/`, data);
+        const response = await apiClient.post(`/v1/workspaces/${workspace?.id}/users/`, data);
         console.log('User add response:', response);
         return response.data;
       } catch (error) {
@@ -117,7 +117,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Remove user mutation
   const removeUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/users/${userId}`);
+      await apiClient.delete(`/v1/workspaces/${workspace?.id}/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
@@ -138,7 +138,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
       };
       console.log('Adding group:', requestData);
       try {
-        const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, requestData);
+        const response = await apiClient.post(`/v1/workspaces/${workspace?.id}/groups/`, requestData);
         console.log('Group add response:', response);
         return response.data;
       } catch (error) {
@@ -165,7 +165,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Remove group mutation
   const removeGroupMutation = useMutation({
     mutationFn: async (groupId: string) => {
-      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`);
+      await apiClient.delete(`/v1/workspaces/${workspace?.id}/groups/${groupId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });
@@ -179,7 +179,7 @@ export const PermissionManagementModal: React.FC<PermissionManagementModalProps>
   // Update group permission mutation
   const updateGroupPermissionMutation = useMutation({
     mutationFn: async ({ groupId, permissionLevel }: { groupId: string; permissionLevel: string }) => {
-      const response = await apiClient.patch(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`, {
+      const response = await apiClient.patch(`/v1/workspaces/${workspace?.id}/groups/${groupId}`, {
         permission_level: permissionLevel,
       });
       return response.data;

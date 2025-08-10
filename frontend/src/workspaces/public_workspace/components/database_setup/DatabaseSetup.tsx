@@ -73,7 +73,7 @@ const DatabaseSetup: React.FC = () => {
         params.append('groupid', formData.groupid);
       }
       
-      const response = await fetch(`/api/v1/total-monitoring/database-connections?${params}`);
+      const response = await fetch(`/v1/total-monitoring/database-connections?${params}`);
       if (!response.ok) {
         throw new Error('Failed to fetch database connections');
       }
@@ -85,7 +85,7 @@ const DatabaseSetup: React.FC = () => {
   // Create connection mutation
   const createConnectionMutation = useMutation({
     mutationFn: async (connectionData: DatabaseConnectionCreate) => {
-      const response = await fetch('/api/v1/total-monitoring/database-connections', {
+      const response = await fetch('/v1/total-monitoring/database-connections', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

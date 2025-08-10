@@ -353,13 +353,13 @@ export const ProcessFlowEditor: React.FC = () => {
 
       if (currentFlow) {
         // Update existing flow
-        await apiClient.put(`/api/v1/workspaces/personal_test/process-flow/flows/${currentFlow.id}`, {
+        await apiClient.put(`/v1/workspaces/personal_test/process-flow/flows/${currentFlow.id}`, {
           name: flowName,
           flow_data: { nodes, edges },
         });
       } else {
         // Create new flow
-        const response = await apiClient.post('/api/v1/workspaces/personal_test/process-flow/flows', flowData);
+        const response = await apiClient.post('/v1/workspaces/personal_test/process-flow/flows', flowData);
         setCurrentFlow(response.data);
       }
     } catch (err) {
@@ -403,7 +403,7 @@ export const ProcessFlowEditor: React.FC = () => {
     setIsLoadingEquipment(true);
     try {
       const response = await apiClient.get(
-        `/api/v1/workspaces/personal_test/process-flow/equipment/status?limit=20&offset=${equipmentOffset}`
+        `/v1/workspaces/personal_test/process-flow/equipment/status?limit=20&offset=${equipmentOffset}`
       );
       const { items, has_more } = response.data;
       
@@ -420,8 +420,8 @@ export const ProcessFlowEditor: React.FC = () => {
   useEffect(() => {
     // Load initial equipment and measurements
     Promise.all([
-      apiClient.get('/api/v1/workspaces/personal_test/process-flow/equipment/status?limit=20&offset=0'),
-      apiClient.get('/api/v1/workspaces/personal_test/process-flow/measurements'),
+      apiClient.get('/v1/workspaces/personal_test/process-flow/equipment/status?limit=20&offset=0'),
+      apiClient.get('/v1/workspaces/personal_test/process-flow/measurements'),
     ]).then(([equipmentRes, measurementsRes]) => {
       const { items, has_more } = equipmentRes.data;
       setEquipmentList(items);
@@ -434,7 +434,7 @@ export const ProcessFlowEditor: React.FC = () => {
 
     // Load available flows
     if (workspaceId) {
-      apiClient.get('/api/v1/workspaces/personal_test/process-flow/flows')
+      apiClient.get('/v1/workspaces/personal_test/process-flow/flows')
         .then((response) => {
           setFlows(response.data);
         })
@@ -446,7 +446,7 @@ export const ProcessFlowEditor: React.FC = () => {
     // Load existing flow if ID is provided
     const flowId = new URLSearchParams(window.location.search).get('flowId');
     if (flowId) {
-      apiClient.get(`/api/v1/workspaces/personal_test/process-flow/flows/${flowId}`)
+      apiClient.get(`/v1/workspaces/personal_test/process-flow/flows/${flowId}`)
         .then((response) => {
           const flow = response.data;
           setCurrentFlow(flow);

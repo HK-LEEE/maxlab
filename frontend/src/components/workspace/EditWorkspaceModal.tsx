@@ -58,7 +58,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
     queryKey: ['workspace-groups', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/groups/`);
+      const response = await apiClient.get(`/v1/workspaces/${workspace.id}/groups/`);
       return response.data;
     },
     enabled: !!workspace && isOpen,
@@ -69,7 +69,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
     queryKey: ['workspace-users', workspace?.id],
     queryFn: async () => {
       if (!workspace) return [];
-      const response = await apiClient.get(`/api/v1/workspaces/${workspace.id}/users/`);
+      const response = await apiClient.get(`/v1/workspaces/${workspace.id}/users/`);
       return response.data;
     },
     enabled: !!workspace && isOpen,
@@ -126,7 +126,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Add user mutation
   const addUserMutation = useMutation({
     mutationFn: async (data: { user_id: string; permission_level: string }) => {
-      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/users/`, data);
+      const response = await apiClient.post(`/v1/workspaces/${workspace?.id}/users/`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -144,7 +144,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Remove user mutation
   const removeUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/users/${userId}`);
+      await apiClient.delete(`/v1/workspaces/${workspace?.id}/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-users', workspace?.id] });
@@ -158,7 +158,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Add group mutation
   const addGroupMutation = useMutation({
     mutationFn: async (data: { group_id: string; permission_level: string }) => {
-      const response = await apiClient.post(`/api/v1/workspaces/${workspace?.id}/groups/`, data);
+      const response = await apiClient.post(`/v1/workspaces/${workspace?.id}/groups/`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -175,7 +175,7 @@ export const EditWorkspaceModal: React.FC<EditWorkspaceModalProps> = ({
   // Remove group mutation
   const removeGroupMutation = useMutation({
     mutationFn: async (groupId: string) => {
-      await apiClient.delete(`/api/v1/workspaces/${workspace?.id}/groups/${groupId}`);
+      await apiClient.delete(`/v1/workspaces/${workspace?.id}/groups/${groupId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-groups', workspace?.id] });

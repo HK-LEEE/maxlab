@@ -88,7 +88,7 @@ export const FieldMappingDialog: React.FC<FieldMappingDialogProps> = ({
     setIsLoading(true);
     try {
       const response = await apiClient.get(
-        `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings`
+        `/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings`
       );
       setMappings(response.data);
     } catch (error) {
@@ -102,7 +102,7 @@ export const FieldMappingDialog: React.FC<FieldMappingDialogProps> = ({
     setIsLoadingColumns(true);
     try {
       const response = await apiClient.post(
-        `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/execute-query`,
+        `/v1/personal-test/process-flow/data-sources/${dataSourceId}/execute-query`,
         {
           query_type: activeTab,
           limit: 1
@@ -124,7 +124,7 @@ export const FieldMappingDialog: React.FC<FieldMappingDialogProps> = ({
     setIsSaving(true);
     try {
       await apiClient.post(
-        `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings`,
+        `/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings`,
         mapping
       );
       await loadMappings();
@@ -145,7 +145,7 @@ export const FieldMappingDialog: React.FC<FieldMappingDialogProps> = ({
 
     try {
       await apiClient.delete(
-        `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings/${mappingId}`
+        `/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings/${mappingId}`
       );
       await loadMappings();
     } catch (error) {
@@ -183,7 +183,7 @@ export const FieldMappingDialog: React.FC<FieldMappingDialogProps> = ({
     try {
       for (const mapping of defaultMappings) {
         await apiClient.post(
-          `/api/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings`,
+          `/v1/personal-test/process-flow/data-sources/${dataSourceId}/field-mappings`,
           mapping
         );
       }

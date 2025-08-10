@@ -336,7 +336,7 @@ const ProcessFlowEditorContent: React.FC = () => {
     
     try {
       // Use the saved flow's ID for version creation
-      const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${savedFlow.id}/versions`, {
+      const response = await apiClient.post(`/v1/personal-test/process-flow/flows/${savedFlow.id}/versions`, {
         name: versionName,
         description,
         flow_data: { nodes, edges, nodeSize }
@@ -419,7 +419,7 @@ const ProcessFlowEditorContent: React.FC = () => {
       const description = `Saved from editor at ${new Date().toLocaleString()}`;
       
       try {
-        const response = await apiClient.post(`/api/v1/personal-test/process-flow/flows/${savedFlow.id}/versions`, {
+        const response = await apiClient.post(`/v1/personal-test/process-flow/flows/${savedFlow.id}/versions`, {
           name: versionName,
           description,
           flow_data: { nodes, edges, nodeSize }

@@ -41,7 +41,7 @@ const ProcessFlowEditor = ({
   const loadFlow = async () => {
     try {
       const response = await fetch(
-        `/api/v1/personal-test/process-flow/flows/${flowId}`,
+        `/v1/personal-test/process-flow/flows/${flowId}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -86,8 +86,8 @@ const ProcessFlowEditor = ({
       };
 
       const url = flowId 
-        ? `/api/v1/personal-test/process-flow/flows/${flowId}`
-        : '/api/v1/personal-test/process-flow/flows';
+        ? `/v1/personal-test/process-flow/flows/${flowId}`
+        : '/v1/personal-test/process-flow/flows';
       
       const method = flowId ? 'PUT' : 'POST';
 
@@ -129,7 +129,7 @@ const ProcessFlowEditor = ({
       setPublishing(true);
 
       const response = await fetch(
-        `/api/v1/personal-test/process-flow/flows/${flowId}/publish`,
+        `/v1/personal-test/process-flow/flows/${flowId}/publish`,
         {
           method: 'POST',
           headers: {

@@ -132,7 +132,7 @@ interface InstrumentConfigDialogProps {
 ```
 
 ### 3.2 Measurement Selection Flow
-1. **Browse All Measurements**: Load from `/api/v1/personal-test/process-flow/measurements`
+1. **Browse All Measurements**: Load from `/v1/personal-test/process-flow/measurements`
 2. **Search & Filter**: 
    - By measurement code
    - By description
@@ -145,7 +145,7 @@ interface InstrumentConfigDialogProps {
 ```typescript
 // Load measurements independently
 const loadMeasurements = async (searchTerm?: string) => {
-  const response = await apiClient.get('/api/v1/personal-test/process-flow/measurements', {
+  const response = await apiClient.get('/v1/personal-test/process-flow/measurements', {
     params: {
       workspace_id: 'personal_test',
       search: searchTerm,

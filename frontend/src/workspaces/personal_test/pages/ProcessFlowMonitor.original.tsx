@@ -128,7 +128,7 @@ export const ProcessFlowMonitor: React.FC = () => {
   useEffect(() => {
     if (!workspaceId) return;
     
-    apiClient.get(`/api/v1/workspaces/personal_test/process-flow/flows?workspace_id=${workspaceId}`)
+    apiClient.get(`/v1/workspaces/personal_test/process-flow/flows?workspace_id=${workspaceId}`)
       .then((response) => {
         setFlows(response.data);
         if (response.data.length > 0 && !selectedFlow) {
@@ -143,8 +143,8 @@ export const ProcessFlowMonitor: React.FC = () => {
     setIsLoading(true);
     try {
       const [statusResponse, measurementResponse] = await Promise.all([
-        apiClient.get('/api/v1/workspaces/personal_test/process-flow/equipment/status?limit=100'),
-        apiClient.get('/api/v1/workspaces/personal_test/process-flow/measurements?limit=100'),
+        apiClient.get('/v1/workspaces/personal_test/process-flow/equipment/status?limit=100'),
+        apiClient.get('/v1/workspaces/personal_test/process-flow/measurements?limit=100'),
       ]);
       
       const equipmentStatusList = statusResponse.data.items || statusResponse.data;

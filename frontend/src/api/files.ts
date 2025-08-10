@@ -24,7 +24,7 @@ export const fileApi = {
     params.append('is_public', isPublic.toString());
     
     const response = await apiClient.post<FileUploadResponse>(
-      `/api/v1/workspaces/${workspaceId}/files/upload?${params.toString()}`,
+      `/v1/workspaces/${workspaceId}/files/upload?${params.toString()}`,
       formData,
       {
         headers: {
@@ -40,7 +40,7 @@ export const fileApi = {
     data: DirectoryCreate
   ): Promise<WorkspaceFile> => {
     const response = await apiClient.post<WorkspaceFile>(
-      `/api/v1/workspaces/${workspaceId}/files/directory`,
+      `/v1/workspaces/${workspaceId}/files/directory`,
       data
     );
     return response.data;
@@ -56,18 +56,18 @@ export const fileApi = {
     if (includeDeleted) params.append('include_deleted', 'true');
     
     const response = await apiClient.get<FileListResponse>(
-      `/api/v1/workspaces/${workspaceId}/files?${params.toString()}`
+      `/v1/workspaces/${workspaceId}/files?${params.toString()}`
     );
     return response.data;
   },
 
   getFile: async (fileId: string): Promise<WorkspaceFile> => {
-    const response = await apiClient.get<WorkspaceFile>(`/api/v1/files/${fileId}`);
+    const response = await apiClient.get<WorkspaceFile>(`/v1/files/${fileId}`);
     return response.data;
   },
 
   downloadFile: async (fileId: string): Promise<void> => {
-    const response = await apiClient.get(`/api/v1/files/${fileId}/download`, {
+    const response = await apiClient.get(`/v1/files/${fileId}/download`, {
       responseType: 'blob',
     });
     
@@ -95,7 +95,7 @@ export const fileApi = {
     fileId: string,
     data: Partial<WorkspaceFile>
   ): Promise<WorkspaceFile> => {
-    const response = await apiClient.put<WorkspaceFile>(`/api/v1/files/${fileId}`, data);
+    const response = await apiClient.put<WorkspaceFile>(`/v1/files/${fileId}`, data);
     return response.data;
   },
 
@@ -104,19 +104,19 @@ export const fileApi = {
     targetParentId?: string
   ): Promise<WorkspaceFile> => {
     const response = await apiClient.post<WorkspaceFile>(
-      `/api/v1/files/${fileId}/move`,
+      `/v1/files/${fileId}/move`,
       { target_parent_id: targetParentId }
     );
     return response.data;
   },
 
   deleteFile: async (fileId: string, permanent: boolean = false): Promise<void> => {
-    await apiClient.delete(`/api/v1/files/${fileId}?permanent=${permanent}`);
+    await apiClient.delete(`/v1/files/${fileId}?permanent=${permanent}`);
   },
 
   getStorageStats: async (workspaceId: string): Promise<StorageStats> => {
     const response = await apiClient.get<StorageStats>(
-      `/api/v1/workspaces/${workspaceId}/storage/stats`
+      `/v1/workspaces/${workspaceId}/storage/stats`
     );
     return response.data;
   },

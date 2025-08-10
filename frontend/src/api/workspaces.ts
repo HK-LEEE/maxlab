@@ -3,7 +3,7 @@ import type { Workspace, WorkspaceCreate, WorkspaceListResponse, WorkspaceTreeRe
 
 export const workspaceApi = {
   getWorkspaces: async (skip = 0, limit = 100): Promise<WorkspaceListResponse> => {
-    const response = await apiClient.get<WorkspaceListResponse>('/api/v1/workspaces/', {
+    const response = await apiClient.get<WorkspaceListResponse>('/v1/workspaces/', {
       params: { skip, limit },
     });
     return response.data;
@@ -13,7 +13,7 @@ export const workspaceApi = {
     console.log('📡 API: Getting workspace tree, parentId:', parentId);
     
     try {
-      const response = await apiClient.get<WorkspaceTreeResponse>('/api/v1/workspaces/tree', {
+      const response = await apiClient.get<WorkspaceTreeResponse>('/v1/workspaces/tree', {
         params: { parent_id: parentId },
       });
       console.log('📡 API: Workspace tree response:', response.status, response.data);
@@ -35,21 +35,21 @@ export const workspaceApi = {
   },
 
   getWorkspace: async (id: string): Promise<Workspace> => {
-    const response = await apiClient.get<Workspace>(`/api/v1/workspaces/${id}`);
+    const response = await apiClient.get<Workspace>(`/v1/workspaces/${id}`);
     return response.data;
   },
 
   createWorkspace: async (data: WorkspaceCreate): Promise<Workspace> => {
-    const response = await apiClient.post<Workspace>('/api/v1/workspaces/', data);
+    const response = await apiClient.post<Workspace>('/v1/workspaces/', data);
     return response.data;
   },
 
   updateWorkspace: async (id: string, data: Partial<WorkspaceCreate>): Promise<Workspace> => {
-    const response = await apiClient.put<Workspace>(`/api/v1/workspaces/${id}`, data);
+    const response = await apiClient.put<Workspace>(`/v1/workspaces/${id}`, data);
     return response.data;
   },
 
   deleteWorkspace: async (id: string): Promise<void> => {
-    await apiClient.delete(`/api/v1/workspaces/${id}`);
+    await apiClient.delete(`/v1/workspaces/${id}`);
   },
 };

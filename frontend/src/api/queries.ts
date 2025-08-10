@@ -11,20 +11,20 @@ import type {
 export const queryApi = {
   getQueries: async (workspaceId: number, skip = 0, limit = 100): Promise<QueryListResponse> => {
     const response = await apiClient.get<QueryListResponse>(
-      `/api/v1/workspaces/${workspaceId}/queries`,
+      `/v1/workspaces/${workspaceId}/queries`,
       { params: { skip, limit } }
     );
     return response.data;
   },
 
   getQuery: async (queryId: number): Promise<Query> => {
-    const response = await apiClient.get<Query>(`/api/v1/queries/${queryId}`);
+    const response = await apiClient.get<Query>(`/v1/queries/${queryId}`);
     return response.data;
   },
 
   createQuery: async (workspaceId: number, data: QueryCreate): Promise<Query> => {
     const response = await apiClient.post<Query>(
-      `/api/v1/workspaces/${workspaceId}/queries`,
+      `/v1/workspaces/${workspaceId}/queries`,
       data
     );
     return response.data;
@@ -32,7 +32,7 @@ export const queryApi = {
 
   updateQueryStatus: async (queryId: number, status: QueryStatus): Promise<Query> => {
     const response = await apiClient.patch<Query>(
-      `/api/v1/queries/${queryId}/status`,
+      `/v1/queries/${queryId}/status`,
       { status }
     );
     return response.data;
@@ -40,7 +40,7 @@ export const queryApi = {
 
   executeQuery: async (queryId: number, params: QueryExecuteRequest): Promise<QueryExecuteResponse> => {
     const response = await apiClient.post<QueryExecuteResponse>(
-      `/api/v1/internal/execute/${queryId}`,
+      `/v1/internal/execute/${queryId}`,
       params
     );
     return response.data;

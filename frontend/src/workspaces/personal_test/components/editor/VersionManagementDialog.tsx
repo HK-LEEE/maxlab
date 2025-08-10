@@ -61,7 +61,7 @@ export const VersionManagementDialog: React.FC<VersionManagementDialogProps> = (
   const loadVersions = async (flowId: string) => {
     setLoadingVersions(true);
     try {
-      const response = await apiClient.get(`/api/v1/personal-test/process-flow/flows/${flowId}/versions`);
+      const response = await apiClient.get(`/v1/personal-test/process-flow/flows/${flowId}/versions`);
       setVersions(response.data.versions);
       setCurrentVersion(response.data.current_version);
     } catch (error: any) {
@@ -98,7 +98,7 @@ export const VersionManagementDialog: React.FC<VersionManagementDialogProps> = (
 
   const handleVersionRestore = async (version: FlowVersion) => {
     try {
-      await apiClient.put(`/api/v1/personal-test/process-flow/flows/${version.flow_id}/versions/${version.id}/restore`);
+      await apiClient.put(`/v1/personal-test/process-flow/flows/${version.flow_id}/versions/${version.id}/restore`);
       // Load the flow with restored version
       const flow = flows.find(f => f.id === version.flow_id);
       if (flow) {
@@ -113,7 +113,7 @@ export const VersionManagementDialog: React.FC<VersionManagementDialogProps> = (
   const handleVersionPublish = async (version: FlowVersion) => {
     if (onPublish) {
       try {
-        await apiClient.put(`/api/v1/personal-test/process-flow/flows/${version.flow_id}/versions/${version.id}/publish`);
+        await apiClient.put(`/v1/personal-test/process-flow/flows/${version.flow_id}/versions/${version.id}/publish`);
         onPublish(version.flow_id, version.id);
         // Reload versions to update publish status
         loadVersions(version.flow_id);

@@ -56,7 +56,7 @@ export const usePublishManager = (workspaceId: string) => {
     
     try {
       const response = await apiClient.get(
-        `/api/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}&_t=${Date.now()}`
+        `/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}&_t=${Date.now()}`
       );
       
       const flowsData = response.data;
@@ -123,7 +123,7 @@ export const usePublishManager = (workspaceId: string) => {
       });
 
       const response = await apiClient.put(
-        `/api/v1/personal-test/process-flow/flows/${flowId}/publish`,
+        `/v1/personal-test/process-flow/flows/${flowId}/publish`,
         { workspace_id: workspaceUuid }
       );
       
@@ -187,7 +187,7 @@ export const usePublishManager = (workspaceId: string) => {
 
     try {
       await apiClient.put(
-        `/api/v1/personal-test/process-flow/flows/${flowId}/unpublish`,
+        `/v1/personal-test/process-flow/flows/${flowId}/unpublish`,
         { workspace_id: workspaceUuid }
       );
       

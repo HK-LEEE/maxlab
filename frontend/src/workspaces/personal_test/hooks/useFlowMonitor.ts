@@ -78,7 +78,7 @@ export const useFlowMonitor = (workspaceId: string) => {
   useEffect(() => {
     if (!workspaceId) return;
     
-    apiClient.get(`/api/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}&_t=${Date.now()}`)
+    apiClient.get(`/v1/personal-test/process-flow/flows?workspace_id=${workspaceUuid}&_t=${Date.now()}`)
       .then((response) => {
         setFlows(response.data);
         if (response.data.length > 0 && !selectedFlow) {
@@ -137,7 +137,7 @@ export const useFlowMonitor = (workspaceId: string) => {
       } else {
         // Fallback: get active data sources for workspace and use the first active one
         try {
-          const dataSourcesResponse = await apiClient.get(`/api/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`);
+          const dataSourcesResponse = await apiClient.get(`/v1/personal-test/process-flow/data-sources?workspace_id=${workspaceId}`);
           
           const activeSources = dataSourcesResponse.data.filter((ds: any) => 
             ds.is_active && 
@@ -155,8 +155,8 @@ export const useFlowMonitor = (workspaceId: string) => {
       
       // Fetch equipment status and measurement data individually
       const [equipmentResponse, measurementResponse] = await Promise.all([
-        apiClient.get(`/api/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}${dataSourceParam}&_t=${Date.now()}`),
-        apiClient.get(`/api/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}${dataSourceParam}&_t=${Date.now()}`)
+        apiClient.get(`/v1/personal-test/process-flow/equipment/status?workspace_id=${workspaceId}${dataSourceParam}&_t=${Date.now()}`),
+        apiClient.get(`/v1/personal-test/process-flow/measurements?workspace_id=${workspaceId}${dataSourceParam}&_t=${Date.now()}`)
       ]);
       
       const equipmentStatusList = equipmentResponse.data.items || [];

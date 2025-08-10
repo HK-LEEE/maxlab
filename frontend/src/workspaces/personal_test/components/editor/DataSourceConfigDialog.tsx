@@ -50,7 +50,7 @@ export function DataSourceConfigDialog({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `/api/v1/personal-test/process-flow/data-sources`,
+        `/v1/personal-test/process-flow/data-sources`,
         {
           params: { workspace_id: workspaceId },
           headers: { Authorization: `Bearer ${token}` },
@@ -123,13 +123,13 @@ export function DataSourceConfigDialog({
 
       if (selectedSource.id) {
         await axios.put(
-          `/api/v1/personal-test/process-flow/data-sources/${selectedSource.id}`,
+          `/v1/personal-test/process-flow/data-sources/${selectedSource.id}`,
           config,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          `/api/v1/personal-test/process-flow/data-sources`,
+          `/v1/personal-test/process-flow/data-sources`,
           config,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -154,7 +154,7 @@ export function DataSourceConfigDialog({
     try {
       setIsLoading(true);
       await axios.delete(
-        `/api/v1/personal-test/process-flow/data-sources/${id}`,
+        `/v1/personal-test/process-flow/data-sources/${id}`,
         {
           params: { workspace_id: workspaceId },
           headers: { Authorization: `Bearer ${token}` },
@@ -180,7 +180,7 @@ export function DataSourceConfigDialog({
       setTestResult(null);
       
       const response = await axios.post(
-        `/api/v1/personal-test/process-flow/data-sources/${selectedSource.id}/test`,
+        `/v1/personal-test/process-flow/data-sources/${selectedSource.id}/test`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

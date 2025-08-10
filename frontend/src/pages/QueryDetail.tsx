@@ -44,7 +44,7 @@ export const QueryDetail: React.FC = () => {
     );
   }
 
-  const apiEndpoint = `${import.meta.env.VITE_API_BASE_URL}/api/v1/execute/${query.id}`;
+  const apiEndpoint = `${import.meta.env.VITE_API_BASE_URL}/v1/execute/${query.id}`;
   const curlExample = `curl -X POST "${apiEndpoint}" \\
   -H "Content-Type: application/json" \\
   -d '{"params": {"param1": "value1"}}'`;
