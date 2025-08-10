@@ -810,27 +810,72 @@ async def oauth_logout_sync(request: Request = None):
             </head>
             <body>
                 <script>
-                    // SSO 로그아웃 동기화 메시지를 부모 창에 전송
-                    console.log('🔄 SSO Logout Sync: Sending logout signal to parent window');
+                    // Enhanced SSO 로그아웃 동기화 with confirmation
+                    console.log('🔄 SSO Logout Sync: Clearing MAX Lab session...');
                     
-                    if (window.parent && window.parent !== window) {
-                        window.parent.postMessage({
-                            type: 'SSO_LOGOUT_SYNC',
-                            source: 'max_platform'
-                        }, '*');
-                    }
-                    
-                    // localStorage 정리 (같은 도메인인 경우)
+                    // Clear localStorage first
                     try {
-                        localStorage.removeItem('accessToken');
-                        localStorage.removeItem('user');
-                        localStorage.removeItem('sso_sync_token');
-                        localStorage.removeItem('sso_sync_user');
-                        localStorage.setItem('sso_logout_sync', 'true');
-                        console.log('✅ SSO Logout Sync: Local storage cleared');
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        console.log('✅ SSO Logout Sync: Storage cleared');
                     } catch (e) {
-                        console.warn('⚠️ SSO Logout Sync: Could not access localStorage:', e);
+                        console.warn('⚠️ SSO Logout Sync: Could not clear storage:', e);
                     }
+                    
+                    // Clear cookies
+                    try {
+                        document.cookie.split(";").forEach(function(c) { 
+                            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                        });
+                        console.log('✅ SSO Logout Sync: Cookies cleared');
+                    } catch (e) {
+                        console.warn('⚠️ SSO Logout Sync: Could not clear cookies:', e);
+                    }
+                    
+                    // Send confirmation to parent window
+                    console.log('🔄 SSO Logout Sync: Sending confirmation to parent window');
+                    
+                    function sendConfirmation() {
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'SSO_LOGOUT_SYNC',
+                                source: 'maxlab',  // Fixed: source should be where message comes FROM
+                                success: true,
+                                timestamp: Date.now()
+                            }, '*');
+                            console.log('✅ SSO Logout Sync: Confirmation sent');
+                        }
+                        
+                        // Also broadcast to BroadcastChannel
+                        if ('BroadcastChannel' in window) {
+                            try {
+                                const channel = new BroadcastChannel('maxlab_cross_domain_logout');
+                                channel.postMessage({ 
+                                    type: 'LOGOUT', 
+                                    reason: 'sso_logout_sync',
+                                    timestamp: Date.now()
+                                });
+                                channel.close();
+                                console.log('✅ SSO Logout Sync: Broadcast sent');
+                            } catch (e) {
+                                console.warn('⚠️ SSO Logout Sync: Broadcast failed:', e);
+                            }
+                        }
+                    }
+                    
+                    // Send confirmation immediately and also after a short delay
+                    sendConfirmation();
+                    setTimeout(sendConfirmation, 100);
+                    setTimeout(sendConfirmation, 500);
+                    
+                    // Redirect to login page after a delay
+                    setTimeout(() => {
+                        try {
+                            window.top.location.href = window.location.origin + '/login?logout=sso_sync';
+                        } catch (e) {
+                            console.log('🔄 Cannot redirect top window, user will handle manually');
+                        }
+                    }, 1000);
                 </script>
             </body>
             </html>

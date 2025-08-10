@@ -228,8 +228,11 @@ function App() {
       const trustedOrigins = [
         'https://max.dwchem.co.kr',
         'https://maxplatform.dwchem.co.kr',
+        'https://maxlab.dwchem.co.kr', // 자기 자신 (iframe logout-sync)
         'http://localhost:3000', // 개발 환경
         'http://localhost:3001', // 개발 환경 대체 포트
+        'http://localhost:3010', // maxlab 개발 환경
+        'http://localhost:8100', // maxlab backend 개발 환경
       ];
       
       if (!trustedOrigins.includes(event.origin)) {
@@ -295,6 +298,11 @@ function App() {
         });
         
         console.log('✅ SSO: Auto logout completed via MAX Platform');
+        
+        // 로그인 페이지로 리다이렉트 (SSO 로그아웃 표시)
+        setTimeout(() => {
+          window.location.href = '/login?logout=sso_sync';
+        }, 100);
       }
     };
     

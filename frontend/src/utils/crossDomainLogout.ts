@@ -250,11 +250,38 @@ export class CrossDomainLogoutManager {
       });
     }
 
-    // 쿠키 클리어 (같은 도메인만 가능)
-    document.cookie.split(";").forEach(c => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    // 쿠키 클리어 (including .dwchem.co.kr domain)
+    const cookiesToClear = [
+      'access_token',
+      'session_id', 
+      'session_token',
+      'user_id',
+      'refresh_token'
+    ];
+    
+    cookiesToClear.forEach(cookieName => {
+      // Clear for current domain
+      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+      
+      // Clear for .dwchem.co.kr domain (important for cross-domain SSO)
+      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.dwchem.co.kr;`;
+      
+      // Clear for specific subdomains
+      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=maxlab.dwchem.co.kr;`;
+      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=max.dwchem.co.kr;`;
     });
-    devLog.info('✅ Cookies cleared');
+    
+    // Also clear any other cookies that might exist
+    document.cookie.split(";").forEach(c => {
+      const eqPos = c.indexOf("=");
+      const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+      if (name && !cookiesToClear.includes(name)) {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.dwchem.co.kr;`;
+      }
+    });
+    
+    devLog.info('✅ Cookies cleared for .dwchem.co.kr domain');
 
     // Service Worker 캐시 클리어
     if ('caches' in window) {
