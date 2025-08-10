@@ -1,0 +1,73 @@
+14:45:03.524 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-BiM44STu.js:228:5243
+14:45:03.524 📋 Authenticated user detected - will validate with server index-BiM44STu.js:228:5774
+14:45:03.524 📋 Rehydrated state (pending server validation): 
+Object { user: {…}, isAuthenticated: true, initState: "syncing", error: null, lastSyncTime: 1754804642256, retryCount: 0, setAuthState: setAuthState(n), setAuthError: setAuthError(n), clearError: clearError(), incrementRetry: incrementRetry(), … }
+index-BiM44STu.js:228:5933
+14:45:03.526 🛡️ CSRF protection initialized with existing token index-BiM44STu.js:263:5675
+14:45:03.532 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-BiM44STu.js:263:20823
+14:45:03.534 🔀 OAuth Coordinator [05:45:03][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-BiM44STu.js:263:50721
+14:45:03.544 ✅ Auth sync initialized with BroadcastChannel index-BiM44STu.js:263:92335
+14:45:03.544 🔒 Initializing cross-domain logout listener index-BiM44STu.js:846:92293
+14:45:03.544 📡 SSO: PostMessage listener registered index-BiM44STu.js:846:93709
+14:45:03.544 🔄 Auth state change: idle → syncing 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-BiM44STu.js:227:10583
+14:45:03.544 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-BiM44STu.js:258:13225
+14:45:03.560 🔄 Auth state change: ready → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (2) […] }
+index-BiM44STu.js:227:10583
+14:45:03.630 [CustomTableNode Public Mode] 
+Object { publishToken: "I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs", pathParts: (4) […], pathname: "/public/flow/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs", pathPartsLength: 4, pathPartsDetail: '[0]="", [1]="public", [2]="flow", [3]="I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs"', endpoint: "/api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs/data-sources/2881a01f-1eed-4343-b0d1-5d8d22f6744a/execute-query" }
+index-BiM44STu.js:799:7454
+14:45:03.644 [CustomTableNode Result] 
+Object { nodeId: "table_1753867633681", isPublicMonitoring: true, hasError: true, hasSampleData: true, sampleDataLength: 0, columns: [] }
+index-BiM44STu.js:799:8534
+14:45:03.644 2025-08-10 14:45:03.644 [ERROR] Failed to execute table query {"error":{},"nodeId":"table_1753867633681"} index-BiM44STu.js:750:1183
+14:45:16.024 🔄 Manual refresh triggered for published flow index-BiM44STu.js:846:71381
+14:45:44.184 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  7ms]
+
+14:45:45.088 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+14:45:46.091 XHRGET
+https://maxlab.dwchem.co.kr/api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs?_t=1754804746088&_r=y4unk0p0o77
+[HTTP/2 200  5ms]
+
+14:45:46.096 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  9ms]
+
+14:45:46.104 XHRGET
+https://maxlab.dwchem.co.kr/api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs/equipment/status?_t=1754804746101
+[HTTP/2 200  38ms]
+
+14:45:46.106 XHRGET
+https://maxlab.dwchem.co.kr/api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs/measurements?_t=1754804746103
+[HTTP/2 200  41ms]
+
+14:45:47.120 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+14:45:48.121 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+14:45:49.130 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+14:45:50.131 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+
+
+
+3|maxlab-backend-8010       | 2025-08-10T14:45:16: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/I44anriCP7JjtoSkAFHILWeNTr9qM4nMzNxcU2s44Xs?_t=1754804716025&_r=eegief6fl7o HTTP/1.1" 200 OK
+3|maxlab-backend-8010       | 2025-08-10T14:45:16: 2025-08-10 14:45:16,038 - app.core.security - WARNING - Decryption failed, returning original value:
+3|maxlab-backend-8010       | 2025-08-10T14:45:16: 2025-08-10 14:45:16,039 - app.core.security - WARNING - Decryption failed, returning original value:
+3|maxlab-backend-8010       | 2025-08-10T14:45:16: 2025-08-10 14:45:16,060 - app.services.status_normalizer - ERROR - Failed to load custom status mappings for workspace 21ee03db-90c4-4592-b00f-c44801e0b164: 'asyncpg.pgproto.pgproto.UUID' object has no attribute 'replace'
