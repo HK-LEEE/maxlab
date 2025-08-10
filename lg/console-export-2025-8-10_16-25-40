@@ -1,0 +1,69 @@
+16:25:40.246 🔒 Executing cross-domain logout cleanup index-BiM44STu.js:846:88522
+16:25:40.246 🚨 Cross-domain logout detected - clearing session index-BiM44STu.js:846:92376
+16:25:40.250 📨 Received auth sync event: LOGOUT index-BiM44STu.js:263:93015
+16:25:40.250 📨 Received logout event from other tab: cross_domain_logout index-BiM44STu.js:846:91813
+16:25:40.251 🚨 Logout broadcast received index-BiM44STu.js:846:87231
+16:25:40.251 🔒 Executing cross-domain logout cleanup index-BiM44STu.js:846:88522
+16:25:40.270 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  0ms]
+
+16:25:40.274 GET
+https://maxlab.dwchem.co.kr/assets/oauthProviderLogout-DtUtMk7L.js
+
+16:25:40.284 GET
+https://maxlab.dwchem.co.kr/assets/index-DwhDH3qg.css
+[HTTP/2 200 OK 0ms]
+
+16:25:40.309 GET
+https://maxlab.dwchem.co.kr/assets/index-BiM44STu.js
+[HTTP/2 200  0ms]
+
+16:25:40.352 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-BiM44STu.js:228:5243
+16:25:40.353 🆕 New or unauthenticated user, preparing for silent auth attempt index-BiM44STu.js:228:6013
+16:25:40.356 🛡️ New CSRF token generated index-BiM44STu.js:263:6222
+16:25:40.356 🛡️ CSRF protection initialized with new token index-BiM44STu.js:263:5768
+16:25:40.360 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-BiM44STu.js:263:20823
+16:25:40.363 🔀 OAuth Coordinator [07:25:40][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-BiM44STu.js:263:50721
+16:25:40.371 GET
+https://maxlab.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+16:25:40.373 ✅ Auth sync initialized with BroadcastChannel index-BiM44STu.js:263:92335
+16:25:40.374 🔒 Initializing cross-domain logout listener index-BiM44STu.js:846:92293
+16:25:40.374 📡 SSO: PostMessage listener registered index-BiM44STu.js:846:93709
+16:25:40.374 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-BiM44STu.js:227:10583
+16:25:40.374 🔇 Attempting silent SSO login... index-BiM44STu.js:265:4480
+16:25:40.374 🔀 OAuth Coordinator [07:25:40][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1754810740375_31ulhhshj 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-BiM44STu.js:263:50672
+16:25:40.374 🚫 Unsafe path for token refresh: /login index-BiM44STu.js:258:19740
+16:25:40.374 🚫 Silent auth not allowed on current page: /login index-BiM44STu.js:258:17753
+16:25:40.375 🔀 OAuth Coordinator [07:25:40][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-BiM44STu.js:263:50721
+16:25:40.375 🔀 OAuth Coordinator [07:25:40][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1754810740375_31ulhhshj index-BiM44STu.js:263:50721
+16:25:40.376 🔀 OAuth Coordinator [07:25:40][Q:1|A:0]: ✅ silent_login request completed: silent_login_1754810740375_31ulhhshj index-BiM44STu.js:263:50721
+16:25:40.376 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-BiM44STu.js:265:6132
+16:25:40.376 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-BiM44STu.js:227:10583
+16:25:40.376 🚫 Unsafe path for token refresh: /login index-BiM44STu.js:258:19740
+16:25:40.378 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-BiM44STu.js:750:4401
+16:25:40.380 🛑 User not authenticated, stopping token refresh index-BiM44STu.js:265:18362
+16:25:40.380 🔥 Component mounted, current oauthLoading: false index-BiM44STu.js:750:4996
+16:25:40.383 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-BiM44STu.js:750:4401
+16:25:40.384 🔄 Logout detected, resetting login component state index-BiM44STu.js:750:5402
+16:25:40.385 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-BiM44STu.js:750:4401
+
+
+
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
