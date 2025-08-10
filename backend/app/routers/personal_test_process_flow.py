@@ -843,7 +843,7 @@ async def get_public_process_flow(
 async def get_public_equipment_status(
     publish_token: str,
     equipment_type: Optional[str] = Query(None),
-    status: Optional[str] = Query(None),
+    equipment_status: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db)
@@ -892,7 +892,7 @@ async def get_public_equipment_status(
             # Get equipment status
             equipment_data = await provider.get_equipment_status(
                 equipment_type=equipment_type,
-                status=status,
+                status=equipment_status,
                 limit=limit,
                 offset=offset
             )
@@ -948,7 +948,7 @@ async def get_public_equipment_status(
         return await get_equipment_status(
             workspace_id=workspace_id,
             equipment_type=equipment_type,
-            status=status,
+            status=equipment_status,
             limit=limit,
             offset=offset,
             db=db
@@ -1149,7 +1149,7 @@ async def get_public_measurements(
 async def get_equipment_status(
     workspace_id: str = Query('personaltest', description="Workspace ID"),
     equipment_type: Optional[str] = Query(None),
-    status: Optional[str] = Query(None),
+    equipment_status: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     data_source_id: Optional[str] = Query(None, description="Data Source ID"),
@@ -1186,7 +1186,7 @@ async def get_equipment_status(
         logger.info(f"🎯 Calling provider.get_equipment_status()")
         response_data = await provider.get_equipment_status(
             equipment_type=equipment_type,
-            status=status,
+            status=equipment_status,
             limit=limit,
             offset=offset
         )

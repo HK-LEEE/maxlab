@@ -149,12 +149,19 @@ class DynamicProvider(IDataProvider):
                         self._config['connection_string'] = self._config['api_url']
                 elif self._config.get('mssql_connection_string'):
                     decrypted = decrypt_connection_string(self._config['mssql_connection_string'])
-                    # If decryption fails, it returns the original value
-                    if decrypted != self._config['mssql_connection_string']:
+                    # Check if decryption returned None (failed for encrypted value)
+                    if decrypted is None:
+                        logger.error(f"❌ Failed to decrypt MSSQL connection string for workspace {self.workspace_id}")
+                        # Don't use None as connection string
+                        self._config['connection_string'] = None
+                    elif decrypted != self._config['mssql_connection_string']:
+                        # Successfully decrypted
                         self._config['connection_string'] = decrypted
+                        logger.info(f"✅ Successfully decrypted MSSQL connection string")
                     else:
-                        # Try using as plain text if decryption failed
+                        # Plain text connection string (no decryption needed)
                         self._config['connection_string'] = self._config['mssql_connection_string']
+                        logger.info(f"ℹ️ Using plain text MSSQL connection string")
                 else:
                     self._config['connection_string'] = None
                     
@@ -206,8 +213,12 @@ class DynamicProvider(IDataProvider):
             elif source_type == "mssql":
                 from .mssql import MSSQLProvider
                 if not config.get("connection_string"):
-                    logger.error(f"❌ MSSQL provider requires connection_string")
-                    raise ValueError("MSSQL provider requires connection_string")
+                    logger.error(f"❌ MSSQL provider requires connection_string - decryption may have failed")
+                    # Provide more context about the failure
+                    if config.get("mssql_connection_string"):
+                        raise ValueError("MSSQL connection string decryption failed. Please check encryption key configuration.")
+                    else:
+                        raise ValueError("MSSQL provider requires connection_string but none was configured")
                     
                 logger.info(f"🔧 Creating MSSQL provider with connection string length: {len(config.get('connection_string'))}")
                 self._provider = MSSQLProvider(

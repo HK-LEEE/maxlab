@@ -17,7 +17,7 @@ import asyncio
 from functools import lru_cache
 import json
 from sqlalchemy.ext.asyncio import AsyncSession
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import os
 import base64
 from pydantic import BaseModel
@@ -1137,13 +1137,19 @@ def decrypt_connection_string(encrypted_value: Optional[str]) -> Optional[str]:
     
     try:
         key = get_or_create_encryption_key()
+        if not key:
+            logger.error("❌ No encryption key available for decryption")
+            return None
+            
         f = Fernet(key)
         # Decode from base64 first
         encrypted_bytes = base64.b64decode(encrypted_value.encode())
         decrypted = f.decrypt(encrypted_bytes)
         return decrypted.decode()
+    except InvalidToken as e:
+        logger.error(f"❌ Decryption failed - Invalid token or wrong encryption key: {str(e)[:100]}")
     except Exception as e:
-        logger.error(f"Decryption failed for connection string: {e}")
+        logger.error(f"❌ Decryption failed for connection string: {e}")
         # For public endpoints, we need to be more strict about encryption failures
         # Check if it looks like an encrypted value (base64 encoded)
         try:
