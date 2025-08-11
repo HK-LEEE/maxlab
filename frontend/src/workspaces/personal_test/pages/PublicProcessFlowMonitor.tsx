@@ -215,9 +215,13 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
 
   // 현재 Flow에 등록된 equipment 노드의 equipmentCode 추출
   const nodeEquipmentCodes = new Set<string>();
+  let instrumentCount = 0;
+  
   nodes.forEach(node => {
     if (node.type === 'equipment' && node.data.equipmentCode) {
       nodeEquipmentCodes.add(node.data.equipmentCode);
+    } else if (node.type === 'instrument') {
+      instrumentCount++;
     }
   });
 
@@ -384,7 +388,7 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
       </div>
 
       {/* Status Summary */}
-      <StatusSummary statusCounts={statusCounts} isFullscreen={isFullscreen} />
+      <StatusSummary statusCounts={statusCounts} instrumentCount={instrumentCount} isFullscreen={isFullscreen} />
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden relative">

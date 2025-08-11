@@ -778,6 +778,10 @@ export const useFlowMonitor = (workspaceId: string) => {
     return counts;
   };
 
+  const getInstrumentCount = () => {
+    return nodes.filter(node => node.type === 'instrument').length;
+  };
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
@@ -827,6 +831,7 @@ export const useFlowMonitor = (workspaceId: string) => {
     isSidebarOpen,
     isFullscreen,
     statusCounts: getStatusCounts(),
+    instrumentCount: getInstrumentCount(),
     onNodesChange,
     onEdgesChange,
     setSelectedFlow,

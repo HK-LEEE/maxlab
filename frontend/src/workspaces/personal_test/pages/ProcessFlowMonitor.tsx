@@ -143,6 +143,7 @@ const ProcessFlowMonitorContent: React.FC = () => {
     isSidebarOpen,
     isFullscreen,
     statusCounts,
+    instrumentCount,
     onNodesChange,
     onEdgesChange,
     setSelectedFlow,
@@ -238,7 +239,7 @@ const ProcessFlowMonitorContent: React.FC = () => {
       />
 
       {/* Status Summary */}
-      <StatusSummary statusCounts={statusCounts} isFullscreen={isFullscreen} />
+      <StatusSummary statusCounts={statusCounts} instrumentCount={instrumentCount} isFullscreen={isFullscreen} />
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Equipment Sidebar */}
