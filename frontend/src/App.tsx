@@ -69,8 +69,18 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 const AuthRefreshProvider: React.FC = () => {
-  useAuthRefresh();
+  // Skip auth refresh on public routes
+  if (!isPublicRoute()) {
+    useAuthRefresh();
+  }
   return null;
+};
+
+// Helper function to check if current page is a public route
+const isPublicRoute = () => {
+  const currentPath = window.location.pathname;
+  return currentPath.startsWith('/public/flow/') || 
+         currentPath.startsWith('/workspaces/personal_test/monitor/public/');
 };
 
 function App() {
@@ -103,6 +113,12 @@ function App() {
   // SSO: 초기 로드 시 SSO 동기화 토큰 체크
   useEffect(() => {
     const checkSSOSync = async () => {
+      // Skip SSO sync on public routes
+      if (isPublicRoute()) {
+        console.log('🔓 Public route detected, skipping SSO sync check');
+        return;
+      }
+      
       // 이미 인증된 상태면 스킵
       if (isAuthenticated) {
         return;
@@ -142,10 +158,17 @@ function App() {
   }, []);
   
   // 기존 isInitializing 대신 authStore의 상태 사용
-  const isInitializing = initState !== 'ready' && initState !== 'error';
+  // Skip initialization screen on public routes
+  const isInitializing = !isPublicRoute() && (initState !== 'ready' && initState !== 'error');
   
   // Auth Sync Service 초기화
   useEffect(() => {
+    // Skip auth sync service on public routes
+    if (isPublicRoute()) {
+      console.log('🔓 Public route detected, skipping Auth Sync Service initialization');
+      return;
+    }
+    
     authSyncService.initialize({
       onLogout: (reason) => {
         console.log('📨 Received logout event from other tab:', reason);
@@ -180,6 +203,12 @@ function App() {
 
   // 🚫 SIMPLIFIED: 크로스 도메인 로그아웃 리스너 초기화
   useEffect(() => {
+    // Skip cross-domain logout listeners on public routes
+    if (isPublicRoute()) {
+      console.log('🔓 Public route detected, skipping cross-domain logout listeners');
+      return;
+    }
+    
     // SAFETY: 로그아웃 진행 중이면 리스너 초기화 건너뛰기
     const logoutInProgress = sessionStorage.getItem('logout_in_progress');
     if (logoutInProgress && Date.now() - parseInt(logoutInProgress) < 10000) {
@@ -193,8 +222,7 @@ function App() {
     instantLogoutChannel.onLogout(() => {
       console.log('🔥 Instant logout detected via BroadcastChannel/localStorage');
       
-      const currentPath = window.location.pathname;
-      const isPublicPage = currentPath.startsWith('/public/flow/') || currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+      const isPublicPageNow = isPublicRoute();
       
       // 로그아웃 진행 상태 표시
       sessionStorage.setItem('logout_in_progress', Date.now().toString());
@@ -203,7 +231,7 @@ function App() {
       localStorage.clear();
       logout();
       
-      if (!isPublicPage) {
+      if (!isPublicPageNow) {
         window.location.href = '/login?reason=instant_logout';
       }
     });
@@ -212,8 +240,7 @@ function App() {
     crossDomainLogout.startListening(() => {
       console.log('🚨 Cross-domain logout detected - clearing session');
       
-      const currentPath = window.location.pathname;
-      const isPublicPage = currentPath.startsWith('/public/flow/') || currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+      const isPublicPageNow = isPublicRoute();
       
       // 로그아웃 진행 상태 표시 (10초간)
       sessionStorage.setItem('logout_in_progress', Date.now().toString());
@@ -226,7 +253,7 @@ function App() {
       logout();
       
       // Public 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
-      if (!isPublicPage) {
+      if (!isPublicPageNow) {
         // 짧은 지연 후 리다이렉트 (cleanup 시간 확보)
         setTimeout(() => {
           window.location.href = '/login?reason=cross_domain_logout';
@@ -244,6 +271,12 @@ function App() {
   
   // SSO: MAX Platform에서 전송한 PostMessage 수신
   useEffect(() => {
+    // Skip SSO message handling on public routes
+    if (isPublicRoute()) {
+      console.log('🔓 Public route detected, skipping SSO PostMessage listener');
+      return;
+    }
+    
     const handleSSOMessage = async (event: MessageEvent) => {
       // 보안: 신뢰할 수 있는 오리진에서만 메시지 수락
       const trustedOrigins = [
@@ -364,7 +397,7 @@ function App() {
       
       const currentPath = window.location.pathname;
       const currentSearch = window.location.search;
-      const isPublicPage = currentPath.startsWith('/public/flow/');
+      const isPublicPageNow = isPublicRoute();
       const isLoginPage = currentPath === '/login';
       const isOAuthCallback = currentPath === '/oauth/callback';
       
@@ -378,7 +411,7 @@ function App() {
       logout();
       
       // Public 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
-      if (!isPublicPage) {
+      if (!isPublicPageNow) {
         devLog.info('Session expired, redirecting to login...');
         // 현재 페이지를 기억해서 로그인 후 돌아올 수 있도록
         const returnUrl = encodeURIComponent(currentPath + currentSearch);
@@ -464,6 +497,12 @@ function App() {
   
   // 개발 환경에서만 진단 도구 및 토큰 테스트 헬퍼 등록
   useEffect(() => {
+    // Skip development diagnostics on public routes
+    if (isPublicRoute()) {
+      console.log('🔓 Public route detected, skipping development diagnostics');
+      return;
+    }
+    
     if (isDevelopment()) {
       // 🔍 Authentication diagnostics monitoring
       console.log('🧪 Starting authentication diagnostics...');
@@ -551,6 +590,13 @@ function App() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        // 🔓 CRITICAL FIX: Skip authentication completely on public routes
+        if (isPublicRoute()) {
+          console.log('🔓 Public route detected, skipping authentication initialization completely');
+          setAuthState('ready'); // Set auth state to ready without authentication
+          return;
+        }
+        
         // 🔒 CRITICAL FIX: Use ref values to prevent stale closures
         const currentInitState = useAuthStore.getState().initState;
         const currentIsAuthenticated = useAuthStore.getState().isAuthenticated;

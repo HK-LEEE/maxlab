@@ -295,6 +295,12 @@ export function isSafePageForTokenRefresh(): boolean {
   const currentPath = window.location.pathname;
   const currentHash = window.location.hash;
   
+  // 🔓 CRITICAL FIX: Public routes don't need token refresh
+  if (currentPath.startsWith('/public/flow/') || currentPath.startsWith('/workspaces/personal_test/monitor/public/')) {
+    console.log('🔓 Public route detected, token refresh not needed:', currentPath);
+    return false;
+  }
+  
   // OAuth 관련 페이지들은 토큰 갱신 불허
   const unsafePaths = [
     '/login',
