@@ -863,19 +863,20 @@ async def oauth_logout_sync(request: Request = None):
                         }
                     }
                     
-                    // Send confirmation immediately and also after a short delay
+                    // 🔥 즉시 전송 + 여러 번 시도
                     sendConfirmation();
-                    setTimeout(sendConfirmation, 100);
-                    setTimeout(sendConfirmation, 500);
+                    setTimeout(sendConfirmation, 10);   // 🔥 100 → 10ms
+                    setTimeout(sendConfirmation, 50);   // 🔥 500 → 50ms
+                    setTimeout(sendConfirmation, 100);  // 🔥 추가
                     
-                    // Redirect to login page after a delay
+                    // 🔥 리다이렉트 시간 단축
                     setTimeout(() => {
                         try {
                             window.top.location.href = window.location.origin + '/login?logout=sso_sync';
                         } catch (e) {
                             console.log('🔄 Cannot redirect top window, user will handle manually');
                         }
-                    }, 1000);
+                    }, 200); // 🔥 1000 → 200ms
                 </script>
             </body>
             </html>

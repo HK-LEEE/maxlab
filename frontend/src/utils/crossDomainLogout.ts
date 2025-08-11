@@ -6,7 +6,7 @@
 import { devLog } from './logger';
 
 const LOGOUT_EVENT_KEY = 'max_platform_logout';
-const LOGOUT_CHECK_INTERVAL = 30000; // 30초마다 체크 (성능 최적화)
+const LOGOUT_CHECK_INTERVAL = 5000;  // 🔥 30000 → 5000 (5초)
 
 export class CrossDomainLogoutManager {
   private static instance: CrossDomainLogoutManager;
@@ -170,8 +170,8 @@ export class CrossDomainLogoutManager {
     
     const now = Date.now();
     
-    // ENHANCED: 5초 쿨다운으로 증가 (기존 500ms에서)
-    if (now - this.lastLogoutTime < 5000) {
+    // 🔥 1초 쿨다운으로 감소 (기존 5000ms에서)
+    if (now - this.lastLogoutTime < 1000) {
       devLog.debug('🔄 Logout cooldown active, ignoring duplicate logout');
       return;
     }

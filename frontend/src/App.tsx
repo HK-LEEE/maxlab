@@ -22,6 +22,7 @@ import AuthDiagnostics from './utils/authDiagnostics';
 import AuthInitDebugger from './utils/debugAuthInit';
 import { authSyncService } from './services/authSyncService';
 import { crossDomainLogout } from './utils/crossDomainLogout';
+import { instantLogoutChannel } from './utils/instantLogoutChannel';
 import './styles/index.css';
 
 devLog.log('App.tsx loaded');
@@ -188,6 +189,25 @@ function App() {
     
     console.log('🔒 Initializing cross-domain logout listener');
     
+    // 🔥 즉시 로그아웃 채널 리스너 등록
+    instantLogoutChannel.onLogout(() => {
+      console.log('🔥 Instant logout detected via BroadcastChannel/localStorage');
+      
+      const currentPath = window.location.pathname;
+      const isPublicPage = currentPath.startsWith('/public/flow/') || currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+      
+      // 로그아웃 진행 상태 표시
+      sessionStorage.setItem('logout_in_progress', Date.now().toString());
+      
+      // 즉시 로그아웃 수행
+      localStorage.clear();
+      logout();
+      
+      if (!isPublicPage) {
+        window.location.href = '/login?reason=instant_logout';
+      }
+    });
+    
     // 크로스 도메인 로그아웃 감지 시작
     crossDomainLogout.startListening(() => {
       console.log('🚨 Cross-domain logout detected - clearing session');
@@ -218,6 +238,7 @@ function App() {
     
     return () => {
       crossDomainLogout.stopListening();
+      instantLogoutChannel.close();  // 🔥 즉시 로그아웃 채널 정리
     };
   }, []); // FIXED: Remove logout dependency to prevent infinite loops
   
@@ -392,12 +413,31 @@ function App() {
     window.addEventListener('auth:network_error', handleTokenRefreshNetworkError as EventListener);
     window.addEventListener('auth:refresh_token_invalid', handleRefreshTokenInvalid as EventListener);
     
+    // 🔥 localStorage 변경 즉시 감지 for instant logout
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'logout_trigger' && e.newValue) {
+        try {
+          const data = JSON.parse(e.newValue);
+          if (Date.now() - data.timestamp < 2000) { // 2초 이내만
+            console.log('🔥 Instant logout detected via storage');
+            logout();
+            window.location.href = '/login?logout=cross_domain';
+          }
+        } catch (error) {
+          console.error('Failed to parse logout trigger:', error);
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
     return () => {
       window.removeEventListener('auth:logout', handleAutoLogout as EventListener);
       window.removeEventListener('auth:token_expiring', handleTokenExpiring as EventListener);
       window.removeEventListener('auth:refresh_token_expiring', handleRefreshTokenExpiring as EventListener);
       window.removeEventListener('auth:network_error', handleTokenRefreshNetworkError as EventListener);
       window.removeEventListener('auth:refresh_token_invalid', handleRefreshTokenInvalid as EventListener);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [logout]);
   
