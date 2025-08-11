@@ -155,7 +155,8 @@ app.add_middleware(
     exempt_paths={
         "/docs", "/redoc", "/openapi.json", "/favicon.ico",
         "/api/v1/health", "/api/v1/csrf/", "/static/",
-        "/api/v1/auth/", "/api/oauth/"
+        "/api/v1/auth/", "/api/oauth/",
+        "/api/v1/personal-test/process-flow/public/"  # Exempt public monitoring endpoints
     }
 )
 
