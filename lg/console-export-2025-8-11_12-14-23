@@ -125,3 +125,323 @@ D0 @ index-hqrokkxs.js:48
 0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                         ]
 0|maxplatform-backend-8000  | 2025-08-11T15:50:03: [parameters: {'client_id': 'maxplatform-web', 'client_secret': 'not-used-f...', 'redirect_uris': 'https://max.dwchem.co.kr,https://maxlab.dwchem.co.kr', 'grant_types': 'password,refresh_token', 'response_types': 'token', 'scope': 'openid profile email'}]
 0|maxplatform-backend-8000  | 2025-08-11T15:50:03: (Background on this error at: https://sqlalche.me/e/20/f405)
+
+
+
+ 🔄 Rehydrating auth state for initialization Object
+ 🆕 New or unauthenticated user, preparing for silent auth attempt
+ 🛡️ New CSRF token generated
+ 🛡️ CSRF protection initialized with new token
+ 🔀 OAuth Coordinator [07:38:35][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized
+ ✅ Auth sync initialized with BroadcastChannel
+ 🔒 Initializing cross-domain logout listener
+ 📡 SSO: PostMessage listener registered
+ 🔄 Auth state change: idle → silent_auth Object
+ 🔇 Attempting silent SSO login...
+ 🔀 OAuth Coordinator [07:38:35][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1754897915454_vozlq1cfe Object
+ ✅ Silent auth conditions met, starting...
+ 🔀 OAuth Coordinator [07:38:35][Q:1|A:0]: 🔄 Starting OAuth request queue processing
+ 🔀 OAuth Coordinator [07:38:35][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1754897915454_vozlq1cfe
+ 🔇 Starting silent authentication...
+ 🔄 Rehydrating auth state for initialization [object Object]
+ 🆕 New or unauthenticated user, preparing for silent auth attempt
+ 🛡️ CSRF protection initialized with existing token
+ 🔀 OAuth Coordinator [07:38:35][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized
+ ✅ Auth sync initialized with BroadcastChannel
+ 🔒 Initializing cross-domain logout listener
+ 📡 SSO: PostMessage listener registered
+ 🔄 Auth state change: idle → silent_auth [object Object]
+ 🔇 Attempting silent SSO login...
+ 🔀 OAuth Coordinator [07:38:35][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1754897915529_8d6q250iy [object Object]
+ 🚫 Unsafe path for token refresh: /oauth/callback
+ 🚫 Silent auth not allowed on current page: /oauth/callback
+ 🔀 OAuth Coordinator [07:38:35][Q:1|A:0]: 🔄 Starting OAuth request queue processing
+ 🔀 OAuth Coordinator [07:38:35][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1754897915529_8d6q250iy
+ 🔀 OAuth Coordinator [07:38:35][Q:1|A:0]: ✅ silent_login request completed: silent_login_1754897915529_8d6q250iy
+ ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page
+ 🔄 Auth state change: silent_auth → ready [object Object]
+ 🚫 Unsafe path for token refresh: /oauth/callback
+ 🔍 Popup mode detection started: [object Object]
+ 🔍 Searching for OAuth flow state with state: mDZr5X_T...
+ 📋 Found total flow states: 0
+ 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search...
+  🚨 OAuth flow state not found for state: mDZr5X_T... [object Object]
+getFlowState @ index-C6MwXdfO.js:228
+ 🎯 Popup mode detected via window.parent
+ 🛑 User not authenticated, stopping token refresh
+ 🔄 Migrating legacy OAuth state to new state manager
+ 🔐 OAuth flow state created: [object Object]
+ ✅ Legacy OAuth state migrated: me6swpsf5xz8v06q1y
+ 🔄 Legacy OAuth state migrated: [object Object]
+ 🔍 Popup mode detection started: [object Object]
+ 🔍 Searching for OAuth flow state with state: mDZr5X_T...
+ 📋 Found total flow states: 1
+ ✅ Found OAuth flow state: [object Object]
+ 🎯 Popup mode detected via window.parent
+ 🔍 OAuth Callback Mode Detection: [object Object]
+ 🔍 OAuth Callback URL Analysis: [object Object]
+  🚨 OAuth Server Error: [object Object]
+(anonymous) @ index-C6MwXdfO.js:755
+  🚨 No access token found - session expired
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🚨 Cross-domain logout detected - clearing session
+ 🔄 Cross-domain logout detected on public page, staying on current page
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🚨 Cross-domain logout detected - clearing session
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+  🚨 Logout detected from another tab
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🍪 OAuth provider cookies cleared
+ 🍪 OAuth provider cookies cleared
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🔒 Starting comprehensive security cleanup...
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔒 Starting comprehensive browser security cleanup...
+ ✅ Cleared 1 localStorage items
+ ✅ Cleared 1 sessionStorage items
+ ✅ Cleared 0 cookies
+ 🍪 OAuth provider cookies cleared
+ 🍪 OAuth provider cookies cleared
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🔒 Starting comprehensive security cleanup...
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔒 Starting comprehensive browser security cleanup...
+ ✅ Cleared 0 localStorage items
+ ✅ Cleared 0 sessionStorage items
+ ✅ Cleared 0 cookies
+ ✅ Cleared 0 IndexedDB databases
+ ✅ Cleared 0 cache storages
+ 🔒 Security cleanup completed in 19.30ms
+ ✅ Security cleanup completed: Object
+ 🧹 Complete secure cleanup finished
+ 🔄 MaxLab manual reset initiated
+ ✅ OAuth loop prevention state reset
+ ✅ User logged out successfully
+ ✅ Cleared 0 IndexedDB databases
+ ✅ Cleared 0 cache storages
+ 🔒 Security cleanup completed in 38.90ms
+ ✅ Security cleanup completed: [object Object]
+ 🧹 Complete secure cleanup finished
+ 🔄 MaxLab manual reset initiated
+ ✅ OAuth loop prevention state reset
+ ✅ User logged out successfully
+  🚨 No access token found - session expired
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🔄 Rehydrating auth state for initialization [object Object]
+ 🆕 New or unauthenticated user, preparing for silent auth attempt
+ 🛡️ New CSRF token generated
+ 🛡️ CSRF protection initialized with new token
+ 🔀 OAuth Coordinator [07:38:40][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized
+ ✅ Auth sync initialized with BroadcastChannel
+ 🔒 Initializing cross-domain logout listener
+ 📡 SSO: PostMessage listener registered
+ 🔄 Auth state change: idle → silent_auth [object Object]
+ 🔇 Attempting silent SSO login...
+ 🔀 OAuth Coordinator [07:38:40][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1754897920618_02889m0o5 [object Object]
+ 🚫 Unsafe path for token refresh: /login
+ 🚫 Silent auth not allowed on current page: /login
+ 🔀 OAuth Coordinator [07:38:40][Q:1|A:0]: 🔄 Starting OAuth request queue processing
+ 🔀 OAuth Coordinator [07:38:40][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1754897920618_02889m0o5
+ 🔀 OAuth Coordinator [07:38:40][Q:1|A:0]: ✅ silent_login request completed: silent_login_1754897920618_02889m0o5
+ ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page
+ 🔄 Auth state change: silent_auth → ready [object Object]
+ 🚫 Unsafe path for token refresh: /login
+ 🔥 Login component render - current state: [object Object]
+ 🛑 User not authenticated, stopping token refresh
+ 🔥 Component mounted, current oauthLoading: false
+ 🔥 Login component render - current state: [object Object]
+ 🔄 Logout detected, resetting login component state
+ 🔥 Login component render - current state: [object Object]
+ 🔇 Attempting silent SSO login...
+ 🔀 OAuth Coordinator [07:38:40][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1754897920724_zklqlrvyx [object Object]
+ 🚫 Unsafe path for token refresh: /login
+ 🚫 Silent auth not allowed on current page: /login
+ 🔀 OAuth Coordinator [07:38:40][Q:1|A:0]: 🔄 Starting OAuth request queue processing
+ 🔀 OAuth Coordinator [07:38:40][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1754897920724_zklqlrvyx
+ 🔀 OAuth Coordinator [07:38:40][Q:1|A:0]: ✅ silent_login request completed: silent_login_1754897920724_zklqlrvyx
+ ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page
+ 🔥 Login component render - current state: [object Object]
+  🚨 No access token found - session expired
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🚨 Cross-domain logout detected - clearing session
+ 🔄 Cross-domain logout detected on public page, staying on current page
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🚨 Cross-domain logout detected - clearing session
+ 🍪 OAuth provider cookies cleared
+ 🍪 OAuth provider cookies cleared
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🔒 Starting comprehensive security cleanup...
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔒 Starting comprehensive browser security cleanup...
+ ✅ Cleared 1 localStorage items
+ ✅ Cleared 1 sessionStorage items
+ ✅ Cleared 0 cookies
+ 🔇 Silent auth timeout
+ 🔀 OAuth Coordinator [07:38:45][Q:1|A:0]: ✅ silent_login request completed: silent_login_1754897915454_vozlq1cfe
+ 🚫 Silent auth request aborted by coordinator
+ ℹ️ Silent SSO login failed: silent_auth_timeout
+  ❌ Auth error: silent_auth_timeout - Automatic login timed out
+setAuthError @ index-C6MwXdfO.js:228
+ 🔄 Auth state change: error → ready Object
+ 🛑 User not authenticated, stopping token refresh
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+  🚨 Logout detected from another tab
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ ✅ Cleared 0 IndexedDB databases
+ ✅ Cleared 0 cache storages
+ 🔒 Security cleanup completed in 26.90ms
+ ✅ Security cleanup completed: Object
+ 🧹 Complete secure cleanup finished
+ 🔄 MaxLab manual reset initiated
+ ✅ OAuth loop prevention state reset
+ ✅ User logged out successfully
+  🚨 No token on focus - logout detected
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🚨 Cross-domain logout detected - clearing session
+ 🔄 Cross-domain logout detected on public page, staying on current page
+  🚨 Cross-domain logout broadcast received
+n.onmessage @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+ 🍪 OAuth provider cookies cleared
+ 🍪 OAuth provider cookies cleared
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🔒 Starting comprehensive security cleanup...
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Refresh token cleared from secure storage
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔐 User-isolated tokens cleared
+ 🧹 All tokens cleared
+ 🧹 Clearing all user tokens...
+ 🧹 Refresh token cleared from secure storage
+ ✅ Cleared tokens for 0 users
+ 🔒 Starting comprehensive browser security cleanup...
+ ✅ Cleared 1 localStorage items
+ ✅ Cleared 1 sessionStorage items
+ ✅ Cleared 0 cookies
+ ✅ Cleared 0 IndexedDB databases
+ ✅ Cleared 0 cache storages
+ 🔒 Security cleanup completed in 20.60ms
+ ✅ Security cleanup completed: Object
+ 🧹 Complete secure cleanup finished
+ 🔄 MaxLab manual reset initiated
+ ✅ OAuth loop prevention state reset
+ ✅ User logged out successfully
+[NEW] Explain Console errors by using Copilot in Edge: click
+
+         to explain an error.
+        Learn more
+        Don't show again
+  🚨 No access token found - session expired
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+(anonymous) @ index-C6MwXdfO.js:851
+  🚫 Circuit breaker: Too many logout attempts, stopping
+handleLogout @ index-C6MwXdfO.js:851
+(anonymous) @ index-C6MwXdfO.js:851
+  🚨 No access token found - session expired
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+(anonymous) @ index-C6MwXdfO.js:851
+  🚫 Circuit breaker: Too many logout attempts, stopping
+handleLogout @ index-C6MwXdfO.js:851
+(anonymous) @ index-C6MwXdfO.js:851
+  🚨 No access token found - session expired
+(anonymous) @ index-C6MwXdfO.js:851
+  🔒 Executing cross-domain logout cleanup
+handleLogout @ index-C6MwXdfO.js:851
+(anonymous) @ index-C6MwXdfO.js:851
+  🚫 Circuit breaker: Too many logout attempts, stopping
+handleLogout @ index-C6MwXdfO.js:851
+(anonymous) @ index-C6MwXdfO.js:851
