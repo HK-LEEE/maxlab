@@ -1,0 +1,117 @@
+12:13:44.388 GET
+https://max.dwchem.co.kr/login
+[HTTP/2 200  3ms]
+
+12:13:44.458 GET
+https://max.dwchem.co.kr/assets/index-tH9mwzno.js
+[HTTP/2 200  5ms]
+
+12:13:44.459 GET
+https://max.dwchem.co.kr/assets/index-BAsSAK70.css
+[HTTP/2 200  25ms]
+
+12:13:44.477 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
+12:13:44.503 GET
+https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+[HTTP/2 200  183ms]
+
+12:13:44.718 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-tH9mwzno.js:705:971
+12:13:44.719 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-tH9mwzno.js:529:68503
+12:13:44.719 📡 TRY start index-tH9mwzno.js:529:68565
+12:13:44.719 ❌ 토큰이 없어 인증되지 않은 상태 index-tH9mwzno.js:529:69250
+12:13:44.722 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-tH9mwzno.js:705:971
+12:13:44.742 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  228ms]
+
+12:13:44.749 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  221ms]
+
+12:13:44.750 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  269ms]
+
+12:13:45.009 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+12:13:51.491 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  237ms]
+
+12:13:51.736 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-tH9mwzno.js:529:68503
+12:13:51.737 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  4ms]
+
+12:13:51.737 📡 TRY start index-tH9mwzno.js:529:68565
+12:13:51.737 📡 사용자 정보 로드 시작 index-tH9mwzno.js:529:68992
+12:13:51.746 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  6ms]
+
+12:13:51.748 🔄 SSO: Syncing login to MAX Lab... index-tH9mwzno.js:529:67913
+12:13:51.752 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU0ODgzODMxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0ODgyMDMxLCJqdGkiOiI5NzEwYmZkNC1lMGM3LTQ0MDItODdiNC03N2ZlZDI4OWRkZTgiLCJuYmYiOjE3NTQ4ODIwMzEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiJkNTE4ZmVkMTdlM2M1ZDFkIn0.TdQaJNPvCVnRGGqsC6VyYGiZFGftDIsfHsjGbPeEhw4&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-11T03:13:51.709016","login_count":588,"roles":[],"groups":[]}
+[HTTP/2 200  1ms]
+
+12:13:51.752 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-tH9mwzno.js:705:971
+12:13:51.752 ✅ User authenticated, checking OAuth return... index-tH9mwzno.js:705:1270
+12:13:51.758 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-tH9mwzno.js:529:69196
+12:13:51.775 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  16ms]
+
+12:13:51.818 Features response: 
+Object { user_info: {…}, services: (9) […], categories: (5) […] }
+index-tH9mwzno.js:712:36612
+12:13:51.819 Features data: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-tH9mwzno.js:712:36653
+12:13:51.823 GET
+https://maxlab.dwchem.co.kr/assets/index-DNrsbNI2.js
+[HTTP/2 200  3ms]
+
+12:13:51.824 GET
+https://maxlab.dwchem.co.kr/assets/index-DwhDH3qg.css
+[HTTP/2 200  34ms]
+
+12:13:51.950 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-DNrsbNI2.js:228:5243
+12:13:51.952 📋 Authenticated user detected - will validate with server index-DNrsbNI2.js:228:5774
+12:13:51.952 📋 Rehydrated state (pending server validation): 
+Object { user: {…}, isAuthenticated: true, initState: "syncing", error: null, lastSyncTime: 1754881991959, retryCount: 0, setAuthState: setAuthState(n), setAuthError: setAuthError(n), clearError: clearError(), incrementRetry: incrementRetry(), … }
+index-DNrsbNI2.js:228:5933
+12:13:51.954 🛡️ CSRF protection initialized with existing token index-DNrsbNI2.js:263:5675
+12:13:51.959 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-DNrsbNI2.js:263:20823
+12:13:51.964 🔀 OAuth Coordinator [03:13:51][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-DNrsbNI2.js:263:50721
+12:13:51.971 ✅ SSO: MAX Lab sync iframe loaded index-tH9mwzno.js:529:68175
+12:13:51.972 ✅ Auth sync initialized with BroadcastChannel index-DNrsbNI2.js:263:92335
+12:13:51.972 🔒 Initializing cross-domain logout listener index-DNrsbNI2.js:846:94683
+12:13:51.973 📡 SSO: PostMessage listener registered index-DNrsbNI2.js:846:96902
+12:13:51.973 🔄 Auth state change: idle → syncing 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-DNrsbNI2.js:227:10583
+12:13:51.973 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-DNrsbNI2.js:258:13225
+12:13:51.990 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+12:13:52.004 🔄 Auth state change: ready → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-DNrsbNI2.js:227:10583
+12:13:52.006 No routes matched location "/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU0ODgzODMxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0ODgyMDMxLCJqdGkiOiI5NzEwYmZkNC1lMGM3LTQ0MDItODdiNC03N2ZlZDI4OWRkZTgiLCJuYmYiOjE3NTQ4ODIwMzEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiJkNTE4ZmVkMTdlM2M1ZDFkIn0.TdQaJNPvCVnRGGqsC6VyYGiZFGftDIsfHsjGbPeEhw4&user=%7B%22id%22%3A%2221a2aaa7-444a-4038-bda3-d8bf2c4ef162%22%2C%22real_name%22%3A%22%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22display_name%22%3A%22admin%22%2C%22email%22%3A%22admin%40test.com%22%2C%22phone_number%22%3A%22010-1234-5678%22%2C%22department%22%3A%22%EA%B4%80%EB%A6%AC%EB%B6%80%22%2C%22position%22%3A%22%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Atrue%2C%22is_verified%22%3Atrue%2C%22created_at%22%3A%222025-06-19T16%3A50%3A56.017084%22%2C%22last_login_at%22%3A%222025-08-11T03%3A13%3A51.709016%22%2C%22login_count%22%3A588%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D" index-DNrsbNI2.js:49:38912
