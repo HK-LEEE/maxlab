@@ -10,11 +10,13 @@ interface InstrumentDetailModalProps {
 }
 
 interface MeasurementData {
-  code: string;
-  desc: string;
-  value: number | string;
+  measurement_code: string;
+  measurement_desc: string;
+  measurement_value: number | string;
   unit?: string;
   spec_status: string | number;
+  upper_spec_limit?: number;
+  lower_spec_limit?: number;
   usl?: number;
   lsl?: number;
   timestamp?: string;
@@ -156,14 +158,18 @@ export const InstrumentDetailModal: React.FC<InstrumentDetailModalProps> = ({
     return `${value}${unit ? ` ${unit}` : ''}`;
   };
 
-  // 규격 범위 표시
-  const formatSpecRange = (lsl?: number, usl?: number) => {
-    if (lsl !== undefined && usl !== undefined) {
-      return `${lsl.toFixed(1)} ~ ${usl.toFixed(1)}`;
-    } else if (lsl !== undefined) {
-      return `≥ ${lsl.toFixed(1)}`;
-    } else if (usl !== undefined) {
-      return `≤ ${usl.toFixed(1)}`;
+  // 규격 범위 표시 (API 필드명 대응)
+  const formatSpecRange = (measurement: MeasurementData) => {
+    // API가 upper_spec_limit/lower_spec_limit 또는 usl/lsl 둘 다 제공할 수 있음
+    const upperLimit = measurement.upper_spec_limit ?? measurement.usl;
+    const lowerLimit = measurement.lower_spec_limit ?? measurement.lsl;
+    
+    if (lowerLimit !== undefined && upperLimit !== undefined) {
+      return `${lowerLimit.toFixed(1)} ~ ${upperLimit.toFixed(1)}`;
+    } else if (lowerLimit !== undefined) {
+      return `≥ ${lowerLimit.toFixed(1)}`;
+    } else if (upperLimit !== undefined) {
+      return `≤ ${upperLimit.toFixed(1)}`;
     }
     return '규격 없음';
   };
@@ -209,13 +215,13 @@ export const InstrumentDetailModal: React.FC<InstrumentDetailModalProps> = ({
               {measurements.slice(0, 4).map((measurement: MeasurementData) => {
                 const specConfig = getSpecStatusDisplay(measurement.spec_status);
                 return (
-                  <div key={measurement.code} className="flex items-center space-x-2 min-w-0 flex-shrink-0">
+                  <div key={measurement.measurement_code} className="flex items-center space-x-2 min-w-0 flex-shrink-0">
                     <specConfig.icon size={14} className={specConfig.iconColor} />
                     <span className="text-xs font-medium text-gray-700 truncate">
-                      {measurement.desc}
+                      {measurement.measurement_desc}
                     </span>
                     <span className="text-xs text-gray-900 font-mono">
-                      {formatValue(measurement.value, measurement.unit)}
+                      {formatValue(measurement.measurement_value, measurement.unit)}
                     </span>
                   </div>
                 );
@@ -236,16 +242,16 @@ export const InstrumentDetailModal: React.FC<InstrumentDetailModalProps> = ({
                   
                   return (
                     <div 
-                      key={measurement.code}
+                      key={measurement.measurement_code}
                       className={`p-4 rounded-lg border-2 ${specConfig.borderColor} ${specConfig.bgColor} transition-all hover:shadow-md`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-gray-900 truncate">
-                            {measurement.desc}
+                            {measurement.measurement_desc}
                           </h4>
                           <p className="text-xs text-gray-600 truncate">
-                            {measurement.code}
+                            {measurement.measurement_code}
                           </p>
                         </div>
                         <div className={`p-1 rounded ${specConfig.bgColor}`}>
@@ -256,7 +262,7 @@ export const InstrumentDetailModal: React.FC<InstrumentDetailModalProps> = ({
                       <div className="space-y-2">
                         <div className="flex items-baseline justify-between">
                           <span className="text-2xl font-bold text-gray-900 font-mono">
-                            {formatValue(measurement.value, measurement.unit)}
+                            {formatValue(measurement.measurement_value, measurement.unit)}
                           </span>
                         </div>
                         
@@ -266,9 +272,10 @@ export const InstrumentDetailModal: React.FC<InstrumentDetailModalProps> = ({
                           </span>
                         </div>
                         
-                        {(measurement.lsl !== undefined || measurement.usl !== undefined) && (
+                        {((measurement.lower_spec_limit !== undefined || measurement.upper_spec_limit !== undefined) || 
+                          (measurement.lsl !== undefined || measurement.usl !== undefined)) && (
                           <div className="text-xs text-gray-600">
-                            <span className="font-medium">규격:</span> {formatSpecRange(measurement.lsl, measurement.usl)}
+                            <span className="font-medium">규격:</span> {formatSpecRange(measurement)}
                           </div>
                         )}
                       </div>
