@@ -20,6 +20,7 @@ import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { CustomTableNode } from '../components/common/CustomTableNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
+import { InstrumentDetailModal } from '../components/common/InstrumentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { DatabaseConfigAlert } from '../components/common/DatabaseConfigAlert';
 import { AlarmNotification } from '../components/monitor/AlarmNotification';
@@ -134,6 +135,7 @@ const FlowCanvas: React.FC<{
 const PublicProcessFlowMonitorContent: React.FC = () => {
   const { publishToken } = useParams<{ publishToken: string }>();
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedInstrumentNode, setSelectedInstrumentNode] = useState<Node | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport] = useState<Viewport | undefined>();
   const [showAlarms, setShowAlarms] = useState(true);
@@ -181,6 +183,8 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {
       setSelectedNode(node);
+    } else if (node.type === 'instrument') {
+      setSelectedInstrumentNode(node);
     }
   }, []);
 
@@ -445,6 +449,24 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
               
               // Otherwise show measurements for this equipment
               return m.equipment_code === selectedNode.data.equipmentCode;
+            })}
+          />
+        )}
+
+        {/* Instrument Detail Modal */}
+        {selectedInstrumentNode && (
+          <InstrumentDetailModal
+            node={selectedInstrumentNode}
+            isOpen={true}
+            onClose={() => setSelectedInstrumentNode(null)}
+            measurements={measurements.filter(m => {
+              // If displayMeasurements is configured, only show those measurements
+              if (selectedInstrumentNode.data.displayMeasurements && selectedInstrumentNode.data.displayMeasurements.length > 0) {
+                return selectedInstrumentNode.data.displayMeasurements.includes(m.measurement_code);
+              }
+              
+              // Otherwise show no measurements (empty array)
+              return false;
             })}
           />
         )}

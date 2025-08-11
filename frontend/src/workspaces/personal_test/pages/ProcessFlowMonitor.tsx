@@ -18,6 +18,7 @@ import { GroupNode } from '../components/common/GroupNode';
 import { TextNode } from '../components/common/TextNode';
 import { CustomTableNode } from '../components/common/CustomTableNode';
 import { EquipmentDetailModal } from '../components/common/EquipmentDetailModal';
+import { InstrumentDetailModal } from '../components/common/InstrumentDetailModal';
 import { CustomEdgeWithLabel } from '../components/common/CustomEdgeWithLabel';
 import { DatabaseConfigAlert } from '../components/common/DatabaseConfigAlert';
 
@@ -159,6 +160,8 @@ const ProcessFlowMonitorContent: React.FC = () => {
 
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedInstrumentNode, setSelectedInstrumentNode] = useState<Node | null>(null);
+  const [isInstrumentModalOpen, setIsInstrumentModalOpen] = useState(false);
   const [showAlarms, setShowAlarms] = useState(true);
 
   // Define nodeTypes outside component since Custom Table nodes handle their own data
@@ -174,17 +177,13 @@ const ProcessFlowMonitorContent: React.FC = () => {
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     if (node.type === 'equipment') {
-      // console.log('Monitor - Node clicked:', {
-      //   nodeId: node.id,
-      //   nodeType: node.type,
-      //   nodeData: node.data,
-      //   equipmentCode: node.data.equipmentCode,
-      //   availableStatuses: equipmentStatuses.map(s => s.equipment_code)
-      // });
       setSelectedNode(node);
       setIsDetailModalOpen(true);
+    } else if (node.type === 'instrument') {
+      setSelectedInstrumentNode(node);
+      setIsInstrumentModalOpen(true);
     }
-  }, [equipmentStatuses]);
+  }, []);
 
   const selectedEquipmentStatus = selectedNode 
     ? equipmentStatuses.find(s => s.equipment_code === selectedNode.data.equipmentCode)
@@ -195,6 +194,18 @@ const ProcessFlowMonitorContent: React.FC = () => {
         // If displayMeasurements is configured, only show those measurements
         if (selectedNode.data.displayMeasurements && selectedNode.data.displayMeasurements.length > 0) {
           return selectedNode.data.displayMeasurements.includes(m.measurement_code);
+        }
+        
+        // Otherwise show no measurements (empty array)
+        return false;
+      })
+    : [];
+
+  const selectedInstrumentMeasurements = selectedInstrumentNode
+    ? measurements.filter(m => {
+        // If displayMeasurements is configured, only show those measurements
+        if (selectedInstrumentNode.data.displayMeasurements && selectedInstrumentNode.data.displayMeasurements.length > 0) {
+          return selectedInstrumentNode.data.displayMeasurements.includes(m.measurement_code);
         }
         
         // Otherwise show no measurements (empty array)
@@ -279,6 +290,17 @@ const ProcessFlowMonitorContent: React.FC = () => {
         }}
         equipmentStatus={selectedEquipmentStatus}
         measurements={selectedEquipmentMeasurements}
+      />
+
+      {/* Instrument Detail Modal */}
+      <InstrumentDetailModal
+        node={selectedInstrumentNode}
+        isOpen={isInstrumentModalOpen}
+        onClose={() => {
+          setIsInstrumentModalOpen(false);
+          setSelectedInstrumentNode(null);
+        }}
+        measurements={selectedInstrumentMeasurements}
       />
 
       {/* Alarm Notification - Hidden
