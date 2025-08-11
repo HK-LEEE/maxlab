@@ -213,19 +213,38 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   //   }
   // }, [isDefaultDatabase, isLoadingDataSources]);
 
-  // 계측기 노드 카운팅
+  // 현재 Flow에 등록된 equipment 노드 정보 수집
+  const nodeEquipmentMap = new Map<string, any>();
+  const nodeEquipmentTypes = new Set<string>();
   let instrumentCount = 0;
+  
   nodes.forEach(node => {
-    if (node.type === 'instrument') {
+    if (node.type === 'equipment') {
+      // equipmentCode가 있으면 우선 사용
+      if (node.data.equipmentCode) {
+        nodeEquipmentMap.set(node.data.equipmentCode, node);
+      }
+      // equipmentType도 수집 (fallback용)
+      if (node.data.equipmentType) {
+        nodeEquipmentTypes.add(node.data.equipmentType);
+      }
+    } else if (node.type === 'instrument') {
       instrumentCount++;
     }
   });
 
-  // 모든 설비 상태를 카운팅 (Flow에 상관없이)
-  const equipmentStatusCount = equipmentStatuses.length;
-  const activeCount = equipmentStatuses.filter(eq => eq.status === 'ACTIVE').length;
-  const pauseCount = equipmentStatuses.filter(eq => eq.status === 'PAUSE').length;
-  const stopCount = equipmentStatuses.filter(eq => eq.status === 'STOP').length;
+  // 노드에 등록된 설비만 필터링하여 카운팅
+  const filteredStatuses = equipmentStatuses.filter(eq => {
+    // 1. equipmentCode로 먼저 매칭 시도
+    // 2. equipmentCode가 없으면 equipmentType으로 매칭
+    return nodeEquipmentMap.has(eq.equipment_code) || 
+           nodeEquipmentTypes.has(eq.equipment_type);
+  });
+
+  const equipmentStatusCount = filteredStatuses.length;
+  const activeCount = filteredStatuses.filter(eq => eq.status === 'ACTIVE').length;
+  const pauseCount = filteredStatuses.filter(eq => eq.status === 'PAUSE').length;
+  const stopCount = filteredStatuses.filter(eq => eq.status === 'STOP').length;
 
   // Status counts for StatusSummary component
   const statusCounts = {

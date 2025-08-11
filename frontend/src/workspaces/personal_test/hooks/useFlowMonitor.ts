@@ -760,14 +760,38 @@ export const useFlowMonitor = (workspaceId: string) => {
   const getStatusCounts = () => {
     const counts = { ACTIVE: 0, PAUSE: 0, STOP: 0 };
     
-    // 모든 설비 상태를 카운팅 (Flow에 상관없이)
+    // 현재 Flow에 등록된 equipment 노드 정보 수집
+    const nodeEquipmentMap = new Map<string, any>();
+    const nodeEquipmentTypes = new Set<string>();
+    
+    nodes.forEach(node => {
+      if (node.type === 'equipment') {
+        // equipmentCode가 있으면 우선 사용
+        if (node.data.equipmentCode) {
+          nodeEquipmentMap.set(node.data.equipmentCode, node);
+        }
+        // equipmentType도 수집 (fallback용)
+        if (node.data.equipmentType) {
+          nodeEquipmentTypes.add(node.data.equipmentType);
+        }
+      }
+    });
+    
+    // 노드에 등록된 설비만 카운팅
     equipmentStatuses.forEach((status) => {
-      if (status.status === 'ACTIVE') {
-        counts.ACTIVE++;
-      } else if (status.status === 'PAUSE') {
-        counts.PAUSE++;
-      } else if (status.status === 'STOP') {
-        counts.STOP++;
+      // 1. equipmentCode로 먼저 매칭 시도
+      const isInFlow = nodeEquipmentMap.has(status.equipment_code) ||
+                       // 2. equipmentCode가 없으면 equipmentType으로 매칭
+                       nodeEquipmentTypes.has(status.equipment_type);
+      
+      if (isInFlow) {
+        if (status.status === 'ACTIVE') {
+          counts.ACTIVE++;
+        } else if (status.status === 'PAUSE') {
+          counts.PAUSE++;
+        } else if (status.status === 'STOP') {
+          counts.STOP++;
+        }
       }
     });
     
