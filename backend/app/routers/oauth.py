@@ -822,10 +822,37 @@ async def oauth_logout_sync(request: Request = None):
                         console.warn('⚠️ SSO Logout Sync: Could not clear storage:', e);
                     }
                     
+                    // 🔥 Add instant logout trigger to localStorage BEFORE clearing
+                    try {
+                        localStorage.setItem('logout_trigger', JSON.stringify({
+                            timestamp: Date.now(),
+                            source: 'maxplatform_iframe'
+                        }));
+                        console.log('✅ SSO Logout Sync: Logout trigger set');
+                        
+                        // Clean up after 1 second
+                        setTimeout(() => {
+                            try {
+                                localStorage.removeItem('logout_trigger');
+                            } catch (e) {}
+                        }, 1000);
+                    } catch (e) {
+                        console.warn('⚠️ SSO Logout Sync: Could not set logout trigger:', e);
+                    }
+                    
                     // Clear cookies
                     try {
+                        const isProduction = window.location.hostname.includes('dwchem.co.kr');
                         document.cookie.split(";").forEach(function(c) { 
-                            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                            const cookie = c.replace(/^ +/, "");
+                            const eqPos = cookie.indexOf("=");
+                            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                            // Clear for current domain
+                            document.cookie = name + "=;expires=" + new Date().toUTCString() + ";path=/";
+                            // Clear for .dwchem.co.kr domain in production
+                            if (isProduction) {
+                                document.cookie = name + "=;expires=" + new Date().toUTCString() + ";path=/;domain=.dwchem.co.kr";
+                            }
                         });
                         console.log('✅ SSO Logout Sync: Cookies cleared');
                     } catch (e) {
@@ -859,6 +886,20 @@ async def oauth_logout_sync(request: Request = None):
                                 console.log('✅ SSO Logout Sync: Broadcast sent');
                             } catch (e) {
                                 console.warn('⚠️ SSO Logout Sync: Broadcast failed:', e);
+                            }
+                            
+                            // 🔥 Also use instant logout channel
+                            try {
+                                const instantChannel = new BroadcastChannel('sso_instant_logout');
+                                instantChannel.postMessage({
+                                    type: 'INSTANT_LOGOUT',
+                                    timestamp: Date.now(),
+                                    source: 'maxplatform_iframe'
+                                });
+                                instantChannel.close();
+                                console.log('✅ SSO Logout Sync: Instant logout broadcast sent');
+                            } catch (e) {
+                                console.warn('⚠️ SSO Logout Sync: Instant broadcast failed:', e);
                             }
                         }
                     }

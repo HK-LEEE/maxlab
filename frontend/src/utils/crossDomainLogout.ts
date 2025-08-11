@@ -143,7 +143,11 @@ export class CrossDomainLogoutManager {
         return;
       }
 
-      const response = await fetch('https://max.dwchem.co.kr/api/oauth/userinfo', {
+      const maxPlatformUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://max.dwchem.co.kr'
+        : 'http://localhost:3000';
+
+      const response = await fetch(`${maxPlatformUrl}/api/oauth/userinfo`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -153,8 +157,23 @@ export class CrossDomainLogoutManager {
 
       if (response.status === 401) {
         // 인증 실패 = 로그아웃됨
-        devLog.warn('🚨 MAX Platform session expired or logged out');
+        devLog.warn('🚨 MAX Platform session expired or logged out - forcing logout');
         this.handleLogout(onLogoutDetected);
+      } else if (response.status === 200) {
+        // 🔥 Fallback: Check if the user from MAX Platform matches our local user
+        try {
+          const maxPlatformUser = await response.json();
+          const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+          
+          // If users don't match or MAX Platform has no user, logout
+          if (!maxPlatformUser || !maxPlatformUser.email || 
+              (localUser.email && localUser.email !== maxPlatformUser.email)) {
+            devLog.warn('🚨 User mismatch detected - MAX Platform user changed');
+            this.handleLogout(onLogoutDetected);
+          }
+        } catch (e) {
+          devLog.debug('Could not compare users:', e);
+        }
       }
     } catch (error) {
       // 네트워크 오류는 무시 (오프라인 등)
@@ -259,16 +278,21 @@ export class CrossDomainLogoutManager {
       'refresh_token'
     ];
     
+    const isProduction = window.location.hostname.includes('dwchem.co.kr');
+    
     cookiesToClear.forEach(cookieName => {
-      // Clear for current domain
+      // Clear for current domain (works on localhost and production)
       document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
       
-      // Clear for .dwchem.co.kr domain (important for cross-domain SSO)
-      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.dwchem.co.kr;`;
-      
-      // Clear for specific subdomains
-      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=maxlab.dwchem.co.kr;`;
-      document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=max.dwchem.co.kr;`;
+      // Only set domain cookies in production
+      if (isProduction) {
+        // Clear for .dwchem.co.kr domain (important for cross-domain SSO)
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.dwchem.co.kr;`;
+        
+        // Clear for specific subdomains
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=maxlab.dwchem.co.kr;`;
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=max.dwchem.co.kr;`;
+      }
     });
     
     // Also clear any other cookies that might exist

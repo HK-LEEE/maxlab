@@ -309,6 +309,27 @@ function App() {
       if (event.data.type === 'SSO_LOGOUT_SYNC') {
         console.log('🔄 SSO: Received logout sync from MAX Platform');
         
+        // 🔥 Force immediate cleanup
+        try {
+          // Clear all storage immediately
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          // Clear cookies
+          const isProduction = window.location.hostname.includes('dwchem.co.kr');
+          document.cookie.split(";").forEach(c => {
+            const cookie = c.replace(/^ +/, "");
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            document.cookie = name + "=;expires=" + new Date().toUTCString() + ";path=/";
+            if (isProduction) {
+              document.cookie = name + "=;expires=" + new Date().toUTCString() + ";path=/;domain=.dwchem.co.kr";
+            }
+          });
+        } catch (e) {
+          console.error('Failed to clear storage:', e);
+        }
+        
         // 로컬 세션 종료
         logout();
         
