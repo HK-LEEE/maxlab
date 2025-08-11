@@ -213,27 +213,19 @@ const PublicProcessFlowMonitorContent: React.FC = () => {
   //   }
   // }, [isDefaultDatabase, isLoadingDataSources]);
 
-  // 현재 Flow에 등록된 equipment 노드의 equipmentCode 추출
-  const nodeEquipmentCodes = new Set<string>();
+  // 계측기 노드 카운팅
   let instrumentCount = 0;
-  
   nodes.forEach(node => {
-    if (node.type === 'equipment' && node.data.equipmentCode) {
-      nodeEquipmentCodes.add(node.data.equipmentCode);
-    } else if (node.type === 'instrument') {
+    if (node.type === 'instrument') {
       instrumentCount++;
     }
   });
 
-  // 노드에 등록된 설비만 필터링하여 카운팅
-  const filteredStatuses = equipmentStatuses.filter(eq => 
-    nodeEquipmentCodes.has(eq.equipment_code)
-  );
-
-  const equipmentStatusCount = filteredStatuses.length;
-  const activeCount = filteredStatuses.filter(eq => eq.status === 'ACTIVE').length;
-  const pauseCount = filteredStatuses.filter(eq => eq.status === 'PAUSE').length;
-  const stopCount = filteredStatuses.filter(eq => eq.status === 'STOP').length;
+  // 모든 설비 상태를 카운팅 (Flow에 상관없이)
+  const equipmentStatusCount = equipmentStatuses.length;
+  const activeCount = equipmentStatuses.filter(eq => eq.status === 'ACTIVE').length;
+  const pauseCount = equipmentStatuses.filter(eq => eq.status === 'PAUSE').length;
+  const stopCount = equipmentStatuses.filter(eq => eq.status === 'STOP').length;
 
   // Status counts for StatusSummary component
   const statusCounts = {

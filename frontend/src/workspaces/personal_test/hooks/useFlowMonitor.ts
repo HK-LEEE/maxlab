@@ -760,18 +760,14 @@ export const useFlowMonitor = (workspaceId: string) => {
   const getStatusCounts = () => {
     const counts = { ACTIVE: 0, PAUSE: 0, STOP: 0 };
     
-    // 현재 Flow에 등록된 equipment 노드의 equipmentCode 추출
-    const nodeEquipmentCodes = new Set<string>();
-    nodes.forEach(node => {
-      if (node.type === 'equipment' && node.data.equipmentCode) {
-        nodeEquipmentCodes.add(node.data.equipmentCode);
-      }
-    });
-    
-    // 노드에 등록된 설비만 카운팅
+    // 모든 설비 상태를 카운팅 (Flow에 상관없이)
     equipmentStatuses.forEach((status) => {
-      if (nodeEquipmentCodes.has(status.equipment_code)) {
-        counts[status.status]++;
+      if (status.status === 'ACTIVE') {
+        counts.ACTIVE++;
+      } else if (status.status === 'PAUSE') {
+        counts.PAUSE++;
+      } else if (status.status === 'STOP') {
+        counts.STOP++;
       }
     });
     
