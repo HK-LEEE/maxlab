@@ -445,3 +445,18 @@ handleLogout @ index-C6MwXdfO.js:851
   🚫 Circuit breaker: Too many logout attempts, stopping
 handleLogout @ index-C6MwXdfO.js:851
 (anonymous) @ index-C6MwXdfO.js:851
+
+
+
+0|maxplatf | 2025-08-11T17:09:42: 2025-08-11 17:09:42.432 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatf | 2025-08-11T17:09:42: 2025-08-11 17:09:42.433 [DEBUG] app.services.session_monitor:177 - Session check completed: 7 sessions checked (took 0.00s)
+0|maxplatf | 2025-08-11T17:10:21: 2025-08-11 17:10:21.415 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatf | 2025-08-11T17:10:21: 2025-08-11 17:10:21.416 [WARNING] app.utils.auth:224 - JWT verification failed: Signature has expired.
+0|maxplatf | 2025-08-11T17:10:21: 2025-08-11 17:10:21.416 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/me HTTP/1.1" 401
+0|maxplatf | 2025-08-11T17:10:21: 2025-08-11 17:10:21.433 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatf | 2025-08-11T17:10:21: 2025-08-11 17:10:21.436 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatf | 2025-08-11T17:10:26: 2025-08-11 17:10:26.913 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatf | 2025-08-11T17:10:26: 2025-08-11 17:10:26.914 [WARNING] app.utils.auth:224 - JWT verification failed: Signature has expired.
+0|maxplatf | 2025-08-11T17:10:26: 2025-08-11 17:10:26.914 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/me HTTP/1.1" 401
+0|maxplatf | 2025-08-11T17:10:26: 2025-08-11 17:10:26.938 [DEBUG] app.middleware.session_middleware:117 - JWT token expired
+0|maxplatf | 2025-08-11T17:10:26: 2025-08-11 17:10:26.940 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
