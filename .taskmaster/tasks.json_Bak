@@ -1,0 +1,141 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 21,
+        "title": "데이터베이스 스키마 및 모델 구현",
+        "description": "Process Monitoring System을 위한 PostgreSQL 데이터베이스 스키마 설계 및 SQLAlchemy 모델 구현",
+        "details": "PostgreSQL 데이터베이스에 프로세스 플로우, 버전 관리, 장비 마스터 데이터, 측정값, 사용자 권한, 퍼블리싱 토큰을 위한 테이블 생성. SQLAlchemy async 모델 정의하고 마이그레이션 스크립트 작성. JSONB를 사용한 플로우 데이터 저장, 버전 히스토리 관리, 소프트 삭제 구현. 인덱스 최적화 및 데이터 보존 정책 적용.",
+        "testStrategy": "마이그레이션 테스트, 모델 CRUD 작업 테스트, 데이터 무결성 검증, 성능 테스트 (500+ 노드 플로우), 동시성 테스트",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "FastAPI 백엔드 기본 구조 및 인증 시스템 구축",
+        "description": "FastAPI 프레임워크 기반 백엔드 API 서버 구축 및 MaxPlatform SSO 통합",
+        "details": "FastAPI 애플리케이션 초기 설정, OAuth2/OIDC MaxPlatform 통합, JWT 토큰 검증 미들웨어, 사용자 권한 관리 시스템 구현. CORS, 보안 헤더, 속도 제한 설정. PostgreSQL 연결 풀링, Redis 캐싱 설정. OpenAPI 문서 자동 생성 구성. 환경별 설정 관리 (.env).",
+        "testStrategy": "인증 플로우 테스트, 토큰 검증 테스트, 권한 부여 테스트, API 엔드포인트 기본 테스트, 보안 헤더 검증",
+        "priority": "high",
+        "dependencies": [
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "React 19.1.0 프론트엔드 기본 구조 및 테마 시스템 구현",
+        "description": "React 19.1.0 기반 프론트엔드 애플리케이션 초기 구조 및 light/dark 테마 시스템 구현",
+        "details": "React 19.1.0 + TypeScript 프로젝트 설정, Vite 빌드 도구 구성, Tailwind CSS 커스텀 테마 설정. Zustand 상태 관리 설정, React Router 라우팅 구성. Light/Dark 테마 전환 기능, 시스템 선호도 감지, 테마 전환 애니메이션. MaxLab 디자인 시스템 통합, 공통 컴포넌트 라이브러리 구축. Heroicons/Lucide 아이콘 라이브러리 설정.",
+        "testStrategy": "컴포넌트 렌더링 테스트, 테마 전환 테스트, 반응형 디자인 테스트, 접근성 테스트, 크로스 브라우저 호환성 테스트",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "플로우 관리 시스템 및 버전 관리 구현",
+        "description": "프로세스 플로우 CRUD 작업, 버전 관리, 검색/필터링 기능을 포함한 플로우 관리 시스템 구현",
+        "details": "플로우 생성, 수정, 삭제, 조회 API 엔드포인트 구현. 버전 관리 시스템 (최대 100개 버전), diff 비교 기능. 플로우 목록 화면, 검색 및 필터링 (생성자, 날짜, 상태). 배치 작업 (삭제, 아카이브, 내보내기), 메타데이터 관리. 액세스 제어 및 권한 시스템. Import/Export 기능 (JSON/XML 형식).",
+        "testStrategy": "플로우 CRUD 테스트, 버전 관리 테스트, 검색/필터링 테스트, 권한 테스트, 대용량 플로우 처리 테스트",
+        "priority": "high",
+        "dependencies": [
+          21,
+          22
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 25,
+        "title": "ReactFlow 기반 플로우 에디터 핵심 기능 구현",
+        "description": "ReactFlow 11.11.4를 사용한 화학공정 다이어그램 에디터 구현 및 노드/엣지 타입 정의",
+        "details": "ReactFlow 11.11.4 설치 및 설정, 화학공정 특화 노드 타입 구현 (장비, 계측기, 스트림, 주석). 엣지 타입 정의 (물질 흐름, 에너지 흐름, 정보 흐름). 드래그 앤 드롭 기능, 노드/엣지 추가/삭제/편집. 컨텍스트 메뉴, 키보드 단축키 지원. 줌/팬 기능, 미니맵, 컨트롤 패널. 실시간 유효성 검증, 충돌 감지.",
+        "testStrategy": "노드/엣지 조작 테스트, 드래그 앤 드롭 테스트, 키보드 단축키 테스트, 대용량 다이어그램 성능 테스트, 실시간 유효성 검증 테스트",
+        "priority": "high",
+        "dependencies": [
+          23,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "자동 저장 및 충돌 해결 시스템 구현",
+        "description": "에디터의 자동 저장 기능, 충돌 해결, Undo/Redo 시스템 구현",
+        "details": "자동 저장 시스템 (5초 간격), 네트워크 오류 처리 및 재시도 로직. 다중 사용자 충돌 감지 및 해결 시스템, 최종 쓰기 승리 전략. Undo/Redo 스택 관리, 액션 히스토리 추적. 오프라인 지원, 로컬 스토리지 백업. 변경 사항 표시 및 저장 상태 인디케이터.",
+        "testStrategy": "자동 저장 테스트, 충돌 시나리오 테스트, Undo/Redo 기능 테스트, 네트워크 중단 테스트, 오프라인 모드 테스트",
+        "priority": "medium",
+        "dependencies": [
+          25
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "외부 데이터 소스 연동 및 실시간 데이터 통합",
+        "description": ".env 기반 외부 데이터베이스 연결 설정 및 실시간 데이터 스트리밍 시스템 구현",
+        "details": "다중 데이터베이스 지원 (MSSQL, Oracle, PostgreSQL), .env 설정 기반 동적 연결. 데이터 소스 설정 UI, 연결 테스트 기능. WebSocket/SSE 실시간 데이터 스트리밍, MQTT IoT 센서 데이터 통합. 데이터 매핑 및 변환, 단위 변환. 연결 풀 관리, 장애 복구, 서킷 브레이커 패턴.",
+        "testStrategy": "데이터베이스 연결 테스트, 실시간 데이터 스트리밍 테스트, 연결 장애 복구 테스트, 성능 테스트 (100+ 동시 연결)",
+        "priority": "medium",
+        "dependencies": [
+          22
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "실시간 모니터링 대시보드 구현",
+        "description": "실시간 데이터 시각화, 장비 상태 모니터링, 알람 시스템을 포함한 모니터링 화면 구현",
+        "details": "실시간 데이터 시각화 컴포넌트, 장비 상태 인디케이터 (정상/경고/오류). 측정값 표시, 트렌드 차트, 히스토그램. 알람 시스템 (임계값 설정, 알림 표시). 자동 새로고침 (설정 가능한 간격), 데이터 필터링. 반응형 디자인 (모바일 지원), 전체 화면 모드. 내보내기 기능 (PDF, PNG, SVG).",
+        "testStrategy": "실시간 데이터 업데이트 테스트, 알람 시스템 테스트, 차트 성능 테스트, 모바일 반응형 테스트, 내보내기 기능 테스트",
+        "priority": "medium",
+        "dependencies": [
+          25,
+          27
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "공개 퍼블리싱 시스템 및 토큰 기반 액세스 구현",
+        "description": "인증 없이 접근 가능한 공개 모니터링 대시보드 퍼블리싱 시스템 구현",
+        "details": "토큰 기반 공개 액세스 시스템, UUID 토큰 생성 및 관리. 읽기 전용 공개 모니터링 뷰, 인증 우회 미들웨어. 임베드 가능한 위젯 지원, QR 코드 생성 (모바일 액세스). 토큰 만료 및 회전 시스템, 액세스 로그. 공개 엔드포인트 속도 제한, DDoS 보호. SEO 최적화, 메타 태그 지원.",
+        "testStrategy": "토큰 생성 및 검증 테스트, 공개 액세스 테스트, 임베드 위젯 테스트, 보안 테스트 (토큰 우회 시도), 성능 테스트",
+        "priority": "medium",
+        "dependencies": [
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "성능 최적화 및 캐싱 시스템 구현",
+        "description": "대용량 플로우 처리, Redis 캐싱, 가상화를 통한 성능 최적화 구현",
+        "details": "ReactFlow 가상화 및 지연 로딩 구현 (500+ 노드 처리). Redis 캐싱 전략 (플로우 데이터, 실시간 데이터, 사용자 세션). CDN 설정, 정적 자산 최적화. 데이터베이스 쿼리 최적화, 인덱스 튜닝. 백그라운드 작업 처리 (Celery), 이미지 처리. 메모리 사용량 최적화, 가비지 컬렉션 튜닝.",
+        "testStrategy": "대용량 플로우 성능 테스트 (500+ 노드), 동시 사용자 테스트 (100+), 메모리 사용량 테스트, 캐시 효율성 테스트, 페이지 로드 시간 측정",
+        "priority": "medium",
+        "dependencies": [
+          25,
+          27
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-13T23:37:22.174Z",
+      "updated": "2025-08-11T04:33:49.755Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

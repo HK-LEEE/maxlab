@@ -268,27 +268,44 @@ export class AuthErrorInterceptor {
 
       switch (errorData.category) {
         case 'AUTH':
+          // 🔒 Check if current page is a public page
+          const currentPath = window.location.pathname;
+          const isPublicPage = currentPath.startsWith('/public/flow/') || 
+                               currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+          
           if (errorData.error_code === 'AUTH_001' || errorData.error_code === 'AUTH_002') {
             // 🚫 SIMPLIFIED: 401 에러 시 바로 MAX Platform으로 리다이렉트
-            // 토큰 리프레시 시도 없이 즉시 로그인 페이지로 이동
-            console.warn('🚨 Authentication failed - redirecting to MAX Platform');
-            
-            // 모든 스토리지 클리어
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            // MAX Platform으로 직접 리다이렉트
-            window.location.href = 'https://max.dwchem.co.kr/login';
+            // 단, Public 페이지가 아닌 경우에만 리다이렉트
+            if (!isPublicPage) {
+              console.warn('🚨 Authentication failed - redirecting to MAX Platform');
+              
+              // 모든 스토리지 클리어
+              localStorage.clear();
+              sessionStorage.clear();
+              
+              // MAX Platform으로 직접 리다이렉트
+              window.location.href = 'https://max.dwchem.co.kr/login';
+            } else {
+              console.log('📊 Authentication error on public page - continuing without redirect');
+            }
             return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
           } else if (errorData.error_code === 'AUTH_004') {
-            // Authentication required - MAX Platform으로 리다이렉트
-            console.warn('🚨 Authentication required - redirecting to MAX Platform');
-            window.location.href = 'https://max.dwchem.co.kr/login';
+            // Authentication required - MAX Platform으로 리다이렉트 (public 페이지 제외)
+            if (!isPublicPage) {
+              console.warn('🚨 Authentication required - redirecting to MAX Platform');
+              window.location.href = 'https://max.dwchem.co.kr/login';
+            } else {
+              console.log('📊 Authentication required on public page - continuing without redirect');
+            }
             return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
           } else if (errorData.error_code === 'AUTH_005') {
-            // Token revoked - force logout and redirect
-            await authService.logout();
-            window.location.href = 'https://max.dwchem.co.kr/login';
+            // Token revoked - force logout and redirect (public 페이지 제외)
+            if (!isPublicPage) {
+              await authService.logout();
+              window.location.href = 'https://max.dwchem.co.kr/login';
+            } else {
+              console.log('📊 Token revoked on public page - continuing without redirect');
+            }
             return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
           }
           break;

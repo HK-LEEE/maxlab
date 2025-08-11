@@ -1,0 +1,414 @@
+==========================================
+PRODUCT REQUIREMENTS DOCUMENT (PRD)
+==========================================
+Project: Process Monitoring System
+Product: MaxLab Chemical Workspace Extension
+Version: 1.0
+Date: 2025-01-11
+==========================================
+
+1. EXECUTIVE SUMMARY
+==========================================
+The Process Monitoring System is a new feature under the Chemical workspace in MaxLab that enables 
+chemical engineers and process operators to create, manage, and monitor process flow diagrams in 
+real-time. Built on ReactFlow technology, it provides an intuitive interface for designing chemical 
+processes and monitoring equipment status with public sharing capabilities.
+
+Key Features:
+- Process flow diagram creation and editing using ReactFlow
+- Version control and flow management
+- Real-time monitoring with live data integration
+- Public publishing without authentication requirements
+- Multi-database support through .env configuration
+- Light/dark theme support consistent with MaxLab design
+
+2. BUSINESS OBJECTIVES
+==========================================
+2.1 Primary Goals
+- Enable chemical engineers to digitize process flow diagrams
+- Provide real-time monitoring of chemical processes
+- Allow public sharing of monitoring dashboards without authentication
+- Reduce manual process documentation effort by 70%
+- Improve process visibility and collaboration
+
+2.2 Success Metrics
+- User adoption rate: 80% of chemical engineers within 3 months
+- Process digitization: 100+ flows created in first quarter
+- Monitoring uptime: 99.9% availability
+- Public dashboard views: 1000+ monthly views
+- User satisfaction: 4.5+ rating
+
+3. USER PERSONAS
+==========================================
+3.1 Chemical Engineer (Primary)
+- Role: Process design and optimization
+- Needs: Create and modify process flows, simulate scenarios
+- Technical level: Moderate, familiar with engineering software
+- Usage: Daily for design and analysis
+
+3.2 Process Operator (Secondary)
+- Role: Monitor and control chemical processes
+- Needs: Real-time monitoring, quick issue identification
+- Technical level: Basic to moderate
+- Usage: Continuous monitoring during shifts
+
+3.3 Plant Manager (Tertiary)
+- Role: Oversee plant operations
+- Needs: High-level dashboards, KPI monitoring
+- Technical level: Basic
+- Usage: Daily review of key metrics
+
+4. FUNCTIONAL REQUIREMENTS
+==========================================
+
+4.1 Flow Management Screen
+- List all process flows with search and filter
+- Version control with history tracking
+- Batch operations (delete, archive, export)
+- Flow metadata (creator, date, status)
+- Access control and permissions
+- Import/export functionality
+
+4.2 Flow Editor Screen
+- ReactFlow-based diagram editor
+- Chemical process node types:
+  * Equipment nodes (reactors, pumps, valves)
+  * Instrument nodes (sensors, controllers)
+  * Stream nodes (material/energy flows)
+  * Annotation nodes
+- Edge types for different flow types:
+  * Material flow
+  * Energy flow
+  * Information flow
+- Data source configuration from .env
+- Real-time validation
+- Auto-save with conflict resolution
+- Undo/redo functionality
+- Template library
+- Keyboard shortcuts
+
+4.3 Monitoring Flow Screen
+- Real-time data visualization
+- Equipment status indicators
+- Measurement value display
+- Alarm notifications
+- Trend charts and histograms
+- Public publishing with token generation
+- Responsive design for mobile viewing
+- Export capabilities (PDF, PNG, SVG)
+
+4.4 Public Access Features
+- Token-based access without authentication
+- Read-only monitoring view
+- Auto-refresh with configurable intervals
+- Embedded widget support
+- QR code generation for mobile access
+
+5. NON-FUNCTIONAL REQUIREMENTS
+==========================================
+
+5.1 Performance
+- Page load time < 2 seconds
+- Real-time update latency < 500ms
+- Support 100+ concurrent users
+- Handle flows with 500+ nodes
+- 60 FPS for smooth interactions
+
+5.2 Security
+- OAuth2/OIDC integration with MaxPlatform
+- Encrypted data source credentials
+- SQL injection prevention
+- XSS protection
+- Rate limiting for public endpoints
+- Token expiration and rotation
+
+5.3 Scalability
+- Horizontal scaling support
+- Database connection pooling
+- Caching strategy (Redis)
+- CDN for static assets
+- Background job processing
+
+5.4 Reliability
+- 99.9% uptime SLA
+- Automatic failover
+- Data backup every 6 hours
+- Disaster recovery plan
+- Circuit breaker patterns
+
+5.5 Usability
+- WCAG 2.1 AA compliance
+- Mobile responsive design
+- Multi-language support (Korean, English)
+- Keyboard navigation
+- Screen reader compatibility
+
+5.6 Compatibility
+- Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+- React 19.1.0+
+- Node.js 18+
+- PostgreSQL 13+
+- Support for MSSQL, Oracle data sources
+
+6. TECHNICAL ARCHITECTURE
+==========================================
+
+6.1 Frontend Stack
+- React 19.1.0 with TypeScript
+- ReactFlow 11.11.4
+- Zustand for state management
+- Tailwind CSS with custom theme
+- Vite for build tooling
+- Vitest for testing
+
+6.2 Backend Stack
+- FastAPI (Python 3.11+)
+- SQLAlchemy with async support
+- PostgreSQL primary database
+- Redis for caching
+- Celery for background tasks
+
+6.3 Infrastructure
+- Docker containerization
+- Kubernetes orchestration
+- GitHub Actions CI/CD
+- AWS/Azure cloud deployment
+- CloudFlare CDN
+
+6.4 Integration Points
+- MaxPlatform SSO authentication
+- External database connections
+- REST API for third-party systems
+- WebSocket for real-time updates
+- MQTT for IoT sensor data
+
+7. USER INTERFACE REQUIREMENTS
+==========================================
+
+7.1 Design Principles
+- Clean, professional interface
+- Consistent with MaxLab design system
+- Domain-specific visual language
+- Progressive disclosure
+- Mobile-first responsive design
+
+7.2 Theme Support
+- Light theme (default)
+- Dark theme
+- System preference detection
+- Smooth theme transitions
+- Persistent user preference
+
+7.3 Component Library
+- Reusable React components
+- Storybook documentation
+- Consistent spacing and typography
+- Icon library (Heroicons/Lucide)
+- Loading states and skeletons
+
+7.4 Interaction Patterns
+- Drag-and-drop for node placement
+- Context menus for quick actions
+- Keyboard shortcuts for power users
+- Touch gestures for mobile
+- Undo/redo support
+
+8. DATA REQUIREMENTS
+==========================================
+
+8.1 Data Sources
+- Primary: MaxLab PostgreSQL database
+- Secondary: External databases via .env configuration
+- Real-time: WebSocket/SSE streams
+- Historical: Time-series database
+
+8.2 Data Models
+- Process flows (JSONB storage)
+- Flow versions with diffs
+- Equipment master data
+- Measurement readings
+- User permissions
+- Publishing tokens
+
+8.3 Data Retention
+- Active flows: Indefinite
+- Version history: 100 versions or 1 year
+- Monitoring data: 90 days
+- Audit logs: 1 year
+- Deleted flows: 30 days soft delete
+
+9. DEPLOYMENT PLAN
+==========================================
+
+Phase 1: Foundation (Weeks 1-4)
+- Database schema implementation
+- Basic API endpoints
+- Authentication integration
+- Core ReactFlow setup
+
+Phase 2: Editor Development (Weeks 5-8)
+- Flow editor implementation
+- Node and edge types
+- Data source configuration
+- Auto-save functionality
+
+Phase 3: Monitoring Features (Weeks 9-12)
+- Real-time data integration
+- Monitoring dashboard
+- Alert system
+- Performance optimization
+
+Phase 4: Publishing & Polish (Weeks 13-16)
+- Public publishing system
+- Mobile responsiveness
+- Theme integration
+- Documentation and training
+
+Phase 5: Beta Testing (Weeks 17-18)
+- User acceptance testing
+- Performance testing
+- Security audit
+- Bug fixes
+
+Phase 6: Production Release (Week 19-20)
+- Gradual rollout
+- Monitoring setup
+- Support documentation
+- Training sessions
+
+10. RISKS AND MITIGATION
+==========================================
+
+10.1 Technical Risks
+- ReactFlow performance with large diagrams
+  Mitigation: Virtualization and lazy loading
+  
+- Real-time data synchronization complexity
+  Mitigation: Fallback polling mechanism
+  
+- Database connection pool exhaustion
+  Mitigation: Connection pooling and monitoring
+
+10.2 Business Risks
+- Low user adoption
+  Mitigation: User training and change management
+  
+- Data security concerns
+  Mitigation: Encryption and audit logging
+  
+- Integration complexity
+  Mitigation: Phased rollout and testing
+
+11. TESTING REQUIREMENTS
+==========================================
+
+11.1 Unit Testing
+- Component tests with Vitest
+- API endpoint tests with pytest
+- 80% code coverage minimum
+
+11.2 Integration Testing
+- Flow creation workflows
+- Data source connections
+- Authentication flows
+
+11.3 Performance Testing
+- Load testing with 1000+ users
+- Stress testing with large flows
+- Network latency simulation
+
+11.4 Security Testing
+- Penetration testing
+- OWASP vulnerability scan
+- Authentication bypass attempts
+
+11.5 User Acceptance Testing
+- Chemical engineer workflows
+- Operator monitoring scenarios
+- Manager dashboard usage
+
+12. DOCUMENTATION REQUIREMENTS
+==========================================
+
+12.1 Technical Documentation
+- API documentation (OpenAPI/Swagger)
+- Database schema documentation
+- Deployment guide
+- Configuration guide
+
+12.2 User Documentation
+- User manual
+- Quick start guide
+- Video tutorials
+- FAQ section
+
+12.3 Developer Documentation
+- Architecture overview
+- Contributing guidelines
+- Code style guide
+- Testing guide
+
+13. MAINTENANCE AND SUPPORT
+==========================================
+
+13.1 Monitoring
+- Application performance monitoring (APM)
+- Error tracking (Sentry)
+- Usage analytics
+- Database performance metrics
+
+13.2 Support Levels
+- L1: Basic user support
+- L2: Technical support
+- L3: Development team escalation
+
+13.3 Update Schedule
+- Security patches: As needed
+- Bug fixes: Bi-weekly
+- Feature updates: Monthly
+- Major releases: Quarterly
+
+14. SUCCESS CRITERIA
+==========================================
+
+14.1 Launch Criteria
+- All P0 features implemented
+- Performance benchmarks met
+- Security audit passed
+- Documentation complete
+- Training materials ready
+
+14.2 Post-Launch Metrics
+- 95% uptime in first month
+- < 5 critical bugs
+- 80% user satisfaction
+- 50+ flows created
+- 10+ public dashboards published
+
+15. APPENDICES
+==========================================
+
+A. Glossary of Terms
+- Process Flow: Visual representation of chemical process
+- Node: Component in flow diagram (equipment, instrument)
+- Edge: Connection between nodes
+- Publishing: Making flow publicly accessible
+- Data Source: External database connection
+
+B. Reference Documents
+- /docs_pm/01_frontend_implementation.md
+- /docs_pm/02_backend_architecture.md
+- /docs_pm/03_ux_design.md
+- MaxLab System Architecture
+- MaxPlatform SSO Documentation
+
+C. Approval Sign-offs
+- Product Owner: ________________
+- Technical Lead: ________________
+- UX Designer: ________________
+- QA Lead: ________________
+- Security Officer: ________________
+
+==========================================
+END OF DOCUMENT
+==========================================

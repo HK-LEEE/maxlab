@@ -1,173 +1,93 @@
 {
 	"meta": {
-		"generatedAt": "2025-07-18T00:34:10.846Z",
+		"generatedAt": "2025-08-11T04:40:04.428Z",
 		"tasksAnalyzed": 10,
 		"totalTasks": 10,
-		"analysisCount": 20,
+		"analysisCount": 10,
 		"thresholdScore": 5,
 		"projectName": "Task Master",
-		"usedResearch": true
+		"usedResearch": false
 	},
 	"complexityAnalysis": [
 		{
-			"taskId": 1,
-			"taskTitle": "Database Security and Performance Optimization",
+			"taskId": 21,
+			"taskTitle": "데이터베이스 스키마 및 모델 구현",
 			"complexityScore": 8,
 			"recommendedSubtasks": 6,
-			"expansionPrompt": "Break down into database performance optimization (indexing, query optimization), connection pooling setup, SSL/TLS security implementation, backup strategy, PostgreSQL production configuration, and monitoring implementation",
-			"reasoning": "High complexity due to multiple technical domains (performance, security, configuration) requiring deep PostgreSQL expertise and production-ready implementation"
+			"expansionPrompt": "PostgreSQL 데이터베이스 스키마와 SQLAlchemy 모델을 단계적으로 구현하세요. 프로세스 플로우 테이블, 버전 관리 시스템, 장비 마스터 데이터, 측정값 저장, 사용자 권한, 퍼블리싱 토큰 관리를 위한 테이블과 모델을 각각 분리하여 작업하고, 인덱스 최적화와 마이그레이션을 포함하세요.",
+			"reasoning": "복잡한 데이터베이스 설계와 여러 도메인의 테이블, JSONB 활용, 성능 최적화가 필요한 고복잡도 작업"
 		},
 		{
-			"taskId": 2,
-			"taskTitle": "Authentication System Security Hardening",
+			"taskId": 22,
+			"taskTitle": "FastAPI 백엔드 기본 구조 및 인증 시스템 구축",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "FastAPI 애플리케이션의 기본 구조를 설정하고 MaxPlatform SSO 통합을 구현하세요. 프로젝트 구조 설정, OAuth2/OIDC 인증 구현, 미들웨어 설정, 데이터베이스 연결, OpenAPI 문서 설정을 단계적으로 진행하세요.",
+			"reasoning": "복잡한 인증 시스템과 외부 SSO 통합, 여러 보안 구성 요소가 필요한 중고복잡도 작업"
+		},
+		{
+			"taskId": 23,
+			"taskTitle": "React 19.1.0 프론트엔드 기본 구조 및 테마 시스템 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "React 19.1.0 프로젝트의 기본 구조를 설정하고 테마 시스템을 구현하세요. 프로젝트 초기 설정, 상태 관리 및 라우팅 구성, 테마 시스템 구현, 공통 컴포넌트 라이브러리 구축을 순서대로 진행하세요.",
+			"reasoning": "최신 React 기술과 테마 시스템 구현이 필요하지만 상대적으로 표준적인 프론트엔드 설정 작업"
+		},
+		{
+			"taskId": 24,
+			"taskTitle": "플로우 관리 시스템 및 버전 관리 구현",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "플로우 관리의 핵심 기능들을 단계적으로 구현하세요. CRUD API 엔드포인트, 버전 관리 시스템, 검색 및 필터링, 배치 작업, 권한 시스템, Import/Export 기능을 각각 분리하여 작업하세요.",
+			"reasoning": "복잡한 버전 관리 시스템, 다양한 검색/필터링 기능, 배치 처리가 포함된 고복잡도 작업"
+		},
+		{
+			"taskId": 25,
+			"taskTitle": "ReactFlow 기반 플로우 에디터 핵심 기능 구현",
 			"complexityScore": 9,
 			"recommendedSubtasks": 7,
-			"expansionPrompt": "Split into secure token refresh implementation, CSRF protection setup, session security enhancement, API rate limiting with Redis, JWT validation and blacklisting, logout with token revocation, and brute force protection",
-			"reasoning": "Very high complexity involving multiple security protocols, OAuth 2.0 intricacies, and critical security vulnerabilities that require expert-level implementation"
+			"expansionPrompt": "ReactFlow를 활용한 화학공정 다이어그램 에디터를 단계적으로 구현하세요. ReactFlow 설정, 화학공정 특화 노드 타입, 엣지 타입, 드래그앤드롭 기능, UI 컨트롤, 실시간 검증, 대용량 처리 최적화를 각각 분리하여 작업하세요.",
+			"reasoning": "복잡한 시각적 에디터, 특화된 노드/엣지 타입, 실시간 검증, 대용량 처리가 필요한 최고복잡도 작업"
 		},
 		{
-			"taskId": 3,
-			"taskTitle": "Process Flow Editor Stability Enhancement",
+			"taskId": 26,
+			"taskTitle": "자동 저장 및 충돌 해결 시스템 구현",
 			"complexityScore": 7,
 			"recommendedSubtasks": 5,
-			"expansionPrompt": "Divide into React Error Boundaries implementation, ReactFlow performance optimization with virtualization, auto-save functionality with debouncing, memory leak fixes using React hooks optimization, and performance monitoring setup",
-			"reasoning": "High complexity due to React performance optimization, memory management challenges, and ReactFlow-specific optimization requiring advanced React knowledge"
+			"expansionPrompt": "에디터의 자동 저장과 충돌 해결 시스템을 구현하세요. 자동 저장 메커니즘, 충돌 감지 및 해결, Undo/Redo 시스템, 오프라인 지원, 상태 표시 기능을 단계적으로 구현하세요.",
+			"reasoning": "복잡한 동시성 처리, 충돌 해결 알고리즘, 오프라인 지원이 필요한 중고복잡도 작업"
 		},
 		{
-			"taskId": 4,
-			"taskTitle": "API Optimization and Error Handling",
-			"complexityScore": 7,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Break into structured error handling implementation, API response caching with Redis, database query optimization, request/response validation with Pydantic, comprehensive logging setup, and API versioning strategy",
-			"reasoning": "High complexity involving FastAPI optimization, caching strategies, database performance, and comprehensive error handling patterns"
-		},
-		{
-			"taskId": 5,
-			"taskTitle": "Mock Data Identification and Removal",
-			"complexityScore": 5,
-			"recommendedSubtasks": 4,
-			"expansionPrompt": "Split into codebase scanning for hardcoded data, mock API response removal and real endpoint replacement, development configuration cleanup, and automated testing data removal",
-			"reasoning": "Medium complexity requiring systematic code review and careful replacement without breaking functionality, but mostly manual work"
-		},
-		{
-			"taskId": 6,
-			"taskTitle": "Real Data Integration and Validation",
+			"taskId": 27,
+			"taskTitle": "외부 데이터 소스 연동 및 실시간 데이터 통합",
 			"complexityScore": 8,
 			"recommendedSubtasks": 6,
-			"expansionPrompt": "Divide into MAX Platform user profile integration, equipment data source connections, real-time WebSocket implementation, data validation schema creation, data transformation pipelines, and data quality monitoring setup",
-			"reasoning": "High complexity involving external API integrations, real-time data handling, and data pipeline architecture requiring robust error handling"
+			"expansionPrompt": "다중 외부 데이터 소스 연동과 실시간 데이터 통합을 구현하세요. 데이터베이스 연결 관리, 데이터 소스 설정 UI, 실시간 스트리밍, IoT 데이터 통합, 데이터 변환, 장애 복구 시스템을 각각 분리하여 작업하세요.",
+			"reasoning": "다양한 외부 시스템 연동, 실시간 처리, 복잡한 장애 복구 메커니즘이 필요한 고복잡도 작업"
 		},
 		{
-			"taskId": 7,
-			"taskTitle": "Production Environment Configuration",
-			"complexityScore": 6,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Break into environment configuration setup, SSL/TLS certificate configuration, reverse proxy with Nginx setup, security headers implementation, and production database connection configuration",
-			"reasoning": "Medium-high complexity involving DevOps knowledge, security configuration, and production deployment expertise"
-		},
-		{
-			"taskId": 8,
-			"taskTitle": "Monitoring and Alerting System",
+			"taskId": 28,
+			"taskTitle": "실시간 모니터링 대시보드 구현",
 			"complexityScore": 7,
 			"recommendedSubtasks": 5,
-			"expansionPrompt": "Split into Prometheus metrics setup, Grafana dashboard creation, structured logging implementation, health check endpoints creation, and alerting system configuration",
-			"reasoning": "High complexity requiring monitoring system expertise, observability patterns, and integration of multiple monitoring tools"
+			"expansionPrompt": "실시간 모니터링 대시보드의 핵심 기능들을 구현하세요. 실시간 데이터 시각화, 장비 상태 모니터링, 알람 시스템, 반응형 디자인, 내보내기 기능을 단계적으로 구현하세요.",
+			"reasoning": "실시간 데이터 처리, 복잡한 시각화, 알람 시스템이 포함된 중고복잡도 작업"
 		},
 		{
-			"taskId": 9,
-			"taskTitle": "Performance Optimization and Scaling",
-			"complexityScore": 6,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Divide into React code splitting and lazy loading, Vite build optimization, CDN integration, Redis caching implementation, and service worker setup for offline capabilities",
-			"reasoning": "Medium-high complexity involving frontend performance optimization, build tools configuration, and caching strategies"
-		},
-		{
-			"taskId": 10,
-			"taskTitle": "Documentation and User Guide Creation",
-			"complexityScore": 4,
-			"recommendedSubtasks": 4,
-			"expansionPrompt": "Break into user manual creation, OpenAPI/Swagger documentation generation, administrator guide writing, and troubleshooting documentation creation",
-			"reasoning": "Medium complexity primarily involving content creation and documentation tools, but requires understanding of all system components"
-		},
-		{
-			"taskId": 11,
-			"taskTitle": "Remove Fallback Authentication Logic",
+			"taskId": 29,
+			"taskTitle": "공개 퍼블리싱 시스템 및 토큰 기반 액세스 구현",
 			"complexityScore": 6,
 			"recommendedSubtasks": 4,
-			"expansionPrompt": "Break down the removal of fallback authentication into: 1) Identify and document all fallback code locations, 2) Remove decode_jwt_token_locally() and its references, 3) Clean up verify_token_with_auth_server() to remove conditional paths, 4) Remove environment-specific auth branching and multi-tier verification",
-			"reasoning": "Medium-high complexity due to the need to carefully identify and remove intertwined fallback logic without breaking existing functionality. Requires thorough code analysis and careful refactoring."
+			"expansionPrompt": "공개 퍼블리싱 시스템을 구현하세요. 토큰 기반 인증 시스템, 공개 모니터링 뷰, 임베드 위젯 및 QR 코드, 보안 및 SEO 최적화를 단계적으로 구현하세요.",
+			"reasoning": "토큰 기반 인증과 공개 액세스 시스템이지만 상대적으로 표준적인 보안 패턴을 따르는 중복잡도 작업"
 		},
 		{
-			"taskId": 12,
-			"taskTitle": "Implement OAuth-Only Authentication Flow",
+			"taskId": 30,
+			"taskTitle": "성능 최적화 및 캐싱 시스템 구현",
 			"complexityScore": 8,
 			"recommendedSubtasks": 6,
-			"expansionPrompt": "Implement OAuth-only flow with: 1) Design new verify_token_with_auth_server() architecture, 2) Implement proper Bearer token handling and HTTP headers, 3) Configure SERVICE_TOKEN management, 4) Integrate with MAX Platform OAuth userinfo endpoint, 5) Implement error handling for OAuth failures, 6) Performance optimization to meet 200ms requirement",
-			"reasoning": "High complexity as it involves completely rewriting core authentication logic, fixing existing bugs, integrating with external OAuth service, and meeting strict performance requirements."
-		},
-		{
-			"taskId": 13,
-			"taskTitle": "Design Comprehensive Error Code System",
-			"complexityScore": 4,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Create error code system with: 1) Define error code structure and categories (AUTH_XXX), 2) Map technical errors to user-friendly messages, 3) Design error response schema with code, message, and action fields",
-			"reasoning": "Low-medium complexity as it's primarily a design task requiring good organization and user experience considerations, but no complex technical implementation."
-		},
-		{
-			"taskId": 14,
-			"taskTitle": "Implement Backend Error Handling",
-			"complexityScore": 7,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Implement error handling with: 1) Add try-catch blocks to all auth functions, 2) Map exceptions to error codes, 3) Handle OAuth-specific failures (timeouts, invalid tokens), 4) Implement structured error response formatting, 5) Ensure immediate failure strategy without retries",
-			"reasoning": "Medium-high complexity due to the need to handle various failure scenarios consistently across the backend, ensure proper error propagation, and maintain performance requirements."
-		},
-		{
-			"taskId": 15,
-			"taskTitle": "Develop Frontend Error UI Components",
-			"complexityScore": 5,
-			"recommendedSubtasks": 4,
-			"expansionPrompt": "Create error UI components: 1) Design and implement reusable error modal/popup component, 2) Implement error code to UI message mapping, 3) Add user action buttons based on error type, 4) Ensure responsive design and accessibility compliance",
-			"reasoning": "Medium complexity involving UI/UX design, component development, and proper integration with the error handling system while maintaining good user experience."
-		},
-		{
-			"taskId": 16,
-			"taskTitle": "Unify Development and Production Environment Configuration",
-			"complexityScore": 6,
-			"recommendedSubtasks": 4,
-			"expansionPrompt": "Unify environments by: 1) Audit current environment-specific authentication code, 2) Create unified OAuth configuration structure, 3) Standardize environment variables across environments, 4) Remove all conditional environment branching in auth code",
-			"reasoning": "Medium-high complexity due to the need to ensure consistency across environments without breaking existing deployments, requiring careful configuration management."
-		},
-		{
-			"taskId": 17,
-			"taskTitle": "Optimize Dependency Management",
-			"complexityScore": 7,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Optimize dependencies: 1) Analyze Redis usage and make it optional, 2) Implement graceful Redis failure handling, 3) Define and validate SERVICE_TOKEN requirements, 4) Document all external dependencies and failure modes, 5) Implement dependency health checks",
-			"reasoning": "Medium-high complexity as it involves refactoring core dependencies, ensuring system resilience, and potentially removing or making optional critical infrastructure components."
-		},
-		{
-			"taskId": 18,
-			"taskTitle": "Implement Frontend Token Management Simplification",
-			"complexityScore": 7,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Simplify token management: 1) Remove multi-token type handling code, 2) Implement automatic token refresh logic, 3) Create seamless re-authentication flow, 4) Implement secure browser token storage, 5) Add token expiration monitoring",
-			"reasoning": "Medium-high complexity involving security considerations, user experience optimization, and proper integration with the OAuth-only backend while maintaining session continuity."
-		},
-		{
-			"taskId": 19,
-			"taskTitle": "Implement Security Enhancements",
-			"complexityScore": 8,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Enhance security with: 1) Implement HTTPS enforcement for all auth endpoints, 2) Add/verify CSRF protection mechanisms, 3) Implement rate limiting on auth endpoints, 4) Secure token transmission protocols, 5) Implement proper session management, 6) Add security headers and audit logging",
-			"reasoning": "High complexity due to critical security requirements, multiple attack vectors to address, and the need for thorough testing to ensure no vulnerabilities are introduced."
-		},
-		{
-			"taskId": 20,
-			"taskTitle": "Create Comprehensive Testing and Documentation",
-			"complexityScore": 9,
-			"recommendedSubtasks": 7,
-			"expansionPrompt": "Create testing and documentation: 1) Develop end-to-end integration test suite, 2) Create performance test suite for 200ms requirement, 3) Build user acceptance test scenarios, 4) Write OAuth flow technical documentation, 5) Create developer onboarding guide, 6) Document troubleshooting procedures, 7) Establish continuous testing pipeline",
-			"reasoning": "Very high complexity due to the comprehensive nature of testing requirements, need for multiple test strategies, extensive documentation needs, and dependency on all other tasks being completed."
+			"expansionPrompt": "시스템 전반의 성능 최적화를 구현하세요. ReactFlow 가상화, Redis 캐싱 전략, CDN 설정, 데이터베이스 최적화, 백그라운드 작업 처리, 메모리 최적화를 각각 분리하여 작업하세요.",
+			"reasoning": "복잡한 성능 최적화, 다양한 캐싱 전략, 시스템 전반의 튜닝이 필요한 고복잡도 작업"
 		}
 	]
 }
