@@ -1,222 +1,127 @@
-12:13:44.388 GET
-https://max.dwchem.co.kr/login
-[HTTP/2 200  3ms]
-
-12:13:44.458 GET
-https://max.dwchem.co.kr/assets/index-tH9mwzno.js
-[HTTP/2 200  5ms]
-
-12:13:44.459 GET
-https://max.dwchem.co.kr/assets/index-BAsSAK70.css
-[HTTP/2 200  25ms]
-
-12:13:44.477 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
-12:13:44.503 GET
-https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
-[HTTP/2 200  183ms]
-
-12:13:44.718 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
-index-tH9mwzno.js:705:971
-12:13:44.719 🔐 AuthContext initAuth 시작: 
-Object { hasToken: false }
-index-tH9mwzno.js:529:68503
-12:13:44.719 📡 TRY start index-tH9mwzno.js:529:68565
-12:13:44.719 ❌ 토큰이 없어 인증되지 않은 상태 index-tH9mwzno.js:529:69250
-12:13:44.722 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
-index-tH9mwzno.js:705:971
-12:13:44.742 GET
-https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
-[HTTP/2 200  228ms]
-
-12:13:44.749 GET
-https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
-[HTTP/2 200  221ms]
-
-12:13:44.750 GET
-https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
-[HTTP/2 200  269ms]
-
-12:13:45.009 GET
-https://max.dwchem.co.kr/favicon.ico
-[HTTP/2 200  0ms]
-
-12:13:51.491 XHRPOST
-https://max.dwchem.co.kr/api/auth/login
-[HTTP/2 200  237ms]
-
-12:13:51.736 🔐 AuthContext initAuth 시작: 
-Object { hasToken: true }
-index-tH9mwzno.js:529:68503
-12:13:51.737 XHRGET
-https://max.dwchem.co.kr/api/auth/me
-[HTTP/2 200  4ms]
-
-12:13:51.737 📡 TRY start index-tH9mwzno.js:529:68565
-12:13:51.737 📡 사용자 정보 로드 시작 index-tH9mwzno.js:529:68992
-12:13:51.746 XHRGET
-https://max.dwchem.co.kr/api/auth/me
-[HTTP/2 200  6ms]
-
-12:13:51.748 🔄 SSO: Syncing login to MAX Lab... index-tH9mwzno.js:529:67913
-12:13:51.752 GET
-https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU0ODgzODMxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0ODgyMDMxLCJqdGkiOiI5NzEwYmZkNC1lMGM3LTQ0MDItODdiNC03N2ZlZDI4OWRkZTgiLCJuYmYiOjE3NTQ4ODIwMzEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiJkNTE4ZmVkMTdlM2M1ZDFkIn0.TdQaJNPvCVnRGGqsC6VyYGiZFGftDIsfHsjGbPeEhw4&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-11T03:13:51.709016","login_count":588,"roles":[],"groups":[]}
-[HTTP/2 200  1ms]
-
-12:13:51.752 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
-index-tH9mwzno.js:705:971
-12:13:51.752 ✅ User authenticated, checking OAuth return... index-tH9mwzno.js:705:1270
-12:13:51.758 ✅ 사용자 정보 로드 성공: 
-Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
-index-tH9mwzno.js:529:69196
-12:13:51.775 XHRGET
-https://max.dwchem.co.kr/api/services/mother-page
-[HTTP/2 200  16ms]
-
-12:13:51.818 Features response: 
-Object { user_info: {…}, services: (9) […], categories: (5) […] }
-index-tH9mwzno.js:712:36612
-12:13:51.819 Features data: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-index-tH9mwzno.js:712:36653
-12:13:51.823 GET
-https://maxlab.dwchem.co.kr/assets/index-DNrsbNI2.js
-[HTTP/2 200  3ms]
-
-12:13:51.824 GET
-https://maxlab.dwchem.co.kr/assets/index-DwhDH3qg.css
-[HTTP/2 200  34ms]
-
-12:13:51.950 🔄 Rehydrating auth state for initialization 
-Object { state: {…} }
-index-DNrsbNI2.js:228:5243
-12:13:51.952 📋 Authenticated user detected - will validate with server index-DNrsbNI2.js:228:5774
-12:13:51.952 📋 Rehydrated state (pending server validation): 
-Object { user: {…}, isAuthenticated: true, initState: "syncing", error: null, lastSyncTime: 1754881991959, retryCount: 0, setAuthState: setAuthState(n), setAuthError: setAuthError(n), clearError: clearError(), incrementRetry: incrementRetry(), … }
-index-DNrsbNI2.js:228:5933
-12:13:51.954 🛡️ CSRF protection initialized with existing token index-DNrsbNI2.js:263:5675
-12:13:51.959 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-DNrsbNI2.js:263:20823
-12:13:51.964 🔀 OAuth Coordinator [03:13:51][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-DNrsbNI2.js:263:50721
-12:13:51.971 ✅ SSO: MAX Lab sync iframe loaded index-tH9mwzno.js:529:68175
-12:13:51.972 ✅ Auth sync initialized with BroadcastChannel index-DNrsbNI2.js:263:92335
-12:13:51.972 🔒 Initializing cross-domain logout listener index-DNrsbNI2.js:846:94683
-12:13:51.973 📡 SSO: PostMessage listener registered index-DNrsbNI2.js:846:96902
-12:13:51.973 🔄 Auth state change: idle → syncing 
-Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
-index-DNrsbNI2.js:227:10583
-12:13:51.973 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-DNrsbNI2.js:258:13225
-12:13:51.990 XHRGET
-https://max.dwchem.co.kr/api/oauth/userinfo
-[HTTP/2 200  6ms]
-
-12:13:52.004 🔄 Auth state change: ready → ready 
-Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
-index-DNrsbNI2.js:227:10583
-12:13:52.006 No routes matched location "/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU0ODgzODMxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU0ODgyMDMxLCJqdGkiOiI5NzEwYmZkNC1lMGM3LTQ0MDItODdiNC03N2ZlZDI4OWRkZTgiLCJuYmYiOjE3NTQ4ODIwMzEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiJkNTE4ZmVkMTdlM2M1ZDFkIn0.TdQaJNPvCVnRGGqsC6VyYGiZFGftDIsfHsjGbPeEhw4&user=%7B%22id%22%3A%2221a2aaa7-444a-4038-bda3-d8bf2c4ef162%22%2C%22real_name%22%3A%22%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22display_name%22%3A%22admin%22%2C%22email%22%3A%22admin%40test.com%22%2C%22phone_number%22%3A%22010-1234-5678%22%2C%22department%22%3A%22%EA%B4%80%EB%A6%AC%EB%B6%80%22%2C%22position%22%3A%22%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Atrue%2C%22is_verified%22%3Atrue%2C%22created_at%22%3A%222025-06-19T16%3A50%3A56.017084%22%2C%22last_login_at%22%3A%222025-08-11T03%3A13%3A51.709016%22%2C%22login_count%22%3A588%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D" index-DNrsbNI2.js:49:38912
-12:14:11.638 Feature clicked: 
-Object { id: "15", name: "MAX LAB", display_name: "MAX LAB", description: "", category: "dashboard", icon: "max lab", url_path: "https://maxlab.dwchem.co.kr", is_external: true, open_in_new_tab: true, is_active: true }
-index-tH9mwzno.js:712:38192
-12:14:11.639 Feature URL path: https://maxlab.dwchem.co.kr index-tH9mwzno.js:712:38226
-12:14:15.652 GET
-https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
-[HTTP/2 200  0ms]
-
-12:14:16.613 🔄 Starting smart logout process... index-tH9mwzno.js:712:9145
-12:14:16.614 🔄 Calling backend logout API... index-tH9mwzno.js:712:9302
-12:14:16.616 XHRPOST
-https://max.dwchem.co.kr/api/user/sessions/logout
-[HTTP/2 500  7ms]
-
-12:14:16.635 Error during logout: Error: 데이터베이스 연결 오류가 발생했습니다.
-    n useSimpleLogout.ts:38
-    p MainLayout.tsx:66
-    i SimpleLogoutModal.tsx:23
-    React 16
-    <anonymous> main.tsx:18
-index-tH9mwzno.js:712:8650
-12:14:16.636 ⚠️ 백엔드 로그아웃 API 오류: Error: 데이터베이스 연결 오류가 발생했습니다.
-    n useSimpleLogout.ts:38
-    p MainLayout.tsx:66
-    i SimpleLogoutModal.tsx:23
-    React 16
-    <anonymous> main.tsx:18
-index-tH9mwzno.js:712:9416
-12:14:16.636 🔄 Performing SSO logout... index-tH9mwzno.js:712:9454
-12:14:16.636 🔄 Starting enhanced logout process... index-tH9mwzno.js:529:70143
-12:14:16.636 🔄 Executing cross-domain logout synchronization... index-tH9mwzno.js:529:70295
-12:14:16.636 🔄 Starting cross-domain logout process... index-tH9mwzno.js:529:64602
-12:14:16.636 ✅ Local storage cleared index-tH9mwzno.js:529:66433
-12:14:16.636 Cookie “access_token” has been rejected for invalid domain. login
-12:14:16.636 Cookie “session_id” has been rejected for invalid domain. login
-12:14:16.636 Cookie “session_token” has been rejected for invalid domain. login
-12:14:16.636 Cookie “user_id” has been rejected for invalid domain. login
-12:14:16.636 Cookie “refresh_token” has been rejected for invalid domain. login
-12:14:16.636 ✅ Cookies cleared for .dwchem.co.kr index-tH9mwzno.js:529:67002
-12:14:16.636 🔄 Attempting MAX Lab logout sync (attempt 1/2) index-tH9mwzno.js:529:65200
-12:14:16.640 GET
-https://maxlab.dwchem.co.kr/oauth/logout-sync
-[HTTP/2 200  0ms]
-
-12:14:16.641 🔐 AuthContext initAuth 시작: 
-Object { hasToken: false }
-index-tH9mwzno.js:529:68503
-12:14:16.642 📡 TRY start index-tH9mwzno.js:529:68565
-12:14:16.642 ❌ 토큰이 없어 인증되지 않은 상태 index-tH9mwzno.js:529:69250
-12:14:16.648 🔍 OAuth useEffect triggered: 
-Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
-index-tH9mwzno.js:705:971
-12:14:16.716 GET
-https://maxlab.dwchem.co.kr/assets/index-DNrsbNI2.js
-[HTTP/2 200  3ms]
-
-12:14:16.717 GET
-https://maxlab.dwchem.co.kr/assets/index-DwhDH3qg.css
-[HTTP/2 200  31ms]
-
-12:14:16.840 🔄 Rehydrating auth state for initialization 
-Object { state: {…} }
-index-DNrsbNI2.js:228:5243
-12:14:16.841 📋 Authenticated user detected - will validate with server index-DNrsbNI2.js:228:5774
-12:14:16.842 📋 Rehydrated state (pending server validation): 
-Object { user: {…}, isAuthenticated: true, initState: "syncing", error: null, lastSyncTime: 1754882051835, retryCount: 0, setAuthState: setAuthState(n), setAuthError: setAuthError(n), clearError: clearError(), incrementRetry: incrementRetry(), … }
-index-DNrsbNI2.js:228:5933
-12:14:16.844 🛡️ CSRF protection initialized with existing token index-DNrsbNI2.js:263:5675
-12:14:16.851 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-DNrsbNI2.js:263:20823
-12:14:16.853 🔀 OAuth Coordinator [03:14:16][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-DNrsbNI2.js:263:50721
-12:14:16.860 📡 MAX Lab logout sync iframe loaded index-tH9mwzno.js:529:65987
-12:14:16.861 ✅ Auth sync initialized with BroadcastChannel index-DNrsbNI2.js:263:92335
-12:14:16.861 🔒 Initializing cross-domain logout listener index-DNrsbNI2.js:846:94683
-12:14:16.861 📡 SSO: PostMessage listener registered index-DNrsbNI2.js:846:96902
-12:14:16.861 🔄 Auth state change: idle → syncing 
-Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
-index-DNrsbNI2.js:227:10583
-12:14:16.861 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-DNrsbNI2.js:258:13225
-12:14:16.873 XHRGET
-https://max.dwchem.co.kr/api/oauth/userinfo
-[HTTP/2 200  9ms]
-
-12:14:16.916 🔄 Auth state change: ready → ready 
-Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
-index-DNrsbNI2.js:227:10583
-12:14:16.918 No routes matched location "/oauth/logout-sync" index-DNrsbNI2.js:49:38912
-12:14:21.865 XHRGET
-https://max.dwchem.co.kr/api/oauth/userinfo
-[HTTP/2 200  7ms]
+AuthContext.tsx:64 🔐 AuthContext initAuth 시작: Object
+AuthContext.tsx:68 📡 TRY start
+AuthContext.tsx:89 📡 사용자 정보 로드 시작
+AuthContext.tsx:97 ✅ 사용자 정보 로드 성공: Object
+DashboardPage.tsx:98 Features response: Object
+DashboardPage.tsx:99 Features data: Array(9)
+DashboardPage.tsx:204 Feature clicked: Object
+DashboardPage.tsx:205 Feature URL path: https://maxlab.dwchem.co.kr
+MainLayout.tsx:54 🔄 Starting smart logout process...
+MainLayout.tsx:65 🔄 Calling backend logout API...
+MainLayout.tsx:67 ✅ Backend logout API completed
+MainLayout.tsx:75 🔄 Performing SSO logout...
+AuthContext.tsx:172 🔄 Starting enhanced logout process...
+AuthContext.tsx:184 🔄 Executing cross-domain logout synchronization...
+crossDomainLogout.ts:35 🔄 Starting cross-domain logout process...
+crossDomainLogout.ts:180 ✅ Local storage cleared
+crossDomainLogout.ts:219 ✅ Cookies cleared
+crossDomainLogout.ts:84 🔄 Attempting MAX Lab logout sync (attempt 1/2)
+AuthContext.tsx:64 🔐 AuthContext initAuth 시작: Object
+AuthContext.tsx:68 📡 TRY start
+AuthContext.tsx:105 ❌ 토큰이 없어 인증되지 않은 상태
+LoginPage.jsx:33 🔍 OAuth useEffect triggered: Object
+VM1053 index-hqrokkxs.js:228 🔄 Rehydrating auth state for initialization Object
+VM1053 index-hqrokkxs.js:228 📋 Authenticated user detected - will validate with server
+VM1053 index-hqrokkxs.js:228 📋 Rehydrated state (pending server validation): Object
+VM1053 index-hqrokkxs.js:263 🛡️ CSRF protection initialized with existing token
+VM1053 index-hqrokkxs.js:263 🔀 OAuth Coordinator [06:54:36][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized
+crossDomainLogout.ts:134 📡 MAX Lab logout sync iframe loaded
+VM1053 index-hqrokkxs.js:263 ✅ Auth sync initialized with BroadcastChannel
+VM1053 index-hqrokkxs.js:846 🔒 Initializing cross-domain logout listener
+VM1053 index-hqrokkxs.js:846 📡 SSO: PostMessage listener registered
+VM1053 index-hqrokkxs.js:227 🔄 Auth state change: idle → syncing Object
+VM1053 index-hqrokkxs.js:258 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo
+VM1053 index-hqrokkxs.js:227 🔄 Auth state change: ready → ready Object
+VM1053 index-hqrokkxs.js:49 No routes matched location "/oauth/logout-sync" 
+Vs @ VM1053 index-hqrokkxs.js:49
+Nv @ VM1053 index-hqrokkxs.js:51
+wN @ VM1053 index-hqrokkxs.js:49
+IN @ VM1053 index-hqrokkxs.js:51
+hh @ VM1053 index-hqrokkxs.js:48
+Ah @ VM1053 index-hqrokkxs.js:48
+Xy @ VM1053 index-hqrokkxs.js:48
+_0 @ VM1053 index-hqrokkxs.js:48
+P_ @ VM1053 index-hqrokkxs.js:48
+ef @ VM1053 index-hqrokkxs.js:48
+x0 @ VM1053 index-hqrokkxs.js:48
+z0 @ VM1053 index-hqrokkxs.js:48
+Ti @ VM1053 index-hqrokkxs.js:48
+D0 @ VM1053 index-hqrokkxs.js:48
+(anonymous) @ VM1053 index-hqrokkxs.js:48
+crossDomainLogout.ts:93 ⚠️ MAX Lab logout sync timeout
+(anonymous) @ crossDomainLogout.ts:93
+crossDomainLogout.ts:84 🔄 Attempting MAX Lab logout sync (attempt 2/2)
+index-hqrokkxs.js:228 🔄 Rehydrating auth state for initialization {state: {…}}
+index-hqrokkxs.js:228 📋 Authenticated user detected - will validate with server
+index-hqrokkxs.js:228 📋 Rehydrated state (pending server validation): {user: {…}, isAuthenticated: true, initState: 'syncing', error: null, lastSyncTime: 1754895276683, …}
+index-hqrokkxs.js:263 🛡️ CSRF protection initialized with existing token
+index-hqrokkxs.js:263 🔀 OAuth Coordinator [06:55:06][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized
+crossDomainLogout.ts:134 📡 MAX Lab logout sync iframe loaded
+index-hqrokkxs.js:263 ✅ Auth sync initialized with BroadcastChannel
+index-hqrokkxs.js:846 🔒 Initializing cross-domain logout listener
+index-hqrokkxs.js:846 📡 SSO: PostMessage listener registered
+index-hqrokkxs.js:227 🔄 Auth state change: idle → syncing {isAuthenticated: true, hasUser: true, stackTrace: Array(3)}
+index-hqrokkxs.js:258 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo
+index-hqrokkxs.js:227 🔄 Auth state change: ready → ready {isAuthenticated: true, hasUser: true, stackTrace: Array(2)}
+index-hqrokkxs.js:49 No routes matched location "/oauth/logout-sync" 
+Vs @ index-hqrokkxs.js:49
+Nv @ index-hqrokkxs.js:51
+wN @ index-hqrokkxs.js:49
+IN @ index-hqrokkxs.js:51
+hh @ index-hqrokkxs.js:48
+Ah @ index-hqrokkxs.js:48
+Xy @ index-hqrokkxs.js:48
+_0 @ index-hqrokkxs.js:48
+P_ @ index-hqrokkxs.js:48
+ef @ index-hqrokkxs.js:48
+x0 @ index-hqrokkxs.js:48
+z0 @ index-hqrokkxs.js:48
+Ti @ index-hqrokkxs.js:48
+D0 @ index-hqrokkxs.js:48
+(anonymous) @ index-hqrokkxs.js:48
 
 
-
-
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16: 2025-08-11 12:14:16.622 [INFO] app.middleware.security:376 - AUDIT_LOG: {"timestamp": "2025-08-11T03:14:16.621974", "action_type": "user_session_logout", "user_id": "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", "user_email": "admin@test.com", "success": false, "error_message": "(psycopg2.errors.SyntaxError) syntax error at or near \":\"\nLINE 4:                 WHERE user_id = ANY(:user_ids::uuid[]) \n                                            ^\n\n[SQL: \n                UPDATE oauth_access_tokens \n                SET revoked_at = NOW() \n                WHERE user_id = ANY(:user_ids::uuid[]) \n                AND revoked_at IS NULL\n            ]\n(Background on this error at: https://sqlalche.me/e/20/f405)", "execution_time": 0.000462, "request_data": {"request": {"logout_type": "all", "reason": "User requested all logout via simplified UI"}}}
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16: 2025-08-11 12:14:16.622 [ERROR] app.database:99 - SQLAlchemy 오류: (psycopg2.errors.SyntaxError) syntax error at or near ":"
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16: LINE 4:                 WHERE user_id = ANY(:user_ids::uuid[])
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:                                             ^
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16: [SQL:
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:                 UPDATE oauth_access_tokens
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:                 SET revoked_at = NOW()
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:                 WHERE user_id = ANY(:user_ids::uuid[])
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:                 AND revoked_at IS NULL
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16:             ]
-0|maxplatform-backend-8000  | 2025-08-11T12:14:16: (Background on this error at: https://sqlalche.me/e/20/f405)
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.212 [INFO] app.api.oauth_simple:2832 - 🔐 Starting enhanced logout process - client_id: None
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.212 [INFO] app.api.oauth_simple:2862 - 🔐 Found token in cookie: access_token
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.212 [INFO] app.utils.auth:289 - Auth event: token_verification | Data: {'event_type': 'token_verification', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'jti': '36c6aa24-b5b4-4001-9dbe-10a361fd228e'}}
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.213 [DEBUG] app.utils.auth:538 - ✅ User validated from token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.214 [INFO] app.api.oauth_simple:2866 - 🔐 User from cookie access_token: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.214 [INFO] app.api.oauth_simple:2923 - 🔐 Revoked direct token: 0 tokens
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.216 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 12c18761-5d86-4237-b2d4-180a918755f8
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.217 [INFO] app.core.redis_session:199 - ✅ Session deleted: 12c18761-5d86-4237-b2d4-180a918755f8
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.217 [INFO] app.core.redis_session:233 - ✅ Deleted 1 sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.217 [INFO] app.core.oauth_redis_integration:167 - ✅ Cleaned up 1 OAuth Redis sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.217 [INFO] app.api.oauth_simple:3029 - ✅ Cleaned up 1 Redis sessions for user 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.218 [INFO] app.api.oauth_simple:3078 - 🔐 Token revocation completed: {'access_tokens_revoked': 0, 'refresh_tokens_revoked': 1, 'sessions_terminated': 1, 'id_tokens_invalidated': 0, 'cookies_cleared': 0}
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.220 [INFO] app.api.oauth_simple:3118 - 🔐 Logout redirect to trusted domain: max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.220 [INFO] app.api.oauth_simple:3130 - 🔐 Enhanced OIDC Logout completed: {'access_tokens_revoked': 0, 'refresh_tokens_revoked': 1, 'sessions_terminated': 1, 'id_tokens_invalidated': 0, 'cookies_cleared': 0}
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.220 [INFO] app.api.oauth_simple:3131 - 🔐 Redirecting to: https://max.dwchem.co.kr/login?logout=success
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.222 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/oauth/logout?post_logout_redirect_uri=https%3A%2F%2Fmax.dwchem.co.kr%2Flogin%3Flogout%3Dsuccess HTTP/1.1" 302
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.317 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.317 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.344 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-11T15:49:54: 2025-08-11 15:49:54.349 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/services/mother-page HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-11T15:49:58: 2025-08-11 15:49:58.109 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-11T15:49:58: 2025-08-11 15:49:58.112 [INFO] app.routers.batch_logout:371 - User admin@test.com logged out all sessions
+0|maxplatform-backend-8000  | 2025-08-11T15:49:58: 2025-08-11 15:49:58.112 [INFO] app.middleware.security:376 - AUDIT_LOG: {"timestamp": "2025-08-11T06:49:58.112717", "action_type": "user_session_logout", "user_id": "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", "user_email": "admin@test.com", "success": true, "error_message": null, "execution_time": 0.002003, "request_data": {"request": {"logout_type": "all", "reason": "User requested all logout via simplified UI"}}}
+0|maxplatform-backend-8000  | 2025-08-11T15:49:58: 2025-08-11 15:49:58.113 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/user/sessions/logout HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-11T15:49:58: 2025-08-11 15:49:58.192 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.210 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.644 [INFO] app.routers.auth:382 - 로그인 시도: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.858 [INFO] app.routers.auth:401 - 사용자 인증 성공: krn@test.com (ID: d65db892-9691-46e3-a2c6-d962980f2f51)
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.861 [INFO] app.routers.auth:409 - 로그인 기록 업데이트 완료: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.862 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': 'd65db892-9691-46e3-a2c6-d962980f2f51', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-11T07:20:03.861845', 'jti': 'bfb72ce2-fa6e-4682-abc4-248f2a87b533'}}
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.864 [INFO] app.core.redis_session:233 - ✅ Deleted 0 sessions for user d65db892-9691-46e3-a2c6-
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: 2025-08-11 15:50:03.871 [WARNING] app.routers.auth:483 - Failed to store JWT token hash for revocation tracking: (psycopg2.errors.UndefinedColumn) column "grant_types" of relation "oauth_clients" does not exist
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: LINE 3: ...        (client_id, client_secret, redirect_uris, grant_type...
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                                                              ^
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: [SQL:
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                             INSERT INTO oauth_clients
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                             (client_id, client_secret, redirect_uris, grant_types,
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                              response_types, scope, is_active, is_confidential)
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                             VALUES (%(client_id)s, %(client_secret)s, %(redirect_uris)s, %(grant_types)s,
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                                     %(response_types)s, %(scope)s, true, false)
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03:                         ]
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: [parameters: {'client_id': 'maxplatform-web', 'client_secret': 'not-used-f...', 'redirect_uris': 'https://max.dwchem.co.kr,https://maxlab.dwchem.co.kr', 'grant_types': 'password,refresh_token', 'response_types': 'token', 'scope': 'openid profile email'}]
+0|maxplatform-backend-8000  | 2025-08-11T15:50:03: (Background on this error at: https://sqlalche.me/e/20/f405)
