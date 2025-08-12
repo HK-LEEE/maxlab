@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Page Authentication Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.pass { background: #10b981; color: white; }
+        .status.fail { background: #ef4444; color: white; }
+        .status.pending { background: #f59e0b; color: white; }
+        .log-output {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .log-line { margin: 2px 0; }
+        .log-line.error { color: #f87171; }
+        .log-line.success { color: #4ade80; }
+        .log-line.warning { color: #fbbf24; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Public Page Authentication Test</h1>
+    
+    <div class="test-card">
+        <h2>Test Configuration</h2>
+        <p><strong>Frontend URL:</strong> <span id="frontend-url">Loading...</span></p>
+        <p><strong>Public Routes to Test:</strong></p>
+        <ul>
+            <li>/public/flow/test-token</li>
+            <li>/workspaces/personal_test/monitor/public/test-token</li>
+        </ul>
+    </div>
+
+    <div class="test-card">
+        <h2>Test Results <span id="overall-status" class="status pending">PENDING</span></h2>
+        
+        <h3>1. Authentication Check <span id="auth-status" class="status pending">PENDING</span></h3>
+        <p>Verifying that public pages don't initialize authentication...</p>
+        <div id="auth-log" class="log-output" style="display:none;"></div>
+        
+        <h3>2. Console Log Analysis <span id="console-status" class="status pending">PENDING</span></h3>
+        <p>Checking for authentication-related errors in console...</p>
+        <div id="console-log" class="log-output" style="display:none;"></div>
+        
+        <h3>3. Network Request Analysis <span id="network-status" class="status pending">PENDING</span></h3>
+        <p>Monitoring for unexpected authentication API calls...</p>
+        <div id="network-log" class="log-output" style="display:none;"></div>
+        
+        <button onclick="runTests()">Run Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <script>
+        // Configuration
+        const FRONTEND_BASE = window.location.origin;
+        const PUBLIC_ROUTES = [
+            '/public/flow/test-token',
+            '/workspaces/personal_test/monitor/public/test-token'
+        ];
+        
+        // Update UI with configuration
+        document.getElementById('frontend-url').textContent = FRONTEND_BASE;
+        
+        function addLogLine(containerId, message, type = '') {
+            const container = document.getElementById(containerId);
+            container.style.display = 'block';
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(line);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function updateStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            element.textContent = status.toUpperCase();
+            element.className = `status ${status}`;
+        }
+        
+        async function testPublicRoute(route) {
+            const testWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            return new Promise((resolve) => {
+                let authDetected = false;
+                let consoleErrors = [];
+                let authRequests = [];
+                
+                // Inject monitoring script
+                testWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Testing: ${route}</title>
+                        <script>
+                            // Override console methods to capture logs
+                            const originalLog = console.log;
+                            const originalError = console.error;
+                            const originalWarn = console.warn;
+                            
+                            window.capturedLogs = [];
+                            
+                            console.log = function(...args) {
+                                const message = args.join(' ');
+                                window.capturedLogs.push({type: 'log', message});
+                                
+                                // Check for authentication-related logs
+                                if (message.includes('Auth') || message.includes('OAuth') || 
+                                    message.includes('SSO') || message.includes('login') ||
+                                    message.includes('token') || message.includes('silent')) {
+                                    window.authDetected = true;
+                                }
+                                originalLog.apply(console, args);
+                            };
+                            
+                            console.error = function(...args) {
+                                const message = args.join(' ');
+                                window.capturedLogs.push({type: 'error', message});
+                                originalError.apply(console, args);
+                            };
+                            
+                            console.warn = function(...args) {
+                                const message = args.join(' ');
+                                window.capturedLogs.push({type: 'warn', message});
+                                originalWarn.apply(console, args);
+                            };
+                            
+                            // Monitor fetch requests
+                            const originalFetch = window.fetch;
+                            window.authRequests = [];
+                            
+                            window.fetch = function(url, options) {
+                                const urlString = typeof url === 'string' ? url : url.toString();
+                                
+                                // Check for auth-related endpoints
+                                if (urlString.includes('/auth') || urlString.includes('/oauth') ||
+                                    urlString.includes('/login') || urlString.includes('/token') ||
+                                    urlString.includes('/session')) {
+                                    window.authRequests.push(urlString);
+                                }
+                                
+                                return originalFetch.apply(this, arguments);
+                            };
+                            
+                            // Set test flag
+                            window.isPublicPageTest = true;
+                        <\/script>
+                    </head>
+                    <body>
+                        <h2>Loading ${route}...</h2>
+                        <iframe 
+                            id="testFrame" 
+                            src="${FRONTEND_BASE}${route}" 
+                            style="width: 100%; height: 500px; border: 1px solid #ccc;">
+                        </iframe>
+                    </body>
+                    </html>
+                `);
+                
+                // Wait for page to load and check results
+                setTimeout(() => {
+                    try {
+                        // Get captured data from test window
+                        const logs = testWindow.capturedLogs || [];
+                        const authReqs = testWindow.authRequests || [];
+                        const authDetected = testWindow.authDetected || false;
+                        
+                        // Close test window
+                        testWindow.close();
+                        
+                        resolve({
+                            route,
+                            authDetected,
+                            logs,
+                            authRequests: authReqs,
+                            success: !authDetected && authReqs.length === 0
+                        });
+                    } catch (error) {
+                        testWindow.close();
+                        resolve({
+                            route,
+                            error: error.message,
+                            success: false
+                        });
+                    }
+                }, 5000); // Wait 5 seconds for page to load
+            });
+        }
+        
+        async function runTests() {
+            // Reset UI
+            clearResults();
+            updateStatus('overall-status', 'pending');
+            updateStatus('auth-status', 'pending');
+            updateStatus('console-status', 'pending');
+            updateStatus('network-status', 'pending');
+            
+            addLogLine('auth-log', 'Starting authentication bypass test...', 'success');
+            
+            let allTestsPassed = true;
+            
+            for (const route of PUBLIC_ROUTES) {
+                addLogLine('auth-log', `Testing route: ${route}`);
+                
+                const result = await testPublicRoute(route);
+                
+                if (result.error) {
+                    addLogLine('auth-log', `Error testing ${route}: ${result.error}`, 'error');
+                    allTestsPassed = false;
+                    continue;
+                }
+                
+                // Check authentication detection
+                if (result.authDetected) {
+                    addLogLine('auth-log', `❌ Authentication detected on ${route}`, 'error');
+                    allTestsPassed = false;
+                } else {
+                    addLogLine('auth-log', `✅ No authentication on ${route}`, 'success');
+                }
+                
+                // Check console logs
+                const authLogs = result.logs.filter(log => 
+                    log.message.includes('Auth') || log.message.includes('OAuth') ||
+                    log.message.includes('SSO') || log.message.includes('login')
+                );
+                
+                if (authLogs.length > 0) {
+                    addLogLine('console-log', `Found ${authLogs.length} auth-related logs on ${route}:`, 'warning');
+                    authLogs.slice(0, 5).forEach(log => {
+                        addLogLine('console-log', log.message, log.type);
+                    });
+                } else {
+                    addLogLine('console-log', `✅ No auth logs on ${route}`, 'success');
+                }
+                
+                // Check network requests
+                if (result.authRequests.length > 0) {
+                    addLogLine('network-log', `❌ Found ${result.authRequests.length} auth requests on ${route}:`, 'error');
+                    result.authRequests.forEach(req => {
+                        addLogLine('network-log', req, 'error');
+                    });
+                    allTestsPassed = false;
+                } else {
+                    addLogLine('network-log', `✅ No auth requests on ${route}`, 'success');
+                }
+            }
+            
+            // Update final status
+            updateStatus('auth-status', allTestsPassed ? 'pass' : 'fail');
+            updateStatus('console-status', allTestsPassed ? 'pass' : 'fail');
+            updateStatus('network-status', allTestsPassed ? 'pass' : 'fail');
+            updateStatus('overall-status', allTestsPassed ? 'pass' : 'fail');
+            
+            if (allTestsPassed) {
+                addLogLine('auth-log', '🎉 All tests passed! Public pages bypass authentication correctly.', 'success');
+            } else {
+                addLogLine('auth-log', '⚠️ Some tests failed. Authentication is still active on public pages.', 'error');
+            }
+        }
+        
+        function clearResults() {
+            ['auth-log', 'console-log', 'network-log'].forEach(id => {
+                const element = document.getElementById(id);
+                element.innerHTML = '';
+                element.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
