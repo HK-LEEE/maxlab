@@ -301,26 +301,49 @@ function App() {
         try {
           const { sessionData, token } = event.data;
           
-          // 토큰과 사용자 정보 저장
-          localStorage.setItem('accessToken', token);
-          localStorage.setItem('user', JSON.stringify(sessionData));
+          // Normalize user data to ensure required fields exist
+          const normalizedUser = {
+            id: sessionData.id || sessionData.user_id || sessionData.sub || sessionData.email,
+            email: sessionData.email || '',
+            username: sessionData.username || sessionData.name || sessionData.display_name || sessionData.email || 'Unknown User',
+            full_name: sessionData.full_name || sessionData.real_name || sessionData.name || sessionData.username || sessionData.email || 'Unknown User',
+            is_active: sessionData.is_active !== undefined ? sessionData.is_active : true,
+            is_admin: Boolean(sessionData.is_admin || sessionData.is_superuser || sessionData.admin),
+            role: (sessionData.is_admin || sessionData.is_superuser || sessionData.admin) ? 'admin' : 'user',
+            groups: sessionData.groups || [],
+            permissions: sessionData.permissions || [],
+            ...sessionData // Keep all original fields
+          };
           
-          // Auth Store 업데이트
-          setAuth(token, sessionData);
-          setUser(sessionData);
-          
-          // 인증 상태 업데이트
-          setAuthState('ready');
-          resetRetry();
-          
-          console.log('✅ SSO: Auto login successful via MAX Platform');
-          
-          // Auth Sync Service를 통해 다른 탭에도 알림
-          authSyncService.broadcast({
-            type: 'LOGIN',
-            user: sessionData,
-            token: token
+          console.log('🔄 SSO: Normalized user data:', {
+            id: normalizedUser.id,
+            username: normalizedUser.username,
+            email: normalizedUser.email,
+            is_admin: normalizedUser.is_admin
           });
+          
+          // Store user data BEFORE setting auth state to prevent race conditions
+          localStorage.setItem('user', JSON.stringify(normalizedUser));
+          localStorage.setItem('accessToken', token);
+          
+          // Auth Store 업데이트 - use normalized user data
+          setUser(normalizedUser);
+          
+          // Small delay to ensure localStorage writes complete
+          setTimeout(() => {
+            setAuth(token, normalizedUser);
+            setAuthState('ready');
+            resetRetry();
+            
+            console.log('✅ SSO: Auto login successful via MAX Platform');
+            
+            // Auth Sync Service를 통해 다른 탭에도 알림
+            authSyncService.broadcast({
+              type: 'LOGIN',
+              user: normalizedUser,
+              token: token
+            });
+          }, 50);
           
         } catch (error) {
           console.error('❌ SSO: Failed to process sync message:', error);

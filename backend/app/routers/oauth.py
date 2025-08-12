@@ -720,17 +720,44 @@ async def oauth_sync(
             user_info = response.json()
             logger.info(f"✅ SSO Sync: Token validated for user: {user_info.get('email', 'unknown')}")
         
-        # 2. 세션 데이터 생성
+        # 2. 세션 데이터 생성 - Ensure all required fields for MaxLab frontend
         session_data = {
+            # Primary ID field - MaxLab frontend expects 'id'
+            "id": user_info.get("sub") or user_info.get("id") or user_info.get("user_id"),
             "user_id": user_info.get("sub"),
+            "sub": user_info.get("sub"),  # Keep for OAuth compatibility
+            
+            # User display information
             "email": user_info.get("email"),
-            "name": user_info.get("name"),
+            "username": user_info.get("display_name") or user_info.get("name") or user_info.get("email", "Unknown User"),
+            "full_name": user_info.get("real_name") or user_info.get("full_name") or user_info.get("name") or user_info.get("email", "Unknown User"),
+            "name": user_info.get("name"),  # Keep original field
+            "display_name": user_info.get("display_name"),
+            "real_name": user_info.get("real_name"),
+            
+            # User metadata
+            "department": user_info.get("department"),
+            "position": user_info.get("position"),
+            "phone_number": user_info.get("phone_number"),
+            
+            # Permissions and status
             "groups": user_info.get("groups", []),
             "permissions": user_info.get("permissions", []),
+            "roles": user_info.get("roles", []),
             "is_admin": user_info.get("is_admin", False),
+            "is_active": user_info.get("is_active", True),
+            "is_verified": user_info.get("is_verified", False),
+            "role": "admin" if user_info.get("is_admin", False) else "user",
+            
+            # Session metadata
             "access_token": token,
             "sync_source": "max_platform",
-            "sync_time": time.time()
+            "sync_time": time.time(),
+            
+            # Additional metadata from MAX Platform
+            "created_at": user_info.get("created_at"),
+            "last_login_at": user_info.get("last_login_at"),
+            "login_count": user_info.get("login_count")
         }
         
         # 3. PostMessage로 프론트엔드에 세션 데이터 전송
