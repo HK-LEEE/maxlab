@@ -97,7 +97,7 @@ export const InstrumentDetailModal: React.FC<InstrumentDetailModalProps> = ({
         };
       default:
         return {
-          text: '알 수 없음',
+          text: '정상',
           bgColor: 'bg-gray-100',
           textColor: 'text-gray-800',
           icon: HelpCircle,

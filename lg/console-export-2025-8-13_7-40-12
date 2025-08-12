@@ -1,0 +1,1129 @@
+07:39:02.176 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-Cu_uWjzM.js:529:68804
+07:39:02.176 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:39:02.176 ❌ 토큰이 없어 인증되지 않은 상태 index-Cu_uWjzM.js:529:69551
+07:39:02.185 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:39:06.751 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-Cu_uWjzM.js:529:68804
+07:39:06.752 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:39:06.752 📡 사용자 정보 로드 시작 index-Cu_uWjzM.js:529:69293
+07:39:06.759 🔄 SSO: Syncing login to MAX Lab... index-Cu_uWjzM.js:529:68214
+07:39:06.762 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:39:06.762 ✅ User authenticated, checking OAuth return... index-Cu_uWjzM.js:705:1270
+07:39:06.784 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-Cu_uWjzM.js:529:69497
+07:39:06.793 Features response: 
+Object { user_info: {…}, services: (9) […], categories: (5) […] }
+index-Cu_uWjzM.js:712:36612
+07:39:06.793 Features data: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-Cu_uWjzM.js:712:36653
+07:39:06.955 ✅ SSO: MAX Lab sync iframe loaded index-Cu_uWjzM.js:529:68476
+07:39:08.221 Feature clicked: 
+Object { id: "15", name: "MAX LAB", display_name: "MAX LAB", description: "", category: "dashboard", icon: "max lab", url_path: "https://maxlab.dwchem.co.kr", is_external: true, open_in_new_tab: true, is_active: true }
+index-Cu_uWjzM.js:712:38192
+07:39:08.221 Feature URL path: https://maxlab.dwchem.co.kr index-Cu_uWjzM.js:712:38226
+07:39:14.719 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  0ms]
+
+07:39:15.940 🔄 Starting smart logout process... index-Cu_uWjzM.js:712:9145
+07:39:15.941 🔄 Calling backend logout API... index-Cu_uWjzM.js:712:9302
+07:39:15.943 XHRPOST
+https://max.dwchem.co.kr/api/user/sessions/logout
+[HTTP/2 200  10ms]
+
+07:39:15.969 ✅ Backend logout API completed index-Cu_uWjzM.js:712:9361
+07:39:15.969 🔄 Performing SSO logout... index-Cu_uWjzM.js:712:9454
+07:39:15.969 🔄 Starting enhanced logout process... index-Cu_uWjzM.js:529:70444
+07:39:15.969 🔄 Executing cross-domain logout synchronization... index-Cu_uWjzM.js:529:70596
+07:39:15.969 🔄 Starting cross-domain logout process... index-Cu_uWjzM.js:529:64602
+07:39:15.970 ✅ Local storage cleared index-Cu_uWjzM.js:529:66596
+07:39:15.970 Cookie “access_token” has been rejected for invalid domain. max.dwchem.co.kr
+07:39:15.970 Cookie “session_id” has been rejected for invalid domain. max.dwchem.co.kr
+07:39:15.970 Cookie “session_token” has been rejected for invalid domain. max.dwchem.co.kr
+07:39:15.970 Cookie “user_id” has been rejected for invalid domain. max.dwchem.co.kr
+07:39:15.970 Cookie “refresh_token” has been rejected for invalid domain. max.dwchem.co.kr
+07:39:15.970 ✅ Cookies cleared index-Cu_uWjzM.js:529:67321
+07:39:15.970 🔄 Attempting MAX Lab logout sync (attempt 1/2) index-Cu_uWjzM.js:529:65200
+07:39:15.977 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-Cu_uWjzM.js:529:68804
+07:39:15.978 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:39:15.978 ❌ 토큰이 없어 인증되지 않은 상태 index-Cu_uWjzM.js:529:69551
+07:39:15.983 GET
+https://maxlab.dwchem.co.kr/oauth/logout-sync
+[HTTP/2 200  0ms]
+
+07:39:15.988 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:39:16.018 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:16.042 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:16.104 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:16.105 📋 Authenticated user detected - will validate with server index-W9qWMePJ.js:228:5774
+07:39:16.106 📋 Rehydrated state (pending server validation): 
+Object { user: {…}, isAuthenticated: true, initState: "syncing", error: null, lastSyncTime: 1755038348805, retryCount: 0, setAuthState: setAuthState(n), setAuthError: setAuthError(n), clearError: clearError(), incrementRetry: incrementRetry(), … }
+index-W9qWMePJ.js:228:5933
+07:39:16.108 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:16.108 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:16.114 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:16.116 📁 Loaded 1 queued security events from localStorage index-W9qWMePJ.js:263:45176
+07:39:16.116 🔀 OAuth Coordinator [22:39:16][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:16.124 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:16.125 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:16.125 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:16.125 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:16.125 🔄 Auth state change: idle → syncing 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:16.126 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-W9qWMePJ.js:258:13225
+07:39:16.154 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 401  5ms]
+
+07:39:16.161 ❌ Server-side token validation failed: Error: Failed to fetch user info: 
+    Ki https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:258
+    getCurrentUser https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:265
+    hI https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:851
+    hI https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:851
+    ki https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    mx https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    mn https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    mx https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    mn https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    mx https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    Dx https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    Tx https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:48
+    I https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:25
+    k https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:25
+    $k https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:25
+    Pk https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:25
+    Hk https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:41
+    Bk https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:49
+    <anonymous> https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js:49
+index-W9qWMePJ.js:851:111641
+07:39:16.162 🧹 Clearing invalid token and auth state index-W9qWMePJ.js:851:111700
+07:39:16.162 🔄 Auth state change: idle → idle 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:16.163 ❌ Auth error: server_error - Your session has expired. Please log in again. index-W9qWMePJ.js:228:110
+07:39:16.163 🔄 Auth state change: error → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:16.164 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:16.164 🔀 OAuth Coordinator [22:39:16][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038356164_yovxhp0l0 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:16.164 ✅ Silent auth conditions met, starting... index-W9qWMePJ.js:258:18553
+07:39:16.164 🔀 OAuth Coordinator [22:39:16][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:16.164 🔀 OAuth Coordinator [22:39:16][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038356164_yovxhp0l0 index-W9qWMePJ.js:263:51105
+07:39:16.175 GET
+https://maxlab.dwchem.co.kr/assets/oauthProviderLogout-DtUtMk7L.js
+[HTTP/2 200  0ms]
+
+07:39:16.177 🔇 Starting silent authentication... index-W9qWMePJ.js:258:14932
+07:39:16.181 🚨 Logout detected from another tab index-W9qWMePJ.js:851:94761
+07:39:16.181 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:16.181 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:16.181 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:16.183 Cookie with an empty name and an empty value has been rejected. 3 logout-sync
+07:39:16.183 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
+07:39:16.183 🍪 OAuth provider cookies cleared index-W9qWMePJ.js:265:9176
+07:39:16.183 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:16.183 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:16.183 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:16.183 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:16.183 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:16.183 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:16.183 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:16.183 🔒 Starting comprehensive security cleanup... index-W9qWMePJ.js:265:9412
+07:39:16.183 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:16.183 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:16.183 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:16.183 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:16.184 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:16.184 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:16.184 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:16.184 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:16.184 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:16.184 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:16.184 🔒 Starting comprehensive browser security cleanup... index-W9qWMePJ.js:263:80820
+07:39:16.184 ✅ Cleared 1 localStorage items index-W9qWMePJ.js:263:80954
+07:39:16.184 ✅ Cleared 7 sessionStorage items index-W9qWMePJ.js:263:81133
+07:39:16.184 ✅ Cleared 0 cookies index-W9qWMePJ.js:263:81308
+07:39:16.185 ✅ Cleared 0 IndexedDB databases index-W9qWMePJ.js:263:81466
+07:39:16.188 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+read:profile+read:groups+manage:workflows&state=Qn0lZZQ4K9vZAnPAI5p4hTjjsa2tFivF0-zq3CKqDX0&code_challenge=SO-tCXlILFShSHQ8bgO6mcHhGSCBe38IFcvg6gFGjzY&code_challenge_method=S256&prompt=none&nonce=cfa3c8a587c5bcbbf3105035a707b6476c9f0f21dc9c1df10989aca1b7f55d88
+[HTTP/2 307  20ms]
+
+07:39:16.192 ✅ Cleared 0 cache storages index-W9qWMePJ.js:263:81651
+07:39:16.192 🔒 Security cleanup completed in 7.00ms index-W9qWMePJ.js:263:81949
+07:39:16.192 ✅ Security cleanup completed: 
+Object { localStorage: 1, sessionStorage: 7, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "7.00ms" }
+index-W9qWMePJ.js:265:10224
+07:39:16.192 🧹 Complete secure cleanup finished index-W9qWMePJ.js:265:10646
+07:39:16.192 🔄 MaxLab manual reset initiated index-W9qWMePJ.js:227:10363
+07:39:16.192 ✅ OAuth loop prevention state reset index-W9qWMePJ.js:228:1620
+07:39:16.192 ✅ User logged out successfully index-W9qWMePJ.js:228:1746
+07:39:16.257 GET
+https://maxlab.dwchem.co.kr/oauth/callback?code=fLbzuVj3yIG6TknuYT34F3iqy62JayzNF0xKvQVq1NE&state=Qn0lZZQ4K9vZAnPAI5p4hTjjsa2tFivF0-zq3CKqDX0
+[HTTP/2 200  0ms]
+
+07:39:16.273 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:16.314 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:16.316 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:16.318 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:16.318 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:16.323 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:16.325 🔀 OAuth Coordinator [22:39:16][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:16.333 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:16.333 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:16.333 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:16.333 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:16.333 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:16.333 🔀 OAuth Coordinator [22:39:16][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038356334_wd6pon2km 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:16.334 🚫 Unsafe path for token refresh: /oauth/callback index-W9qWMePJ.js:258:19917
+07:39:16.334 🚫 Silent auth not allowed on current page: /oauth/callback index-W9qWMePJ.js:258:17753
+07:39:16.334 🔀 OAuth Coordinator [22:39:16][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:16.334 🔀 OAuth Coordinator [22:39:16][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038356334_wd6pon2km index-W9qWMePJ.js:263:51105
+07:39:16.335 🔀 OAuth Coordinator [22:39:16][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038356334_wd6pon2km index-W9qWMePJ.js:263:51105
+07:39:16.335 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:16.335 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:16.336 🚫 Unsafe path for token refresh: /oauth/callback index-W9qWMePJ.js:258:19917
+07:39:16.337 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-W9qWMePJ.js:258:10773
+07:39:16.337 🔍 Searching for OAuth flow state with state: Qn0lZZQ4... index-W9qWMePJ.js:228:14264
+07:39:16.337 📋 Found total flow states: 0 index-W9qWMePJ.js:228:14381
+07:39:16.337 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-W9qWMePJ.js:228:14469
+07:39:16.337 🚨 OAuth flow state not found for state: Qn0lZZQ4... 
+Object { searchedFlows: 0, sessionStorageKeys: (2) […] }
+index-W9qWMePJ.js:228:16312
+07:39:16.337 🎯 Popup mode detected via window.parent index-W9qWMePJ.js:258:12244
+07:39:16.338 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:16.338 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-W9qWMePJ.js:258:10773
+07:39:16.338 🔍 Searching for OAuth flow state with state: Qn0lZZQ4... index-W9qWMePJ.js:228:14264
+07:39:16.338 📋 Found total flow states: 0 index-W9qWMePJ.js:228:14381
+07:39:16.338 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-W9qWMePJ.js:228:14469
+07:39:16.338 🚨 OAuth flow state not found for state: Qn0lZZQ4... 
+Object { searchedFlows: 0, sessionStorageKeys: (2) […] }
+index-W9qWMePJ.js:228:16312
+07:39:16.338 🎯 Popup mode detected via window.parent index-W9qWMePJ.js:258:12244
+07:39:16.338 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (2) […] }
+index-W9qWMePJ.js:755:15275
+07:39:16.338 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=fLbzuVj3yIG6TknuYT34F3iqy62JayzNF0xKvQVq1NE&state=Qn0lZZQ4K9vZAnPAI5p4hTjjsa2tFivF0-zq3CKqDX0", pathname: "/oauth/callback", search: "?code=fLbzuVj3yIG6TknuYT34F3iqy62JayzNF0xKvQVq1NE&state=Qn0lZZQ4K9vZAnPAI5p4hTjjsa2tFivF0-zq3CKqDX0", code: "fLbzuVj3...", state: "Qn0lZZQ4...", error: null, errorDescription: null, allParams: {…} }
+index-W9qWMePJ.js:755:16276
+07:39:16.338 🎯 OAuth Callback - Popup Mode Processing Started index-W9qWMePJ.js:755:19445
+07:39:16.338 🔍 Searching for OAuth flow state with state: Qn0lZZQ4... index-W9qWMePJ.js:228:14264
+07:39:16.339 📋 Found total flow states: 1 index-W9qWMePJ.js:228:14381
+07:39:16.339 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-W9qWMePJ.js:228:14469
+07:39:16.339 🔍 Checking stored flow: 
+Object { key: "oauth_flow_in_progress", flowId: undefined, storedState: "undefined...", matchesSearch: false }
+index-W9qWMePJ.js:228:14752
+07:39:16.339 🚨 OAuth flow state not found for state: Qn0lZZQ4... 
+Object { searchedFlows: 1, sessionStorageKeys: (4) […] }
+index-W9qWMePJ.js:228:16312
+07:39:16.339 🔍 Searching for OAuth flow state with state: Qn0lZZQ4... index-W9qWMePJ.js:228:14264
+07:39:16.339 📋 Found total flow states: 1 index-W9qWMePJ.js:228:14381
+07:39:16.339 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-W9qWMePJ.js:228:14469
+07:39:16.339 🔍 Checking stored flow: 
+Object { key: "oauth_flow_in_progress", flowId: undefined, storedState: "undefined...", matchesSearch: false }
+index-W9qWMePJ.js:228:14752
+07:39:16.339 🚨 OAuth flow state not found for state: Qn0lZZQ4... 
+Object { searchedFlows: 1, sessionStorageKeys: (4) […] }
+index-W9qWMePJ.js:228:16312
+07:39:16.339 🔐 OAuth State Validation Debug: 
+Object { urlState: "Qn0lZZQ4...", fullState: "Qn0lZZQ4K9vZAnPAI5p4hTjjsa2tFivF0-zq3CKqDX0", isForceAccountSelection: false, validationResult: {…}, flowState: null, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (4) […] }
+index-W9qWMePJ.js:755:20725
+07:39:16.339 ❌ OAuth State Validation Failed: 
+Object { reason: "Flow state not found or expired", securityLevel: "high", canProceed: false, flowStateExists: false, possibleCauses: (5) […] }
+index-W9qWMePJ.js:755:21330
+07:39:16.340 💾 OAuth error stored in sessionStorage for immediate detection index-W9qWMePJ.js:755:24645
+07:39:16.340 📡 OAuth error sent via BroadcastChannel index-W9qWMePJ.js:755:25161
+07:39:16.341 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-W9qWMePJ.js:258:10773
+07:39:16.341 🔍 Searching for OAuth flow state with state: Qn0lZZQ4... index-W9qWMePJ.js:228:14264
+07:39:16.341 📋 Found total flow states: 0 index-W9qWMePJ.js:228:14381
+07:39:16.341 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-W9qWMePJ.js:228:14469
+07:39:16.341 🚨 OAuth flow state not found for state: Qn0lZZQ4... 
+Object { searchedFlows: 0, sessionStorageKeys: (4) […] }
+index-W9qWMePJ.js:228:16312
+07:39:16.341 🎯 Popup mode detected via window.parent index-W9qWMePJ.js:258:12244
+07:39:21.125 🚨 No access token found - session expired index-W9qWMePJ.js:851:95150
+07:39:21.126 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:21.127 Cookie “access_token” has been rejected for invalid domain. logout-sync
+07:39:21.127 Cookie “session_id” has been rejected for invalid domain. logout-sync
+07:39:21.127 Cookie “session_token” has been rejected for invalid domain. logout-sync
+07:39:21.127 Cookie “user_id” has been rejected for invalid domain. logout-sync
+07:39:21.127 Cookie “refresh_token” has been rejected for invalid domain. logout-sync
+07:39:21.127 🚨 Cross-domain logout detected - clearing session index-W9qWMePJ.js:851:103946
+07:39:21.132 🚨 Logout detected from another tab index-W9qWMePJ.js:851:94761
+07:39:21.132 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:21.132 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:21.132 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:21.132 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:21.132 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:21.132 Cookie with an empty name and an empty value has been rejected. 3 logout-sync
+07:39:21.132 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
+07:39:21.132 🍪 OAuth provider cookies cleared index-W9qWMePJ.js:265:9176
+07:39:21.132 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:21.132 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:21.132 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:21.132 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:21.132 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:21.132 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:21.132 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:21.132 🔒 Starting comprehensive security cleanup... index-W9qWMePJ.js:265:9412
+07:39:21.133 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:21.133 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:21.133 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:21.133 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:21.133 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:21.133 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:21.133 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:21.133 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:21.133 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:21.133 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:21.133 🔒 Starting comprehensive browser security cleanup... index-W9qWMePJ.js:263:80820
+07:39:21.133 ✅ Cleared 1 localStorage items index-W9qWMePJ.js:263:80954
+07:39:21.133 ✅ Cleared 1 sessionStorage items index-W9qWMePJ.js:263:81133
+07:39:21.133 ✅ Cleared 0 cookies index-W9qWMePJ.js:263:81308
+07:39:21.133 ✅ Cleared 0 IndexedDB databases index-W9qWMePJ.js:263:81466
+07:39:21.136 ✅ Cleared 0 cache storages index-W9qWMePJ.js:263:81651
+07:39:21.136 🔒 Security cleanup completed in 4.00ms index-W9qWMePJ.js:263:81949
+07:39:21.136 ✅ Security cleanup completed: 
+Object { localStorage: 1, sessionStorage: 1, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "4.00ms" }
+index-W9qWMePJ.js:265:10224
+07:39:21.137 🧹 Complete secure cleanup finished index-W9qWMePJ.js:265:10646
+07:39:21.137 🔄 MaxLab manual reset initiated index-W9qWMePJ.js:227:10363
+07:39:21.137 ✅ OAuth loop prevention state reset index-W9qWMePJ.js:228:1620
+07:39:21.137 ✅ User logged out successfully index-W9qWMePJ.js:228:1746
+07:39:21.245 XHRPOST
+https://max.dwchem.co.kr/api/security/events
+NS_BINDING_ABORTED
+
+07:39:21.245 ⚠️ Security event send attempt 1 failed, retrying... index-W9qWMePJ.js:263:42079
+07:39:21.246 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  0ms]
+
+07:39:21.257 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:21.271 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:21.317 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:21.318 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:21.320 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:21.320 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:21.326 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:21.328 🔀 OAuth Coordinator [22:39:21][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:21.337 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:21.339 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:21.339 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:21.339 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:21.339 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:21.340 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:21.340 🔀 OAuth Coordinator [22:39:21][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038361340_zvwtdqw8g 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:21.340 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:21.340 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:21.340 🔀 OAuth Coordinator [22:39:21][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:21.340 🔀 OAuth Coordinator [22:39:21][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038361340_zvwtdqw8g index-W9qWMePJ.js:263:51105
+07:39:21.341 🔀 OAuth Coordinator [22:39:21][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038361340_zvwtdqw8g index-W9qWMePJ.js:263:51105
+07:39:21.341 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:21.341 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:21.343 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:21.344 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:21.346 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:21.346 🔥 Component mounted, current oauthLoading: false index-W9qWMePJ.js:755:4996
+07:39:21.347 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-W9qWMePJ.js:755:4401
+07:39:21.348 🔄 Logout detected, resetting login component state index-W9qWMePJ.js:755:5402
+07:39:21.348 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:21.446 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:21.446 🔀 OAuth Coordinator [22:39:21][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038361446_xlsk8rbqc 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:21.447 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:21.447 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:21.447 🔀 OAuth Coordinator [22:39:21][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:21.447 🔀 OAuth Coordinator [22:39:21][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038361446_xlsk8rbqc index-W9qWMePJ.js:263:51105
+07:39:21.447 🔀 OAuth Coordinator [22:39:21][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038361446_xlsk8rbqc index-W9qWMePJ.js:263:51105
+07:39:21.447 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:21.448 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:22.404 🚨 Logout detected from another tab index-W9qWMePJ.js:851:94761
+07:39:22.404 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:22.404 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:22.404 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:26.340 🚨 No access token found - session expired index-W9qWMePJ.js:851:95150
+07:39:26.341 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:26.342 Cookie “access_token” has been rejected for invalid domain. login
+07:39:26.342 Cookie “session_id” has been rejected for invalid domain. login
+07:39:26.342 Cookie “session_token” has been rejected for invalid domain. login
+07:39:26.342 Cookie “user_id” has been rejected for invalid domain. login
+07:39:26.342 Cookie “refresh_token” has been rejected for invalid domain. login
+07:39:26.343 🚨 Cross-domain logout detected - clearing session index-W9qWMePJ.js:851:103946
+07:39:26.352 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:26.352 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:26.358 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:26.358 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:26.358 🚨 Logout detected from another tab index-W9qWMePJ.js:851:94761
+07:39:26.358 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:26.366 GET
+https://maxlab.dwchem.co.kr/assets/oauthProviderLogout-DtUtMk7L.js
+[HTTP/2 200  0ms]
+
+07:39:26.373 Cookie with an empty name and an empty value has been rejected. 3 login
+07:39:26.373 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
+07:39:26.373 🍪 OAuth provider cookies cleared index-W9qWMePJ.js:265:9176
+07:39:26.373 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:26.373 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:26.373 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:26.373 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:26.373 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:26.373 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:26.373 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:26.373 🔒 Starting comprehensive security cleanup... index-W9qWMePJ.js:265:9412
+07:39:26.373 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:26.373 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:26.373 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:26.373 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:26.373 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:26.374 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:26.374 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:26.374 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:26.374 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:26.374 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:26.374 🔒 Starting comprehensive browser security cleanup... index-W9qWMePJ.js:263:80820
+07:39:26.374 ✅ Cleared 1 localStorage items index-W9qWMePJ.js:263:80954
+07:39:26.374 ✅ Cleared 1 sessionStorage items index-W9qWMePJ.js:263:81133
+07:39:26.374 ✅ Cleared 0 cookies index-W9qWMePJ.js:263:81308
+07:39:26.377 ✅ Cleared 0 IndexedDB databases index-W9qWMePJ.js:263:81466
+07:39:26.381 ✅ Cleared 0 cache storages index-W9qWMePJ.js:263:81651
+07:39:26.381 🔒 Security cleanup completed in 8.00ms index-W9qWMePJ.js:263:81949
+07:39:26.381 ✅ Security cleanup completed: 
+Object { localStorage: 1, sessionStorage: 1, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "8.00ms" }
+index-W9qWMePJ.js:265:10224
+07:39:26.382 🧹 Complete secure cleanup finished index-W9qWMePJ.js:265:10646
+07:39:26.382 🔄 MaxLab manual reset initiated index-W9qWMePJ.js:227:10363
+07:39:26.382 ✅ OAuth loop prevention state reset index-W9qWMePJ.js:228:1620
+07:39:26.382 ✅ User logged out successfully index-W9qWMePJ.js:228:1746
+07:39:26.457 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  1ms]
+
+07:39:26.483 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:26.492 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:26.533 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:26.535 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:26.537 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:26.537 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:26.542 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:26.543 🔀 OAuth Coordinator [22:39:26][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:26.551 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:26.552 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:26.552 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:26.552 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:26.552 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:26.552 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:26.552 🔀 OAuth Coordinator [22:39:26][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038366553_6paubkpjl 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:26.552 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:26.552 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:26.552 🔀 OAuth Coordinator [22:39:26][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:26.552 🔀 OAuth Coordinator [22:39:26][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038366553_6paubkpjl index-W9qWMePJ.js:263:51105
+07:39:26.553 🔀 OAuth Coordinator [22:39:26][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038366553_6paubkpjl index-W9qWMePJ.js:263:51105
+07:39:26.553 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:26.553 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:26.554 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:26.555 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:26.557 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:26.557 🔥 Component mounted, current oauthLoading: false index-W9qWMePJ.js:755:4996
+07:39:26.557 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-W9qWMePJ.js:755:4401
+07:39:26.558 🔄 Logout detected, resetting login component state index-W9qWMePJ.js:755:5402
+07:39:26.558 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:26.657 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:26.658 🔀 OAuth Coordinator [22:39:26][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038366658_ocwacru9z 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:26.658 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:26.659 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:26.659 🔀 OAuth Coordinator [22:39:26][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:26.659 🔀 OAuth Coordinator [22:39:26][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038366658_ocwacru9z index-W9qWMePJ.js:263:51105
+07:39:26.659 🔀 OAuth Coordinator [22:39:26][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038366658_ocwacru9z index-W9qWMePJ.js:263:51105
+07:39:26.659 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:26.659 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:31.591 🚨 No access token found - session expired index-W9qWMePJ.js:851:95150
+07:39:31.592 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:31.592 Cookie “access_token” has been rejected for invalid domain. login
+07:39:31.592 Cookie “session_id” has been rejected for invalid domain. login
+07:39:31.592 Cookie “session_token” has been rejected for invalid domain. login
+07:39:31.592 Cookie “user_id” has been rejected for invalid domain. login
+07:39:31.593 Cookie “refresh_token” has been rejected for invalid domain. login
+07:39:31.593 🚨 Cross-domain logout detected - clearing session index-W9qWMePJ.js:851:103946
+07:39:31.598 GET
+https://maxlab.dwchem.co.kr/assets/oauthProviderLogout-DtUtMk7L.js
+[HTTP/2 200  0ms]
+
+07:39:31.598 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:31.598 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:31.601 Cookie with an empty name and an empty value has been rejected. 3 login
+07:39:31.601 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
+07:39:31.601 🍪 OAuth provider cookies cleared index-W9qWMePJ.js:265:9176
+07:39:31.601 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:31.601 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:31.601 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:31.601 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:31.601 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:31.601 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:31.601 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:31.602 🔒 Starting comprehensive security cleanup... index-W9qWMePJ.js:265:9412
+07:39:31.602 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:31.602 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:31.602 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:31.602 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:31.602 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:31.602 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:31.602 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:31.602 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:31.602 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:31.602 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:31.602 🔒 Starting comprehensive browser security cleanup... index-W9qWMePJ.js:263:80820
+07:39:31.602 ✅ Cleared 1 localStorage items index-W9qWMePJ.js:263:80954
+07:39:31.602 ✅ Cleared 1 sessionStorage items index-W9qWMePJ.js:263:81133
+07:39:31.602 ✅ Cleared 0 cookies index-W9qWMePJ.js:263:81308
+07:39:31.603 ✅ Cleared 0 IndexedDB databases index-W9qWMePJ.js:263:81466
+07:39:31.605 ✅ Cleared 0 cache storages index-W9qWMePJ.js:263:81651
+07:39:31.605 🔒 Security cleanup completed in 3.00ms index-W9qWMePJ.js:263:81949
+07:39:31.605 ✅ Security cleanup completed: 
+Object { localStorage: 1, sessionStorage: 1, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "3.00ms" }
+index-W9qWMePJ.js:265:10224
+07:39:31.606 🧹 Complete secure cleanup finished index-W9qWMePJ.js:265:10646
+07:39:31.606 🔄 MaxLab manual reset initiated index-W9qWMePJ.js:227:10363
+07:39:31.606 ✅ OAuth loop prevention state reset index-W9qWMePJ.js:228:1620
+07:39:31.606 ✅ User logged out successfully index-W9qWMePJ.js:228:1746
+07:39:31.699 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  0ms]
+
+07:39:31.722 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:31.782 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:31.820 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:31.822 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:31.824 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:31.825 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:31.829 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:31.831 🔀 OAuth Coordinator [22:39:31][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:31.837 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:31.838 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:31.838 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:31.839 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:31.839 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:31.839 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:31.839 🔀 OAuth Coordinator [22:39:31][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038371839_vo141er4w 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:31.840 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:31.840 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:31.840 🔀 OAuth Coordinator [22:39:31][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:31.840 🔀 OAuth Coordinator [22:39:31][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038371839_vo141er4w index-W9qWMePJ.js:263:51105
+07:39:31.841 🔀 OAuth Coordinator [22:39:31][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038371839_vo141er4w index-W9qWMePJ.js:263:51105
+07:39:31.841 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:31.841 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:31.843 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:31.844 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:31.846 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:31.846 🔥 Component mounted, current oauthLoading: false index-W9qWMePJ.js:755:4996
+07:39:31.847 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-W9qWMePJ.js:755:4401
+07:39:31.848 🔄 Logout detected, resetting login component state index-W9qWMePJ.js:755:5402
+07:39:31.848 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:31.946 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:31.946 🔀 OAuth Coordinator [22:39:31][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038371947_txofncar4 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:31.947 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:31.947 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:31.947 🔀 OAuth Coordinator [22:39:31][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:31.947 🔀 OAuth Coordinator [22:39:31][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038371947_txofncar4 index-W9qWMePJ.js:263:51105
+07:39:31.947 🔀 OAuth Coordinator [22:39:31][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038371947_txofncar4 index-W9qWMePJ.js:263:51105
+07:39:31.947 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:31.947 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:36.860 🚨 No access token found - session expired index-W9qWMePJ.js:851:95150
+07:39:36.862 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:36.862 Cookie “access_token” has been rejected for invalid domain. login
+07:39:36.862 Cookie “session_id” has been rejected for invalid domain. login
+07:39:36.862 Cookie “session_token” has been rejected for invalid domain. login
+07:39:36.862 Cookie “user_id” has been rejected for invalid domain. login
+07:39:36.862 Cookie “refresh_token” has been rejected for invalid domain. login
+07:39:36.863 🚨 Cross-domain logout detected - clearing session index-W9qWMePJ.js:851:103946
+07:39:36.867 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:36.867 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:36.868 GET
+https://maxlab.dwchem.co.kr/assets/oauthProviderLogout-DtUtMk7L.js
+[HTTP/2 200  0ms]
+
+07:39:36.870 Cookie with an empty name and an empty value has been rejected. 3 login
+07:39:36.870 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
+07:39:36.870 🍪 OAuth provider cookies cleared index-W9qWMePJ.js:265:9176
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:36.871 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:36.871 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:36.871 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:36.871 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:36.871 🔒 Starting comprehensive security cleanup... index-W9qWMePJ.js:265:9412
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:36.871 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:36.871 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:36.871 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:36.871 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:36.871 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:36.871 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:36.871 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:36.871 🔒 Starting comprehensive browser security cleanup... index-W9qWMePJ.js:263:80820
+07:39:36.871 ✅ Cleared 1 localStorage items index-W9qWMePJ.js:263:80954
+07:39:36.871 ✅ Cleared 1 sessionStorage items index-W9qWMePJ.js:263:81133
+07:39:36.871 ✅ Cleared 0 cookies index-W9qWMePJ.js:263:81308
+07:39:36.872 ✅ Cleared 0 IndexedDB databases index-W9qWMePJ.js:263:81466
+07:39:36.874 ✅ Cleared 0 cache storages index-W9qWMePJ.js:263:81651
+07:39:36.874 🔒 Security cleanup completed in 2.00ms index-W9qWMePJ.js:263:81949
+07:39:36.874 ✅ Security cleanup completed: 
+Object { localStorage: 1, sessionStorage: 1, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "2.00ms" }
+index-W9qWMePJ.js:265:10224
+07:39:36.874 🧹 Complete secure cleanup finished index-W9qWMePJ.js:265:10646
+07:39:36.874 🔄 MaxLab manual reset initiated index-W9qWMePJ.js:227:10363
+07:39:36.874 ✅ OAuth loop prevention state reset index-W9qWMePJ.js:228:1620
+07:39:36.875 ✅ User logged out successfully index-W9qWMePJ.js:228:1746
+07:39:36.968 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  0ms]
+
+07:39:36.981 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:36.985 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:37.027 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:37.028 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:37.030 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:37.030 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:37.035 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:37.037 🔀 OAuth Coordinator [22:39:37][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:37.044 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:37.045 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:37.045 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:37.045 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:37.046 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:37.046 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:37.046 🔀 OAuth Coordinator [22:39:37][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038377046_v88214csi 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:37.046 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:37.046 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:37.046 🔀 OAuth Coordinator [22:39:37][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:37.046 🔀 OAuth Coordinator [22:39:37][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038377046_v88214csi index-W9qWMePJ.js:263:51105
+07:39:37.047 🔀 OAuth Coordinator [22:39:37][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038377046_v88214csi index-W9qWMePJ.js:263:51105
+07:39:37.047 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:37.047 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:37.048 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:37.050 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:37.051 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:37.051 🔥 Component mounted, current oauthLoading: false index-W9qWMePJ.js:755:4996
+07:39:37.052 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-W9qWMePJ.js:755:4401
+07:39:37.053 🔄 Logout detected, resetting login component state index-W9qWMePJ.js:755:5402
+07:39:37.053 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:37.152 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:37.152 🔀 OAuth Coordinator [22:39:37][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038377152_1xufok5tr 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:37.152 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:37.152 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:37.152 🔀 OAuth Coordinator [22:39:37][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:37.152 🔀 OAuth Coordinator [22:39:37][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038377152_1xufok5tr index-W9qWMePJ.js:263:51105
+07:39:37.152 🔀 OAuth Coordinator [22:39:37][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038377152_1xufok5tr index-W9qWMePJ.js:263:51105
+07:39:37.152 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:37.153 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:42.138 🚨 No access token found - session expired index-W9qWMePJ.js:851:95150
+07:39:42.140 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:42.140 Cookie “access_token” has been rejected for invalid domain. login
+07:39:42.140 Cookie “session_id” has been rejected for invalid domain. login
+07:39:42.140 Cookie “session_token” has been rejected for invalid domain. login
+07:39:42.140 Cookie “user_id” has been rejected for invalid domain. login
+07:39:42.140 Cookie “refresh_token” has been rejected for invalid domain. login
+07:39:42.141 🚨 Cross-domain logout detected - clearing session index-W9qWMePJ.js:851:103946
+07:39:42.145 🚨 Cross-domain logout broadcast received index-W9qWMePJ.js:851:95430
+07:39:42.145 🔒 Executing cross-domain logout cleanup index-W9qWMePJ.js:851:97039
+07:39:42.146 GET
+https://maxlab.dwchem.co.kr/assets/oauthProviderLogout-DtUtMk7L.js
+[HTTP/2 200  0ms]
+
+07:39:42.148 Cookie with an empty name and an empty value has been rejected. 3 login
+07:39:42.148 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
+07:39:42.148 🍪 OAuth provider cookies cleared index-W9qWMePJ.js:265:9176
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:42.149 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:42.149 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:42.149 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:42.149 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:42.149 🔒 Starting comprehensive security cleanup... index-W9qWMePJ.js:265:9412
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:58101
+07:39:42.149 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:42.149 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:42.149 🔐 User-isolated tokens cleared index-W9qWMePJ.js:263:61123
+07:39:42.149 🧹 All tokens cleared index-W9qWMePJ.js:263:61235
+07:39:42.149 🧹 Clearing all user tokens... index-W9qWMePJ.js:263:32906
+07:39:42.149 🧹 Refresh token cleared from secure storage index-W9qWMePJ.js:263:26928
+07:39:42.149 ✅ Cleared tokens for 0 users index-W9qWMePJ.js:263:33195
+07:39:42.149 🔒 Starting comprehensive browser security cleanup... index-W9qWMePJ.js:263:80820
+07:39:42.149 ✅ Cleared 1 localStorage items index-W9qWMePJ.js:263:80954
+07:39:42.149 ✅ Cleared 1 sessionStorage items index-W9qWMePJ.js:263:81133
+07:39:42.149 ✅ Cleared 0 cookies index-W9qWMePJ.js:263:81308
+07:39:42.149 ✅ Cleared 0 IndexedDB databases index-W9qWMePJ.js:263:81466
+07:39:42.151 ✅ Cleared 0 cache storages index-W9qWMePJ.js:263:81651
+07:39:42.151 🔒 Security cleanup completed in 3.00ms index-W9qWMePJ.js:263:81949
+07:39:42.151 ✅ Security cleanup completed: 
+Object { localStorage: 1, sessionStorage: 1, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "3.00ms" }
+index-W9qWMePJ.js:265:10224
+07:39:42.152 🧹 Complete secure cleanup finished index-W9qWMePJ.js:265:10646
+07:39:42.152 🔄 MaxLab manual reset initiated index-W9qWMePJ.js:227:10363
+07:39:42.152 ✅ OAuth loop prevention state reset index-W9qWMePJ.js:228:1620
+07:39:42.152 ✅ User logged out successfully index-W9qWMePJ.js:228:1746
+07:39:42.251 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  0ms]
+
+07:39:42.264 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:42.276 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:42.334 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:42.336 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:42.338 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+07:39:42.338 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+07:39:42.342 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:42.345 🔀 OAuth Coordinator [22:39:42][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:42.353 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:42.354 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:42.354 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:42.354 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:42.354 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:42.354 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:42.354 🔀 OAuth Coordinator [22:39:42][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038382354_d5bledt20 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:42.355 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:42.355 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:42.355 🔀 OAuth Coordinator [22:39:42][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:42.355 🔀 OAuth Coordinator [22:39:42][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038382354_d5bledt20 index-W9qWMePJ.js:263:51105
+07:39:42.356 🔀 OAuth Coordinator [22:39:42][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038382354_d5bledt20 index-W9qWMePJ.js:263:51105
+07:39:42.356 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:42.356 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:42.357 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:42.358 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:42.360 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:42.360 🔥 Component mounted, current oauthLoading: false index-W9qWMePJ.js:755:4996
+07:39:42.361 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-W9qWMePJ.js:755:4401
+07:39:42.361 🔄 Logout detected, resetting login component state index-W9qWMePJ.js:755:5402
+07:39:42.362 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:42.461 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:42.461 🔀 OAuth Coordinator [22:39:42][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038382462_5pwfngrht 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:42.461 🚫 Unsafe path for token refresh: /login index-W9qWMePJ.js:258:19917
+07:39:42.461 🚫 Silent auth not allowed on current page: /login index-W9qWMePJ.js:258:17753
+07:39:42.461 🔀 OAuth Coordinator [22:39:42][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:42.461 🔀 OAuth Coordinator [22:39:42][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038382462_5pwfngrht index-W9qWMePJ.js:263:51105
+07:39:42.461 🔀 OAuth Coordinator [22:39:42][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038382462_5pwfngrht index-W9qWMePJ.js:263:51105
+07:39:42.461 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:42.462 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-W9qWMePJ.js:755:4401
+07:39:46.057 ⚠️ MAX Lab logout sync timeout index-Cu_uWjzM.js:529:65413
+07:39:46.167 🔄 Attempting MAX Lab logout sync (attempt 2/2) index-Cu_uWjzM.js:529:65200
+07:39:46.170 GET
+https://maxlab.dwchem.co.kr/oauth/logout-sync
+[HTTP/2 200  0ms]
+
+07:39:46.186 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+07:39:46.203 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:46.242 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:46.243 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:46.245 🛡️ CSRF protection initialized with existing token index-W9qWMePJ.js:263:5675
+07:39:46.250 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:46.252 🔀 OAuth Coordinator [22:39:46][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:46.259 📡 MAX Lab logout sync iframe loaded index-Cu_uWjzM.js:529:65987
+07:39:46.260 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:46.260 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:46.261 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:46.261 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:46.261 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:46.261 🔀 OAuth Coordinator [22:39:46][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038386262_x279ky55o 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:46.261 ✅ Silent auth conditions met, starting... index-W9qWMePJ.js:258:18553
+07:39:46.261 🔀 OAuth Coordinator [22:39:46][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:46.261 🔀 OAuth Coordinator [22:39:46][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038386262_x279ky55o index-W9qWMePJ.js:263:51105
+07:39:46.263 🔇 Starting silent authentication... index-W9qWMePJ.js:258:14932
+07:39:46.266 GET
+https://max.dwchem.co.kr/api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid+profile+email+read:profile+read:groups+manage:workflows&state=BHVuil0LT8OzwtUilOiFpqN3dlaL3H-kI9fNEtuSAvU&code_challenge=lpG2LxQqR_B9LGmypytDTJiny1Iek-RuN_FLwVa4YyU&code_challenge_method=S256&prompt=none&nonce=7e82afb3497c8eea13175009bdf4ab56dc000c5ef1491d8d55322cd3fcc7955b
+[HTTP/2 307  19ms]
+
+07:39:46.289 GET
+https://maxlab.dwchem.co.kr/oauth/callback?code=FetWWw_fjjNibm4nJG3BocHQoe-2sp2DbLJfKHIn9CU&state=BHVuil0LT8OzwtUilOiFpqN3dlaL3H-kI9fNEtuSAvU
+[HTTP/2 200  0ms]
+
+07:39:46.297 GET
+https://maxlab.dwchem.co.kr/assets/index-W9qWMePJ.js
+[HTTP/2 200  0ms]
+
+07:39:46.336 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+07:39:46.337 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+07:39:46.339 🛡️ CSRF protection initialized with existing token index-W9qWMePJ.js:263:5675
+07:39:46.343 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+07:39:46.345 🔀 OAuth Coordinator [22:39:46][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+07:39:46.353 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+07:39:46.353 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+07:39:46.353 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+07:39:46.354 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:46.354 🔇 Attempting silent SSO login... index-W9qWMePJ.js:265:4480
+07:39:46.354 🔀 OAuth Coordinator [22:39:46][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755038386354_16a0nfem0 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-W9qWMePJ.js:263:51056
+07:39:46.354 🚫 Unsafe path for token refresh: /oauth/callback index-W9qWMePJ.js:258:19917
+07:39:46.354 🚫 Silent auth not allowed on current page: /oauth/callback index-W9qWMePJ.js:258:17753
+07:39:46.354 🔀 OAuth Coordinator [22:39:46][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-W9qWMePJ.js:263:51105
+07:39:46.354 🔀 OAuth Coordinator [22:39:46][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755038386354_16a0nfem0 index-W9qWMePJ.js:263:51105
+07:39:46.355 🔀 OAuth Coordinator [22:39:46][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038386354_16a0nfem0 index-W9qWMePJ.js:263:51105
+07:39:46.355 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-W9qWMePJ.js:265:6132
+07:39:46.355 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:46.356 🚫 Unsafe path for token refresh: /oauth/callback index-W9qWMePJ.js:258:19917
+07:39:46.358 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-W9qWMePJ.js:258:10773
+07:39:46.358 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.358 📋 Found total flow states: 0 index-W9qWMePJ.js:228:14381
+07:39:46.358 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-W9qWMePJ.js:228:14469
+07:39:46.358 🚨 OAuth flow state not found for state: BHVuil0L... 
+Object { searchedFlows: 0, sessionStorageKeys: (5) […] }
+index-W9qWMePJ.js:228:16312
+07:39:46.358 🎯 Popup mode detected via window.parent index-W9qWMePJ.js:258:12244
+07:39:46.359 🛑 User not authenticated, stopping token refresh index-W9qWMePJ.js:265:18362
+07:39:46.359 🔄 Migrating legacy OAuth state to new state manager index-W9qWMePJ.js:228:21206
+07:39:46.359 🔐 OAuth flow state created: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-W9qWMePJ.js:228:14091
+07:39:46.359 ✅ Legacy OAuth state migrated: me94jhrr1wsjndrd92s index-W9qWMePJ.js:228:21781
+07:39:46.359 🔄 Legacy OAuth state migrated: 
+Object { migrated: 1, removed: 3, errors: 0 }
+index-W9qWMePJ.js:755:14439
+07:39:46.359 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-W9qWMePJ.js:258:10773
+07:39:46.359 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.359 📋 Found total flow states: 1 index-W9qWMePJ.js:228:14381
+07:39:46.360 ✅ Found OAuth flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:228:15918
+07:39:46.360 🎯 Popup mode detected via window.parent index-W9qWMePJ.js:258:12244
+07:39:46.360 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (3) […] }
+index-W9qWMePJ.js:755:15275
+07:39:46.360 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=FetWWw_fjjNibm4nJG3BocHQoe-2sp2DbLJfKHIn9CU&state=BHVuil0LT8OzwtUilOiFpqN3dlaL3H-kI9fNEtuSAvU", pathname: "/oauth/callback", search: "?code=FetWWw_fjjNibm4nJG3BocHQoe-2sp2DbLJfKHIn9CU&state=BHVuil0LT8OzwtUilOiFpqN3dlaL3H-kI9fNEtuSAvU", code: "FetWWw_f...", state: "BHVuil0L...", error: null, errorDescription: null, allParams: {…} }
+index-W9qWMePJ.js:755:16276
+07:39:46.360 🎯 OAuth Callback - Popup Mode Processing Started index-W9qWMePJ.js:755:19445
+07:39:46.360 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.360 📋 Found total flow states: 2 index-W9qWMePJ.js:228:14381
+07:39:46.360 ✅ Found OAuth flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:228:15918
+07:39:46.360 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.360 📋 Found total flow states: 2 index-W9qWMePJ.js:228:14381
+07:39:46.360 ✅ Found OAuth flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:228:15918
+07:39:46.360 🔐 OAuth State Validation Debug: 
+Object { urlState: "BHVuil0L...", fullState: "BHVuil0LT8OzwtUilOiFpqN3dlaL3H-kI9fNEtuSAvU", isForceAccountSelection: false, validationResult: {…}, flowState: {…}, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (5) […] }
+index-W9qWMePJ.js:755:20725
+07:39:46.360 ✅ OAuth State Validation Passed index-W9qWMePJ.js:755:25403
+07:39:46.360 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me94jhrr1wsjndrd92s", currentStatus: "created", requestedStatus: "token_exchange" }
+index-W9qWMePJ.js:228:16860
+07:39:46.360 💱 Starting token exchange for code: FetWWw_f... index-W9qWMePJ.js:755:25480
+07:39:46.360 💱 Token exchange debug info: 
+Object { hasState: true, stateValue: "BHVuil0L...", codeValue: "FetWWw_f..." }
+index-W9qWMePJ.js:258:6192
+07:39:46.360 🔍 Validating OAuth flow state... index-W9qWMePJ.js:258:6340
+07:39:46.360 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.361 📋 Found total flow states: 2 index-W9qWMePJ.js:228:14381
+07:39:46.361 ✅ Found OAuth flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:228:15918
+07:39:46.361 🔐 OAuth flow validation result: 
+Object { isValid: true, reason: "Flow state valid", securityLevel: "low", canProceed: true }
+index-W9qWMePJ.js:258:6406
+07:39:46.361 ✅ OAuth flow validation passed, getting flow state... index-W9qWMePJ.js:258:6908
+07:39:46.361 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.361 📋 Found total flow states: 2 index-W9qWMePJ.js:228:14381
+07:39:46.361 ✅ Found OAuth flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:228:15918
+07:39:46.361 🔍 Retrieved flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", hasCodeVerifier: true, codeVerifierLength: 43, status: "created", flowType: "silent" }
+index-W9qWMePJ.js:258:6985
+07:39:46.361 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me94jhrr1wsjndrd92s", currentStatus: "created", requestedStatus: "token_exchange" }
+index-W9qWMePJ.js:228:16860
+07:39:46.361 🔐 Using code verifier from flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", codeVerifierFound: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:258:7216
+07:39:46.361 🔐 Starting token exchange with code: FetWWw_f... index-W9qWMePJ.js:258:8874
+07:39:46.361 🔄 Calling OAuth token endpoint: https://max.dwchem.co.kr/api/oauth/token index-W9qWMePJ.js:258:9053
+07:39:46.363 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-W9qWMePJ.js:258:10773
+07:39:46.363 🔍 Searching for OAuth flow state with state: BHVuil0L... index-W9qWMePJ.js:228:14264
+07:39:46.364 📋 Found total flow states: 2 index-W9qWMePJ.js:228:14381
+07:39:46.364 ✅ Found OAuth flow state: 
+Object { flowId: "me94jhrr1wsjndrd92s", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-W9qWMePJ.js:228:15918
+07:39:46.364 🎯 Popup mode detected via window.parent index-W9qWMePJ.js:258:12244
+07:39:46.367 XHRPOST
+https://max.dwchem.co.kr/api/oauth/token
+
+07:39:46.396 ✅ Token exchange successful index-W9qWMePJ.js:258:10269
+07:39:46.397 📋 Token response details: 
+Object { hasAccessToken: true, hasRefreshToken: true, refreshExpiresIn: 2592000, tokenType: "Bearer", scope: "openid profile email read:profile read:groups manage:workflows" }
+index-W9qWMePJ.js:258:10342
+07:39:46.398 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me94jhrr1wsjndrd92s", currentStatus: "created", requestedStatus: "completed" }
+index-W9qWMePJ.js:228:16860
+07:39:46.398 ✅ OAuth flow completed: me94jhrr1wsjndrd92s index-W9qWMePJ.js:258:10556
+07:39:46.398 ✅ Token exchange successful: 
+Object { hasAccessToken: true, hasRefreshToken: true, tokenType: "Bearer" }
+index-W9qWMePJ.js:755:25585
+07:39:46.398 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me94jhrr1wsjndrd92s", currentStatus: "created", requestedStatus: "completed" }
+index-W9qWMePJ.js:228:16860
+07:39:46.398 📤 Preparing to send OAUTH_SUCCESS message... index-W9qWMePJ.js:755:26275
+07:39:46.398 Window opener exists: false index-W9qWMePJ.js:755:26336
+07:39:46.398 Window parent exists: true index-W9qWMePJ.js:755:26389
+07:39:46.398 Window top exists: true index-W9qWMePJ.js:755:26442
+07:39:46.398 Target origin: https://maxlab.dwchem.co.kr index-W9qWMePJ.js:755:26489
+07:39:46.398 Message payload: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiaXNfYWRtaW4iOnRydWUsInVzZXJfaWQiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFjMWNcdWJjMWNcdWQzMDAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU1MDQwMTg2LCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDM4Mzg2LCJqdGkiOiJhYTUxZGI1My05ODNkLTQxZjItOTBiNi1mYWJlYzZkOTAwYjAiLCJuYmYiOjE3NTUwMzgzODYsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI1MzU2ZmJlNmE4NjIyNjk2In0.W8sbNYK9y1djq6_gRepPhnRdV7JOquV3mRj1szcsdRQ", tokenData: {…} }
+index-W9qWMePJ.js:755:26542
+07:39:46.398 ✅ OAuth result pre-stored in sessionStorage for immediate detection index-W9qWMePJ.js:755:27130
+07:39:46.398 ✅ PostMessage sent to window.parent with wildcard origin index-W9qWMePJ.js:755:27990
+07:39:46.398 ✅ BroadcastChannel message sent (attempt 1/3) index-W9qWMePJ.js:755:28242
+07:39:46.400 🔀 OAuth Coordinator [22:39:46][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755038386262_x279ky55o index-W9qWMePJ.js:263:51105
+07:39:46.400 🚫 Silent auth request aborted by coordinator index-W9qWMePJ.js:258:14651
+07:39:46.400 ✅ Silent SSO login successful index-W9qWMePJ.js:265:4639
+07:39:46.400 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-W9qWMePJ.js:258:13225
+07:39:46.401 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  7ms]
+
+07:39:46.411 🔐 Storing refresh token securely... index-W9qWMePJ.js:263:56847
+07:39:46.411 🔐 Attempting to encrypt and store token (attempt 1/3)... index-W9qWMePJ.js:263:27201
+07:39:46.506 ✅ Token encrypted and stored successfully index-W9qWMePJ.js:263:27426
+07:39:46.508 🔓 Token decrypted successfully index-W9qWMePJ.js:263:28289
+07:39:46.508 🔒 Security event logged: encryption_token_encrypted_stored (low) 
+Object { eventId: "evt_1755038386508_w4h2amdo", timestamp: "2025-08-12T22:39:46.508Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1755038386252_krfh9f1hn0b", details: {…}, context: {…}, metadata: undefined }
+index-W9qWMePJ.js:263:40412
+07:39:46.508 ✅ Refresh token encrypted, stored, and verified securely index-W9qWMePJ.js:263:57185
+07:39:46.508 💾 Tokens stored successfully (including refresh token) index-W9qWMePJ.js:263:55796
+07:39:46.508 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-W9qWMePJ.js:263:30757
+07:39:46.508 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-W9qWMePJ.js:263:32586
+07:39:46.508 ✅ Cleared tokens for 0 other users index-W9qWMePJ.js:263:32749
+07:39:46.508 🔐 Attempting to encrypt and store token (attempt 1/3)... index-W9qWMePJ.js:263:27201
+07:39:46.595 ✅ Token encrypted and stored successfully index-W9qWMePJ.js:263:27426
+07:39:46.595 ✅ Tokens saved successfully for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-W9qWMePJ.js:263:31327
+07:39:46.595 🔓 Cleared logout flags after successful silent login index-W9qWMePJ.js:265:6031
+07:39:46.595 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-W9qWMePJ.js:258:13225
+07:39:46.597 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+07:39:46.605 ✅ MaxLab OAuth success recorded, resetting failure counters index-W9qWMePJ.js:227:6102
+07:39:46.605 📊 MaxLab OAuth attempt recorded: 
+Object { type: "manual", success: true, error: "none", aborted: false, consecutiveFailures: 0, totalAborted: 0 }
+index-W9qWMePJ.js:227:6525
+07:39:46.606 ✅ OAuth success recorded in loop prevention system index-W9qWMePJ.js:228:685
+07:39:46.606 ✅ User authenticated successfully index-W9qWMePJ.js:228:832
+07:39:46.606 🔄 Auth state change: ready → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+07:39:46.609 No routes matched location "/oauth/logout-sync" index-W9qWMePJ.js:49:38911
+07:39:46.610 🔍 Found refresh token metadata, will verify encrypted token exists index-W9qWMePJ.js:263:58482
+07:39:46.611 🔍 Verifying token consistency... index-W9qWMePJ.js:263:63198
+07:39:46.612 🔓 Token decrypted successfully index-W9qWMePJ.js:263:28289
+07:39:46.613 🔓 Retrieved encrypted refresh token index-W9qWMePJ.js:263:56348
+07:39:46.613 ✅ Token consistency verified - metadata and token both exist index-W9qWMePJ.js:263:63769
+07:39:51.331 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+07:39:56.488 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+07:40:01.593 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  12ms]
+
+07:40:06.718 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+07:40:11.826 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
