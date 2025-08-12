@@ -1,0 +1,69 @@
+08:29:51.838 GET
+https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
+[HTTP/2 200  1ms]
+
+08:29:51.886 GET
+https://maxlab.dwchem.co.kr/assets/index-BAct-nPz.css
+[HTTP/2 200 OK 0ms]
+
+08:29:51.916 GET
+https://maxlab.dwchem.co.kr/assets/index-D3lgwVeQ.js
+[HTTP/2 200  0ms]
+
+08:29:51.971 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-D3lgwVeQ.js:228:5243
+08:29:51.973 🆕 New or unauthenticated user, preparing for silent auth attempt index-D3lgwVeQ.js:228:6013
+08:29:51.975 🛡️ New CSRF token generated index-D3lgwVeQ.js:263:6222
+08:29:51.975 🛡️ CSRF protection initialized with new token index-D3lgwVeQ.js:263:5768
+08:29:51.982 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-D3lgwVeQ.js:263:21207
+08:29:51.985 🔀 OAuth Coordinator [23:29:51][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-D3lgwVeQ.js:263:51105
+08:29:51.998 ✅ Auth sync initialized with BroadcastChannel index-D3lgwVeQ.js:263:92719
+08:29:51.998 🔒 Initializing cross-domain logout listener index-D3lgwVeQ.js:851:103606
+08:29:51.999 📡 SSO: PostMessage listener registered index-D3lgwVeQ.js:851:106664
+08:29:51.999 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-D3lgwVeQ.js:227:10583
+08:29:52.000 🔇 Attempting silent SSO login... index-D3lgwVeQ.js:265:4480
+08:29:52.000 🔀 OAuth Coordinator [23:29:52][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755041392000_b1wxifejv 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-D3lgwVeQ.js:263:51056
+08:29:52.000 🚫 Unsafe path for token refresh: /login index-D3lgwVeQ.js:258:19917
+08:29:52.000 🚫 Silent auth not allowed on current page: /login index-D3lgwVeQ.js:258:17753
+08:29:52.000 🔀 OAuth Coordinator [23:29:52][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-D3lgwVeQ.js:263:51105
+08:29:52.000 🔀 OAuth Coordinator [23:29:52][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755041392000_b1wxifejv index-D3lgwVeQ.js:263:51105
+08:29:52.001 🔀 OAuth Coordinator [23:29:52][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755041392000_b1wxifejv index-D3lgwVeQ.js:263:51105
+08:29:52.002 GET
+https://maxlab.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+08:29:52.002 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-D3lgwVeQ.js:265:6132
+08:29:52.002 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-D3lgwVeQ.js:227:10583
+08:29:52.003 🚫 Unsafe path for token refresh: /login index-D3lgwVeQ.js:258:19917
+08:29:52.004 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-D3lgwVeQ.js:755:4401
+08:29:52.006 🛑 User not authenticated, stopping token refresh index-D3lgwVeQ.js:265:18362
+08:29:52.007 🔥 Component mounted, current oauthLoading: false index-D3lgwVeQ.js:755:4996
+08:29:52.008 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-D3lgwVeQ.js:755:4401
+08:29:52.009 🔄 Logout detected, resetting login component state index-D3lgwVeQ.js:755:5402
+08:29:52.011 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-D3lgwVeQ.js:755:4401
+08:29:52.107 🔇 Attempting silent SSO login... index-D3lgwVeQ.js:265:4480
+08:29:52.107 🔀 OAuth Coordinator [23:29:52][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755041392107_b794ku2zo 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-D3lgwVeQ.js:263:51056
+08:29:52.107 🚫 Unsafe path for token refresh: /login index-D3lgwVeQ.js:258:19917
+08:29:52.107 🚫 Silent auth not allowed on current page: /login index-D3lgwVeQ.js:258:17753
+08:29:52.107 🔀 OAuth Coordinator [23:29:52][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-D3lgwVeQ.js:263:51105
+08:29:52.108 🔀 OAuth Coordinator [23:29:52][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755041392107_b794ku2zo index-D3lgwVeQ.js:263:51105
+08:29:52.108 🔀 OAuth Coordinator [23:29:52][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755041392107_b794ku2zo index-D3lgwVeQ.js:263:51105
+08:29:52.108 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-D3lgwVeQ.js:265:6132
+08:29:52.108 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-D3lgwVeQ.js:755:4401
