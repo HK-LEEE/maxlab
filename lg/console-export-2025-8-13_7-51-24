@@ -1,0 +1,194 @@
+Logoin Console log
+
+07:51:16.544 GET
+https://max.dwchem.co.kr/api/oauth/logout?post_logout_redirect_uri=https://max.dwchem.co.kr/login?logout=success
+[HTTP/2 302  17ms]
+
+07:51:16.574 GET
+https://max.dwchem.co.kr/login?logout=success
+[HTTP/2 200  0ms]
+
+07:51:16.589 GET
+https://max.dwchem.co.kr/assets/index-BAsSAK70.css
+[HTTP/2 200 OK 0ms]
+
+07:51:16.624 GET
+https://max.dwchem.co.kr/assets/index-Cu_uWjzM.js
+[HTTP/2 200  0ms]
+
+07:51:16.683 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:16.687 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-Cu_uWjzM.js:529:68804
+07:51:16.687 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:51:16.687 ❌ 토큰이 없어 인증되지 않은 상태 index-Cu_uWjzM.js:529:69551
+07:51:16.692 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:16.712 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+07:51:20.875 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  231ms]
+
+07:51:21.112 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-Cu_uWjzM.js:529:68804
+07:51:21.112 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:51:21.113 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  6ms]
+
+07:51:21.113 📡 사용자 정보 로드 시작 index-Cu_uWjzM.js:529:69293
+07:51:21.115 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  5ms]
+
+07:51:21.121 🔄 SSO: Syncing login to MAX Lab... index-Cu_uWjzM.js:529:68214
+07:51:21.125 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:21.125 ✅ User authenticated, checking OAuth return... index-Cu_uWjzM.js:705:1270
+07:51:21.126 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU1MDQwODgxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDM5MDgxLCJqdGkiOiI0YTFjNTE0OC05ZTAxLTQwMDYtOWM0ZC01YmVkNjVmM2Y5M2YiLCJuYmYiOjE3NTUwMzkwODEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI0YjZmMWUwMWMxMzMxNWZmIn0.mH7al0LiiosBARvoXdQTGIc7Jpb8Kp0fNfxhlAVPyJA&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-12T22:51:21.093593","login_count":615,"roles":[],"groups":[]}
+[HTTP/2 200  35ms]
+
+07:51:21.132 ✅ 사용자 정보 로드 성공: 
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-Cu_uWjzM.js:529:69497
+07:51:21.140 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  12ms]
+
+07:51:21.155 Features response: 
+Object { user_info: {…}, services: (9) […], categories: (5) […] }
+index-Cu_uWjzM.js:712:36612
+07:51:21.155 Features data: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-Cu_uWjzM.js:712:36653
+07:51:21.182 Invalid X-Frame-Options header was found when loading “https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU1MDQwODgxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDM5MDgxLCJqdGkiOiI0YTFjNTE0OC05ZTAxLTQwMDYtOWM0ZC01YmVkNjVmM2Y5M2YiLCJuYmYiOjE3NTUwMzkwODEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI0YjZmMWUwMWMxMzMxNWZmIn0.mH7al0LiiosBARvoXdQTGIc7Jpb8Kp0fNfxhlAVPyJA&user=%7B%22id%22%3A%2221a2aaa7-444a-4038-bda3-d8bf2c4ef162%22%2C%22real_name%22%3A%22%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22display_name%22%3A%22admin%22%2C%22email%22%3A%22admin%40test.com%22%2C%22phone_number%22%3A%22010-1234-5678%22%2C%22department%22%3A%22%EA%B4%80%EB%A6%AC%EB%B6%80%22%2C%22position%22%3A%22%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Atrue%2C%22is_verified%22%3Atrue%2C%22created_at%22%3A%222025-06-19T16%3A50%3A56.017084%22%2C%22last_login_at%22%3A%222025-08-12T22%3A51%3A21.093593%22%2C%22login_count%22%3A615%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D”: “invalid” is not a valid directive. sync
+07:51:21.190 🔄 SSO Sync: Sending session data to parent window sync:11:29
+07:51:21.191 ✅ SSO Sync: Data saved to localStorage sync:25:33
+07:51:21.192 ✅ SSO: MAX Lab sync iframe loaded index-Cu_uWjzM.js:529:68476
+
+
+
+
+Logout Console log
+
+07:51:16.544 GET
+https://max.dwchem.co.kr/api/oauth/logout?post_logout_redirect_uri=https://max.dwchem.co.kr/login?logout=success
+[HTTP/2 302  17ms]
+
+07:51:16.574 GET
+https://max.dwchem.co.kr/login?logout=success
+[HTTP/2 200  0ms]
+
+07:51:16.589 GET
+https://max.dwchem.co.kr/assets/index-BAsSAK70.css
+[HTTP/2 200 OK 0ms]
+
+07:51:16.624 GET
+https://max.dwchem.co.kr/assets/index-Cu_uWjzM.js
+[HTTP/2 200  0ms]
+
+07:51:16.683 🔍 OAuth useEffect triggered:
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:16.687 🔐 AuthContext initAuth 시작:
+Object { hasToken: false }
+index-Cu_uWjzM.js:529:68804
+07:51:16.687 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:51:16.687 ❌ 토큰이 없어 인증되지 않은 상태 index-Cu_uWjzM.js:529:69551
+07:51:16.692 🔍 OAuth useEffect triggered:
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:16.712 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+07:51:20.875 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  231ms]
+
+07:51:21.112 🔐 AuthContext initAuth 시작:
+Object { hasToken: true }
+index-Cu_uWjzM.js:529:68804
+07:51:21.112 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:51:21.113 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  6ms]
+
+07:51:21.113 📡 사용자 정보 로드 시작 index-Cu_uWjzM.js:529:69293
+07:51:21.115 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  5ms]
+
+07:51:21.121 🔄 SSO: Syncing login to MAX Lab... index-Cu_uWjzM.js:529:68214
+07:51:21.125 🔍 OAuth useEffect triggered:
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:21.125 ✅ User authenticated, checking OAuth return... index-Cu_uWjzM.js:705:1270
+07:51:21.126 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU1MDQwODgxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDM5MDgxLCJqdGkiOiI0YTFjNTE0OC05ZTAxLTQwMDYtOWM0ZC01YmVkNjVmM2Y5M2YiLCJuYmYiOjE3NTUwMzkwODEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI0YjZmMWUwMWMxMzMxNWZmIn0.mH7al0LiiosBARvoXdQTGIc7Jpb8Kp0fNfxhlAVPyJA&user={"id":"21a2aaa7-444a-4038-bda3-d8bf2c4ef162","real_name":"관리자","display_name":"admin","email":"admin@test.com","phone_number":"010-1234-5678","department":"관리부","position":"시스템 관리자","is_active":true,"is_admin":true,"is_verified":true,"created_at":"2025-06-19T16:50:56.017084","last_login_at":"2025-08-12T22:51:21.093593","login_count":615,"roles":[],"groups":[]}
+[HTTP/2 200  35ms]
+
+07:51:21.132 ✅ 사용자 정보 로드 성공:
+Object { id: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", real_name: "관리자", display_name: "admin", email: "admin@test.com", phone_number: "010-1234-5678", department: "관리부", position: "시스템 관리자", is_active: true, is_admin: true, is_verified: true, … }
+index-Cu_uWjzM.js:529:69497
+07:51:21.140 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  12ms]
+
+07:51:21.155 Features response:
+Object { user_info: {…}, services: (9) […], categories: (5) […] }
+index-Cu_uWjzM.js:712:36612
+07:51:21.155 Features data:
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+index-Cu_uWjzM.js:712:36653
+07:51:21.182 Invalid X-Frame-Options header was found when loading “https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiZXhwIjoxNzU1MDQwODgxLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDM5MDgxLCJqdGkiOiI0YTFjNTE0OC05ZTAxLTQwMDYtOWM0ZC01YmVkNjVmM2Y5M2YiLCJuYmYiOjE3NTUwMzkwODEsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI0YjZmMWUwMWMxMzMxNWZmIn0.mH7al0LiiosBARvoXdQTGIc7Jpb8Kp0fNfxhlAVPyJA&user=%7B%22id%22%3A%2221a2aaa7-444a-4038-bda3-d8bf2c4ef162%22%2C%22real_name%22%3A%22%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22display_name%22%3A%22admin%22%2C%22email%22%3A%22admin%40test.com%22%2C%22phone_number%22%3A%22010-1234-5678%22%2C%22department%22%3A%22%EA%B4%80%EB%A6%AC%EB%B6%80%22%2C%22position%22%3A%22%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EA%B4%80%EB%A6%AC%EC%9E%90%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Atrue%2C%22is_verified%22%3Atrue%2C%22created_at%22%3A%222025-06-19T16%3A50%3A56.017084%22%2C%22last_login_at%22%3A%222025-08-12T22%3A51%3A21.093593%22%2C%22login_count%22%3A615%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D”: “invalid” is not a valid directive. sync
+07:51:21.190 🔄 SSO Sync: Sending session data to parent window sync:11:29
+07:51:21.191 ✅ SSO Sync: Data saved to localStorage sync:25:33
+07:51:21.192 ✅ SSO: MAX Lab sync iframe loaded index-Cu_uWjzM.js:529:68476
+07:51:31.720 🔄 Starting smart logout process... index-Cu_uWjzM.js:712:9145
+07:51:31.720 🔄 Calling backend logout API... index-Cu_uWjzM.js:712:9302
+07:51:31.723 XHRPOST
+https://max.dwchem.co.kr/api/user/sessions/logout
+[HTTP/2 200  9ms]
+
+07:51:31.737 ✅ Backend logout API completed index-Cu_uWjzM.js:712:9361
+07:51:31.737 🔄 Performing SSO logout... index-Cu_uWjzM.js:712:9454
+07:51:31.737 🔄 Starting enhanced logout process... index-Cu_uWjzM.js:529:70444
+07:51:31.737 🔄 Executing cross-domain logout synchronization... index-Cu_uWjzM.js:529:70596
+07:51:31.737 🔄 Starting cross-domain logout process... index-Cu_uWjzM.js:529:64602
+07:51:31.737 ✅ Local storage cleared index-Cu_uWjzM.js:529:66596
+07:51:31.737 Cookie “access_token” has been rejected for invalid domain. login
+07:51:31.737 Cookie “session_id” has been rejected for invalid domain. login
+07:51:31.737 Cookie “session_token” has been rejected for invalid domain. login
+07:51:31.737 Cookie “user_id” has been rejected for invalid domain. login
+07:51:31.737 Cookie “refresh_token” has been rejected for invalid domain. login
+07:51:31.737 ✅ Cookies cleared index-Cu_uWjzM.js:529:67321
+07:51:31.737 🔄 Attempting MAX Lab logout sync (attempt 1/2) index-Cu_uWjzM.js:529:65200
+07:51:31.740 GET
+https://maxlab.dwchem.co.kr/oauth/logout-sync
+[HTTP/2 200  2ms]
+
+07:51:31.742 🔐 AuthContext initAuth 시작:
+Object { hasToken: false }
+index-Cu_uWjzM.js:529:68804
+07:51:31.743 📡 TRY start index-Cu_uWjzM.js:529:68866
+07:51:31.743 ❌ 토큰이 없어 인증되지 않은 상태 index-Cu_uWjzM.js:529:69551
+07:51:31.747 🔍 OAuth useEffect triggered:
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cu_uWjzM.js:705:971
+07:51:31.749 Invalid X-Frame-Options header was found when loading “https://maxlab.dwchem.co.kr/oauth/logout-sync”: “invalid” is not a valid directive. logout-sync
+07:51:31.770 ✅ MAX Lab logout sync confirmed from https://maxlab.dwchem.co.kr index-Cu_uWjzM.js:529:65790
+07:51:31.771 📡 Logout event broadcasted index-Cu_uWjzM.js:529:67796
+07:51:31.771 ✅ Cross-domain logout completed
+Object { maxLabSynced: true }
+index-Cu_uWjzM.js:529:64780
+07:51:31.771 ✅ MAX Lab logout synchronized successfully index-Cu_uWjzM.js:529:70729
