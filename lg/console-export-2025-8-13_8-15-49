@@ -1,0 +1,55 @@
+08:15:06.176 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-W9qWMePJ.js:228:5243
+08:15:06.176 🆕 New or unauthenticated user, preparing for silent auth attempt index-W9qWMePJ.js:228:6013
+08:15:06.178 🛡️ New CSRF token generated index-W9qWMePJ.js:263:6222
+08:15:06.178 🛡️ CSRF protection initialized with new token index-W9qWMePJ.js:263:5768
+08:15:06.186 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-W9qWMePJ.js:263:21207
+08:15:06.189 🔀 OAuth Coordinator [23:15:06][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-W9qWMePJ.js:263:51105
+08:15:06.202 🔄 SSO: Found sync token from MAX Platform index-W9qWMePJ.js:851:102227
+08:15:06.202 ✅ MaxLab OAuth success recorded, resetting failure counters index-W9qWMePJ.js:227:6102
+08:15:06.202 📊 MaxLab OAuth attempt recorded: 
+Object { type: "manual", success: true, error: "none", aborted: false, consecutiveFailures: 0, totalAborted: 0 }
+index-W9qWMePJ.js:227:6525
+08:15:06.202 ✅ OAuth success recorded in loop prevention system index-W9qWMePJ.js:228:685
+08:15:06.202 ✅ User authenticated successfully index-W9qWMePJ.js:228:832
+08:15:06.202 🔄 Auth state change: ready → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
+index-W9qWMePJ.js:227:10583
+08:15:06.202 ✅ SSO: Auto login from stored sync token successful index-W9qWMePJ.js:851:102417
+08:15:06.202 ✅ Auth sync initialized with BroadcastChannel index-W9qWMePJ.js:263:92719
+08:15:06.202 🔒 Initializing cross-domain logout listener index-W9qWMePJ.js:851:103606
+08:15:06.203 📡 SSO: PostMessage listener registered index-W9qWMePJ.js:851:106122
+08:15:06.203 ✅ Authentication already initialized index-W9qWMePJ.js:851:110886
+08:15:06.208 No valid user data found index-W9qWMePJ.js:265:11102
+08:15:06.208 🔓 User not authenticated, stopping auto refresh index-W9qWMePJ.js:265:13616
+08:15:06.208 📡 API: Getting workspace tree, parentId: undefined index-W9qWMePJ.js:777:27367
+08:15:06.256 📡 API: Workspace tree response: 200 
+Object { workspaces: (2) […], total: 2 }
+index-W9qWMePJ.js:777:27504
+08:15:21.353 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  6ms]
+
+08:15:26.386 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  8ms]
+
+08:15:31.400 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+08:15:36.408 No valid user data found index-W9qWMePJ.js:265:11102
+08:15:36.408 🔓 User not authenticated, stopping auto refresh index-W9qWMePJ.js:265:13616
+08:15:36.410 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+08:15:41.420 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  5ms]
+
+08:15:46.431 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  7ms]
+
