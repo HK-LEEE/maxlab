@@ -76,7 +76,7 @@ export const PersonalTestWorkspace: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Factory size={32} className="text-gray-700" />
             <div>
-              <h1 className="text-3xl font-bold">Personal Test - Chemical Plant</h1>
+              <h1 className="text-3xl font-bold">Process Flow Chemical Plant</h1>
               <p className="text-gray-600 mt-1">케미칼 공장 프로세스 플로우 관리 시스템</p>
             </div>
           </div>
