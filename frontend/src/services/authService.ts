@@ -701,12 +701,23 @@ export const authService = {
             const currentOrigin = window.location.origin;
             const redirectUri = `${currentOrigin}/oauth/callback`;
             const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
-            const ssoRefreshUrl = `${backendUrl}/oauth/sso-token-refresh?redirect_uri=${encodeURIComponent(redirectUri)}`;
+            
+            // 🔒 CRITICAL: Store return URL in localStorage (more persistent than sessionStorage)
+            // Also include timestamp to prevent stale redirects
+            const returnData = {
+              url: window.location.href,
+              timestamp: Date.now(),
+              attempt: 'sso_refresh'
+            };
+            localStorage.setItem('sso_refresh_return_data', JSON.stringify(returnData));
+            sessionStorage.setItem('sso_refresh_return_url', window.location.href); // Keep for backward compatibility
+            
+            // Add state parameter to track this is an SSO refresh attempt
+            const state = `sso_refresh_${Date.now()}`;
+            const ssoRefreshUrl = `${backendUrl}/oauth/sso-token-refresh?redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
             
             console.log('🔄 SSO Session: Redirecting to SSO token refresh endpoint...');
-            
-            // Store current location to return after refresh
-            sessionStorage.setItem('sso_refresh_return_url', window.location.href);
+            console.log('📍 Return URL saved:', window.location.href);
             
             // Redirect to SSO token refresh endpoint
             window.location.href = ssoRefreshUrl;

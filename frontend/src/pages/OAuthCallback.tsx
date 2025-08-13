@@ -92,11 +92,32 @@ export const OAuthCallback: React.FC = () => {
       if (!inPopupMode && !isSilentAuth) {
         const hasValidToken = localStorage.getItem('accessToken');
         const hasAuthorizationCode = searchParams.has('code');
+        const hasError = searchParams.has('error');
+        const state = searchParams.get('state');
+        const isSSORrefreshCallback = state?.startsWith('sso_refresh_');
+        
+        // 🔒 CRITICAL: Detect if this is a stale OAuth callback (user refreshed the page or navigated directly)
+        // Check if there's no authorization code AND no error, which indicates an invalid access
+        if (!hasAuthorizationCode && !hasError) {
+          console.log('⚠️ OAuth callback accessed without authorization code or error - likely a direct access or refresh');
+          
+          // If user has valid token, redirect to dashboard
+          if (hasValidToken) {
+            console.log('✅ User authenticated, redirecting to dashboard...');
+            window.location.replace('/');
+            return;
+          } else {
+            // No token and no auth code - redirect to login
+            console.log('❌ No valid session, redirecting to login...');
+            window.location.replace('/login');
+            return;
+          }
+        }
         
         // 🔒 CRITICAL: Only redirect if user has valid token AND no authorization code to process
         // This prevents infinite loops when refreshing the OAuth callback page
         // BUT allows session upgrades and OAuth completion to work properly
-        if (hasValidToken && !hasAuthorizationCode) {
+        if (hasValidToken && !hasAuthorizationCode && !isSSORrefreshCallback) {
           console.log('✅ User authenticated on OAuth callback page with no authorization code, redirecting immediately...');
           const redirectTo = sessionStorage.getItem('oauthRedirectTo') || '/';
           sessionStorage.removeItem('oauthRedirectTo');
@@ -648,6 +669,9 @@ export const OAuthCallback: React.FC = () => {
               localStorage.setItem('token_renewable_via_sso', 'true');
               localStorage.setItem('sync_time', String(Date.now()));
               
+              // 🔒 CRITICAL: Set flag to prevent immediate re-refresh attempts
+              localStorage.setItem('lastTokenRefresh', Date.now().toString());
+              
               console.log('✅ SSO session metadata updated after successful token refresh');
             }
             
@@ -1095,29 +1119,59 @@ export const OAuthCallback: React.FC = () => {
               
               console.log('✅ SSO session metadata updated after successful token refresh');
               
-              // Get the stored return URL and redirect back
-              const returnUrl = sessionStorage.getItem('sso_refresh_return_url');
-              if (returnUrl) {
-                console.log('🔄 Redirecting back to original URL after SSO token refresh:', returnUrl);
-                sessionStorage.removeItem('sso_refresh_return_url');
-                
-                // Ensure auth store is updated with refreshed token
-                const { useAuthStore } = await import('../stores/authStore');
-                const { setAuth, setUser } = useAuthStore.getState();
-                
-                // Get user info with new token
-                const { authService } = await import('../services/authService');
-                const userInfo = await authService.getCurrentUser();
-                
-                setAuth(tokenResponse.access_token, userInfo);
-                setUser(userInfo);
-                
-                console.log('✅ Auth store updated after SSO token refresh');
-                
-                // Redirect to original location
-                window.location.replace(returnUrl);
-                return;
+              // 🔒 CRITICAL: Try multiple sources for return URL to prevent infinite loops
+              let returnUrl = sessionStorage.getItem('sso_refresh_return_url');
+              
+              // Fallback to localStorage if sessionStorage was cleared
+              if (!returnUrl) {
+                try {
+                  const returnData = localStorage.getItem('sso_refresh_return_data');
+                  if (returnData) {
+                    const parsed = JSON.parse(returnData);
+                    // Only use if recent (within 5 minutes)
+                    if (parsed.timestamp && (Date.now() - parsed.timestamp) < 5 * 60 * 1000) {
+                      returnUrl = parsed.url;
+                      console.log('📍 Retrieved return URL from localStorage fallback:', returnUrl);
+                    }
+                    // Clean up after use
+                    localStorage.removeItem('sso_refresh_return_data');
+                  }
+                } catch (e) {
+                  console.warn('Failed to parse return data from localStorage:', e);
+                }
               }
+              
+              // Final fallback to dashboard to prevent staying on callback page
+              if (!returnUrl) {
+                returnUrl = '/';
+                console.log('⚠️ No stored return URL found, defaulting to dashboard');
+              }
+              
+              console.log('🔄 Redirecting back after SSO token refresh to:', returnUrl);
+              
+              // Clean up storage
+              sessionStorage.removeItem('sso_refresh_return_url');
+              localStorage.removeItem('sso_refresh_return_data');
+              
+              // Ensure auth store is updated with refreshed token
+              const { useAuthStore } = await import('../stores/authStore');
+              const { setAuth, setUser } = useAuthStore.getState();
+              
+              // Get user info with new token
+              const { authService } = await import('../services/authService');
+              const userInfo = await authService.getCurrentUser();
+              
+              setAuth(tokenResponse.access_token, userInfo);
+              setUser(userInfo);
+              
+              console.log('✅ Auth store updated after SSO token refresh');
+              
+              // 🔒 CRITICAL: Set a flag to prevent immediate re-refresh attempts
+              localStorage.setItem('lastTokenRefresh', Date.now().toString());
+              
+              // Redirect to original location or dashboard
+              window.location.replace(returnUrl);
+              return;
             }
             
             // Check if this was a "different user login" attempt
