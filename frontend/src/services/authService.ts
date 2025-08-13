@@ -683,7 +683,44 @@ export const authService = {
       try {
         console.log('🔄 Attempting token refresh with fallback chain...');
         
-        // 1차: Refresh Token 시도
+        // CHECK: Is this an SSO-synced session without refresh tokens?
+        const authMethod = localStorage.getItem('auth_method');
+        const hasRefreshToken = localStorage.getItem('has_refresh_token') === 'true';
+        const maxPlatformSession = localStorage.getItem('max_platform_session') === 'true';
+        const tokenRenewableViaSso = localStorage.getItem('token_renewable_via_sso') === 'true';
+        
+        if (authMethod === 'sso_sync' && !hasRefreshToken && maxPlatformSession && tokenRenewableViaSso) {
+          console.log('🔄 SSO Session: Attempting token refresh via MAX Platform redirect...');
+          
+          // For SSO sessions, redirect to MAX Platform for token refresh
+          try {
+            const currentOrigin = window.location.origin;
+            const redirectUri = `${currentOrigin}/oauth/callback`;
+            const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
+            const ssoRefreshUrl = `${backendUrl}/oauth/sso-token-refresh?redirect_uri=${encodeURIComponent(redirectUri)}`;
+            
+            console.log('🔄 SSO Session: Redirecting to SSO token refresh endpoint...');
+            
+            // Store current location to return after refresh
+            sessionStorage.setItem('sso_refresh_return_url', window.location.href);
+            
+            // Redirect to SSO token refresh endpoint
+            window.location.href = ssoRefreshUrl;
+            
+            // This won't return, but we provide a success response for consistency
+            return {
+              success: true,
+              redirecting: true,
+              message: 'Redirecting to MAX Platform for token refresh'
+            };
+          } catch (ssoError: any) {
+            console.error('❌ SSO token refresh failed:', ssoError);
+            // Fall back to silent auth if SSO refresh fails
+            console.log('🔄 SSO refresh failed, falling back to silent auth...');
+          }
+        }
+        
+        // 1차: Refresh Token 시도 (for non-SSO sessions or SSO with refresh tokens)
         const hasValidRefreshToken = await refreshTokenService.isRefreshTokenValidAsync();
         if (hasValidRefreshToken) {
           try {

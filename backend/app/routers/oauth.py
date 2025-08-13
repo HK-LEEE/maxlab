@@ -754,6 +754,12 @@ async def oauth_sync(
             "sync_source": "max_platform",
             "sync_time": time.time(),
             
+            # SSO Sync specific metadata - CRITICAL for frontend handling
+            "auth_method": "sso_sync",
+            "has_refresh_token": False,  # SSO sync doesn't provide refresh tokens
+            "max_platform_session": True,  # Indicates this is a MAX Platform session
+            "token_renewable_via_sso": True,  # Can renew by going back to MAX Platform
+            
             # Additional metadata from MAX Platform
             "created_at": user_info.get("created_at"),
             "last_login_at": user_info.get("last_login_at"),
@@ -813,6 +819,93 @@ async def oauth_sync(
             </script>
             """,
             status_code=200
+        )
+
+
+@router.get("/sso-token-refresh")
+async def sso_token_refresh(
+    redirect_uri: Optional[str] = Query(None, description="리다이렉트 URI"),
+    state: Optional[str] = Query(None, description="상태 매개변수"),
+    request: Request = None
+):
+    """
+    SSO Token Refresh: MAX Platform 재인증으로 토큰 갱신
+    
+    SSO 동기화된 세션에서 refresh token이 없는 경우
+    MAX Platform으로 silent 재인증을 요청하여 새로운 token을 받습니다.
+    """
+    try:
+        logger.info(f"🔄 SSO Token refresh request - redirect_uri: {redirect_uri}")
+        
+        # 🔒 SECURITY: Validate redirect URI if provided
+        if redirect_uri and not validate_redirect_uri(redirect_uri):
+            logger.warning(f"Invalid redirect URI in SSO token refresh: {redirect_uri}")
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "error": "invalid_redirect_uri",
+                    "error_description": "Redirect URI is not in the allowed list"
+                }
+            )
+        
+        # Use default redirect URI if none provided
+        if not redirect_uri:
+            redirect_uri = f"{request.base_url}oauth/callback" if request else "/"
+            
+        # MAX Platform에 silent 재인증 요청을 위한 URL 생성
+        # prompt=none을 사용하여 사용자 상호작용 없이 재인증 시도
+        auth_params = {
+            "response_type": "code",
+            "client_id": settings.CLIENT_ID or "maxlab",
+            "redirect_uri": redirect_uri,
+            "scope": "openid profile email read:profile read:groups manage:workflows",
+            "prompt": "none",  # 🔑 Silent 재인증
+            "state": state or f"sso_refresh_{int(time.time())}"
+        }
+        
+        query_string = "&".join([f"{k}={v}" for k, v in auth_params.items()])
+        max_platform_auth_url = f"{settings.AUTH_SERVER_URL}/api/oauth/authorize?{query_string}"
+        
+        logger.info(f"🔄 Redirecting to MAX Platform for SSO token refresh: {max_platform_auth_url}")
+        
+        # MAX Platform으로 리다이렉트하여 silent 재인증 요청
+        return RedirectResponse(
+            url=max_platform_auth_url,
+            status_code=status.HTTP_302_FOUND
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ SSO token refresh error: {e}")
+        
+        # 오류 발생 시 적절한 페이지로 리다이렉트
+        fallback_redirect = redirect_uri or "/"
+        
+        return HTMLResponse(
+            content=f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>SSO Token Refresh Error</title>
+                <script>
+                    // 오류 발생을 부모 창에 알림
+                    if (window.opener) {{
+                        window.opener.postMessage({{
+                            type: 'SSO_TOKEN_REFRESH_ERROR',
+                            error: '{str(e)}'
+                        }}, '*');
+                        window.close();
+                    }} else {{
+                        // 일반 페이지에서 호출된 경우 리다이렉트
+                        window.location.href = '{fallback_redirect}';
+                    }}
+                </script>
+            </head>
+            <body>
+                <p>SSO token refresh failed. Redirecting...</p>
+            </body>
+            </html>
+            """,
+            status_code=status.HTTP_200_OK
         )
 
 

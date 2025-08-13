@@ -134,16 +134,37 @@ function App() {
         try {
           const userData = JSON.parse(ssoUser);
           
-          // 토큰과 사용자 정보로 자동 로그인
+          // CRITICAL FIX: Store user data in localStorage for validation
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          // Store access token (SSO sync only provides access token, no refresh token)
+          localStorage.setItem('accessToken', ssoToken);
+          
+          // Set auth state with user data
           setAuth(ssoToken, userData);
           setUser(userData);
+          
+          // IMPORTANT: SSO sync tokens typically don't have refresh tokens
+          // Store flag to indicate this is SSO-based auth without refresh capability
+          localStorage.setItem('auth_source', 'sso_sync');
+          localStorage.setItem('auth_no_refresh_token', 'true');
+          
+          // ENHANCED: Store SSO-specific metadata for proper token refresh handling
+          localStorage.setItem('auth_method', userData.auth_method || 'sso_sync');
+          localStorage.setItem('has_refresh_token', String(userData.has_refresh_token || false));
+          localStorage.setItem('max_platform_session', String(userData.max_platform_session || true));
+          localStorage.setItem('token_renewable_via_sso', String(userData.token_renewable_via_sso || true));
+          localStorage.setItem('sync_time', String(userData.sync_time || Date.now()));
+          
+          console.log('✅ SSO Sync: Enhanced metadata stored for SSO session handling');
+          
           setAuthState('ready');
           
           // 동기화 토큰 정리 (일회성)
           localStorage.removeItem('sso_sync_token');
           localStorage.removeItem('sso_sync_user');
           
-          console.log('✅ SSO: Auto login from stored sync token successful');
+          console.log('✅ SSO: Auto login from stored sync token successful (no refresh token)');
           
         } catch (error) {
           console.error('❌ SSO: Failed to parse stored sync data:', error);

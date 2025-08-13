@@ -168,6 +168,12 @@ export const OAuthCallback: React.FC = () => {
           allParams: Object.fromEntries(searchParams.entries())
         });
         
+        // CHECK: Is this an SSO token refresh callback?
+        const isSSORrefreshCallback = state?.startsWith('sso_refresh_') || sessionStorage.getItem('sso_refresh_return_url');
+        if (isSSORrefreshCallback) {
+          console.log('🔄 SSO Token Refresh Callback Detected');
+        }
+        
         if (error) {
           const errorMessage = errorDescription || `OAuth error: ${error}`;
           
@@ -602,8 +608,23 @@ export const OAuthCallback: React.FC = () => {
             console.log('✅ Token exchange successful:', {
               hasAccessToken: !!tokenResponse.access_token,
               hasRefreshToken: !!tokenResponse.refresh_token,
-              tokenType: tokenResponse.token_type
+              tokenType: tokenResponse.token_type,
+              isSSORrefreshCallback: isSSORrefreshCallback
             });
+            
+            // ENHANCED: Handle SSO token refresh callback in popup mode
+            if (isSSORrefreshCallback) {
+              console.log('🔄 Processing SSO token refresh in popup mode...');
+              
+              // Update SSO session metadata to reflect refreshed tokens
+              localStorage.setItem('auth_method', 'sso_sync');
+              localStorage.setItem('has_refresh_token', String(!!tokenResponse.refresh_token));
+              localStorage.setItem('max_platform_session', 'true');
+              localStorage.setItem('token_renewable_via_sso', 'true');
+              localStorage.setItem('sync_time', String(Date.now()));
+              
+              console.log('✅ SSO session metadata updated after token refresh');
+            }
             
             // 성공 표시
             hasProcessedRef.current = true;
@@ -1023,8 +1044,53 @@ export const OAuthCallback: React.FC = () => {
           try {
             const tokenResponse = await exchangeCodeForToken(code, state || undefined);
             
+            console.log('✅ Token exchange successful in non-popup mode:', {
+              hasAccessToken: !!tokenResponse.access_token,
+              hasRefreshToken: !!tokenResponse.refresh_token,
+              tokenType: tokenResponse.token_type,
+              isSSORrefreshCallback: isSSORrefreshCallback
+            });
+            
             // 성공 표시
             hasProcessedRef.current = true;
+            
+            // ENHANCED: Handle SSO token refresh callback in non-popup mode
+            if (isSSORrefreshCallback) {
+              console.log('🔄 Processing SSO token refresh in non-popup mode...');
+              
+              // Update SSO session metadata to reflect refreshed tokens
+              localStorage.setItem('auth_method', 'sso_sync');
+              localStorage.setItem('has_refresh_token', String(!!tokenResponse.refresh_token));
+              localStorage.setItem('max_platform_session', 'true');
+              localStorage.setItem('token_renewable_via_sso', 'true');
+              localStorage.setItem('sync_time', String(Date.now()));
+              
+              console.log('✅ SSO session metadata updated after token refresh');
+              
+              // Get the stored return URL and redirect back
+              const returnUrl = sessionStorage.getItem('sso_refresh_return_url');
+              if (returnUrl) {
+                console.log('🔄 Redirecting back to original URL after SSO token refresh:', returnUrl);
+                sessionStorage.removeItem('sso_refresh_return_url');
+                
+                // Ensure auth store is updated with refreshed token
+                const { useAuthStore } = await import('../stores/authStore');
+                const { setAuth, setUser } = useAuthStore.getState();
+                
+                // Get user info with new token
+                const { authService } = await import('../services/authService');
+                const userInfo = await authService.getCurrentUser();
+                
+                setAuth(tokenResponse.access_token, userInfo);
+                setUser(userInfo);
+                
+                console.log('✅ Auth store updated after SSO token refresh');
+                
+                // Redirect to original location
+                window.location.replace(returnUrl);
+                return;
+              }
+            }
             
             // Check if this was a "different user login" attempt
             const wasForcedAccountSelection = sessionStorage.getItem('oauth_force_account_selection') === 'true';
