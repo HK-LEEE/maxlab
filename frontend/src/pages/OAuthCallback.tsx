@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import { exchangeCodeForToken, isPopupMode } from '../utils/popupOAuth';
 import { migrateLegacyOAuthState, validateOAuthFlow, getOAuthFlow, updateOAuthFlowStatus } from '../utils/oauthStateManager';
 import { performEmergencyOAuthRecovery, shouldPerformEmergencyRecovery } from '../utils/oauthEmergencyRecovery';
+import { SsoRefreshCircuitBreaker } from '../utils/ssoRefreshCircuitBreaker';
 
 interface CallbackState {
   status: 'loading' | 'success' | 'error';
@@ -172,6 +173,30 @@ export const OAuthCallback: React.FC = () => {
         const isSSORrefreshCallback = state?.startsWith('sso_refresh_') || sessionStorage.getItem('sso_refresh_return_url');
         if (isSSORrefreshCallback) {
           console.log('🔄 SSO Token Refresh Callback Detected');
+          
+          // 🚨 CRITICAL FIX: Handle SSO refresh failures immediately
+          if (error === 'login_required') {
+            console.log('🚨 SSO Token Refresh Failed - MAX Platform session invalid');
+            
+            // Record SSO refresh failure in circuit breaker
+            SsoRefreshCircuitBreaker.recordFailure(errorDescription || error, state || 'unknown');
+            
+            // Circuit breaker will automatically clear SSO metadata when it opens
+            console.log('✅ SSO refresh failure recorded in circuit breaker - infinite loop prevention active');
+            
+            // Redirect to login page instead of continuing loop
+            setState({
+              status: 'error',
+              message: 'Session expired. Please log in again.',
+              error: 'Your MAX Platform session has expired. Please log in to continue.'
+            });
+            
+            setTimeout(() => {
+              navigate('/login', { replace: true });
+            }, 2000);
+            
+            return; // Exit immediately
+          }
         }
         
         if (error) {
@@ -614,7 +639,7 @@ export const OAuthCallback: React.FC = () => {
             
             // ENHANCED: Handle SSO token refresh callback in popup mode
             if (isSSORrefreshCallback) {
-              console.log('🔄 Processing SSO token refresh in popup mode...');
+              console.log('✅ Processing successful SSO token refresh in popup mode...');
               
               // Update SSO session metadata to reflect refreshed tokens
               localStorage.setItem('auth_method', 'sso_sync');
@@ -623,7 +648,7 @@ export const OAuthCallback: React.FC = () => {
               localStorage.setItem('token_renewable_via_sso', 'true');
               localStorage.setItem('sync_time', String(Date.now()));
               
-              console.log('✅ SSO session metadata updated after token refresh');
+              console.log('✅ SSO session metadata updated after successful token refresh');
             }
             
             // 성공 표시
@@ -1056,7 +1081,10 @@ export const OAuthCallback: React.FC = () => {
             
             // ENHANCED: Handle SSO token refresh callback in non-popup mode
             if (isSSORrefreshCallback) {
-              console.log('🔄 Processing SSO token refresh in non-popup mode...');
+              console.log('✅ Processing successful SSO token refresh in non-popup mode...');
+              
+              // Record successful SSO refresh in circuit breaker
+              SsoRefreshCircuitBreaker.recordSuccess();
               
               // Update SSO session metadata to reflect refreshed tokens
               localStorage.setItem('auth_method', 'sso_sync');
@@ -1065,7 +1093,7 @@ export const OAuthCallback: React.FC = () => {
               localStorage.setItem('token_renewable_via_sso', 'true');
               localStorage.setItem('sync_time', String(Date.now()));
               
-              console.log('✅ SSO session metadata updated after token refresh');
+              console.log('✅ SSO session metadata updated after successful token refresh');
               
               // Get the stored return URL and redirect back
               const returnUrl = sessionStorage.getItem('sso_refresh_return_url');

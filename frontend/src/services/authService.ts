@@ -19,6 +19,7 @@ import { authSyncService } from './authSyncService';
 import { useOAuthLoopPrevention, oauthLoopPrevention } from '../utils/oauthInfiniteLoopPrevention';
 import { useAuthStore } from '../stores/authStore';
 import { oauthRequestCoordinator } from './oauthRequestCoordinator';
+import { SsoRefreshCircuitBreaker } from '../utils/ssoRefreshCircuitBreaker';
 
 // Re-export for backward compatibility
 export type IDTokenClaims = MAXPlatformClaims;
@@ -689,7 +690,10 @@ export const authService = {
         const maxPlatformSession = localStorage.getItem('max_platform_session') === 'true';
         const tokenRenewableViaSso = localStorage.getItem('token_renewable_via_sso') === 'true';
         
-        if (authMethod === 'sso_sync' && !hasRefreshToken && maxPlatformSession && tokenRenewableViaSso) {
+        // 🚨 CRITICAL FIX: Use circuit breaker for SSO refresh failures
+        const ssoRefreshAttempt = SsoRefreshCircuitBreaker.canAttemptSsoRefresh();
+        
+        if (authMethod === 'sso_sync' && !hasRefreshToken && maxPlatformSession && tokenRenewableViaSso && ssoRefreshAttempt.allowed) {
           console.log('🔄 SSO Session: Attempting token refresh via MAX Platform redirect...');
           
           // For SSO sessions, redirect to MAX Platform for token refresh
@@ -715,9 +719,18 @@ export const authService = {
             };
           } catch (ssoError: any) {
             console.error('❌ SSO token refresh failed:', ssoError);
+            
+            // Record SSO refresh failure in circuit breaker
+            SsoRefreshCircuitBreaker.recordFailure(ssoError.message || 'SSO redirect failed');
+            
             // Fall back to silent auth if SSO refresh fails
             console.log('🔄 SSO refresh failed, falling back to silent auth...');
           }
+        } else if (!ssoRefreshAttempt.allowed) {
+          console.log(`🚨 SSO refresh blocked by circuit breaker: ${ssoRefreshAttempt.reason}`);
+          console.log(`🕒 Next attempt allowed in: ${ssoRefreshAttempt.nextAttemptIn || 0} seconds`);
+          
+          // Circuit breaker automatically handles SSO metadata cleanup
         }
         
         // 1차: Refresh Token 시도 (for non-SSO sessions or SSO with refresh tokens)
@@ -753,6 +766,10 @@ export const authService = {
             localStorage.setItem('user', JSON.stringify(userWithMetadata));
             
             console.log('✅ Refresh token renewal successful');
+            
+            // Reset SSO circuit breaker on successful token refresh
+            SsoRefreshCircuitBreaker.recordSuccess();
+            
             return {
               success: true,
               token: refreshResult.access_token
@@ -784,12 +801,28 @@ export const authService = {
           
           if (result.success) {
             console.log('✅ Silent auth fallback successful');
+            
+            // Reset SSO circuit breaker on successful silent auth
+            SsoRefreshCircuitBreaker.recordSuccess();
+            
             return {
               success: true,
               token: localStorage.getItem('accessToken') || undefined
             };
           } else {
             console.log('❌ Silent auth fallback failed:', result.error);
+            
+            // If both refresh and silent auth fail, and this was an SSO session, clear metadata
+            const authMethod = localStorage.getItem('auth_method');
+            if (authMethod === 'sso_sync') {
+              console.log('🚨 SSO session completely failed, clearing all SSO metadata');
+              localStorage.removeItem('auth_method');
+              localStorage.removeItem('has_refresh_token');
+              localStorage.removeItem('max_platform_session');
+              localStorage.removeItem('token_renewable_via_sso');
+              localStorage.removeItem('sync_time');
+            }
+            
             return {
               success: false,
               error: result.error || 'Both refresh token and silent auth failed'
