@@ -1,0 +1,46 @@
+18:26:11.277 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-tkVosYJu.js:228:5827
+18:26:11.277 🆕 New or unauthenticated user, preparing for silent auth attempt index-tkVosYJu.js:228:6850
+18:26:11.279 🛡️ New CSRF token generated index-tkVosYJu.js:263:6222
+18:26:11.279 🛡️ CSRF protection initialized with new token index-tkVosYJu.js:263:5768
+18:26:11.286 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-tkVosYJu.js:263:21207
+18:26:11.288 🔀 OAuth Coordinator [09:26:11][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-tkVosYJu.js:263:51842
+18:26:11.297 ✅ Auth sync initialized with BroadcastChannel index-tkVosYJu.js:263:95165
+18:26:11.297 🔒 Initializing cross-domain logout listener index-tkVosYJu.js:851:104711
+18:26:11.298 📡 SSO: PostMessage listener registered index-tkVosYJu.js:851:107716
+18:26:11.298 🚀 Starting auth initialization (single instance guaranteed) index-tkVosYJu.js:851:112222
+18:26:11.298 🔍 MaxLab Infinite loop detection result: 
+Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 0 }
+index-tkVosYJu.js:227:8606
+18:26:11.298 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
+index-tkVosYJu.js:227:4366
+18:26:11.298 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-tkVosYJu.js:227:11473
+18:26:11.298 🔇 Attempting silent SSO login... index-tkVosYJu.js:265:4480
+18:26:11.298 🔀 OAuth Coordinator [09:26:11][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755077171299_mokxk85vq 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-tkVosYJu.js:263:51793
+18:26:11.298 🔀 OAuth Coordinator [09:26:11][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-tkVosYJu.js:263:51842
+18:26:11.298 🔀 OAuth Coordinator [09:26:11][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755077171299_mokxk85vq index-tkVosYJu.js:263:51842
+18:26:11.300 🚫 Unsafe path for token refresh: /login index-tkVosYJu.js:258:22098
+18:26:11.300 🚫 Silent auth not allowed on current page: /login index-tkVosYJu.js:258:19642
+18:26:11.300 🔀 OAuth Coordinator [09:26:11][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755077171299_mokxk85vq index-tkVosYJu.js:263:51842
+18:26:11.300 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-tkVosYJu.js:265:6164
+18:26:11.301 📊 MaxLab OAuth attempt recorded: 
+Object { type: "auto", success: false, error: "Cannot attempt silent auth on current page...", aborted: false, consecutiveFailures: 1, totalAborted: 0 }
+index-tkVosYJu.js:227:7113
+18:26:11.301 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
+index-tkVosYJu.js:227:11473
+18:26:11.302 🚫 Unsafe path for token refresh: /login index-tkVosYJu.js:258:22098
+18:26:11.303 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-tkVosYJu.js:755:4401
+18:26:11.306 🛑 User not authenticated, stopping token refresh index-tkVosYJu.js:265:23061
+18:26:11.306 🔄 Cross-domain logout detected index-tkVosYJu.js:755:5048
+18:26:11.306 🔥 Component mounted, current oauthLoading: false index-tkVosYJu.js:755:5271
+18:26:11.306 🔄 Logout detected, resetting login component state index-tkVosYJu.js:755:5677
+18:26:11.306 🛑 Silent login disabled: Cross-domain logout detected index-tkVosYJu.js:755:6010
