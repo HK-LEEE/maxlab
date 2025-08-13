@@ -222,6 +222,7 @@ const ProcessFlowEditor = ({
             placeholder="Select data source (optional)"
             allowClear
             showTooltip
+            hideDefaultWhenUserSourcesExist={true}
           />
         </Form.Item>
 

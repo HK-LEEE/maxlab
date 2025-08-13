@@ -36,14 +36,16 @@ export function useDataSources(workspaceId = 'personaltest') {
 
       // Auto-select logic: prefer defined data sources over 'default'
       if (sources && sources.length > 0) {
-        // Filter active sources
+        // Filter active sources and prioritize by order
         const activeSources = sources.filter(ds => ds.is_active !== false);
-        const defaultSource = activeSources[0] || sources[0];
+        // Sort by priority (lower number = higher priority) or creation order
+        const sortedSources = activeSources.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+        const defaultSource = sortedSources[0] || sources[0];
         
         setSelectedDataSource(defaultSource.id);
         setDefaultDataSource(defaultSource);
         
-        console.log('Auto-selected data source:', defaultSource);
+        console.log('Auto-selected data source:', defaultSource, `(${sources.length} sources available)`);
       } else {
         // No defined data sources, use null (workspace default)
         setSelectedDataSource(null);

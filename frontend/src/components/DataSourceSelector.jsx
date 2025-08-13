@@ -1,13 +1,11 @@
 import React from 'react';
-import { Select, Spin, Alert, Tooltip } from 'antd';
-import { DatabaseOutlined, InfoCircleOutlined } from '@ant-design/icons';
-
-const { Option } = Select;
+import { Database, Info, Loader2, AlertCircle } from 'lucide-react';
 
 /**
  * Data Source Selector Component
  * Displays available data sources and allows selection
  * Automatically selects first defined data source instead of showing 'default'
+ * Can conditionally hide default option when user-defined sources exist
  */
 const DataSourceSelector = ({ 
   value, 
@@ -21,10 +19,12 @@ const DataSourceSelector = ({
   className,
   size = "middle",
   allowClear = false,
-  showTooltip = true
+  showTooltip = true,
+  hideDefaultWhenUserSourcesExist = false
 }) => {
   // Handle change event
-  const handleChange = (selectedValue) => {
+  const handleChange = (event) => {
+    const selectedValue = event.target.value;
     // Convert empty string to null for workspace default
     onChange(selectedValue || null);
   };
@@ -32,28 +32,25 @@ const DataSourceSelector = ({
   // Render loading state
   if (loading) {
     return (
-      <Spin size="small">
-        <Select
-          style={{ width: 200, ...style }}
-          className={className}
+      <div className="flex items-center space-x-2" style={style}>
+        <Loader2 size={16} className="animate-spin text-gray-500" />
+        <select
+          className={`border border-gray-300 rounded px-2 py-1 text-sm ${className || ''}`}
           disabled
-          placeholder="Loading data sources..."
-          size={size}
-        />
-      </Spin>
+        >
+          <option>Loading data sources...</option>
+        </select>
+      </div>
     );
   }
 
   // Render error state
   if (error) {
     return (
-      <Alert
-        message="Failed to load data sources"
-        description={error}
-        type="error"
-        showIcon
-        style={{ marginBottom: 16 }}
-      />
+      <div className="flex items-center space-x-2 text-red-600 text-sm">
+        <AlertCircle size={16} />
+        <span>Failed to load data sources: {error}</span>
+      </div>
     );
   }
 
@@ -61,62 +58,54 @@ const DataSourceSelector = ({
   const getOptionLabel = (source) => {
     const sourceType = source.source_type?.toUpperCase() || 'UNKNOWN';
     const isActive = source.is_active !== false;
+    const configName = source.config_name || `Data Source ${source.id.slice(0, 8)}`;
     
-    return (
-      <span style={{ color: isActive ? 'inherit' : '#999' }}>
-        <DatabaseOutlined style={{ marginRight: 8 }} />
-        {sourceType} - {source.config_name || `Data Source ${source.id.slice(0, 8)}`}
-        {!isActive && ' (Inactive)'}
-      </span>
-    );
+    return `${sourceType} - ${configName}${!isActive ? ' (Inactive)' : ''}`;
   };
+
+  // Determine if default option should be shown
+  const shouldShowDefault = !hideDefaultWhenUserSourcesExist || dataSources.length === 0;
 
   // Render selector
   return (
-    <div style={{ display: 'inline-block' }}>
-      <Select
+    <div className="flex items-center space-x-2" style={style}>
+      <select
         value={value || ''}
         onChange={handleChange}
-        style={{ minWidth: 200, ...style }}
-        className={className}
+        className={`border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black ${className || ''}`}
         disabled={disabled}
-        placeholder={placeholder}
-        size={size}
-        allowClear={allowClear}
-        suffixIcon={
-          showTooltip ? (
-            <Tooltip title="Select a data source for this process flow. Leave empty to use workspace default.">
-              <InfoCircleOutlined />
-            </Tooltip>
-          ) : (
-            <DatabaseOutlined />
-          )
-        }
+        style={{ minWidth: 200 }}
       >
-        {/* Workspace default option */}
-        <Option value="">
-          <span style={{ fontStyle: 'italic', color: '#666' }}>
-            <DatabaseOutlined style={{ marginRight: 8 }} />
+        {/* Workspace default option - conditionally rendered */}
+        {shouldShowDefault && (
+          <option value="" style={{ fontStyle: 'italic' }}>
             Workspace Default
-          </span>
-        </Option>
+          </option>
+        )}
         
         {/* Defined data sources */}
         {dataSources.map((source) => (
-          <Option 
+          <option 
             key={source.id} 
             value={source.id}
             disabled={source.is_active === false}
+            style={{ color: source.is_active === false ? '#999' : 'inherit' }}
           >
             {getOptionLabel(source)}
-          </Option>
+          </option>
         ))}
-      </Select>
+      </select>
+      
+      {showTooltip && (
+        <div title="Select a data source for this process flow. Leave empty to use workspace default.">
+          <Info size={16} className="text-gray-400 hover:text-gray-600 cursor-help" />
+        </div>
+      )}
       
       {/* Show info if no data sources are defined */}
       {dataSources.length === 0 && !loading && (
-        <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-          <InfoCircleOutlined style={{ marginRight: 4 }} />
+        <div className="flex items-center text-xs text-gray-500 mt-1">
+          <Info size={12} className="mr-1" />
           No data sources defined. Using workspace default configuration.
         </div>
       )}

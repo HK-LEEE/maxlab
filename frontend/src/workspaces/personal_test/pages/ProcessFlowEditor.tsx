@@ -35,6 +35,8 @@ import { ScopeSelectionDialog } from '../components/common/ScopeSelectionDialog'
 import { useFlowEditor } from '../hooks/useFlowEditor';
 import { useDataSources } from '../hooks/useDataSources';
 import { Layout } from '../../../components/common/Layout';
+// @ts-ignore
+import DataSourceSelector from '../../../components/DataSourceSelector';
 import { saveFlowBackup, loadFlowBackup, deleteFlowBackup, cleanupExpiredBackups, hasSignificantChanges, type FlowBackupData } from '../utils/flowBackup';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../../api/client';
@@ -706,19 +708,17 @@ const ProcessFlowEditorContent: React.FC = () => {
             {/* Data Source Selection */}
             <div className="flex items-center space-x-2">
               <Server size={16} className="text-gray-500" />
-              <select
-                value={selectedDataSourceId || ''}
-                onChange={(e) => setSelectedDataSourceId(e.target.value || null)}
-                className="text-sm border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-                disabled={isLoadingDataSources}
-              >
-                <option value="">Default Data Source</option>
-                {dataSources.map((ds) => (
-                  <option key={ds.id} value={ds.id}>
-                    {ds.source_type.toUpperCase()} - {ds.id.slice(0, 8)}...
-                  </option>
-                ))}
-              </select>
+              <DataSourceSelector
+                value={selectedDataSourceId}
+                onChange={setSelectedDataSourceId}
+                dataSources={dataSources}
+                loading={isLoadingDataSources}
+                hideDefaultWhenUserSourcesExist={true}
+                placeholder="Select data source"
+                style={{ minWidth: 200 }}
+                className="text-sm"
+                size="small"
+              />
               {/* Debug info */}
               {selectedDataSourceId && (
                 <span className="text-xs text-gray-500">
