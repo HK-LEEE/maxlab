@@ -677,6 +677,12 @@ export const OAuthCallback: React.FC = () => {
             if (isSSORrefreshCallback) {
               console.log('✅ Processing successful SSO token refresh in popup mode...');
               
+              // 🔒 CRITICAL FIX: Store tokens FIRST in popup mode too
+              console.log('💾 Storing refreshed tokens before metadata update (popup mode)...');
+              const { refreshTokenService } = await import('../services/refreshTokenService');
+              await refreshTokenService.storeTokens(tokenResponse);
+              console.log('✅ Refreshed tokens stored successfully (popup mode)');
+              
               // Update SSO session metadata to reflect refreshed tokens
               localStorage.setItem('auth_method', 'sso_sync');
               localStorage.setItem('has_refresh_token', String(!!tokenResponse.refresh_token));
@@ -687,7 +693,7 @@ export const OAuthCallback: React.FC = () => {
               // 🔒 CRITICAL: Set flag to prevent immediate re-refresh attempts
               localStorage.setItem('lastTokenRefresh', Date.now().toString());
               
-              console.log('✅ SSO session metadata updated after successful token refresh');
+              console.log('✅ SSO session metadata updated after successful token refresh (popup mode)');
             }
             
             // 성공 표시
@@ -1126,6 +1132,12 @@ export const OAuthCallback: React.FC = () => {
               // Record successful SSO refresh in circuit breaker
               SsoRefreshCircuitBreaker.recordSuccess();
               
+              // 🔒 CRITICAL FIX: Store tokens FIRST before trying to update auth store
+              console.log('💾 Storing refreshed tokens before auth store update...');
+              const { refreshTokenService } = await import('../services/refreshTokenService');
+              await refreshTokenService.storeTokens(tokenResponse);
+              console.log('✅ Refreshed tokens stored successfully');
+              
               // Update SSO session metadata to reflect refreshed tokens
               localStorage.setItem('auth_method', 'sso_sync');
               localStorage.setItem('has_refresh_token', String(!!tokenResponse.refresh_token));
@@ -1134,6 +1146,26 @@ export const OAuthCallback: React.FC = () => {
               localStorage.setItem('sync_time', String(Date.now()));
               
               console.log('✅ SSO session metadata updated after successful token refresh');
+              
+              // Now update auth store with the stored tokens
+              try {
+                const { useAuthStore } = await import('../stores/authStore');
+                const { setAuth, setUser } = useAuthStore.getState();
+                
+                // Get user info with the newly stored token
+                const { authService } = await import('../services/authService');
+                const userInfo = await authService.getCurrentUser();
+                
+                setAuth(tokenResponse.access_token, userInfo);
+                setUser(userInfo);
+                
+                console.log('✅ Auth store updated after SSO token refresh with stored tokens');
+              } catch (authUpdateError) {
+                console.error('❌ Failed to update auth store after SSO token refresh:', authUpdateError);
+                
+                // Even if auth store update fails, continue with redirect to prevent loops
+                console.log('⚠️ Continuing with redirect despite auth store update failure');
+              }
               
               // 🔒 CRITICAL: Try multiple sources for return URL to prevent infinite loops
               let returnUrl = sessionStorage.getItem('sso_refresh_return_url');
@@ -1168,19 +1200,6 @@ export const OAuthCallback: React.FC = () => {
               // Clean up storage
               sessionStorage.removeItem('sso_refresh_return_url');
               localStorage.removeItem('sso_refresh_return_data');
-              
-              // Ensure auth store is updated with refreshed token
-              const { useAuthStore } = await import('../stores/authStore');
-              const { setAuth, setUser } = useAuthStore.getState();
-              
-              // Get user info with new token
-              const { authService } = await import('../services/authService');
-              const userInfo = await authService.getCurrentUser();
-              
-              setAuth(tokenResponse.access_token, userInfo);
-              setUser(userInfo);
-              
-              console.log('✅ Auth store updated after SSO token refresh');
               
               // 🔒 CRITICAL: Set a flag to prevent immediate re-refresh attempts
               localStorage.setItem('lastTokenRefresh', Date.now().toString());
