@@ -6,7 +6,7 @@
 
 interface OAuthRequestInfo {
   id: string;
-  type: 'sync' | 'authorize' | 'token_refresh' | 'silent_login';
+  type: 'sync' | 'authorize' | 'token_refresh' | 'silent_login' | 'logout';
   url: string;
   timestamp: number;
   promise: Promise<any>;
@@ -204,6 +204,25 @@ class OAuthRequestCoordinator {
   }
 
   /**
+   * Check if there are any silent authentication requests in progress
+   */
+  hasActiveSilentAuth(): boolean {
+    return Array.from(this.activeRequests.values()).some(
+      req => req.type === 'silent_login' && req.status === 'in_progress'
+    );
+  }
+
+  /**
+   * Check if any authentication operation is in progress (silent auth, token refresh, etc.)
+   */
+  hasActiveAuthOperation(): boolean {
+    return Array.from(this.activeRequests.values()).some(
+      req => (req.type === 'silent_login' || req.type === 'token_refresh' || req.type === 'sync') 
+        && req.status === 'in_progress'
+    );
+  }
+
+  /**
    * Wait for all OAuth sync requests to complete
    */
   async waitForOAuthSync(maxWaitMs = 10000): Promise<void> {
@@ -227,6 +246,33 @@ class OAuthRequestCoordinator {
       };
       
       checkSync();
+    });
+  }
+
+  /**
+   * Wait for all authentication operations to complete before allowing logout
+   */
+  async waitForAuthOperations(maxWaitMs = 10000): Promise<void> {
+    const startTime = Date.now();
+    
+    return new Promise((resolve) => {
+      const checkAuth = () => {
+        const elapsed = Date.now() - startTime;
+        const hasActiveAuth = this.hasActiveAuthOperation();
+        
+        if (!hasActiveAuth) {
+          this.log(`✅ No active authentication operations, proceeding with logout`);
+          resolve();
+        } else if (elapsed > maxWaitMs) {
+          this.log(`⚠️ Auth operation wait timeout after ${elapsed}ms, proceeding anyway`);
+          resolve();
+        } else {
+          this.log(`⏳ Waiting for authentication operations to complete before logout... (${elapsed}ms elapsed)`);
+          setTimeout(checkAuth, 200);
+        }
+      };
+      
+      checkAuth();
     });
   }
 

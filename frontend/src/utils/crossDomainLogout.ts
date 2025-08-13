@@ -4,6 +4,7 @@
  */
 
 import { devLog } from './logger';
+import { oauthRequestCoordinator } from '../services/oauthRequestCoordinator';
 
 const LOGOUT_EVENT_KEY = 'max_platform_logout';
 // DISABLED: Periodic logout checks to prevent aggressive detection
@@ -33,7 +34,7 @@ export class CrossDomainLogoutManager {
     devLog.info('🔒 Starting cross-domain logout listener');
 
     // 1. Storage Event 리스너 (같은 도메인 내 다른 탭)
-    window.addEventListener('storage', (e) => {
+    window.addEventListener('storage', async (e) => {
       // 🚫 ENHANCED: 더 많은 키 체크
       if (e.key === LOGOUT_EVENT_KEY && e.newValue) {
         const logoutTime = parseInt(e.newValue, 10);
@@ -44,14 +45,24 @@ export class CrossDomainLogoutManager {
         }
       }
       
-      // accessToken이 제거되면 로그아웃으로 간주
+      // accessToken이 제거되면 로그아웃으로 간주 - BUT check for silent auth first
       if (e.key === 'accessToken' && !e.newValue) {
+        // Check if silent authentication is in progress
+        if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+          devLog.info('🔇 Access token removed during silent auth, ignoring');
+          return;
+        }
         devLog.warn('🚨 Access token removed - logout detected');
         this.handleLogout(onLogoutDetected);
       }
       
-      // user 정보가 제거되면 로그아웃으로 간주
+      // user 정보가 제거되면 로그아웃으로 간주 - BUT check for silent auth first
       if (e.key === 'user' && !e.newValue) {
+        // Check if silent authentication is in progress
+        if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+          devLog.info('🔇 User data removed during silent auth, ignoring');
+          return;
+        }
         devLog.warn('🚨 User data removed - logout detected');
         this.handleLogout(onLogoutDetected);
       }
@@ -69,8 +80,13 @@ export class CrossDomainLogoutManager {
     // 3. BroadcastChannel API (동일 origin만 지원) - FIXED: 전용 채널 사용
     if ('BroadcastChannel' in window) {
       const channel = new BroadcastChannel('maxlab_cross_domain_logout');
-      channel.onmessage = (event) => {
+      channel.onmessage = async (event) => {
         if (event.data.type === 'logout' || event.data.type === 'LOGOUT') {
+          // Check if silent authentication is in progress
+          if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+            devLog.info('🔇 Logout broadcast received during silent auth, ignoring');
+            return;
+          }
           devLog.warn('🚨 Cross-domain logout broadcast received');
           this.handleLogout(onLogoutDetected);
         }
@@ -78,8 +94,13 @@ export class CrossDomainLogoutManager {
       
       // MAX Platform 채널도 수신 (외부 시스템과의 호환성)
       const maxPlatformChannel = new BroadcastChannel('max_platform_auth');
-      maxPlatformChannel.onmessage = (event) => {
+      maxPlatformChannel.onmessage = async (event) => {
         if (event.data.type === 'logout') {
+          // Check if silent authentication is in progress
+          if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+            devLog.info('🔇 MAX Platform logout broadcast received during silent auth, ignoring');
+            return;
+          }
           devLog.warn('🚨 MAX Platform logout broadcast received');
           this.handleLogout(onLogoutDetected);
         }
@@ -87,9 +108,14 @@ export class CrossDomainLogoutManager {
     }
 
     // 4. PostMessage를 통한 크로스 도메인 통신
-    window.addEventListener('message', (event) => {
+    window.addEventListener('message', async (event) => {
       // max.dwchem.co.kr에서만 메시지 수신
       if (event.origin === 'https://max.dwchem.co.kr' && event.data?.type === 'logout') {
+        // Check if silent authentication is in progress
+        if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+          devLog.info('🔇 Cross-domain logout message received during silent auth, ignoring');
+          return;
+        }
         devLog.warn('🚨 Cross-domain logout message received');
         this.handleLogout(onLogoutDetected);
       }
@@ -186,7 +212,7 @@ export class CrossDomainLogoutManager {
   /**
    * 로그아웃 처리
    */
-  private handleLogout(onLogoutDetected: () => void) {
+  private async handleLogout(onLogoutDetected: () => void) {
     devLog.warn('🔒 Executing cross-domain logout cleanup');
     
     const now = Date.now();
@@ -206,6 +232,20 @@ export class CrossDomainLogoutManager {
     if (this.logoutCount >= this.MAX_LOGOUTS_PER_MINUTE) {
       devLog.warn('🚫 Circuit breaker: Too many logout attempts, stopping');
       return;
+    }
+    
+    // 🔒 CRITICAL: Check if silent authentication is in progress
+    if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+      devLog.warn('🚫 Silent authentication in progress, deferring logout');
+      // Wait for auth operations to complete before allowing logout
+      await oauthRequestCoordinator.waitForAuthOperations(5000);
+      
+      // After waiting, check again if we still need to logout
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        devLog.info('✅ Token exists after silent auth, canceling logout');
+        return;
+      }
     }
     
     this.logoutCount++;

@@ -4,6 +4,7 @@
  */
 
 import { apiClient } from '../api/client';
+import { oauthRequestCoordinator } from './oauthRequestCoordinator';
 
 export interface BlacklistTokenRequest {
   token?: string;
@@ -43,6 +44,8 @@ export interface BlacklistStatsResponse {
 
 class TokenBlacklistService {
   private static instance: TokenBlacklistService;
+  private lastSilentAuthCompletion: number = 0;
+  private readonly GRACE_PERIOD_MS = 3000; // 3 second grace period after silent auth
 
   static getInstance(): TokenBlacklistService {
     if (!TokenBlacklistService.instance) {
@@ -52,10 +55,47 @@ class TokenBlacklistService {
   }
 
   /**
+   * Record that silent authentication has completed
+   * This is used to provide a grace period before allowing token blacklisting
+   */
+  recordSilentAuthCompletion(): void {
+    this.lastSilentAuthCompletion = Date.now();
+    console.log('✅ Silent auth completion recorded for grace period');
+  }
+
+  /**
+   * Check if we're still in the grace period after silent auth
+   */
+  private isInGracePeriod(): boolean {
+    const timeSinceSilentAuth = Date.now() - this.lastSilentAuthCompletion;
+    return timeSinceSilentAuth < this.GRACE_PERIOD_MS;
+  }
+
+  /**
    * Blacklist current user's token
    */
   async blacklistCurrentToken(reason: string = 'user_logout'): Promise<BlacklistTokenResponse> {
     try {
+      // Check if silent authentication is currently in progress
+      if (oauthRequestCoordinator.hasActiveSilentAuth()) {
+        console.warn('🚫 Cannot blacklist token during silent authentication');
+        return {
+          success: false,
+          message: 'Token blacklisting blocked during silent authentication',
+          blacklisted_count: 0
+        };
+      }
+
+      // Check if we're still in the grace period after silent auth
+      if (this.isInGracePeriod()) {
+        console.warn('🚫 Token blacklisting blocked during grace period after silent auth');
+        return {
+          success: false,
+          message: 'Token blacklisting blocked during grace period',
+          blacklisted_count: 0
+        };
+      }
+
       const response = await apiClient.post<BlacklistTokenResponse>('/v1/token-blacklist/blacklist', {
         reason
       });

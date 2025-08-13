@@ -8,6 +8,9 @@ interface AuthState extends EnhancedAuthState {
   user: User | null;
   isAuthenticated: boolean;
   
+  // Exclusive operation management
+  exclusiveOperation: 'silent_auth' | 'logout' | 'token_refresh' | null;
+  
   // Enhanced state management
   setAuthState: (state: AuthInitState) => void;
   setAuthError: (error: AuthError | null) => void;
@@ -15,6 +18,11 @@ interface AuthState extends EnhancedAuthState {
   incrementRetry: () => void;
   resetRetry: () => void;
   updateSyncTime: () => void;
+  
+  // Exclusive operation management methods
+  setExclusiveOperation: (operation: 'silent_auth' | 'logout' | 'token_refresh' | null) => void;
+  canStartOperation: (operation: 'silent_auth' | 'logout' | 'token_refresh') => boolean;
+  getExclusiveOperation: () => 'silent_auth' | 'logout' | 'token_refresh' | null;
   
   // Original methods (enhanced)
   setAuth: (token: string, user: User) => void;
@@ -70,6 +78,9 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       
+      // Exclusive operation management
+      exclusiveOperation: null as 'silent_auth' | 'logout' | 'token_refresh' | null,
+      
       // Enhanced state management
       initState: 'idle' as AuthInitState,
       error: null as AuthError | null,
@@ -111,6 +122,55 @@ export const useAuthStore = create<AuthState>()(
       
       updateSyncTime: () => {
         set({ lastSyncTime: Date.now() });
+      },
+      
+      // Exclusive operation management methods
+      setExclusiveOperation: (operation: 'silent_auth' | 'logout' | 'token_refresh' | null) => {
+        const current = get().exclusiveOperation;
+        if (current && operation && current !== operation) {
+          console.warn(`⚠️ Cannot set exclusive operation to ${operation}, ${current} is in progress`);
+          return;
+        }
+        
+        if (operation) {
+          console.log(`🔒 Setting exclusive operation: ${operation}`);
+        } else {
+          console.log(`🔓 Clearing exclusive operation (was: ${current})`);
+        }
+        
+        set({ exclusiveOperation: operation });
+      },
+      
+      canStartOperation: (operation: 'silent_auth' | 'logout' | 'token_refresh') => {
+        const current = get().exclusiveOperation;
+        
+        if (!current) {
+          return true; // No operation in progress
+        }
+        
+        if (current === operation) {
+          return true; // Same operation type is allowed
+        }
+        
+        // Check for conflicting operations
+        const conflicts: Record<string, string[]> = {
+          'silent_auth': ['logout'], // Silent auth conflicts with logout
+          'logout': ['silent_auth', 'token_refresh'], // Logout conflicts with auth operations
+          'token_refresh': ['logout'] // Token refresh conflicts with logout
+        };
+        
+        const isConflicting = conflicts[operation]?.includes(current);
+        
+        if (isConflicting) {
+          console.warn(`⚠️ Cannot start ${operation} while ${current} is in progress`);
+          return false;
+        }
+        
+        return true;
+      },
+      
+      getExclusiveOperation: () => {
+        return get().exclusiveOperation;
       },
       
       setAuth: (token, user) => {

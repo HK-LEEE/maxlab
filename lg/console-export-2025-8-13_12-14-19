@@ -1,5 +1,8 @@
-maxplatform --> maxlab으로 이동할 때, 사용 안하다가 이동하면 로그인창이 뜨면서, 아래 로그가 발생함.
+max.dwchem.co.kr(maxplatform))에서 maxlab.dwchem.co.kr(maxlab)으로 이동할 때, 원래대로 라면 자동로그인 되어서 maxlab을 사용할 수 있따.
+그러나, max.dwchem.co.kr을 오랫동안 사용한하고 이동하면 maxlab에 로그인창이 뜨면서, 아래 로그가 발생함.
+내가 원하는 동작은 오랫동안 사용안하더라도, maxlab으로 이동했을 때 정상적으로 로그인 된 상태였으면 해. (물론 access token이 정상이라는 가정하에.)
 maxplatform은 refresh token기반으로 access token이 지속적으로 갱신된느 것으로 알긴하는데, maxlab에서 아래와 같은 로그가 뜨고 로그인창이 뜨는지 모르겠어.
+
 
 12:14:00.775 🔄 Rehydrating auth state for initialization
 Object { state: {…} }

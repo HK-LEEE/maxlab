@@ -278,6 +278,9 @@ export const authService = {
       if (result.success && result.token) {
         console.log('✅ Silent SSO login successful');
         
+        // Record silent auth completion for grace period
+        tokenBlacklistService.recordSilentAuthCompletion();
+        
         const userInfo = await getUserInfo(result.token);
         
         // 토큰 저장 (RefreshTokenService 사용)
