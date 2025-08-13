@@ -45,24 +45,54 @@ export class CrossDomainLogoutManager {
         }
       }
       
-      // accessToken이 제거되면 로그아웃으로 간주 - BUT check for silent auth first
+      // accessToken이 제거되면 로그아웃으로 간주 - BUT check for auth operations first
       if (e.key === 'accessToken' && !e.newValue) {
-        // Check if silent authentication is in progress
-        if (oauthRequestCoordinator.hasActiveSilentAuth()) {
-          devLog.info('🔇 Access token removed during silent auth, ignoring');
+        // Check if any authentication operation is in progress
+        if (oauthRequestCoordinator.hasActiveSilentAuth() || 
+            oauthRequestCoordinator.hasActiveAuthOperation()) {
+          devLog.info('🔇 Access token removed during auth operation, ignoring');
           return;
         }
+        
+        // Check if OAuth flow or token refresh is in progress
+        const isAuthInProgress = (
+          sessionStorage.getItem('oauth_flow_in_progress') ||
+          sessionStorage.getItem('oauth_callback_processing') ||
+          sessionStorage.getItem('sso_refresh_return_url') ||
+          document.body.getAttribute('data-oauth-processing')
+        );
+        
+        if (isAuthInProgress) {
+          devLog.info('🔇 Access token removed during OAuth/SSO flow, ignoring');
+          return;
+        }
+        
         devLog.warn('🚨 Access token removed - logout detected');
         this.handleLogout(onLogoutDetected);
       }
       
-      // user 정보가 제거되면 로그아웃으로 간주 - BUT check for silent auth first
+      // user 정보가 제거되면 로그아웃으로 간주 - BUT check for auth operations first
       if (e.key === 'user' && !e.newValue) {
-        // Check if silent authentication is in progress
-        if (oauthRequestCoordinator.hasActiveSilentAuth()) {
-          devLog.info('🔇 User data removed during silent auth, ignoring');
+        // Check if any authentication operation is in progress
+        if (oauthRequestCoordinator.hasActiveSilentAuth() || 
+            oauthRequestCoordinator.hasActiveAuthOperation()) {
+          devLog.info('🔇 User data removed during auth operation, ignoring');
           return;
         }
+        
+        // Check if OAuth flow or token refresh is in progress
+        const isAuthInProgress = (
+          sessionStorage.getItem('oauth_flow_in_progress') ||
+          sessionStorage.getItem('oauth_callback_processing') ||
+          sessionStorage.getItem('sso_refresh_return_url') ||
+          document.body.getAttribute('data-oauth-processing')
+        );
+        
+        if (isAuthInProgress) {
+          devLog.info('🔇 User data removed during OAuth/SSO flow, ignoring');
+          return;
+        }
+        
         devLog.warn('🚨 User data removed - logout detected');
         this.handleLogout(onLogoutDetected);
       }

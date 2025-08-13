@@ -501,7 +501,24 @@ export const useAuthStore = create<AuthState>()(
         const hasTokenData = accessToken && tokenExpiryTime;
         const isLocallyValid = hasTokenData && currentTime < parseInt(tokenExpiryTime);
         
-        if (state?.isAuthenticated && state?.user && hasTokenData) {
+        // 🔧 CRITICAL FIX: Check for valid token data first, regardless of previous state
+        // This handles cases where token was refreshed but zustand state is stale
+        if (hasTokenData && (state?.isAuthenticated || isLocallyValid)) {
+          // 🔧 CRITICAL FIX: Restore user from localStorage if not in state but locally valid
+          let userToUse = state?.user;
+          if (!userToUse && isLocallyValid) {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+              try {
+                userToUse = JSON.parse(storedUser);
+                console.log('📋 Restored user from localStorage during rehydration:', userToUse);
+              } catch (e) {
+                console.error('Failed to parse stored user data:', e);
+                userToUse = null;
+              }
+            }
+          }
+          
           // 🔍 Enhanced validation: Check both local and potential server issues
           if (!isLocallyValid) {
             console.log('⚠️ Access token expired locally, will attempt refresh with refresh token');
@@ -520,7 +537,7 @@ export const useAuthStore = create<AuthState>()(
                 error: null,
                 retryCount: 0,
                 isAuthenticated: true, // Keep authenticated for refresh attempt
-                user: state.user // Preserve user data
+                user: userToUse // Preserve user data (from state or localStorage)
               };
             } else {
               // Only clear auth if no refresh token available
@@ -544,7 +561,8 @@ export const useAuthStore = create<AuthState>()(
             error: null,
             retryCount: 0,
             // 🚨 CRITICAL: Keep authenticated true temporarily for App.tsx validation logic
-            isAuthenticated: true  // Keep true so App initialization validates the token
+            isAuthenticated: true,  // Keep true so App initialization validates the token
+            user: userToUse  // Use restored user data
           };
           console.log('📋 Rehydrated state (pending server validation):', rehydratedState);
           return rehydratedState;
