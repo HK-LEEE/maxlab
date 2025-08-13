@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { LogIn, Shield } from 'lucide-react';
+import { LogIn, Shield, AlertCircle } from 'lucide-react';
 import { authService } from '../services/authService';
 import { useAuthStore } from '../stores/authStore';
 import { devLog } from '../utils/logger';
@@ -26,6 +26,8 @@ export const Login: React.FC = () => {
   const authAttemptRef = useRef(false);
   const mountedRef = useRef(true);
   const hasLoggedOutRef = useRef(false); // 🔧 로그아웃 추적
+  const [crossDomainLogoutAttempts, setCrossDomainLogoutAttempts] = useState(0); // 크로스 도메인 로그아웃 시도 횟수
+  const [showLogoutLoading, setShowLogoutLoading] = useState(false); // 로그아웃 로딩 표시 여부
   
   // 🔥 DEBUG: Log current state on every render
   console.log('🔥 Login component render - current state:', {
@@ -55,6 +57,51 @@ export const Login: React.FC = () => {
   const forceNewLogin = urlParams.get('force_new_login') === 'true';
   const oauthReturn = urlParams.get('oauth_return');
   const forceLogin = urlParams.get('force_login') === 'true';
+  const crossDomainLogoutReason = urlParams.get('reason') === 'cross_domain_logout';
+
+  // 크로스 도메인 로그아웃 처리
+  useEffect(() => {
+    // sessionStorage에서도 카운트 확인
+    const storedAttempts = parseInt(sessionStorage.getItem('cross_domain_logout_attempts') || '0');
+    
+    if (crossDomainLogoutReason || storedAttempts > 0) {
+      console.log('🔄 Cross-domain logout detected');
+      hasLoggedOutRef.current = true;
+      
+      // sessionStorage 값과 state 동기화
+      if (storedAttempts > crossDomainLogoutAttempts) {
+        setCrossDomainLogoutAttempts(storedAttempts);
+      }
+      
+      if (crossDomainLogoutReason) {
+        // URL 파라미터로 온 경우에만 로딩 표시
+        const currentAttempts = Math.max(storedAttempts, crossDomainLogoutAttempts);
+        
+        // 3회 이하일 때만 로딩 표시
+        if (currentAttempts <= 3) {
+          setShowLogoutLoading(true);
+          
+          // 2초 후 로딩 숨기기
+          setTimeout(() => {
+            setShowLogoutLoading(false);
+            
+            // 3회 도달 시 알림
+            if (currentAttempts === 3) {
+              toast.error('로그아웃 처리가 완료되었습니다. 새로고침이 중단됩니다.', {
+                duration: 5000,
+                icon: '🛑'
+              });
+              // sessionStorage 카운트 리셋 (1분 후 자동 리셋되지만 명시적으로 처리)
+              setTimeout(() => {
+                sessionStorage.removeItem('cross_domain_logout_attempts');
+                sessionStorage.removeItem('cross_domain_logout_last_attempt');
+              }, 60000);
+            }
+          }, 2000);
+        }
+      }
+    }
+  }, [crossDomainLogoutReason]);
 
   // 컴포넌트 언마운트 감지 및 초기화
   useEffect(() => {
@@ -113,10 +160,16 @@ export const Login: React.FC = () => {
 
   // 페이지 로드 시 인증 방법 체크 및 Silent 로그인 시도
   useEffect(() => {
+    // sessionStorage에서 크로스 도메인 로그아웃 카운트 확인
+    const storedAttempts = parseInt(sessionStorage.getItem('cross_domain_logout_attempts') || '0');
+    const maxAttempts = Math.max(crossDomainLogoutAttempts, storedAttempts);
     
-    // 이미 시도했거나 이미 인증된 경우 또는 로그아웃한 경우 또는 강제 새 로그인인 경우 스킵
-    if (authAttemptRef.current || isAuthenticated || hasLoggedOutRef.current || forceNewLogin) {
+    // 이미 시도했거나 이미 인증된 경우 또는 로그아웃한 경우 또는 강제 새 로그인인 경우 또는 크로스 도메인 로그아웃이 있었던 경우 스킵
+    if (authAttemptRef.current || isAuthenticated || hasLoggedOutRef.current || forceNewLogin || maxAttempts > 0 || crossDomainLogoutReason) {
       setSilentLoginAttempting(false);
+      if (maxAttempts > 0 || crossDomainLogoutReason) {
+        console.log('🛑 Silent login skipped: User logged out from MAX Platform - respecting logout intent');
+      }
       return;
     }
 
@@ -180,7 +233,7 @@ export const Login: React.FC = () => {
     const timeoutId = setTimeout(attemptSilentLogin, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [navigate, setAuth]); // 🔧 CRITICAL: isAuthenticated 제거 - 로그아웃 시 재실행 방지
+  }, [navigate, setAuth, crossDomainLogoutAttempts]); // 🔧 CRITICAL: crossDomainLogoutAttempts 추가 - 3회 이상 시 중단
 
   const handleOAuthLogin = async (forceAccountSelection = false) => {
     console.log('🔥 handleOAuthLogin called with forceAccountSelection:', forceAccountSelection);
@@ -565,6 +618,25 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* 크로스 도메인 로그아웃 로딩 모달 */}
+      {showLogoutLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 animate-pulse">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 border-4 border-yellow-200 border-t-yellow-600 rounded-full animate-spin mb-4"></div>
+              <AlertCircle className="w-8 h-8 text-yellow-600 mb-3" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">로그아웃 처리 중</h3>
+              <p className="text-sm text-gray-600 text-center mb-2">
+                MAX Platform에서 로그아웃을 처리하고 있습니다
+              </p>
+              <p className="text-xs text-gray-500 text-center">
+                시도 {crossDomainLogoutAttempts}/3
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-md mx-4">
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Logo and Title */}
