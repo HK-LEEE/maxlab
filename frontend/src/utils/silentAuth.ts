@@ -221,6 +221,18 @@ export async function attemptSilentLogin(abortSignal?: AbortSignal): Promise<Sil
   if (abortSignal?.aborted) {
     return { success: false, error: 'Silent auth request was aborted before starting' };
   }
+  // 🔒 CRITICAL: Check SSO circuit breaker first
+  const { SsoRefreshCircuitBreaker } = await import('../utils/ssoRefreshCircuitBreaker');
+  const circuitStatus = SsoRefreshCircuitBreaker.canAttemptSsoRefresh();
+  if (!circuitStatus.allowed) {
+    console.log('🚨 Silent auth blocked by SSO circuit breaker:', circuitStatus.reason);
+    console.log(`🕒 Circuit breaker will reset in ${circuitStatus.nextAttemptIn} seconds`);
+    return { 
+      success: false, 
+      error: 'SSO circuit breaker is open - preventing silent auth to avoid loops' 
+    };
+  }
+  
   // 🔒 CRITICAL: Check if user has logged out recently
   const hasLoggedOut = localStorage.getItem('hasLoggedOut');
   const preventSilentAuth = sessionStorage.getItem('preventSilentAuth');

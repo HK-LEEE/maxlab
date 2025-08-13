@@ -138,15 +138,32 @@ export class SsoRefreshCircuitBreaker {
     try {
       console.log('🚨 SSO circuit breaker opened - clearing SSO session metadata');
       
+      // Clear localStorage items
       localStorage.removeItem('auth_method');
       localStorage.removeItem('has_refresh_token');
       localStorage.removeItem('max_platform_session');
       localStorage.removeItem('token_renewable_via_sso');
       localStorage.removeItem('sync_time');
+      localStorage.removeItem('sso_refresh_return_data');
       
+      // Clear sessionStorage items
       sessionStorage.removeItem('sso_refresh_return_url');
+      sessionStorage.removeItem('last_sso_attempt');
+      sessionStorage.removeItem('last_sso_failure');
+      sessionStorage.removeItem('silent_oauth_state');
+      
+      // Set flag to prevent further silent auth attempts
+      sessionStorage.setItem('preventSilentAuth', 'true');
       
       console.log('✅ SSO session metadata cleared to break infinite loop');
+      
+      // Dispatch event to notify components
+      window.dispatchEvent(new CustomEvent('sso:circuit_breaker_open', {
+        detail: { 
+          message: 'SSO circuit breaker opened - authentication required',
+          timestamp: Date.now()
+        }
+      }));
     } catch (e) {
       console.warn('Failed to clear SSO metadata:', e);
     }

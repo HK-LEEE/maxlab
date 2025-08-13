@@ -696,6 +696,23 @@ export const authService = {
         if (authMethod === 'sso_sync' && !hasRefreshToken && maxPlatformSession && tokenRenewableViaSso && ssoRefreshAttempt.allowed) {
           console.log('🔄 SSO Session: Attempting token refresh via MAX Platform redirect...');
           
+          // CRITICAL FIX: Validate session state before attempting SSO refresh
+          // Check if we recently failed an SSO refresh (within last 30 seconds)
+          const lastSsoFailure = sessionStorage.getItem('last_sso_failure');
+          if (lastSsoFailure) {
+            const failureTime = parseInt(lastSsoFailure);
+            const timeSinceFailure = Date.now() - failureTime;
+            const thirtySeconds = 30 * 1000;
+            
+            if (timeSinceFailure < thirtySeconds) {
+              console.log('🚨 Recent SSO failure detected, blocking retry for', Math.ceil((thirtySeconds - timeSinceFailure) / 1000), 'seconds');
+              return {
+                success: false,
+                error: 'Recent SSO failure - please wait before retrying'
+              };
+            }
+          }
+          
           // For SSO sessions, redirect to MAX Platform for token refresh
           try {
             const currentOrigin = window.location.origin;
@@ -718,6 +735,9 @@ export const authService = {
             
             console.log('🔄 SSO Session: Redirecting to SSO token refresh endpoint...');
             console.log('📍 Return URL saved:', window.location.href);
+            
+            // Record attempt time to prevent rapid retries
+            sessionStorage.setItem('last_sso_attempt', Date.now().toString());
             
             // Redirect to SSO token refresh endpoint
             window.location.href = ssoRefreshUrl;
@@ -806,6 +826,23 @@ export const authService = {
         }
         
         // 2차: Silent Auth 폴백
+        // CRITICAL FIX: Check circuit breaker before attempting silent auth
+        const circuitStatus = SsoRefreshCircuitBreaker.canAttemptSsoRefresh();
+        if (!circuitStatus.allowed) {
+          console.log('🚨 Silent auth blocked by SSO circuit breaker:', circuitStatus.reason);
+          console.log(`🕒 Circuit breaker will reset in ${circuitStatus.nextAttemptIn} seconds`);
+          
+          // Clear all SSO metadata to prevent loops
+          localStorage.removeItem('auth_method');
+          localStorage.removeItem('max_platform_session');
+          localStorage.removeItem('token_renewable_via_sso');
+          
+          return {
+            success: false,
+            error: 'SSO circuit breaker is open - authentication required'
+          };
+        }
+        
         if (isSafePageForTokenRefresh()) {
           console.log('🔇 Falling back to silent authentication...');
           const result = await authService.attemptSilentLogin();

@@ -202,8 +202,23 @@ export const OAuthCallback: React.FC = () => {
             // Record SSO refresh failure in circuit breaker
             SsoRefreshCircuitBreaker.recordFailure(errorDescription || error, state || 'unknown');
             
+            // CRITICAL FIX: Record failure time to prevent rapid retries
+            sessionStorage.setItem('last_sso_failure', Date.now().toString());
+            
+            // CRITICAL FIX: Clear all SSO session data immediately to prevent retry
+            localStorage.removeItem('auth_method');
+            localStorage.removeItem('max_platform_session');
+            localStorage.removeItem('token_renewable_via_sso');
+            localStorage.removeItem('has_refresh_token');
+            sessionStorage.removeItem('sso_refresh_return_url');
+            sessionStorage.removeItem('sso_refresh_return_data');
+            sessionStorage.removeItem('last_sso_attempt');
+            
             // Circuit breaker will automatically clear SSO metadata when it opens
-            console.log('✅ SSO refresh failure recorded in circuit breaker - infinite loop prevention active');
+            console.log('✅ SSO refresh failure recorded and all SSO metadata cleared - loop prevention complete');
+            
+            // Set flag to prevent any further silent auth attempts
+            sessionStorage.setItem('preventSilentAuth', 'true');
             
             // Redirect to login page instead of continuing loop
             setState({
