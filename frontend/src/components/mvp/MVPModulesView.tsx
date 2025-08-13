@@ -75,8 +75,8 @@ export const MVPModulesView: React.FC<MVPModulesViewProps> = ({ workspace, isAdm
               <Activity size={24} className="text-blue-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Personal Test Process Flow</h3>
-              <p className="text-gray-600 text-sm">Design and monitor industrial process flows</p>
+              <h3 className="text-lg font-semibold">Process Flow(공정도 작성 및 모니터)</h3>
+              <p className="text-gray-600 text-sm">Design and monitor chemial process flows</p>
             </div>
           </div>
           <div className="text-blue-600">
