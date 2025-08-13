@@ -1,0 +1,364 @@
+실패 했을때 로그
+17:08:50.633 🔄 Rehydrating auth state for initialization
+Object { state: {…} }
+index-BeMjOGix.js:228:5827
+17:08:50.633 🆕 New or unauthenticated user, preparing for silent auth attempt index-BeMjOGix.js:228:6850
+17:08:50.635 🛡️ New CSRF token generated index-BeMjOGix.js:263:6222
+17:08:50.635 🛡️ CSRF protection initialized with new token index-BeMjOGix.js:263:5768
+17:08:50.641 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-BeMjOGix.js:263:21207
+17:08:50.644 🔀 OAuth Coordinator [08:08:50][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-BeMjOGix.js:263:51842
+17:08:50.656 📍 Saving original navigation URL: https://maxlab.dwchem.co.kr/ index-BeMjOGix.js:851:101969
+17:08:50.656 ✅ Auth sync initialized with BroadcastChannel index-BeMjOGix.js:263:94138
+17:08:50.656 🔒 Initializing cross-domain logout listener index-BeMjOGix.js:851:104654
+17:08:50.657 📡 SSO: PostMessage listener registered index-BeMjOGix.js:851:107646
+17:08:50.657 🔄 Auth state change: idle → silent_auth
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-BeMjOGix.js:227:10607
+17:08:50.657 🔇 Attempting silent SSO login... index-BeMjOGix.js:265:4480
+17:08:50.657 🔀 OAuth Coordinator [08:08:50][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755072530657_3kj0cb448
+Object { url: "silent_oauth_auth", priority: 0 }
+index-BeMjOGix.js:263:51793
+17:08:50.657 🔀 OAuth Coordinator [08:08:50][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-BeMjOGix.js:263:51842
+17:08:50.657 🔀 OAuth Coordinator [08:08:50][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755072530657_3kj0cb448 index-BeMjOGix.js:263:51842
+17:08:50.658 ✅ Silent auth conditions met, starting... index-BeMjOGix.js:258:19004
+17:08:50.659 🔇 Starting silent authentication... index-BeMjOGix.js:258:14932
+17:08:50.752 🔄 Rehydrating auth state for initialization
+Object { state: {…} }
+index-BeMjOGix.js:228:5827
+17:08:50.752 🆕 New or unauthenticated user, preparing for silent auth attempt index-BeMjOGix.js:228:6850
+17:08:50.753 🛡️ CSRF protection initialized with existing token index-BeMjOGix.js:263:5675
+17:08:50.760 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-BeMjOGix.js:263:21207
+17:08:50.764 🔀 OAuth Coordinator [08:08:50][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-BeMjOGix.js:263:51842
+17:08:50.771 ✅ Auth sync initialized with BroadcastChannel index-BeMjOGix.js:263:94138
+17:08:50.771 🔒 Initializing cross-domain logout listener index-BeMjOGix.js:851:104654
+17:08:50.771 📡 SSO: PostMessage listener registered index-BeMjOGix.js:851:107646
+17:08:50.772 🔄 Auth state change: idle → silent_auth
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-BeMjOGix.js:227:10607
+17:08:50.772 🔇 Attempting silent SSO login... index-BeMjOGix.js:265:4480
+17:08:50.772 🔀 OAuth Coordinator [08:08:50][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755072530772_xqv6u43i6
+Object { url: "silent_oauth_auth", priority: 0 }
+index-BeMjOGix.js:263:51793
+17:08:50.772 🔀 OAuth Coordinator [08:08:50][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-BeMjOGix.js:263:51842
+17:08:50.772 🔀 OAuth Coordinator [08:08:50][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755072530772_xqv6u43i6 index-BeMjOGix.js:263:51842
+17:08:50.773 🚫 Unsafe path for token refresh: /oauth/callback index-BeMjOGix.js:258:20368
+17:08:50.773 🚫 Silent auth not allowed on current page: /oauth/callback index-BeMjOGix.js:258:18204
+17:08:50.773 🔀 OAuth Coordinator [08:08:50][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755072530772_xqv6u43i6 index-BeMjOGix.js:263:51842
+17:08:50.773 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-BeMjOGix.js:265:6164
+17:08:50.773 🔄 Auth state change: silent_auth → ready
+Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
+index-BeMjOGix.js:227:10607
+17:08:50.774 🚫 Unsafe path for token refresh: /oauth/callback index-BeMjOGix.js:258:20368
+17:08:50.775 🔍 Popup mode detection started:
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-BeMjOGix.js:258:10773
+17:08:50.775 🔍 Searching for OAuth flow state with state: e3PEoy_C... index-BeMjOGix.js:228:15101
+17:08:50.775 📋 Found total flow states: 0 index-BeMjOGix.js:228:15218
+17:08:50.775 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-BeMjOGix.js:228:15306
+17:08:50.775 🚨 OAuth flow state not found for state: e3PEoy_C...
+Object { searchedFlows: 0, sessionStorageKeys: (5) […] }
+index-BeMjOGix.js:228:17149
+17:08:50.775 🎯 Popup mode detected via window.parent index-BeMjOGix.js:258:12244
+17:08:50.775 🛑 User not authenticated, stopping token refresh index-BeMjOGix.js:265:21901
+17:08:50.776 🔄 Migrating legacy OAuth state to new state manager index-BeMjOGix.js:228:22043
+17:08:50.776 🔐 OAuth flow state created:
+Object { flowId: "me9ovbrsqcoz4x8v3gc", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-BeMjOGix.js:228:14928
+17:08:50.776 ✅ Legacy OAuth state migrated: me9ovbrsqcoz4x8v3gc index-BeMjOGix.js:228:22618
+17:08:50.776 🔄 Legacy OAuth state migrated:
+Object { migrated: 1, removed: 3, errors: 0 }
+index-BeMjOGix.js:755:14796
+17:08:50.776 🔍 Popup mode detection started:
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-BeMjOGix.js:258:10773
+17:08:50.776 🔍 Searching for OAuth flow state with state: e3PEoy_C... index-BeMjOGix.js:228:15101
+17:08:50.776 📋 Found total flow states: 1 index-BeMjOGix.js:228:15218
+17:08:50.776 ✅ Found OAuth flow state:
+Object { flowId: "me9ovbrsqcoz4x8v3gc", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:08:50.776 🎯 Popup mode detected via window.parent index-BeMjOGix.js:258:12244
+17:08:50.776 🔍 OAuth Callback Mode Detection:
+Object { inPopupMode: true, isSilentAuth: false, hasCode: false, hasError: true, sessionKeys: (3) […] }
+index-BeMjOGix.js:755:16034
+17:08:50.776 🔍 OAuth Callback URL Analysis:
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=e3PEoy_CjWaLuDTICOigfUWhmkb_4eD_sMPJcYhTwa8&error_description=User+not+logged+in", pathname: "/oauth/callback", search: "?error=login_required&state=e3PEoy_CjWaLuDTICOigfUWhmkb_4eD_sMPJcYhTwa8&error_description=User+not+logged+in", code: "null", state: "e3PEoy_C...", error: "login_required", errorDescription: "User not logged in", allParams: {…} }
+index-BeMjOGix.js:755:17032
+17:08:50.776 🚨 OAuth Server Error:
+Object { error: "login_required", errorDescription: "User not logged in", fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=e3PEoy_CjWaLuDTICOigfUWhmkb_4eD_sMPJcYhTwa8&error_description=User+not+logged+in", allParams: {…} }
+index-BeMjOGix.js:755:18388
+17:09:00.659 🔇 Silent auth timeout index-BeMjOGix.js:258:16159
+17:09:00.662 🔀 OAuth Coordinator [08:09:00][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755072530657_3kj0cb448 index-BeMjOGix.js:263:51842
+17:09:00.662 🚫 Silent auth request aborted by coordinator index-BeMjOGix.js:258:14651
+17:09:00.662 ℹ️ Silent SSO login failed: silent_auth_timeout index-BeMjOGix.js:265:6164
+17:09:00.662 ❌ Auth error: silent_auth_timeout - Automatic login timed out index-BeMjOGix.js:228:110
+17:09:00.662 🔄 Auth state change: error → ready
+Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
+index-BeMjOGix.js:227:10607
+17:09:00.668 🛑 User not authenticated, stopping token refresh index-BeMjOGix.js:265:21901
+17:09:00.673 🚫 Unsafe path for token refresh: /login index-BeMjOGix.js:258:20368
+17:09:00.674 🔥 Login component render - current state:
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-BeMjOGix.js:755:4401
+17:09:00.676 🛑 User not authenticated, stopping token refresh index-BeMjOGix.js:265:21901
+17:09:00.676 🔥 Component mounted, current oauthLoading: false index-BeMjOGix.js:755:5271
+17:09:00.676 🔥 Login component render - current state:
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-BeMjOGix.js:755:4401
+17:09:00.677 🔄 Logout detected, resetting login component state index-BeMjOGix.js:755:5677
+17:09:00.678 🔥 Login component render - current state:
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-BeMjOGix.js:755:4401
+17:09:00.776 🔇 Attempting silent SSO login... index-BeMjOGix.js:265:4480
+17:09:00.777 🔀 OAuth Coordinator [08:09:00][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755072540777_2ivxeguhh
+Object { url: "silent_oauth_auth", priority: 0 }
+index-BeMjOGix.js:263:51793
+17:09:00.777 🔀 OAuth Coordinator [08:09:00][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-BeMjOGix.js:263:51842
+17:09:00.777 🔀 OAuth Coordinator [08:09:00][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755072540777_2ivxeguhh index-BeMjOGix.js:263:51842
+17:09:00.777 🚫 Unsafe path for token refresh: /login index-BeMjOGix.js:258:20368
+17:09:00.777 🚫 Silent auth not allowed on current page: /login index-BeMjOGix.js:258:18204
+17:09:00.777 🔀 OAuth Coordinator [08:09:00][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755072540777_2ivxeguhh index-BeMjOGix.js:263:51842
+17:09:00.777 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-BeMjOGix.js:265:6164
+17:09:00.778 🔥 Login component render - current state:
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-BeMjOGix.js:755:4401
+
+
+
+
+성공했을 때 로그
+
+17:12:10.505 🔄 Rehydrating auth state for initialization
+Object { state: {…} }
+index-BeMjOGix.js:228:5827
+17:12:10.505 🆕 New or unauthenticated user, preparing for silent auth attempt index-BeMjOGix.js:228:6850
+17:12:10.507 🛡️ New CSRF token generated index-BeMjOGix.js:263:6222
+17:12:10.507 🛡️ CSRF protection initialized with new token index-BeMjOGix.js:263:5768
+17:12:10.511 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-BeMjOGix.js:263:21207
+17:12:10.515 🔀 OAuth Coordinator [08:12:10][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-BeMjOGix.js:263:51842
+17:12:10.525 📍 Saving original navigation URL: https://maxlab.dwchem.co.kr/ index-BeMjOGix.js:851:101969
+17:12:10.525 ✅ Auth sync initialized with BroadcastChannel index-BeMjOGix.js:263:94138
+17:12:10.525 🔒 Initializing cross-domain logout listener index-BeMjOGix.js:851:104654
+17:12:10.526 📡 SSO: PostMessage listener registered index-BeMjOGix.js:851:107646
+17:12:10.526 ⚠️ Cached token locally invalid or expired, attempting refresh index-BeMjOGix.js:851:113532
+17:12:10.526 🔄 Force refresh requested, bypassing token validity check index-BeMjOGix.js:263:71163
+17:12:10.526 ℹ️ No valid refresh token available index-BeMjOGix.js:263:72682
+17:12:10.526 🔄 Refresh token failed, trying silent auth as fallback... index-BeMjOGix.js:263:71759
+17:12:10.526 🔄 Attempting token refresh with fallback chain... index-BeMjOGix.js:265:11496
+17:12:10.526 🚫 No refresh token found in any storage index-BeMjOGix.js:263:59638
+17:12:10.526 🔇 Falling back to silent authentication... index-BeMjOGix.js:265:16009
+17:12:10.526 🔇 Attempting silent SSO login... index-BeMjOGix.js:265:4480
+17:12:10.526 🔀 OAuth Coordinator [08:12:10][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755072730527_deoelf648 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-BeMjOGix.js:263:51793
+17:12:10.526 🔀 OAuth Coordinator [08:12:10][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-BeMjOGix.js:263:51842
+17:12:10.526 🔀 OAuth Coordinator [08:12:10][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755072730527_deoelf648 index-BeMjOGix.js:263:51842
+17:12:10.527 ✅ Silent auth conditions met, starting... index-BeMjOGix.js:258:19004
+17:12:10.527 🔇 Starting silent authentication... index-BeMjOGix.js:258:14932
+17:12:10.605 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-BeMjOGix.js:228:5827
+17:12:10.606 🆕 New or unauthenticated user, preparing for silent auth attempt index-BeMjOGix.js:228:6850
+17:12:10.607 🛡️ CSRF protection initialized with existing token index-BeMjOGix.js:263:5675
+17:12:10.611 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-BeMjOGix.js:263:21207
+17:12:10.614 🔀 OAuth Coordinator [08:12:10][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-BeMjOGix.js:263:51842
+17:12:10.623 ✅ Auth sync initialized with BroadcastChannel index-BeMjOGix.js:263:94138
+17:12:10.623 🔒 Initializing cross-domain logout listener index-BeMjOGix.js:851:104654
+17:12:10.623 📡 SSO: PostMessage listener registered index-BeMjOGix.js:851:107646
+17:12:10.623 ⚠️ Cached token locally invalid or expired, attempting refresh index-BeMjOGix.js:851:113532
+17:12:10.623 🔄 Force refresh requested, bypassing token validity check index-BeMjOGix.js:263:71163
+17:12:10.623 ℹ️ No valid refresh token available index-BeMjOGix.js:263:72682
+17:12:10.623 🔄 Refresh token failed, trying silent auth as fallback... index-BeMjOGix.js:263:71759
+17:12:10.623 🔄 Attempting token refresh with fallback chain... index-BeMjOGix.js:265:11496
+17:12:10.623 🚫 No refresh token found in any storage index-BeMjOGix.js:263:59638
+17:12:10.623 🚫 Unsafe path for token refresh: /oauth/callback index-BeMjOGix.js:258:20368
+17:12:10.623 ❌ Current page not safe for silent auth, refresh completely failed index-BeMjOGix.js:265:16743
+17:12:10.623 ❌ Silent auth attempt 1 failed: Refresh token failed and silent auth not available on current page index-BeMjOGix.js:263:73781
+17:12:10.624 🔄 Silent auth retry attempt 1 after 1000ms delay index-BeMjOGix.js:263:73464
+17:12:11.629 🔄 Attempting token refresh with fallback chain... index-BeMjOGix.js:265:11496
+17:12:11.629 🚫 No refresh token found in any storage index-BeMjOGix.js:263:59638
+17:12:11.629 🚫 Unsafe path for token refresh: /oauth/callback index-BeMjOGix.js:258:20368
+17:12:11.629 ❌ Current page not safe for silent auth, refresh completely failed index-BeMjOGix.js:265:16743
+17:12:11.629 ❌ Silent auth attempt 2 failed: Refresh token failed and silent auth not available on current page index-BeMjOGix.js:263:73781
+17:12:11.629 🔄 Silent auth retry attempt 2 after 2000ms delay index-BeMjOGix.js:263:73464
+17:12:13.665 🔄 Attempting token refresh with fallback chain... index-BeMjOGix.js:265:11496
+17:12:13.665 🚫 No refresh token found in any storage index-BeMjOGix.js:263:59638
+17:12:13.665 🚫 Unsafe path for token refresh: /oauth/callback index-BeMjOGix.js:258:20368
+17:12:13.665 ❌ Current page not safe for silent auth, refresh completely failed index-BeMjOGix.js:265:16743
+17:12:13.665 ❌ Silent auth attempt 3 failed: Refresh token failed and silent auth not available on current page index-BeMjOGix.js:263:73781
+17:12:13.665 ❌ All token refresh methods failed, checking current token validity index-BeMjOGix.js:263:72008
+17:12:13.665 ℹ️ Current token still valid despite refresh failure - user can continue working index-BeMjOGix.js:263:72119
+17:12:13.665 🔄 Auth state change: idle → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (2) […] }
+index-BeMjOGix.js:227:10607
+17:12:13.666 🚫 Unsafe path for token refresh: /oauth/callback index-BeMjOGix.js:258:20368
+17:12:13.668 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-BeMjOGix.js:258:10773
+17:12:13.668 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.668 📋 Found total flow states: 0 index-BeMjOGix.js:228:15218
+17:12:13.668 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-BeMjOGix.js:228:15306
+17:12:13.668 🚨 OAuth flow state not found for state: lpgzp4su... 
+Object { searchedFlows: 0, sessionStorageKeys: (5) […] }
+index-BeMjOGix.js:228:17149
+17:12:13.668 🎯 Popup mode detected via window.parent index-BeMjOGix.js:258:12244
+17:12:13.669 🔐 Page not safe for token refresh, disabling auto refresh: /oauth/callback index-BeMjOGix.js:265:21809
+17:12:13.669 🔄 Migrating legacy OAuth state to new state manager index-BeMjOGix.js:228:22043
+17:12:13.670 🔐 OAuth flow state created: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-BeMjOGix.js:228:14928
+17:12:13.670 ✅ Legacy OAuth state migrated: me9ozobqy75sl3jfb1p index-BeMjOGix.js:228:22618
+17:12:13.670 🔄 Legacy OAuth state migrated: 
+Object { migrated: 1, removed: 3, errors: 0 }
+index-BeMjOGix.js:755:14796
+17:12:13.670 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-BeMjOGix.js:258:10773
+17:12:13.670 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.670 📋 Found total flow states: 1 index-BeMjOGix.js:228:15218
+17:12:13.670 ✅ Found OAuth flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:12:13.670 🎯 Popup mode detected via window.parent index-BeMjOGix.js:258:12244
+17:12:13.670 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (3) […] }
+index-BeMjOGix.js:755:16034
+17:12:13.670 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=aeLvWxo8WjDMS-PKqtdrFRH3fD064wJZtUhsFDp84Ds&state=lpgzp4suO9lpTSmZm2uBXaDqXy4UhVQeLDHezKG31ME", pathname: "/oauth/callback", search: "?code=aeLvWxo8WjDMS-PKqtdrFRH3fD064wJZtUhsFDp84Ds&state=lpgzp4suO9lpTSmZm2uBXaDqXy4UhVQeLDHezKG31ME", code: "aeLvWxo8...", state: "lpgzp4su...", error: null, errorDescription: null, allParams: {…} }
+index-BeMjOGix.js:755:17032
+17:12:13.671 🎯 OAuth Callback - Popup Mode Processing Started index-BeMjOGix.js:755:21234
+17:12:13.671 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.671 📋 Found total flow states: 2 index-BeMjOGix.js:228:15218
+17:12:13.671 ✅ Found OAuth flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:12:13.671 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.671 📋 Found total flow states: 2 index-BeMjOGix.js:228:15218
+17:12:13.671 ✅ Found OAuth flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:12:13.671 🔐 OAuth State Validation Debug: 
+Object { urlState: "lpgzp4su...", fullState: "lpgzp4suO9lpTSmZm2uBXaDqXy4UhVQeLDHezKG31ME", isForceAccountSelection: false, validationResult: {…}, flowState: {…}, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (5) […] }
+index-BeMjOGix.js:755:22514
+17:12:13.671 ✅ OAuth State Validation Passed index-BeMjOGix.js:755:27180
+17:12:13.671 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me9ozobqy75sl3jfb1p", currentStatus: "created", requestedStatus: "token_exchange" }
+index-BeMjOGix.js:228:17697
+17:12:13.671 💱 Starting token exchange for code: aeLvWxo8... index-BeMjOGix.js:755:27257
+17:12:13.671 💱 Token exchange debug info: 
+Object { hasState: true, stateValue: "lpgzp4su...", codeValue: "aeLvWxo8..." }
+index-BeMjOGix.js:258:6192
+17:12:13.671 🔍 Validating OAuth flow state... index-BeMjOGix.js:258:6340
+17:12:13.671 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.671 📋 Found total flow states: 2 index-BeMjOGix.js:228:15218
+17:12:13.671 ✅ Found OAuth flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:12:13.671 🔐 OAuth flow validation result: 
+Object { isValid: true, reason: "Flow state valid", securityLevel: "low", canProceed: true }
+index-BeMjOGix.js:258:6406
+17:12:13.671 ✅ OAuth flow validation passed, getting flow state... index-BeMjOGix.js:258:6908
+17:12:13.671 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.671 📋 Found total flow states: 2 index-BeMjOGix.js:228:15218
+17:12:13.671 ✅ Found OAuth flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:12:13.671 🔍 Retrieved flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", hasCodeVerifier: true, codeVerifierLength: 43, status: "created", flowType: "silent" }
+index-BeMjOGix.js:258:6985
+17:12:13.671 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me9ozobqy75sl3jfb1p", currentStatus: "created", requestedStatus: "token_exchange" }
+index-BeMjOGix.js:228:17697
+17:12:13.671 🔐 Using code verifier from flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", codeVerifierFound: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:258:7216
+17:12:13.672 🔐 Starting token exchange with code: aeLvWxo8... index-BeMjOGix.js:258:8874
+17:12:13.672 🔄 Calling OAuth token endpoint: https://max.dwchem.co.kr/api/oauth/token index-BeMjOGix.js:258:9053
+17:12:13.674 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-BeMjOGix.js:258:10773
+17:12:13.674 🔍 Searching for OAuth flow state with state: lpgzp4su... index-BeMjOGix.js:228:15101
+17:12:13.674 📋 Found total flow states: 2 index-BeMjOGix.js:228:15218
+17:12:13.674 ✅ Found OAuth flow state: 
+Object { flowId: "me9ozobqy75sl3jfb1p", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-BeMjOGix.js:228:16755
+17:12:13.674 🎯 Popup mode detected via window.parent index-BeMjOGix.js:258:12244
+17:12:13.675 XHRPOST
+https://max.dwchem.co.kr/api/oauth/token
+
+17:12:13.695 ✅ Token exchange successful index-BeMjOGix.js:258:10269
+17:12:13.710 📋 Token response details: 
+Object { hasAccessToken: true, hasRefreshToken: true, refreshExpiresIn: 2592000, tokenType: "Bearer", scope: "openid profile email read:profile read:groups manage:workflows" }
+index-BeMjOGix.js:258:10342
+17:12:13.711 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me9ozobqy75sl3jfb1p", currentStatus: "created", requestedStatus: "completed" }
+index-BeMjOGix.js:228:17697
+17:12:13.711 ✅ OAuth flow completed: me9ozobqy75sl3jfb1p index-BeMjOGix.js:258:10556
+17:12:13.711 ✅ Token exchange successful: 
+Object { hasAccessToken: true, hasRefreshToken: true, tokenType: "Bearer", isSSORrefreshCallback: null }
+index-BeMjOGix.js:755:27362
+17:12:13.711 🚨 Invalid OAuth flow status transition: 
+Object { flowId: "me9ozobqy75sl3jfb1p", currentStatus: "created", requestedStatus: "completed" }
+index-BeMjOGix.js:228:17697
+17:12:13.711 📤 Preparing to send OAUTH_SUCCESS message... index-BeMjOGix.js:755:28570
+17:12:13.711 Window opener exists: false index-BeMjOGix.js:755:28631
+17:12:13.711 Window parent exists: true index-BeMjOGix.js:755:28684
+17:12:13.711 Window top exists: true index-BeMjOGix.js:755:28737
+17:12:13.711 Target origin: https://maxlab.dwchem.co.kr index-BeMjOGix.js:755:28784
+17:12:13.711 Message payload: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwiaXNfYWRtaW4iOnRydWUsInVzZXJfaWQiOiIyMWEyYWFhNy00NDRhLTQwMzgtYmRhMy1kOGJmMmM0ZWYxNjIiLCJncm91cF9pZCI6IjkzMmQ2NTdlLTU1ZGYtNDlkNy05Y2M1LWQ4NmU3NjIzZGY4ZSIsImdyb3VwX25hbWUiOiJcdWFkMDBcdWI5YWNcdWM3OTAiLCJyb2xlX2lkIjoiMSIsInJvbGVfbmFtZSI6ImFkbWluIiwiZXhwIjoxNzU1MDcyOTEzLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDcyNzMzLCJqdGkiOiJjYWEzZWU0OS03ZTg4LTQ2ZTEtOTA2NC0wMjA4MGM3MWQ2YjUiLCJuYmYiOjE3NTUwNzI3MzMsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiJjNGRlNzgxNmNlZDUwNzQ4In0.Db1BcGVgSasOAZ1dg1eq473dEn9QNCDlPoJznWijep0", tokenData: {…} }
+index-BeMjOGix.js:755:28837
+17:12:13.711 ✅ OAuth result pre-stored in sessionStorage for immediate detection index-BeMjOGix.js:755:29425
+17:12:13.711 ✅ PostMessage sent to window.parent with wildcard origin index-BeMjOGix.js:755:30287
+17:12:13.711 ✅ BroadcastChannel message sent (attempt 1/3) index-BeMjOGix.js:755:30539
+17:12:13.712 🔀 OAuth Coordinator [08:12:13][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755072730527_deoelf648 index-BeMjOGix.js:263:51842
+17:12:13.713 🚫 Silent auth request aborted by coordinator index-BeMjOGix.js:258:14651
+17:12:13.713 ✅ Silent SSO login successful index-BeMjOGix.js:265:4639
+17:12:13.713 ✅ Silent auth completion recorded for grace period index-BeMjOGix.js:263:77297
+17:12:13.713 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-BeMjOGix.js:258:13225
+17:12:13.728 XHRGET
+https://max.dwchem.co.kr/api/oauth/userinfo
+[HTTP/2 200  7ms]
+
+17:12:13.798 🔐 Storing refresh token securely... index-BeMjOGix.js:263:57584
+17:12:13.798 🔐 Attempting to encrypt and store token (attempt 1/3)... index-BeMjOGix.js:263:27201
+17:12:13.889 ✅ Token encrypted and stored successfully index-BeMjOGix.js:263:27426
+17:12:13.891 🔓 Token decrypted successfully index-BeMjOGix.js:263:28289
+17:12:13.892 🔒 Security event logged: encryption_token_encrypted_stored (low) 
+Object { eventId: "evt_1755072733892_rgbxl175", timestamp: "2025-08-13T08:12:13.892Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", sessionId: "sess_1755072730513_gp8ia7x5mql", details: {…}, context: {…}, metadata: undefined }
+index-BeMjOGix.js:263:40412
+17:12:13.892 ✅ Refresh token encrypted, stored, and verified securely index-BeMjOGix.js:263:57922
+17:12:13.892 💾 Tokens stored successfully (including refresh token) index-BeMjOGix.js:263:56533
+17:12:13.892 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:30757
+17:12:13.892 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:32586
+17:12:13.892 ✅ Cleared tokens for 0 other users index-BeMjOGix.js:263:32749
+17:12:13.892 🔐 Attempting to encrypt and store token (attempt 1/3)... index-BeMjOGix.js:263:27201
+17:12:13.991 ✅ Token encrypted and stored successfully index-BeMjOGix.js:263:27426
+17:12:13.992 ✅ Tokens saved successfully for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:31327
+17:12:13.992 🔐 Tokens also stored in user-isolated storage index-BeMjOGix.js:263:56846
+17:12:13.992 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:30757
+17:12:13.992 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:32586
+17:12:13.992 ✅ Cleared tokens for 0 other users index-BeMjOGix.js:263:32749
+17:12:13.992 🔐 Attempting to encrypt and store token (attempt 1/3)... index-BeMjOGix.js:263:27201
+17:12:14.073 ✅ Token encrypted and stored successfully index-BeMjOGix.js:263:27426
+17:12:14.073 ✅ Tokens saved successfully for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:31327
+17:12:14.073 🔓 Cleared logout flags after successful silent login index-BeMjOGix.js:265:6063
+17:12:14.073 ✅ Silent auth fallback successful index-BeMjOGix.js:265:16124
+17:12:14.073 ✅ SSO refresh successful - circuit breaker reset index-BeMjOGix.js:263:97800
+17:12:14.073 ✅ Token refresh successful (silent auth fallback) index-BeMjOGix.js:263:71938
+17:12:14.073 🔄 Auth state change: idle → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (2) […] }
+index-BeMjOGix.js:227:10607
+17:12:14.074 🚫 Token was refreshed recently, skipping to prevent excessive refresh attempts index-BeMjOGix.js:258:20168
+17:12:14.078 🔐 Page not safe for token refresh, disabling auto refresh: / index-BeMjOGix.js:265:21809
+17:12:14.079 📡 API: Getting workspace tree, parentId: undefined index-BeMjOGix.js:777:27364
+17:12:14.083 XHRGET
+https://maxlab.dwchem.co.kr/api/v1/workspaces/tree
+[HTTP/2 200  41ms]
+
+17:12:14.089 GET
+https://maxlab.dwchem.co.kr/assets/inter-latin-500-normal-Cerq10X2.woff2
+[HTTP/2 200  0ms]
+
+17:12:14.133 📡 API: Workspace tree response: 200 
+Object { workspaces: (4) […], total: 4 }
+index-BeMjOGix.js:777:27501
