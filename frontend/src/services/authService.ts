@@ -768,6 +768,32 @@ export const authService = {
             
             // Add state parameter to track this is an SSO refresh attempt
             const state = `sso_refresh_${Date.now()}`;
+            
+            // 🔒 CRITICAL FIX: Create OAuth flow state for SSO refresh
+            // This ensures the OAuth callback can validate the state properly
+            try {
+              const { createOAuthFlow } = await import('../utils/oauthStateManager');
+              
+              // Generate required OAuth parameters for SSO refresh
+              const codeVerifier = authService.generateCodeVerifier();
+              const nonce = authService.generateNonce();
+              
+              createOAuthFlow({
+                flowType: 'redirect',
+                clientId: import.meta.env.VITE_CLIENT_ID || 'maxlab',
+                redirectUri: redirectUri,
+                state: state,
+                codeVerifier: codeVerifier,
+                nonce: nonce,
+                expiryMs: 10 * 60 * 1000 // 10 minutes for SSO refresh
+              });
+              
+              console.log('✅ OAuth flow state created for SSO refresh:', state.substring(0, 16) + '...');
+            } catch (stateError) {
+              console.error('❌ Failed to create OAuth flow state for SSO refresh:', stateError);
+              // Continue without state manager - legacy fallback
+            }
+            
             const ssoRefreshUrl = `${backendUrl}/oauth/sso-token-refresh?redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
             
             console.log('🔄 SSO Session: Redirecting to SSO token refresh endpoint...');
@@ -1231,5 +1257,26 @@ export const authService = {
       console.error('ID Token validation error:', error);
       throw new Error(`ID Token validation failed: ${error.message}`);
     }
+  },
+
+  /**
+   * Generate PKCE code verifier for OAuth flows
+   */
+  generateCodeVerifier(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode(...array))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  },
+
+  /**
+   * Generate nonce for OIDC flows
+   */
+  generateNonce(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
   }
 };
