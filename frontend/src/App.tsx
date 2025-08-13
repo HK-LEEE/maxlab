@@ -236,44 +236,23 @@ function App() {
       }
     });
     
-    // 크로스 도메인 로그아웃 감지 시작
+    // 크로스 도메인 로그아웃 감지 시작 - SIMPLIFIED
     crossDomainLogout.startListening(() => {
       console.log('🚨 Cross-domain logout detected - clearing session');
       
       const isPublicPageNow = isPublicRoute();
       
-      // 크로스 도메인 로그아웃 시도 횟수 체크
-      const attemptCount = parseInt(sessionStorage.getItem('cross_domain_logout_attempts') || '0');
-      const lastAttemptTime = parseInt(sessionStorage.getItem('cross_domain_logout_last_attempt') || '0');
-      const now = Date.now();
-      
-      // 1분이 지나면 카운트 리셋
-      if (now - lastAttemptTime > 60000) {
-        sessionStorage.setItem('cross_domain_logout_attempts', '1');
-      } else {
-        sessionStorage.setItem('cross_domain_logout_attempts', (attemptCount + 1).toString());
-      }
-      sessionStorage.setItem('cross_domain_logout_last_attempt', now.toString());
-      
-      // 로그아웃 진행 상태 표시 (10초간)
-      sessionStorage.setItem('logout_in_progress', Date.now().toString());
-      
       // 모든 스토리지 클리어 및 로그아웃
       localStorage.clear();
-      // sessionStorage는 logout_in_progress, cross_domain_logout_attempts 등을 남겨둠
+      sessionStorage.clear();
       
       // 상태 리셋
       logout();
       
-      // 3회 이하일 때만 리다이렉트
-      const currentAttempts = parseInt(sessionStorage.getItem('cross_domain_logout_attempts') || '1');
-      if (!isPublicPageNow && currentAttempts <= 3) {
-        // 짧은 지연 후 리다이렉트 (cleanup 시간 확보)
-        setTimeout(() => {
-          window.location.href = '/login?reason=cross_domain_logout';
-        }, 100);
-      } else if (currentAttempts > 3) {
-        console.log('🛑 Cross-domain logout attempts exceeded (3/3), stopping redirects');
+      // Only redirect if not on a public page
+      if (!isPublicPageNow) {
+        // Simple redirect without tracking attempts
+        window.location.href = '/login?reason=cross_domain_logout';
       } else {
         console.log('🔄 Cross-domain logout detected on public page, staying on current page');
       }

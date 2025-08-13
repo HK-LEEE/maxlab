@@ -6,7 +6,8 @@
 import { devLog } from './logger';
 
 const LOGOUT_EVENT_KEY = 'max_platform_logout';
-const LOGOUT_CHECK_INTERVAL = 5000;  // 🔥 30000 → 5000 (5초)
+// DISABLED: Periodic logout checks to prevent aggressive detection
+// const LOGOUT_CHECK_INTERVAL = 60000;  // Increased to 60 seconds if needed
 
 export class CrossDomainLogoutManager {
   private static instance: CrossDomainLogoutManager;
@@ -56,19 +57,14 @@ export class CrossDomainLogoutManager {
       }
     });
 
-    // 2. 주기적으로 세션 체크 (더 자주)
+    // 2. DISABLED: Periodic session checks to prevent aggressive logout
+    // Uncomment if periodic checks are needed (with longer interval)
+    /*
     this.checkInterval = setInterval(async () => {
-      // localStorage에 토큰이 없으면 로그아웃으로 간주
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        devLog.warn('🚨 No access token found - session expired');
-        this.handleLogout(onLogoutDetected);
-        return;
-      }
-      
-      // MAX Platform 세션 체크
+      // Only check MAX Platform session, not local token
       await this.checkMaxPlatformSession(onLogoutDetected);
-    }, LOGOUT_CHECK_INTERVAL);
+    }, 60000); // Check every minute instead of 5 seconds
+    */
 
     // 3. BroadcastChannel API (동일 origin만 지원) - FIXED: 전용 채널 사용
     if ('BroadcastChannel' in window) {
@@ -99,7 +95,9 @@ export class CrossDomainLogoutManager {
       }
     });
 
-    // 5. 페이지 포커스 시 세션 체크
+    // 5. DISABLED: Page focus check - too aggressive
+    // Only check on focus if explicitly needed
+    /*
     window.addEventListener('focus', async () => {
       const token = localStorage.getItem('accessToken');
       if (!token) {
@@ -107,8 +105,11 @@ export class CrossDomainLogoutManager {
         this.handleLogout(onLogoutDetected);
       }
     });
+    */
 
-    // 6. 페이지 가시성 변경 시 체크
+    // 6. DISABLED: Visibility change check - too aggressive
+    // Only check visibility if explicitly needed
+    /*
     document.addEventListener('visibilitychange', async () => {
       if (!document.hidden) {
         const token = localStorage.getItem('accessToken');
@@ -118,6 +119,7 @@ export class CrossDomainLogoutManager {
         }
       }
     });
+    */
   }
 
   /**
