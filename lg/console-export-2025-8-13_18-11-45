@@ -1,0 +1,152 @@
+18:11:43.859 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-CV0oMxw3.js:228:5827
+18:11:43.859 🆕 New or unauthenticated user, preparing for silent auth attempt index-CV0oMxw3.js:228:6850
+18:11:43.861 🛡️ CSRF protection initialized with existing token index-CV0oMxw3.js:263:5675
+18:11:43.865 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-CV0oMxw3.js:263:21207
+18:11:43.867 🔀 OAuth Coordinator [09:11:43][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-CV0oMxw3.js:263:51842
+18:11:43.875 ✅ Auth sync initialized with BroadcastChannel index-CV0oMxw3.js:263:95165
+18:11:43.875 🔒 Initializing cross-domain logout listener index-CV0oMxw3.js:851:104711
+18:11:43.875 📡 SSO: PostMessage listener registered index-CV0oMxw3.js:851:107716
+18:11:43.875 🚀 Starting auth initialization (single instance guaranteed) index-CV0oMxw3.js:851:112222
+18:11:43.875 ⚠️ Cached token locally invalid or expired, attempting refresh index-CV0oMxw3.js:851:113996
+18:11:43.875 🔄 Force refresh requested, bypassing token validity check index-CV0oMxw3.js:263:71163
+18:11:43.875 ℹ️ No valid refresh token available index-CV0oMxw3.js:263:72682
+18:11:43.875 🔄 Refresh token failed, trying silent auth as fallback... index-CV0oMxw3.js:263:71759
+18:11:43.875 🚫 OAuth/SSO flow in progress, stopping silent auth retries to prevent conflicts index-CV0oMxw3.js:263:73594
+18:11:43.875 ❌ All token refresh methods failed, checking current token validity index-CV0oMxw3.js:263:72008
+18:11:43.875 ℹ️ Current token still valid despite refresh failure - user can continue working index-CV0oMxw3.js:263:72119
+18:11:43.875 🔄 Auth state change: idle → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (2) […] }
+index-CV0oMxw3.js:227:11473
+18:11:43.876 🚫 OAuth callback page has active flow, not safe for silent auth index-CV0oMxw3.js:258:20133
+18:11:43.877 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: true, windowParent: false, windowSize: "1867x967", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-CV0oMxw3.js:258:10773
+18:11:43.877 🔍 Searching for OAuth flow state with state: sso_refr... index-CV0oMxw3.js:228:15101
+18:11:43.877 📋 Found total flow states: 1 index-CV0oMxw3.js:228:15218
+18:11:43.877 ✅ Found OAuth flow state: 
+Object { flowId: "me9r4716tdise29danm", flowType: "redirect", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:228:16755
+18:11:43.877 🎯 Popup mode detected via window.opener index-CV0oMxw3.js:258:12076
+18:11:43.878 🔐 Page not safe for token refresh, disabling auto refresh: /oauth/callback index-CV0oMxw3.js:265:22969
+18:11:43.878 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: true, windowParent: false, windowSize: "1867x967", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-CV0oMxw3.js:258:10773
+18:11:43.878 🔍 Searching for OAuth flow state with state: sso_refr... index-CV0oMxw3.js:228:15101
+18:11:43.878 📋 Found total flow states: 1 index-CV0oMxw3.js:228:15218
+18:11:43.878 ✅ Found OAuth flow state: 
+Object { flowId: "me9r4716tdise29danm", flowType: "redirect", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:228:16755
+18:11:43.878 🎯 Popup mode detected via window.opener index-CV0oMxw3.js:258:12076
+18:11:43.878 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (3) […] }
+index-CV0oMxw3.js:755:16034
+18:11:43.878 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=CpxDroBnwUku6uiaU5WRFLSWWuE4mNM4XGcyz9Kw13M&state=sso_refresh_1755076303770", pathname: "/oauth/callback", search: "?code=CpxDroBnwUku6uiaU5WRFLSWWuE4mNM4XGcyz9Kw13M&state=sso_refresh_1755076303770", code: "CpxDroBn...", state: "sso_refr...", error: null, errorDescription: null, allParams: {…} }
+index-CV0oMxw3.js:755:17032
+18:11:43.878 🔄 SSO Token Refresh Callback Detected index-CV0oMxw3.js:755:17413
+18:11:43.878 🎯 OAuth Callback - Popup Mode Processing Started index-CV0oMxw3.js:755:21234
+18:11:43.878 🔍 Searching for OAuth flow state with state: sso_refr... index-CV0oMxw3.js:228:15101
+18:11:43.878 📋 Found total flow states: 2 index-CV0oMxw3.js:228:15218
+18:11:43.878 ✅ Found OAuth flow state: 
+Object { flowId: "me9r4716tdise29danm", flowType: "redirect", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:228:16755
+18:11:43.878 🔍 Searching for OAuth flow state with state: sso_refr... index-CV0oMxw3.js:228:15101
+18:11:43.878 📋 Found total flow states: 2 index-CV0oMxw3.js:228:15218
+18:11:43.878 ✅ Found OAuth flow state: 
+Object { flowId: "me9r4716tdise29danm", flowType: "redirect", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:228:16755
+18:11:43.878 🔐 OAuth State Validation Debug: 
+Object { urlState: "sso_refr...", fullState: "sso_refresh_1755076303770", isForceAccountSelection: false, validationResult: {…}, flowState: {…}, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (5) […] }
+index-CV0oMxw3.js:755:22514
+18:11:43.878 ✅ OAuth State Validation Passed index-CV0oMxw3.js:755:27180
+18:11:43.878 🔄 OAuth flow status updated: 
+Object { flowId: "me9r4716tdise29danm", status: "token_exchange", flowType: "redirect" }
+index-CV0oMxw3.js:228:17528
+18:11:43.878 💱 Starting token exchange for code: CpxDroBn... index-CV0oMxw3.js:755:27257
+18:11:43.878 💱 Token exchange debug info: 
+Object { hasState: true, stateValue: "sso_refr...", codeValue: "CpxDroBn..." }
+index-CV0oMxw3.js:258:6192
+18:11:43.878 🔍 Validating OAuth flow state... index-CV0oMxw3.js:258:6340
+18:11:43.878 🔍 Searching for OAuth flow state with state: sso_refr... index-CV0oMxw3.js:228:15101
+18:11:43.879 📋 Found total flow states: 2 index-CV0oMxw3.js:228:15218
+18:11:43.879 ✅ Found OAuth flow state: 
+Object { flowId: "me9r4716tdise29danm", flowType: "redirect", status: "token_exchange", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:228:16755
+18:11:43.879 🔐 OAuth flow validation result: 
+Object { isValid: false, reason: "State already used for token exchange", securityLevel: "high", canProceed: false }
+index-CV0oMxw3.js:258:6406
+18:11:43.879 🚨 OAuth flow validation failed: 
+Object { reason: "State already used for token exchange", securityLevel: "high", canProceed: false }
+index-CV0oMxw3.js:258:7408
+18:11:43.879 🔧 Falling back to legacy sessionStorage for code verifier index-CV0oMxw3.js:258:7610
+18:11:43.879 🔍 Legacy approach failed, searching all sessionStorage for OAuth flows... index-CV0oMxw3.js:258:7793
+18:11:43.879 🔍 Checking direct stored flow: 
+Object { key: "oauth_flow_me9r4716tdise29danm", flowId: "me9r4716tdise29danm", storedState: "sso_refr...", searchState: "sso_refr...", matchesSearch: true, hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:258:8061
+18:11:43.879 ✅ Found code verifier via direct sessionStorage search: 
+Object { flowId: "me9r4716tdise29danm", codeVerifierLength: 43 }
+index-CV0oMxw3.js:258:8359
+18:11:43.879 ✅ Code verifier found via fallback method, length: 43 index-CV0oMxw3.js:258:8646
+18:11:43.879 🔐 Starting token exchange with code: CpxDroBn... index-CV0oMxw3.js:258:8874
+18:11:43.879 🔄 Calling OAuth token endpoint: https://max.dwchem.co.kr/api/oauth/token index-CV0oMxw3.js:258:9053
+18:11:43.882 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: true, windowParent: false, windowSize: "1867x967", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-CV0oMxw3.js:258:10773
+18:11:43.882 🔍 Searching for OAuth flow state with state: sso_refr... index-CV0oMxw3.js:228:15101
+18:11:43.882 📋 Found total flow states: 2 index-CV0oMxw3.js:228:15218
+18:11:43.882 ✅ Found OAuth flow state: 
+Object { flowId: "me9r4716tdise29danm", flowType: "redirect", status: "token_exchange", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-CV0oMxw3.js:228:16755
+18:11:43.882 🎯 Popup mode detected via window.opener index-CV0oMxw3.js:258:12076
+18:11:43.904 ✅ Token exchange successful index-CV0oMxw3.js:258:10269
+18:11:43.905 📋 Token response details: 
+Object { hasAccessToken: true, hasRefreshToken: true, refreshExpiresIn: 2592000, tokenType: "Bearer", scope: "openid profile email read:profile read:groups manage:workflows" }
+index-CV0oMxw3.js:258:10342
+18:11:43.905 ✅ Token exchange successful: 
+Object { hasAccessToken: true, hasRefreshToken: true, tokenType: "Bearer", isSSORrefreshCallback: true }
+index-CV0oMxw3.js:755:27365
+18:11:43.905 ✅ Processing successful SSO token refresh in popup mode... index-CV0oMxw3.js:755:27527
+18:11:43.905 💾 Storing refreshed tokens before metadata update (popup mode)... index-CV0oMxw3.js:755:27601
+18:11:43.905 🔐 Storing refresh token securely... index-CV0oMxw3.js:263:57584
+18:11:43.905 🔐 Attempting to encrypt and store token (attempt 1/3)... index-CV0oMxw3.js:263:27201
+18:11:43.984 ✅ Token encrypted and stored successfully index-CV0oMxw3.js:263:27426
+18:11:43.986 🔓 Token decrypted successfully index-CV0oMxw3.js:263:28289
+18:11:43.986 🔒 Security event logged: encryption_token_encrypted_stored (low) 
+Object { eventId: "evt_1755076303987_69cqiltm", timestamp: "2025-08-13T09:11:43.987Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: "d65db892-9691-46e3-a2c6-d962980f2f51", sessionId: "sess_1755076303867_ccwbocnncwj", details: {…}, context: {…}, metadata: undefined }
+index-CV0oMxw3.js:263:40412
+18:11:43.986 ✅ Refresh token encrypted, stored, and verified securely index-CV0oMxw3.js:263:57922
+18:11:43.986 💾 Tokens stored successfully (including refresh token) index-CV0oMxw3.js:263:56533
+18:11:43.986 🔐 Saving tokens for user: d65db892-9691-46e3-a2c6-d962980f2f51 index-CV0oMxw3.js:263:30757
+18:11:43.986 🧹 Clearing tokens for all users except: d65db892-9691-46e3-a2c6-d962980f2f51 index-CV0oMxw3.js:263:32586
+18:11:43.986 ✅ Cleared tokens for 0 other users index-CV0oMxw3.js:263:32749
+18:11:43.986 🔐 Attempting to encrypt and store token (attempt 1/3)... index-CV0oMxw3.js:263:27201
+18:11:44.079 ✅ Token encrypted and stored successfully index-CV0oMxw3.js:263:27426
+18:11:44.079 ✅ Tokens saved successfully for user: d65db892-9691-46e3-a2c6-d962980f2f51 index-CV0oMxw3.js:263:31327
+18:11:44.079 🔐 Tokens also stored in user-isolated storage index-CV0oMxw3.js:263:56846
+18:11:44.079 ✅ Refreshed tokens stored successfully (popup mode) index-CV0oMxw3.js:755:27859
+18:11:44.079 ✅ SSO session metadata updated after successful token refresh (popup mode) index-CV0oMxw3.js:755:28264
+18:11:44.079 🔄 OAuth flow status updated: 
+Object { flowId: "me9r4716tdise29danm", status: "completed", flowType: "redirect" }
+index-CV0oMxw3.js:228:17528
+18:11:44.079 📤 Preparing to send OAUTH_SUCCESS message... index-CV0oMxw3.js:755:28909
+18:11:44.079 Window opener exists: true index-CV0oMxw3.js:755:28970
+18:11:44.079 Window parent exists: true index-CV0oMxw3.js:755:29023
+18:11:44.079 Window top exists: true index-CV0oMxw3.js:755:29076
+18:11:44.080 Target origin: https://maxlab.dwchem.co.kr index-CV0oMxw3.js:755:29123
+18:11:44.080 Message payload: 
+Object { type: "OAUTH_SUCCESS", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNjVkYjg5Mi05NjkxLTQ2ZTMtYTJjNi1kOTYyOTgwZjJmNTEiLCJlbWFpbCI6ImtybkB0ZXN0LmNvbSIsImlzX2FkbWluIjpmYWxzZSwidXNlcl9pZCI6ImQ2NWRiODkyLTk2OTEtNDZlMy1hMmM2LWQ5NjI5ODBmMmY1MSIsImdyb3VwX2lkIjoiZTg1YjFlMzAtNTNjYi00MmFkLWFiYTAtOTRlNjE1MTEzZjNkIiwiZ3JvdXBfbmFtZSI6Ilx1YWNmNVx1YzgxNVx1YWMxY1x1YmMxY1x1YWRmOFx1YjhmOShcdWM3NzVcdWMwYjApIiwiZXhwIjoxNzU1MDc2NDgzLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU1MDc2MzAzLCJqdGkiOiJlMWM5ODY5Zi0yOGEzLTQ2ZTYtOGEwNi02MDIwNjYzMjBlOGEiLCJuYmYiOjE3NTUwNzYzMDMsImlzcyI6Im1heHBsYXRmb3JtIiwibm9uY2UiOiI4YzcxNmYyOWVkN2Y4ZWUwIn0.fc11utI_x12boVqJ3pSfFv7PdJtwrsYOBoDCrYFF9sE", tokenData: {…} }
+index-CV0oMxw3.js:755:29176
+18:11:44.080 ✅ OAuth result pre-stored in sessionStorage for immediate detection index-CV0oMxw3.js:755:29764
+18:11:44.080 ✅ PostMessage sent to window.opener with origin: https://maxlab.dwchem.co.kr index-CV0oMxw3.js:755:30200
+18:11:44.080 ✅ BroadcastChannel message sent (attempt 1/3) index-CV0oMxw3.js:755:30908
+18:11:44.080 Failed to execute ‘postMessage’ on ‘DOMWindow’: The target origin provided (‘https://maxlab.dwchem.co.kr’) does not match the recipient window’s origin (‘https://max.dwchem.co.kr’). callback
+18:11:44.180 ✅ BroadcastChannel message sent (attempt 2/3) index-CV0oMxw3.js:755:30908
+18:11:44.280 ✅ BroadcastChannel message sent (attempt 3/3) index-CV0oMxw3.js:755:30908
+18:11:44.280 📡 Sent message via BroadcastChannel index-CV0oMxw3.js:755:31671
+18:11:44.281 💾 Stored OAuth result in sessionStorage key: oauth_result index-CV0oMxw3.js:755:31984
+18:11:44.281 💾 Stored OAuth result in sessionStorage key: oauth_success index-CV0oMxw3.js:755:31984
+18:11:44.281 💾 Stored OAuth result in sessionStorage key: oauth_token_data index-CV0oMxw3.js:755:31984
+18:11:44.281 💾 Stored individual OAuth token data index-CV0oMxw3.js:755:32263
+18:11:44.281 🚪 Waiting for parent acknowledgment before closing popup... index-CV0oMxw3.js:755:32523
