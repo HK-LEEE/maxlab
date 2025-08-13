@@ -214,6 +214,7 @@ export class PopupOAuthLogin {
         sessionStorage.setItem('oauth_popup_mode', 'true');
         sessionStorage.setItem('oauth_window_type', 'popup');
         sessionStorage.setItem('oauth_parent_origin', window.location.origin);
+        sessionStorage.setItem('oauth_popup_mode_timestamp', Date.now().toString());
         
         // Clear any previous OAuth results
         sessionStorage.removeItem('oauth_result');
@@ -1285,6 +1286,7 @@ export class PopupOAuthLogin {
     sessionStorage.removeItem('oauth_popup_mode');
     sessionStorage.removeItem('oauth_window_type');
     sessionStorage.removeItem('oauth_parent_origin');
+    sessionStorage.removeItem('oauth_popup_mode_timestamp');
     
     // 🔧 CRITICAL: Only remove force account selection if login was successful
     const hasSuccessResult = sessionStorage.getItem('oauth_result') || 
@@ -1859,6 +1861,7 @@ export function isPopupMode(): boolean {
     oauthPopupMode: sessionStorage.getItem('oauth_popup_mode'),
     oauthWindowType: sessionStorage.getItem('oauth_window_type'),
     oauthForceAccountSelection: sessionStorage.getItem('oauth_force_account_selection'),
+    ssoRefreshReturnUrl: sessionStorage.getItem('sso_refresh_return_url'),
     windowOpener: !!window.opener,
     windowParent: window.parent !== window,
     windowSize: `${window.innerWidth}x${window.innerHeight}`,
@@ -1866,7 +1869,14 @@ export function isPopupMode(): boolean {
     referrer: document.referrer
   });
   
-  // Method 0: Check state manager for popup flows (new method)
+  // 🔧 CRITICAL FIX: Check if we're in SSO refresh flow (redirect mode)
+  const ssoRefreshReturnUrl = sessionStorage.getItem('sso_refresh_return_url');
+  if (ssoRefreshReturnUrl) {
+    console.log('🚫 SSO refresh flow detected - forcing redirect mode (not popup)');
+    return false;
+  }
+  
+  // Method 0: Check state manager for popup flows (new method) - MOST RELIABLE
   const urlParams = new URLSearchParams(window.location.search);
   const state = urlParams.get('state');
   if (state) {
@@ -1881,51 +1891,92 @@ export function isPopupMode(): boolean {
     }
     
     if (flowState && flowState.flowType === 'popup') {
-      console.log('🎯 Popup mode detected via OAuth flow state manager');
+      console.log('🎯 Popup mode detected via OAuth flow state manager (AUTHORITATIVE)');
       return true;
+    } else if (flowState && flowState.flowType === 'redirect') {
+      console.log('🚫 Redirect mode detected via OAuth flow state manager (AUTHORITATIVE)');
+      return false;
     }
   }
   
-  // Method 1: Explicit popup mode flag
-  if (sessionStorage.getItem('oauth_popup_mode') === 'true' || 
-      sessionStorage.getItem('oauth_window_type') === 'popup') {
-    console.log('🎯 Popup mode detected via oauth session flags');
-    return true;
+  // Method 1: Explicit popup mode flag - but verify it's not stale
+  const oauthPopupMode = sessionStorage.getItem('oauth_popup_mode');
+  const oauthWindowType = sessionStorage.getItem('oauth_window_type');
+  if (oauthPopupMode === 'true' || oauthWindowType === 'popup') {
+    // 🔧 CRITICAL FIX: Check if this is a stale flag from previous operation
+    const popupModeTimestamp = sessionStorage.getItem('oauth_popup_mode_timestamp');
+    if (popupModeTimestamp) {
+      const age = Date.now() - parseInt(popupModeTimestamp);
+      if (age > 300000) { // 5 minutes
+        console.log(`🧹 Removing stale oauth_popup_mode flag (age: ${age}ms)`);
+        sessionStorage.removeItem('oauth_popup_mode');
+        sessionStorage.removeItem('oauth_window_type');
+        sessionStorage.removeItem('oauth_popup_mode_timestamp');
+      } else {
+        console.log('🎯 Popup mode detected via oauth session flags (fresh)');
+        return true;
+      }
+    } else {
+      // No timestamp, assume it's recent if we're on OAuth callback
+      if (window.location.pathname.includes('/oauth/callback')) {
+        console.log('🎯 Popup mode detected via oauth session flags');
+        return true;
+      }
+    }
   }
   
-  // Method 2: Force account selection implies popup mode (since it's only used in popup)
-  if (sessionStorage.getItem('oauth_force_account_selection') === 'true' &&
-      window.location.pathname.includes('/oauth/callback')) {
-    console.log('🎯 Popup mode detected via oauth_force_account_selection flag');
-    return true;
+  // Method 2: Force account selection implies popup mode - but verify freshness
+  const forceAccountSelection = sessionStorage.getItem('oauth_force_account_selection');
+  if (forceAccountSelection === 'true' && window.location.pathname.includes('/oauth/callback')) {
+    // 🔧 CRITICAL FIX: Only trust this if there's no conflicting flow state
+    if (!state || (!getOAuthFlow(state) && !state.includes('_force_'))) {
+      console.log('🎯 Popup mode detected via oauth_force_account_selection flag');
+      return true;
+    } else {
+      console.log('🚫 oauth_force_account_selection found but flow state indicates redirect mode');
+    }
   }
   
-  // Method 3: Window opener relationship
+  // Method 3: Window opener relationship - MORE RESTRICTIVE
   if (window.opener !== null && window.opener !== window) {
-    console.log('🎯 Popup mode detected via window.opener');
-    return true;
+    // 🔧 CRITICAL FIX: Be more restrictive - check additional popup indicators
+    const hasPopupIndicators = (
+      window.innerWidth <= 700 && window.innerHeight <= 900 || // Reasonable popup size
+      window.name.includes('oauth') || window.name.includes('popup') ||
+      sessionStorage.getItem('oauth_popup_mode') === 'true'
+    );
+    
+    if (hasPopupIndicators) {
+      console.log('🎯 Popup mode detected via window.opener + popup indicators');
+      return true;
+    } else {
+      console.log('🚫 window.opener exists but no popup indicators - treating as regular tab navigation');
+    }
   }
   
-  // Method 4: Window parent relationship (for iframe scenarios)
+  // Method 4: Window parent relationship (for iframe scenarios) - UNCHANGED
   if (window.parent !== null && window.parent !== window && 
       window.location.pathname.includes('/oauth/callback')) {
-    console.log('🎯 Popup mode detected via window.parent');
+    console.log('🎯 Popup mode detected via window.parent (iframe scenario)');
     return true;
   }
   
-  // Method 5: URL parameter detection (reuse existing urlParams)
+  // Method 5: URL parameter detection (reuse existing urlParams) - UNCHANGED
   if (urlParams.get('popup') === 'true' || urlParams.get('mode') === 'popup') {
     console.log('🎯 Popup mode detected via URL parameters');
     return true;
   }
   
-  // Method 6: Referrer-based detection
+  // Method 6: Referrer-based detection - MORE RESTRICTIVE
   if (document.referrer && document.referrer !== window.location.href) {
     try {
       const referrerUrl = new URL(document.referrer);
       const currentUrl = new URL(window.location.href);
-      if (referrerUrl.origin === currentUrl.origin && window.location.pathname.includes('/oauth/callback')) {
-        console.log('🎯 Popup mode detected via referrer analysis');
+      // 🔧 CRITICAL FIX: Only use referrer detection with additional popup indicators
+      if (referrerUrl.origin === currentUrl.origin && 
+          window.location.pathname.includes('/oauth/callback') &&
+          (window.innerWidth <= 700 || sessionStorage.getItem('oauth_popup_mode') === 'true')) {
+        console.log('🎯 Popup mode detected via referrer analysis + popup indicators');
         return true;
       }
     } catch (e) {
@@ -1933,14 +1984,14 @@ export function isPopupMode(): boolean {
     }
   }
   
-  // Method 7: Window size heuristic (popups are typically smaller)
-  if (window.innerWidth <= 600 && window.innerHeight <= 800 && 
+  // Method 7: Window size heuristic - MORE RESTRICTIVE
+  if (window.innerWidth <= 600 && window.innerHeight <= 700 && 
       window.location.pathname.includes('/oauth/callback')) {
-    console.log('🎯 Popup mode detected via window size heuristic');
+    console.log('🎯 Popup mode detected via window size heuristic (strict)');
     return true;
   }
   
-  // Method 8: Window name detection (some browsers set popup window names)
+  // Method 8: Window name detection - UNCHANGED
   if (window.name && (window.name.includes('oauth') || window.name.includes('popup'))) {
     console.log('🎯 Popup mode detected via window name');
     return true;
