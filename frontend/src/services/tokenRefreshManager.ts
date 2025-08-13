@@ -244,6 +244,33 @@ export class TokenRefreshManager {
 
     while (retryCount < this.config.maxRetries) {
       try {
+        // 🔒 CRITICAL: Check if OAuth flow or SSO refresh is in progress before retry
+        const isOAuthInProgress = (
+          sessionStorage.getItem('oauth_flow_in_progress') ||
+          sessionStorage.getItem('oauth_callback_processing') ||
+          sessionStorage.getItem('sso_refresh_return_url') ||
+          document.body.getAttribute('data-oauth-processing')
+        );
+        
+        if (isOAuthInProgress) {
+          console.log('🚫 OAuth/SSO flow in progress, stopping silent auth retries to prevent conflicts');
+          return { success: false, error: 'OAuth flow in progress - silent auth cancelled to prevent conflicts' };
+        }
+        
+        // 🔒 CRITICAL: Check if tokens were already refreshed by another process
+        const currentToken = localStorage.getItem('accessToken');
+        const lastTokenRefresh = localStorage.getItem('lastTokenRefresh');
+        if (currentToken && lastTokenRefresh) {
+          const refreshTime = parseInt(lastTokenRefresh);
+          const timeSinceRefresh = Date.now() - refreshTime;
+          
+          // If token was refreshed within last 30 seconds, consider it fresh
+          if (timeSinceRefresh < 30000) {
+            console.log('✅ Token was recently refreshed by another process, stopping silent auth retries');
+            return { success: true };
+          }
+        }
+        
         // 지수 백오프 지연
         if (retryCount > 0) {
           const delay = Math.min(
@@ -252,6 +279,19 @@ export class TokenRefreshManager {
           );
           console.log(`🔄 Silent auth retry attempt ${retryCount} after ${delay}ms delay`);
           await this.delay(delay);
+          
+          // Re-check OAuth flow status after delay
+          const isStillInProgress = (
+            sessionStorage.getItem('oauth_flow_in_progress') ||
+            sessionStorage.getItem('oauth_callback_processing') ||
+            sessionStorage.getItem('sso_refresh_return_url') ||
+            document.body.getAttribute('data-oauth-processing')
+          );
+          
+          if (isStillInProgress) {
+            console.log('🚫 OAuth/SSO flow started during retry delay, cancelling silent auth');
+            return { success: false, error: 'OAuth flow started during retry - silent auth cancelled' };
+          }
         }
 
         const result = await silentAuthFunction();

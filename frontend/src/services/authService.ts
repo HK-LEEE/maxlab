@@ -696,6 +696,16 @@ export const authService = {
         if (authMethod === 'sso_sync' && !hasRefreshToken && maxPlatformSession && tokenRenewableViaSso && ssoRefreshAttempt.allowed) {
           console.log('🔄 SSO Session: Attempting token refresh via MAX Platform redirect...');
           
+          // 🔒 CRITICAL: Cancel any pending silent auth attempts to prevent conflicts
+          try {
+            const cancelledCount = oauthRequestCoordinator.cancelRequestsByType('silent_login');
+            if (cancelledCount > 0) {
+              console.log(`✅ Cancelled ${cancelledCount} pending silent auth requests before SSO refresh`);
+            }
+          } catch (e) {
+            console.warn('⚠️ Failed to cancel silent auth requests:', e);
+          }
+          
           // CRITICAL FIX: Validate session state before attempting SSO refresh
           // Check if we recently failed an SSO refresh (within last 30 seconds)
           const lastSsoFailure = sessionStorage.getItem('last_sso_failure');
