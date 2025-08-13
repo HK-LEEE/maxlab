@@ -504,19 +504,36 @@ export const useAuthStore = create<AuthState>()(
         if (state?.isAuthenticated && state?.user && hasTokenData) {
           // 🔍 Enhanced validation: Check both local and potential server issues
           if (!isLocallyValid) {
-            console.log('⚠️ Authenticated user but token expired locally, clearing auth');
-            // Clear expired auth data immediately
-            const keysToRemove = ['accessToken', 'tokenExpiryTime', 'tokenType', 'expiresIn', 'refreshToken', 'refreshTokenExpiry'];
+            console.log('⚠️ Access token expired locally, will attempt refresh with refresh token');
+            // CRITICAL FIX: Don't clear refresh token when access token expires
+            // Only clear the expired access token, keep refresh token for renewal
+            const keysToRemove = ['accessToken', 'tokenExpiryTime', 'tokenType', 'expiresIn'];
             keysToRemove.forEach(key => localStorage.removeItem(key));
             
-            return {
-              ...state,
-              initState: 'idle' as AuthInitState,
-              error: null,
-              retryCount: 0,
-              isAuthenticated: false,
-              user: null
-            };
+            // Check if we have a refresh token to attempt renewal
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (refreshToken) {
+              console.log('🔄 Refresh token available, maintaining auth state for refresh attempt');
+              return {
+                ...state,
+                initState: 'syncing' as AuthInitState, // Set to syncing to trigger refresh
+                error: null,
+                retryCount: 0,
+                isAuthenticated: true, // Keep authenticated for refresh attempt
+                user: state.user // Preserve user data
+              };
+            } else {
+              // Only clear auth if no refresh token available
+              console.log('❌ No refresh token available, clearing auth completely');
+              return {
+                ...state,
+                initState: 'idle' as AuthInitState,
+                error: null,
+                retryCount: 0,
+                isAuthenticated: false,
+                user: null
+              };
+            }
           }
           
           // 🔧 CRITICAL: Set to syncing state to trigger server validation  

@@ -717,9 +717,25 @@ function App() {
               // Continue to silent auth attempt below instead of stopping
             }
           } else {
-            devLog.warn('❌ Cached token locally invalid or expired, clearing auth');
-            logout();
-            setAuthState('idle');
+            devLog.warn('⚠️ Cached token locally invalid or expired, attempting refresh');
+            // CRITICAL FIX: Don't call logout() immediately when token expires
+            // Try to refresh the token first, only logout if refresh fails
+            try {
+              const refreshResult = await authService.refreshToken(true);
+              if (refreshResult) {
+                devLog.info('✅ Token refresh successful, continuing with auth');
+                setAuthState('ready');
+                return; // Exit early, no need for silent auth
+              } else {
+                devLog.warn('❌ Token refresh failed, will attempt silent auth');
+                // Don't call logout() here - let silent auth try first
+                setAuthState('idle');
+              }
+            } catch (error) {
+              devLog.warn('❌ Token refresh error, will attempt silent auth:', error);
+              // Don't call logout() here - let silent auth try first  
+              setAuthState('idle');
+            }
             // Continue to silent auth attempt below
           }
         }
