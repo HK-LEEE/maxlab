@@ -739,17 +739,42 @@ export const authService = {
             let returnUrl = window.location.href;
             const currentUrl = new URL(returnUrl);
             
-            // Check if current URL is already an error callback
-            const isErrorCallback = currentUrl.pathname === '/oauth/callback' && 
-                                  (currentUrl.searchParams.has('error') || 
-                                   currentUrl.searchParams.has('error_description'));
+            // 🔧 CRITICAL FIX: Check if current URL is ANY OAuth callback (success OR error)
+            const isAnyOAuthCallback = currentUrl.pathname === '/oauth/callback' && 
+                                     (currentUrl.searchParams.has('code') || 
+                                      currentUrl.searchParams.has('error') || 
+                                      currentUrl.searchParams.has('error_description') ||
+                                      currentUrl.searchParams.has('state'));
+                                      
+            // 🔧 ENHANCED: Extra check for SSO refresh loops
+            const isSSORrefreshCallback = currentUrl.searchParams.get('state')?.startsWith('sso_refresh_');
             
-            if (isErrorCallback) {
-              console.log('⚠️ Current URL is an error callback, using safe fallback');
-              // Use the stored original URL or fallback to dashboard
+            if (isAnyOAuthCallback) {
+              if (isSSORrefreshCallback) {
+                console.log('🚨 CRITICAL: SSO refresh callback detected as current URL - this would cause infinite redirect loop!');
+              } else {
+                console.log('⚠️ Current URL is OAuth callback, using safe fallback to prevent infinite redirect');
+              }
+              
+              // 🔧 ENHANCED: Multiple fallback strategies for return URL
               const storedOriginalUrl = sessionStorage.getItem('original_navigation_url') || 
                                        localStorage.getItem('pre_auth_url');
-              returnUrl = storedOriginalUrl || `${currentOrigin}/dashboard`;
+                                       
+              // Additional fallback: check referrer if available and safe
+              let fallbackUrl = storedOriginalUrl;
+              if (!fallbackUrl && document.referrer) {
+                const referrerUrl = new URL(document.referrer);
+                // Only use referrer if it's from the same origin and not an auth page
+                const isReferrerSafe = referrerUrl.origin === currentOrigin && 
+                                     !referrerUrl.pathname.includes('/oauth/') &&
+                                     !referrerUrl.pathname.includes('/login');
+                if (isReferrerSafe) {
+                  fallbackUrl = document.referrer;
+                  console.log('📍 Using referrer as fallback return URL');
+                }
+              }
+              
+              returnUrl = fallbackUrl || `${currentOrigin}/dashboard`;
               console.log('✅ Using safe return URL:', returnUrl);
             }
             
