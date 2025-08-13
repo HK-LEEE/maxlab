@@ -510,7 +510,7 @@ export class OAuthStateManager {
     newStatus: OAuthFlowState['status']
   ): boolean {
     const validTransitions: Record<OAuthFlowState['status'], OAuthFlowState['status'][]> = {
-      'created': ['in_progress', 'failed', 'expired'],
+      'created': ['in_progress', 'token_exchange', 'completed', 'failed', 'expired'], // 🔧 FIX: Allow direct token_exchange for SSO refresh flows
       'in_progress': ['token_exchange', 'completed', 'failed', 'expired'], // Allow direct completion
       'token_exchange': ['completed', 'failed', 'expired'],
       'completed': ['failed'], // Allow marking as failed if cleanup issues occur

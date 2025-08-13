@@ -755,8 +755,9 @@ export const OAuthCallback: React.FC = () => {
               
               // 🔒 SECURE: Only try specific known origins, not wildcard
               const trustedOrigins = [
-                window.location.origin,  // Same origin
+                window.location.origin,  // Same origin (max.dwchem.co.kr)
                 new URL(authUrl).origin,  // OAuth server origin
+                'https://maxlab.dwchem.co.kr', // 🔧 FIX: Explicitly add MaxLab origin for SSO callbacks
                 ...(document.referrer ? [new URL(document.referrer).origin] : []), // Referrer if available
               ];
               

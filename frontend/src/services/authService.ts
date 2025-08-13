@@ -713,23 +713,19 @@ export const authService = {
             }
           }
           
-          // SAFETY CHECK: Detect redirect loop pattern
-          const recentAttempts = sessionStorage.getItem('sso_refresh_attempts');
-          if (recentAttempts) {
-            const attempts = JSON.parse(recentAttempts);
-            const recentCount = attempts.filter((t: number) => Date.now() - t < 60000).length;
-            if (recentCount >= 3) {
-              console.log('🚨 Too many SSO refresh attempts, possible redirect loop detected');
-              // Clear SSO metadata to break the loop
-              localStorage.removeItem('auth_method');
-              localStorage.removeItem('max_platform_session');
-              localStorage.removeItem('token_renewable_via_sso');
-              sessionStorage.setItem('preventSilentAuth', 'true');
-              return {
-                success: false,
-                error: 'Too many authentication attempts - please login manually'
-              };
-            }
+          // 🔧 FIX: Use unified SSO circuit breaker instead of duplicate logic
+          // Check SSO circuit breaker status (already checked above, but ensure it's current)
+          if (!ssoRefreshAttempt.allowed) {
+            console.log(`🚨 SSO refresh blocked by circuit breaker: ${ssoRefreshAttempt.reason}`);
+            // Clear SSO metadata to break potential loops
+            localStorage.removeItem('auth_method');
+            localStorage.removeItem('max_platform_session');
+            localStorage.removeItem('token_renewable_via_sso');
+            sessionStorage.setItem('preventSilentAuth', 'true');
+            return {
+              success: false,
+              error: ssoRefreshAttempt.reason || 'Too many authentication attempts - please login manually'
+            };
           }
           
           // For SSO sessions, redirect to MAX Platform for token refresh
@@ -802,13 +798,7 @@ export const authService = {
             // Record attempt time to prevent rapid retries
             sessionStorage.setItem('last_sso_attempt', Date.now().toString());
             
-            // Track attempts for loop detection
-            const existingAttempts = sessionStorage.getItem('sso_refresh_attempts');
-            const attempts = existingAttempts ? JSON.parse(existingAttempts) : [];
-            attempts.push(Date.now());
-            // Keep only recent attempts (last 2 minutes)
-            const recentAttempts = attempts.filter((t: number) => Date.now() - t < 120000);
-            sessionStorage.setItem('sso_refresh_attempts', JSON.stringify(recentAttempts));
+            // 🔧 REMOVED: Duplicate SSO attempt tracking - now using unified SsoRefreshCircuitBreaker
             
             // Redirect to SSO token refresh endpoint
             window.location.href = ssoRefreshUrl;

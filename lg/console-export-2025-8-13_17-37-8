@@ -1,4 +1,5 @@
-처음 로그인하고, maxlab으로 이동할 때, 잘 로그인 되는 상황.
+1. 처음 로그인하고, maxlab으로 이동할 때, 잘 로그인 되는 상황.
+
 17:36:24.451 🔄 Rehydrating auth state for initialization
 Object { state: {…} }
 index-DahPL_yD.js:228:5827
@@ -34,6 +35,7 @@ index-DahPL_yD.js:777:27501
 
 
 2. 첫번째 maxlab에서 창을 닫고, 다시 maxlab으로 이동할 때, 창이 꺼져버리는 로그
+
 17:37:04.326 🔄 Rehydrating auth state for initialization
 Object { state: {…} }
 index-DahPL_yD.js:228:5827
