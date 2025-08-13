@@ -1,0 +1,103 @@
+17:26:58.437 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-fDzzRBL7.js:228:5827
+17:26:58.437 🆕 New or unauthenticated user, preparing for silent auth attempt index-fDzzRBL7.js:228:6850
+17:26:58.439 🛡️ CSRF protection initialized with existing token index-fDzzRBL7.js:263:5675
+17:26:58.443 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-fDzzRBL7.js:263:21207
+17:26:58.445 🔀 OAuth Coordinator [08:26:58][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-fDzzRBL7.js:263:51842
+17:26:58.452 ✅ Auth sync initialized with BroadcastChannel index-fDzzRBL7.js:263:94138
+17:26:58.452 🔒 Initializing cross-domain logout listener index-fDzzRBL7.js:851:104711
+17:26:58.453 📡 SSO: PostMessage listener registered index-fDzzRBL7.js:851:107716
+17:26:58.453 🚀 Starting auth initialization (single instance guaranteed) index-fDzzRBL7.js:851:112222
+17:26:58.453 ⚠️ Cached token locally invalid or expired, attempting refresh index-fDzzRBL7.js:851:113996
+17:26:58.453 🔄 Force refresh requested, bypassing token validity check index-fDzzRBL7.js:263:71163
+17:26:58.453 ℹ️ No valid refresh token available index-fDzzRBL7.js:263:72682
+17:26:58.453 🔄 Refresh token failed, trying silent auth as fallback... index-fDzzRBL7.js:263:71759
+17:26:58.453 🔄 Attempting token refresh with fallback chain... index-fDzzRBL7.js:265:11496
+17:26:58.453 🔄 SSO Session: Attempting token refresh via MAX Platform redirect... index-fDzzRBL7.js:265:11842
+17:26:58.453 🚨 Too many SSO refresh attempts, possible redirect loop detected index-fDzzRBL7.js:265:12329
+17:26:58.453 ❌ Silent auth attempt 1 failed: Too many authentication attempts - please login manually index-fDzzRBL7.js:263:73781
+17:26:58.453 🔄 Silent auth retry attempt 1 after 1000ms delay index-fDzzRBL7.js:263:73464
+17:26:59.453 🔄 Attempting token refresh with fallback chain... index-fDzzRBL7.js:265:11496
+17:26:59.453 🚫 No refresh token found in any storage index-fDzzRBL7.js:263:59638
+17:26:59.453 🚫 OAuth callback page has active flow, not safe for silent auth index-fDzzRBL7.js:258:20133
+17:26:59.453 ❌ Current page not safe for silent auth, refresh completely failed index-fDzzRBL7.js:265:16743
+17:26:59.453 ❌ Silent auth attempt 2 failed: Refresh token failed and silent auth not available on current page index-fDzzRBL7.js:263:73781
+17:26:59.453 🔄 Silent auth retry attempt 2 after 2000ms delay index-fDzzRBL7.js:263:73464
+17:27:01.466 🔄 Attempting token refresh with fallback chain... index-fDzzRBL7.js:265:11496
+17:27:01.467 🚫 No refresh token found in any storage index-fDzzRBL7.js:263:59638
+17:27:01.467 🚫 OAuth callback page has active flow, not safe for silent auth index-fDzzRBL7.js:258:20133
+17:27:01.467 ❌ Current page not safe for silent auth, refresh completely failed index-fDzzRBL7.js:265:16743
+17:27:01.467 ❌ Silent auth attempt 3 failed: Refresh token failed and silent auth not available on current page index-fDzzRBL7.js:263:73781
+17:27:01.467 ❌ All token refresh methods failed, checking current token validity index-fDzzRBL7.js:263:72008
+17:27:01.467 ℹ️ Current token still valid despite refresh failure - user can continue working index-fDzzRBL7.js:263:72119
+17:27:01.467 🔄 Auth state change: idle → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (2) […] }
+index-fDzzRBL7.js:227:11473
+17:27:01.469 🚫 OAuth callback page has active flow, not safe for silent auth index-fDzzRBL7.js:258:20133
+17:27:01.471 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: true, windowParent: false, windowSize: "1867x967", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-fDzzRBL7.js:258:10773
+17:27:01.471 🔍 Searching for OAuth flow state with state: sso_refr... index-fDzzRBL7.js:228:15101
+17:27:01.471 📋 Found total flow states: 0 index-fDzzRBL7.js:228:15218
+17:27:01.471 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-fDzzRBL7.js:228:15306
+17:27:01.471 🚨 OAuth flow state not found for state: sso_refr... 
+Object { searchedFlows: 0, sessionStorageKeys: (2) […] }
+index-fDzzRBL7.js:228:17149
+17:27:01.471 🎯 Popup mode detected via window.opener index-fDzzRBL7.js:258:12076
+17:27:01.473 🔐 Page not safe for token refresh, disabling auto refresh: /oauth/callback index-fDzzRBL7.js:265:21809
+17:27:01.473 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: true, windowParent: false, windowSize: "1867x967", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-fDzzRBL7.js:258:10773
+17:27:01.473 🔍 Searching for OAuth flow state with state: sso_refr... index-fDzzRBL7.js:228:15101
+17:27:01.473 📋 Found total flow states: 0 index-fDzzRBL7.js:228:15218
+17:27:01.473 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-fDzzRBL7.js:228:15306
+17:27:01.473 🚨 OAuth flow state not found for state: sso_refr... 
+Object { searchedFlows: 0, sessionStorageKeys: (2) […] }
+index-fDzzRBL7.js:228:17149
+17:27:01.473 🎯 Popup mode detected via window.opener index-fDzzRBL7.js:258:12076
+17:27:01.473 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (2) […] }
+index-fDzzRBL7.js:755:16034
+17:27:01.474 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=XCYrXk7HztVbQIgIyQi_pZzyZzzrrIGBjSZKDoN_6Xs&state=sso_refresh_1755073618345", pathname: "/oauth/callback", search: "?code=XCYrXk7HztVbQIgIyQi_pZzyZzzrrIGBjSZKDoN_6Xs&state=sso_refresh_1755073618345", code: "XCYrXk7H...", state: "sso_refr...", error: null, errorDescription: null, allParams: {…} }
+index-fDzzRBL7.js:755:17032
+17:27:01.474 🔄 SSO Token Refresh Callback Detected index-fDzzRBL7.js:755:17413
+17:27:01.474 🎯 OAuth Callback - Popup Mode Processing Started index-fDzzRBL7.js:755:21234
+17:27:01.474 🔍 Searching for OAuth flow state with state: sso_refr... index-fDzzRBL7.js:228:15101
+17:27:01.474 📋 Found total flow states: 1 index-fDzzRBL7.js:228:15218
+17:27:01.474 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-fDzzRBL7.js:228:15306
+17:27:01.474 🔍 Checking stored flow: 
+Object { key: "oauth_flow_in_progress", flowId: undefined, storedState: "undefined...", matchesSearch: false }
+index-fDzzRBL7.js:228:15589
+17:27:01.474 🚨 OAuth flow state not found for state: sso_refr... 
+Object { searchedFlows: 1, sessionStorageKeys: (4) […] }
+index-fDzzRBL7.js:228:17149
+17:27:01.474 🔍 Searching for OAuth flow state with state: sso_refr... index-fDzzRBL7.js:228:15101
+17:27:01.474 📋 Found total flow states: 1 index-fDzzRBL7.js:228:15218
+17:27:01.474 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-fDzzRBL7.js:228:15306
+17:27:01.474 🔍 Checking stored flow: 
+Object { key: "oauth_flow_in_progress", flowId: undefined, storedState: "undefined...", matchesSearch: false }
+index-fDzzRBL7.js:228:15589
+17:27:01.474 🚨 OAuth flow state not found for state: sso_refr... 
+Object { searchedFlows: 1, sessionStorageKeys: (4) […] }
+index-fDzzRBL7.js:228:17149
+17:27:01.474 🔐 OAuth State Validation Debug: 
+Object { urlState: "sso_refr...", fullState: "sso_refresh_1755073618345", isForceAccountSelection: false, validationResult: {…}, flowState: null, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (4) […] }
+index-fDzzRBL7.js:755:22514
+17:27:01.474 ❌ OAuth State Validation Failed: 
+Object { reason: "Flow state not found or expired", securityLevel: "high", canProceed: false, flowStateExists: false, possibleCauses: (5) […] }
+index-fDzzRBL7.js:755:23119
+17:27:01.475 💾 OAuth error stored in sessionStorage for immediate detection index-fDzzRBL7.js:755:26429
+17:27:01.475 ✅ OAuth error sent via PostMessage to opener index-fDzzRBL7.js:755:26697
+17:27:01.475 📡 OAuth error sent via BroadcastChannel index-fDzzRBL7.js:755:26941
+17:27:01.476 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, windowOpener: true, windowParent: false, windowSize: "1867x967", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-fDzzRBL7.js:258:10773
+17:27:01.476 🔍 Searching for OAuth flow state with state: sso_refr... index-fDzzRBL7.js:228:15101
+17:27:01.476 📋 Found total flow states: 0 index-fDzzRBL7.js:228:15218
+17:27:01.476 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-fDzzRBL7.js:228:15306
+17:27:01.476 🚨 OAuth flow state not found for state: sso_refr... 
+Object { searchedFlows: 0, sessionStorageKeys: (4) […] }
+index-fDzzRBL7.js:228:17149
+17:27:01.476 🎯 Popup mode detected via window.opener index-fDzzRBL7.js:258:12076
