@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -23,6 +23,7 @@ import AuthInitDebugger from './utils/debugAuthInit';
 import { authSyncService } from './services/authSyncService';
 import { crossDomainLogout } from './utils/crossDomainLogout';
 import { instantLogoutChannel } from './utils/instantLogoutChannel';
+import { oauthLoopPrevention } from './utils/oauthInfiniteLoopPrevention';
 import './styles/index.css';
 
 devLog.log('App.tsx loaded');
@@ -83,8 +84,16 @@ const isPublicRoute = () => {
          currentPath.startsWith('/workspaces/personal_test/monitor/public/');
 };
 
+// Global initialization guard to prevent double initialization
+let globalInitializationInProgress = false;
+let globalInitializationCompleted = false;
+
 function App() {
   devLog.debug('App component rendering');
+  
+  // CRITICAL FIX: Add initialization guard state
+  const [appInitialized, setAppInitialized] = useState(false);
+  const initializationRef = useRef(false);
   
   // CRITICAL FIX: Save original navigation URL before any redirects
   useEffect(() => {
@@ -652,8 +661,34 @@ function App() {
         if (isPublicRoute()) {
           console.log('🔓 Public route detected, skipping authentication initialization completely');
           setAuthState('ready'); // Set auth state to ready without authentication
+          setAppInitialized(true);
           return;
         }
+        
+        // 🔒 CRITICAL FIX: Global initialization guard to prevent double initialization
+        if (globalInitializationInProgress) {
+          console.log('🛑 Global initialization already in progress, skipping duplicate initialization');
+          return;
+        }
+        
+        // 🔒 CRITICAL FIX: Check if already initialized globally
+        if (globalInitializationCompleted) {
+          console.log('✅ Global initialization already completed');
+          setAppInitialized(true);
+          return;
+        }
+        
+        // 🔒 CRITICAL FIX: Use ref to ensure single initialization per instance
+        if (initializationRef.current) {
+          console.log('🛑 This component instance already initialized');
+          return;
+        }
+        
+        // Mark initialization as started
+        globalInitializationInProgress = true;
+        initializationRef.current = true;
+        
+        console.log('🚀 Starting auth initialization (single instance guaranteed)');
         
         // 🔒 CRITICAL FIX: Use ref values to prevent stale closures
         const currentInitState = useAuthStore.getState().initState;
@@ -667,6 +702,7 @@ function App() {
           // If OAuth popup redirected less than 5 seconds ago, skip initialization
           if (timeSinceRedirect < 5000) {
             console.log('🔄 OAuth popup is currently redirecting, skipping auth initialization');
+            globalInitializationInProgress = false;
             return;
           } else {
             // Clean up stale redirect flag
@@ -678,12 +714,16 @@ function App() {
         // 🔒 GUARD: Prevent duplicate initialization
         if (currentInitState === 'syncing' || currentInitState === 'silent_auth') {
           console.log('🛑 Authentication initialization already in progress:', currentInitState);
+          globalInitializationInProgress = false;
           return;
         }
         
         // 🔒 SECURITY: Skip initialization if already ready
         if (currentInitState === 'ready') {
           console.log('✅ Authentication already initialized');
+          globalInitializationInProgress = false;
+          globalInitializationCompleted = true;
+          setAppInitialized(true);
           return;
         }
         
@@ -782,6 +822,35 @@ function App() {
         
         // 🔧 SECURITY FIX: Handle non-authenticated users with silent auth
         if (currentInitState === 'idle' || currentInitState === 'hydrating') {
+          // 🔒 CRITICAL: Check for OAuth loop before attempting silent auth
+          const loopDetection = oauthLoopPrevention.detectInfiniteLoop();
+          if (loopDetection.inLoop) {
+            console.warn('🚨 OAuth infinite loop detected, skipping silent auth:', loopDetection);
+            setAuthState('ready');
+            globalInitializationInProgress = false;
+            globalInitializationCompleted = true;
+            setAppInitialized(true);
+            
+            // Set error for user feedback
+            setAuthError({
+              type: 'unknown',
+              message: loopDetection.recommendation || 'Authentication loop detected. Please try manual login.',
+              recoverable: true
+            });
+            return;
+          }
+          
+          // Check if silent auth is allowed by loop prevention
+          const canAttempt = oauthLoopPrevention.canAttemptOAuth('auto');
+          if (!canAttempt.allowed) {
+            console.warn('🚫 Silent auth blocked by loop prevention:', canAttempt.reason);
+            setAuthState('ready');
+            globalInitializationInProgress = false;
+            globalInitializationCompleted = true;
+            setAppInitialized(true);
+            return;
+          }
+          
           devLog.info('🔄 Attempting silent authentication...');
           setAuthState('silent_auth');
           
@@ -819,8 +888,14 @@ function App() {
                 is_admin: freshUser.is_admin 
               });
               
+              // Record successful OAuth attempt
+              oauthLoopPrevention.recordAttempt('auto', true);
+              
             } catch (validationError: any) {
               devLog.error('❌ Silent auth token validation failed:', validationError);
+              
+              // Record failed OAuth attempt
+              oauthLoopPrevention.recordAttempt('auto', false, validationError.message);
               
               // Silent auth succeeded but token is invalid on server - clear everything
               const keysToRemove = [
@@ -842,6 +917,9 @@ function App() {
           } else {
             devLog.info('ℹ️ Silent login not available, user needs to login manually');
             
+            // Record failed OAuth attempt
+            oauthLoopPrevention.recordAttempt('auto', false, result.error || 'Silent login unavailable');
+            
             if (result.error === 'silent_auth_timeout') {
               const authError = {
                 type: 'silent_auth_timeout' as const,
@@ -854,8 +932,16 @@ function App() {
           
           setAuthState('ready'); // Always move to ready state after attempt
         }
+        
+        // Mark initialization as complete
+        globalInitializationInProgress = false;
+        globalInitializationCompleted = true;
+        setAppInitialized(true);
       } catch (error: any) {
         devLog.warn('⚠️ Auth initialization error:', error);
+        
+        // Record failed OAuth attempt
+        oauthLoopPrevention.recordAttempt('auto', false, error.message);
         
         const authError = {
           type: 'unknown' as const,
@@ -865,6 +951,11 @@ function App() {
         
         setAuthError(authError);
         setAuthState('ready'); // Move to ready state even on error
+        
+        // Mark initialization as complete even on error
+        globalInitializationInProgress = false;
+        globalInitializationCompleted = true;
+        setAppInitialized(true);
       }
     };
 

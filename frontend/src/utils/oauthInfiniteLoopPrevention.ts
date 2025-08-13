@@ -22,6 +22,8 @@ interface OAuthAttempt {
   success: boolean;
   error?: string;
   aborted?: boolean;
+  path?: string; // Track the path where attempt was made
+  isDoubleInit?: boolean; // Track if this is a double initialization
 }
 
 interface OAuthLoopState {
@@ -30,6 +32,8 @@ interface OAuthLoopState {
   circuitBreakerOpen: boolean;
   consecutiveFailures: number;
   totalAbortedRequests: number;
+  doubleInitDetections: number; // Track double initialization detections
+  lastDoubleInitTime: number | null; // Track when last double init was detected
 }
 
 export class OAuthInfiniteLoopPrevention {
@@ -83,7 +87,9 @@ export class OAuthInfiniteLoopPrevention {
       lastSuccessfulAuth: null,
       circuitBreakerOpen: false,
       consecutiveFailures: 0,
-      totalAbortedRequests: 0
+      totalAbortedRequests: 0,
+      doubleInitDetections: 0,
+      lastDoubleInitTime: null
     };
     this.saveState();
   }
@@ -185,15 +191,47 @@ export class OAuthInfiniteLoopPrevention {
   }
 
   /**
+   * Detect double initialization pattern
+   */
+  public detectDoubleInitialization(): boolean {
+    const now = Date.now();
+    const recentAttempts = this.state.attempts.filter(attempt => attempt.timestamp > now - 5000); // Last 5 seconds
+    
+    // Check if we have multiple attempts in a very short time from the same flow
+    if (recentAttempts.length >= 2) {
+      const intervals = [];
+      for (let i = 1; i < recentAttempts.length; i++) {
+        intervals.push(recentAttempts[i].timestamp - recentAttempts[i-1].timestamp);
+      }
+      
+      // If attempts are less than 200ms apart, it's likely double initialization
+      if (intervals.some(interval => interval < 200)) {
+        this.state.doubleInitDetections++;
+        this.state.lastDoubleInitTime = now;
+        this.saveState();
+        console.warn('🚨 Double initialization detected - multiple OAuth attempts within 200ms');
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  /**
    * Record an OAuth attempt
    */
-  public recordAttempt(type: 'auto' | 'manual' | 'retry', success: boolean, error?: string): void {
+  public recordAttempt(type: 'auto' | 'manual' | 'retry', success: boolean, error?: string, path?: string): void {
+    const now = Date.now();
+    const isDoubleInit = this.detectDoubleInitialization();
+    
     const attempt: OAuthAttempt = {
-      timestamp: Date.now(),
+      timestamp: now,
       type,
       success,
       error,
-      aborted: error?.includes('aborted') || error?.includes('NS_BINDING_ABORTED') || false
+      aborted: error?.includes('aborted') || error?.includes('NS_BINDING_ABORTED') || false,
+      path: path || window.location.pathname,
+      isDoubleInit
     };
 
     this.state.attempts.push(attempt);
@@ -285,6 +323,20 @@ export class OAuthInfiniteLoopPrevention {
         indicators.push('Very short intervals between attempts');
         confidence += 15;
       }
+    }
+
+    // Check for double initialization pattern
+    const doubleInitAttempts = recentAttempts.filter(attempt => attempt.isDoubleInit);
+    if (doubleInitAttempts.length >= 2 || this.state.doubleInitDetections >= 2) {
+      indicators.push('Double initialization pattern detected');
+      confidence += 35;
+    }
+
+    // Check for OAuth callback path issues
+    const callbackAttempts = recentAttempts.filter(attempt => attempt.path === '/oauth/callback');
+    if (callbackAttempts.length >= 2 && callbackAttempts.some(a => !a.success)) {
+      indicators.push('OAuth callback page initialization issues');
+      confidence += 25;
     }
 
     const inLoop = confidence >= 50;
@@ -485,8 +537,8 @@ export function useOAuthLoopPrevention() {
     return oauthLoopPrevention.canAttemptOAuth(type);
   };
 
-  const recordAttempt = (type: 'auto' | 'manual' | 'retry', success: boolean, error?: string) => {
-    oauthLoopPrevention.recordAttempt(type, success, error);
+  const recordAttempt = (type: 'auto' | 'manual' | 'retry', success: boolean, error?: string, path?: string) => {
+    oauthLoopPrevention.recordAttempt(type, success, error, path);
   };
 
   const detectLoop = () => {

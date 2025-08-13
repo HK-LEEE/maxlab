@@ -313,16 +313,6 @@ export function isSafePageForTokenRefresh(): boolean {
     return false;
   }
   
-  // OAuth 관련 페이지들은 토큰 갱신 불허
-  const unsafePaths = [
-    '/login',
-    '/logout', 
-    '/oauth/callback',
-    '/oauth/authorize',
-    '/signup',
-    '/register'
-  ];
-  
   // OAuth 콜백 처리 중인지 확인 (URL 파라미터 기준)
   const urlParams = new URLSearchParams(window.location.search);
   const isOAuthCallback = urlParams.has('code') && urlParams.has('state');
@@ -339,7 +329,7 @@ export function isSafePageForTokenRefresh(): boolean {
     window.location.search.includes('oauth_callback_processing')
   );
 
-  // 🔒 SECURITY: Check if OAuth callback was recently completed
+  // 🔒 CRITICAL FIX: Check if OAuth callback was recently completed (within iframe/popup)
   const isRecentOAuthComplete = Boolean(
     currentPath === '/oauth/callback' && 
     !isOAuthInProgress && 
@@ -347,6 +337,37 @@ export function isSafePageForTokenRefresh(): boolean {
     !isImplicitOAuth &&
     localStorage.getItem('accessToken') // User is already authenticated
   );
+  
+  // 🔒 CRITICAL FIX: If on /oauth/callback with no active OAuth flow and user is authenticated,
+  // it's safe for silent auth (this handles the iframe case after successful auth)
+  const isOAuthCallbackSafeForSilentAuth = Boolean(
+    currentPath === '/oauth/callback' &&
+    !urlParams.has('code') &&  // No authorization code in URL
+    !urlParams.has('error') &&  // No error in URL
+    !isOAuthInProgress &&       // No OAuth flow in progress
+    localStorage.getItem('accessToken') // User has valid token
+  );
+  
+  // OAuth 관련 페이지들은 토큰 갱신 불허 (with exception for safe callback state)
+  const unsafePaths = [
+    '/login',
+    '/logout', 
+    '/oauth/authorize',
+    '/signup',
+    '/register'
+  ];
+  
+  // Special handling for /oauth/callback
+  if (currentPath === '/oauth/callback') {
+    // Allow silent auth if it's safe (no active OAuth flow)
+    if (isOAuthCallbackSafeForSilentAuth) {
+      console.log('✅ OAuth callback page is safe for silent auth (no active flow)');
+      return true;
+    }
+    // Otherwise, it's unsafe
+    console.log('🚫 OAuth callback page has active flow, not safe for silent auth');
+    return false;
+  }
 
   // 글로벌 OAuth 콜백 처리 상태 확인 (DOM 기반)
   const isOAuthCallbackProcessing = Boolean(

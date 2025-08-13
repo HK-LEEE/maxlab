@@ -327,7 +327,8 @@ https://max.dwchem.co.kr/api/oauth/userinfo
 Object { eventId: "evt_1755072733892_rgbxl175", timestamp: "2025-08-13T08:12:13.892Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", sessionId: "sess_1755072730513_gp8ia7x5mql", details: {…}, context: {…}, metadata: undefined }
 index-BeMjOGix.js:263:40412
 17:12:13.892 ✅ Refresh token encrypted, stored, and verified securely index-BeMjOGix.js:263:57922
-17:12:13.892 💾 Tokens stored successfully (including refresh token) index-BeMjOGix.js:263:56533
+17:12:13.892 💾 Tokens stored successfull
+y (including refresh token) index-BeMjOGix.js:263:56533
 17:12:13.892 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:30757
 17:12:13.892 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-BeMjOGix.js:263:32586
 17:12:13.892 ✅ Cleared tokens for 0 other users index-BeMjOGix.js:263:32749
