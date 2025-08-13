@@ -48,7 +48,9 @@ export class OAuthInfiniteLoopPrevention {
     lastSuccessfulAuth: null,
     circuitBreakerOpen: false,
     consecutiveFailures: 0,
-    totalAbortedRequests: 0
+    totalAbortedRequests: 0,
+    doubleInitDetections: 0,
+    lastDoubleInitTime: null
   };
 
   constructor() {
