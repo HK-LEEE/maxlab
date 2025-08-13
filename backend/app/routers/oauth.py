@@ -30,6 +30,7 @@ ALLOWED_REDIRECT_PATTERNS = [
     r"^https://maxlab\.dwchem\.co\.kr/$",  # Production root (dwchem)
     r"^https://[a-zA-Z0-9-]+\.dwchem\.co\.kr/$",  # Production root (dwchem)
     r"^https://maxlab\.dwchem\.co\.kr/login(\?.*)?$",  # Production login (dwchem) with optional query params for logout
+    r"^https://max\.dwchem\.co\.kr/login(\?.*)?$",  # Production login (dwchem) with optional query params for logout
 ]
 
 def validate_redirect_uri(redirect_uri: str) -> bool:
