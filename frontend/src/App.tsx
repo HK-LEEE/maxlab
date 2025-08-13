@@ -86,6 +86,25 @@ const isPublicRoute = () => {
 function App() {
   devLog.debug('App component rendering');
   
+  // CRITICAL FIX: Save original navigation URL before any redirects
+  useEffect(() => {
+    // Only save if not already on an error page or auth callback
+    const currentUrl = window.location.href;
+    const pathname = window.location.pathname;
+    
+    // Don't save auth-related URLs as original navigation
+    const isAuthRelatedPage = pathname === '/oauth/callback' || 
+                              pathname === '/login' ||
+                              currentUrl.includes('error=') ||
+                              currentUrl.includes('error_description=');
+    
+    if (!isAuthRelatedPage && !sessionStorage.getItem('original_navigation_url')) {
+      console.log('📍 Saving original navigation URL:', currentUrl);
+      sessionStorage.setItem('original_navigation_url', currentUrl);
+      localStorage.setItem('pre_auth_url', currentUrl);
+    }
+  }, []); // Run only once on mount
+  
   // Enhanced auth state management
   const { 
     isAuthenticated,

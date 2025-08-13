@@ -713,31 +713,76 @@ export const authService = {
             }
           }
           
+          // SAFETY CHECK: Detect redirect loop pattern
+          const recentAttempts = sessionStorage.getItem('sso_refresh_attempts');
+          if (recentAttempts) {
+            const attempts = JSON.parse(recentAttempts);
+            const recentCount = attempts.filter((t: number) => Date.now() - t < 60000).length;
+            if (recentCount >= 3) {
+              console.log('🚨 Too many SSO refresh attempts, possible redirect loop detected');
+              // Clear SSO metadata to break the loop
+              localStorage.removeItem('auth_method');
+              localStorage.removeItem('max_platform_session');
+              localStorage.removeItem('token_renewable_via_sso');
+              sessionStorage.setItem('preventSilentAuth', 'true');
+              return {
+                success: false,
+                error: 'Too many authentication attempts - please login manually'
+              };
+            }
+          }
+          
           // For SSO sessions, redirect to MAX Platform for token refresh
           try {
             const currentOrigin = window.location.origin;
             const redirectUri = `${currentOrigin}/oauth/callback`;
             const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010';
             
-            // 🔒 CRITICAL: Store return URL in localStorage (more persistent than sessionStorage)
-            // Also include timestamp to prevent stale redirects
+            // 🔒 CRITICAL FIX: Validate return URL before saving
+            // Don't save error callback URLs as return URLs - this causes infinite loops!
+            let returnUrl = window.location.href;
+            const currentUrl = new URL(returnUrl);
+            
+            // Check if current URL is already an error callback
+            const isErrorCallback = currentUrl.pathname === '/oauth/callback' && 
+                                  (currentUrl.searchParams.has('error') || 
+                                   currentUrl.searchParams.has('error_description'));
+            
+            if (isErrorCallback) {
+              console.log('⚠️ Current URL is an error callback, using safe fallback');
+              // Use the stored original URL or fallback to dashboard
+              const storedOriginalUrl = sessionStorage.getItem('original_navigation_url') || 
+                                       localStorage.getItem('pre_auth_url');
+              returnUrl = storedOriginalUrl || `${currentOrigin}/dashboard`;
+              console.log('✅ Using safe return URL:', returnUrl);
+            }
+            
+            // Store the safe return URL
             const returnData = {
-              url: window.location.href,
+              url: returnUrl,
               timestamp: Date.now(),
               attempt: 'sso_refresh'
             };
             localStorage.setItem('sso_refresh_return_data', JSON.stringify(returnData));
-            sessionStorage.setItem('sso_refresh_return_url', window.location.href); // Keep for backward compatibility
+            sessionStorage.setItem('sso_refresh_return_url', returnUrl); // Keep for backward compatibility
             
             // Add state parameter to track this is an SSO refresh attempt
             const state = `sso_refresh_${Date.now()}`;
             const ssoRefreshUrl = `${backendUrl}/oauth/sso-token-refresh?redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
             
             console.log('🔄 SSO Session: Redirecting to SSO token refresh endpoint...');
-            console.log('📍 Return URL saved:', window.location.href);
+            console.log('📍 Return URL saved:', returnUrl);
             
             // Record attempt time to prevent rapid retries
             sessionStorage.setItem('last_sso_attempt', Date.now().toString());
+            
+            // Track attempts for loop detection
+            const existingAttempts = sessionStorage.getItem('sso_refresh_attempts');
+            const attempts = existingAttempts ? JSON.parse(existingAttempts) : [];
+            attempts.push(Date.now());
+            // Keep only recent attempts (last 2 minutes)
+            const recentAttempts = attempts.filter((t: number) => Date.now() - t < 120000);
+            sessionStorage.setItem('sso_refresh_attempts', JSON.stringify(recentAttempts));
             
             // Redirect to SSO token refresh endpoint
             window.location.href = ssoRefreshUrl;

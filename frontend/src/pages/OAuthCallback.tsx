@@ -1260,11 +1260,25 @@ export const OAuthCallback: React.FC = () => {
             toast.success('Successfully logged in!');
             
             // 🔒 SECURITY: Immediate redirect to prevent auth loop
-            const redirectTo = sessionStorage.getItem('oauthRedirectTo') || '/';
+            // CRITICAL FIX: Clean up all stored URLs after successful auth
+            const redirectTo = sessionStorage.getItem('oauthRedirectTo') || 
+                             sessionStorage.getItem('original_navigation_url') || 
+                             localStorage.getItem('pre_auth_url') || 
+                             '/';
+            
+            // Clean up all auth-related storage
             sessionStorage.removeItem('oauthRedirectTo');
             sessionStorage.removeItem('oauth_flow_in_progress');
             sessionStorage.removeItem('oauth_callback_processing');
+            sessionStorage.removeItem('original_navigation_url');
+            sessionStorage.removeItem('sso_refresh_return_url');
+            sessionStorage.removeItem('last_sso_attempt');
+            sessionStorage.removeItem('last_sso_failure');
+            localStorage.removeItem('pre_auth_url');
+            localStorage.removeItem('sso_refresh_return_data');
             document.body.removeAttribute('data-oauth-processing');
+            
+            console.log('✅ Authentication successful, redirecting to:', redirectTo);
             
             // Force immediate redirect using window.location for security
             window.location.replace(redirectTo);
