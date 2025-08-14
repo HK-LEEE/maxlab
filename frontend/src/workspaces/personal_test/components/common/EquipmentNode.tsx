@@ -348,13 +348,30 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     (window as any)[globalScrollKey] = active;
   };
   
+  // Track global auto-scroll changes
+  const [globalAutoScroll, setGlobalAutoScroll] = useState((window as any).autoScrollMeasurements);
+  
+  useEffect(() => {
+    const checkGlobalState = () => {
+      const currentGlobal = (window as any).autoScrollMeasurements;
+      if (currentGlobal !== globalAutoScroll) {
+        setGlobalAutoScroll(currentGlobal);
+      }
+    };
+    
+    // Check for changes periodically
+    const interval = setInterval(checkGlobalState, 500);
+    return () => clearInterval(interval);
+  }, [globalAutoScroll]);
+  
   // Initialize or update scroll based on conditions (not on data changes)
   useEffect(() => {
     const timer = setTimeout(() => {
       const isMonitorPage = window.location.pathname.includes('monitor') || 
                            window.location.pathname.includes('public');
-      // Use autoScroll from props instead of global value
-      const shouldScroll = isMonitorPage && data.autoScroll;
+      // Use autoScroll from props if available, otherwise use global value
+      const autoScrollValue = data.autoScroll !== undefined ? data.autoScroll : (window as any).autoScrollMeasurements;
+      const shouldScroll = isMonitorPage && autoScrollValue;
       
       // Debug logging for auto-scroll conditions
       // Auto-scroll debug console log removed
@@ -462,7 +479,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     }, 250); // Debounce to prevent rapid state changes
 
     return () => clearTimeout(timer);
-  }, [actualNodeHeight, isResizing, id, data.autoScroll, data.measurements]); // Detect size and resize changes for scroll recalculation
+  }, [actualNodeHeight, isResizing, id, data.measurements, globalAutoScroll]); // Detect size and resize changes for scroll recalculation
   
   // Cleanup scroll interval on unmount
   useEffect(() => {

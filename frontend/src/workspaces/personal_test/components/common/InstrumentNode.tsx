@@ -318,17 +318,34 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     (window as any)[globalScrollKey] = active;
   };
   
+  // Track global auto-scroll changes
+  const [globalAutoScroll, setGlobalAutoScroll] = useState((window as any).autoScrollMeasurements);
+  
+  useEffect(() => {
+    const checkGlobalState = () => {
+      const currentGlobal = (window as any).autoScrollMeasurements;
+      if (currentGlobal !== globalAutoScroll) {
+        setGlobalAutoScroll(currentGlobal);
+      }
+    };
+    
+    // Check for changes periodically
+    const interval = setInterval(checkGlobalState, 500);
+    return () => clearInterval(interval);
+  }, [globalAutoScroll]);
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       const isMonitorPage = window.location.pathname.includes('monitor') || 
                            window.location.pathname.includes('public');
-      // Use autoScroll from props instead of global value
-      const shouldScroll = isMonitorPage && data.autoScroll;
+      // Use autoScroll from props if available, otherwise use global value
+      const autoScrollValue = data.autoScroll !== undefined ? data.autoScroll : globalAutoScroll;
+      const shouldScroll = isMonitorPage && autoScrollValue;
       
       log.debug('InstrumentNode auto-scroll check', {
         nodeId: id,
         isMonitorPage,
-        autoScroll: data.autoScroll,
+        autoScroll: autoScrollValue,
         shouldScroll,
         hasMeasurements: !!data.measurements,
         measurementCount: data.measurements?.length || 0
@@ -391,7 +408,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [actualNodeHeight, isResizing, id, data.measurements, data.autoScroll]);
+  }, [actualNodeHeight, isResizing, id, data.measurements, globalAutoScroll]);
   
   // Cleanup scroll interval on unmount
   useEffect(() => {

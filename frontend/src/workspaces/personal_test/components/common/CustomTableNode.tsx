@@ -281,13 +281,30 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
     executeQuery();
   }, [executeQuery]);
 
+  // Track global auto-scroll changes
+  const [globalAutoScroll, setGlobalAutoScroll] = useState((window as any).autoScrollMeasurements);
+  
+  useEffect(() => {
+    const checkGlobalState = () => {
+      const currentGlobal = (window as any).autoScrollMeasurements;
+      if (currentGlobal !== globalAutoScroll) {
+        setGlobalAutoScroll(currentGlobal);
+      }
+    };
+    
+    // Check for changes periodically
+    const interval = setInterval(checkGlobalState, 500);
+    return () => clearInterval(interval);
+  }, [globalAutoScroll]);
+  
   // Auto-scroll functionality for table data
   useEffect(() => {
     const timer = setTimeout(() => {
       const isMonitorPage = window.location.pathname.includes('monitor') || 
                            window.location.pathname.includes('public');
-      // Use autoScroll from props instead of global value
-      const shouldScroll = isMonitorPage && data.autoScroll;
+      // Use autoScroll from props if available, otherwise use global value
+      const autoScrollValue = data.autoScroll !== undefined ? data.autoScroll : globalAutoScroll;
+      const shouldScroll = isMonitorPage && autoScrollValue;
       
       // Debug logging for auto-scroll conditions
       // Auto-scroll debug console log removed
@@ -386,7 +403,7 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
     }, 100); // Small delay to ensure DOM is ready
 
     return () => clearTimeout(timer);
-  }, [tableData, actualNodeHeight, isLoading, error, id, data.autoScroll]);
+  }, [tableData, actualNodeHeight, isLoading, error, id, globalAutoScroll]);
 
   // Cleanup scroll interval on unmount
   useEffect(() => {

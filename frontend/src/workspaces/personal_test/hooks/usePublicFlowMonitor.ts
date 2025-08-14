@@ -131,12 +131,11 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       if (isInitialLoad && flowData.flow_data) {
         // Process nodes to ensure proper sizing like in useFlowEditor
         const processedNodes = (flowData.flow_data.nodes || []).map((node: any) => {
-          // Add autoScroll to all nodes that support it
-          const nodeWithAutoScroll = {
+          // Don't add autoScroll here, let global value handle it
+          const nodeWithData = {
             ...node,
             data: {
-              ...node.data,
-              autoScroll: autoScroll // Add current autoScroll state
+              ...node.data
             }
           };
           
@@ -160,7 +159,7 @@ export const usePublicFlowMonitor = (publishToken: string) => {
             
             
             return {
-              ...nodeWithAutoScroll,
+              ...nodeWithData,
               style: {
                 // PRESERVE stored resized dimensions - they take priority over nodeSize defaults
                 width: finalWidth,
@@ -168,12 +167,12 @@ export const usePublicFlowMonitor = (publishToken: string) => {
                 ...node.style // Preserve other style properties
               },
               data: {
-                ...nodeWithAutoScroll.data,
+                ...nodeWithData.data,
                 nodeSize: savedNodeSize // Ensure nodeSize is in data
               }
             };
           }
-          return nodeWithAutoScroll;
+          return nodeWithData;
         });
         
         setNodes(processedNodes);
@@ -734,24 +733,9 @@ export const usePublicFlowMonitor = (publishToken: string) => {
     return () => clearInterval(interval);
   }, [autoRefresh, flow, loadFlow, refreshInterval]);
 
-  // Set global auto-scroll state and update nodes with autoScroll prop
+  // Set global auto-scroll state
   useEffect(() => {
     (window as any).autoScrollMeasurements = autoScroll;
-    
-    // Update all nodes with the new autoScroll value
-    setNodes((currentNodes) => currentNodes.map((node) => {
-      // Only update nodes that support auto-scroll
-      if (node.type === 'equipment' || node.type === 'instrument' || node.type === 'table') {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            autoScroll: autoScroll
-          }
-        };
-      }
-      return node;
-    }));
   }, [autoScroll]);
 
   return {
