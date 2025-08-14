@@ -852,6 +852,13 @@ async def sso_token_refresh(
         # Use default redirect URI if none provided
         if not redirect_uri:
             redirect_uri = f"{request.base_url}oauth/callback" if request else "/"
+        
+        # 🔑 Extract session token from cookies to pass as login_hint
+        session_token = None
+        if request.cookies:
+            session_token = request.cookies.get('session_id') or request.cookies.get('session_token')
+            if session_token:
+                logger.info(f"🔑 Found session token in cookies for SSO refresh: {session_token[:8]}...")
             
         # MAX Platform에 silent 재인증 요청을 위한 URL 생성
         # prompt=none을 사용하여 사용자 상호작용 없이 재인증 시도
@@ -863,6 +870,10 @@ async def sso_token_refresh(
             "prompt": "none",  # 🔑 Silent 재인증
             "state": state or f"sso_refresh_{int(time.time())}"
         }
+        
+        # Add session token as login_hint for session recovery
+        if session_token:
+            auth_params["login_hint"] = session_token
         
         query_string = "&".join([f"{k}={v}" for k, v in auth_params.items()])
         max_platform_auth_url = f"{settings.AUTH_SERVER_URL}/api/oauth/authorize?{query_string}"
