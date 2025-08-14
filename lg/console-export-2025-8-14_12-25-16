@@ -1,0 +1,120 @@
+12:25:01.530 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-B6qVxQMt.js:228:5827
+12:25:01.530 ⚠️ Access token expired locally, will attempt refresh with refresh token index-B6qVxQMt.js:228:6294
+12:25:01.531 ❌ No refresh token available, clearing auth completely index-B6qVxQMt.js:228:6682
+12:25:01.534 🛡️ New CSRF token generated index-B6qVxQMt.js:263:6222
+12:25:01.534 🛡️ CSRF protection initialized with new token index-B6qVxQMt.js:263:5768
+12:25:01.541 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-B6qVxQMt.js:263:21207
+12:25:01.545 🔀 OAuth Coordinator [03:25:01][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-B6qVxQMt.js:263:51842
+12:25:01.560 📍 Saving original navigation URL: https://maxlab.dwchem.co.kr/ index-B6qVxQMt.js:851:102738
+12:25:01.560 ✅ Auth sync initialized with BroadcastChannel index-B6qVxQMt.js:263:95165
+12:25:01.560 🔒 Initializing cross-domain logout listener index-B6qVxQMt.js:851:105423
+12:25:01.561 📡 SSO: PostMessage listener registered index-B6qVxQMt.js:851:108415
+12:25:01.561 🚀 Starting auth initialization (single instance guaranteed) index-B6qVxQMt.js:851:112916
+12:25:01.561 ⚠️ Cached token locally invalid or expired, attempting refresh index-B6qVxQMt.js:851:114688
+12:25:01.561 🔄 Force refresh requested, bypassing token validity check index-B6qVxQMt.js:263:71163
+12:25:01.561 🔍 Found refresh token metadata, will verify encrypted token exists index-B6qVxQMt.js:263:59219
+12:25:01.561 🔍 Verifying token consistency... index-B6qVxQMt.js:263:63935
+12:25:01.562 🔄 Attempting refresh with refresh token... index-B6qVxQMt.js:263:72769
+12:25:01.568 🔓 Token decrypted successfully index-B6qVxQMt.js:263:28289
+12:25:01.568 🔓 Retrieved encrypted refresh token index-B6qVxQMt.js:263:57085
+12:25:01.568 ✅ Token consistency verified - metadata and token both exist index-B6qVxQMt.js:263:64506
+12:25:01.570 🔓 Token decrypted successfully index-B6qVxQMt.js:263:28289
+12:25:01.570 🔓 Retrieved encrypted refresh token index-B6qVxQMt.js:263:57085
+12:25:01.570 🔄 Attempting refresh with refresh token... index-B6qVxQMt.js:263:53138
+12:25:01.570 📡 Auth Server URL: https://max.dwchem.co.kr index-B6qVxQMt.js:263:53232
+12:25:01.570 🔑 Client ID: maxlab index-B6qVxQMt.js:263:53269
+12:25:01.570 🔐 Has Client Secret: false index-B6qVxQMt.js:263:53312
+12:25:01.570 🎟️ Refresh Token Available: true index-B6qVxQMt.js:263:53369
+12:25:01.570 🎟️ Refresh Token Prefix: SpofFdXA6g... index-B6qVxQMt.js:263:53417
+12:25:01.570 🔀 OAuth Coordinator [03:25:01][Q:0|A:0]: 📝 Queuing sync request: sync_1755141901570_7jcvq8myv 
+Object { url: "https://max.dwchem.co.kr/api/oauth/token", priority: 1 }
+index-B6qVxQMt.js:263:51793
+12:25:01.571 🔀 OAuth Coordinator [03:25:01][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-B6qVxQMt.js:263:51842
+12:25:01.571 🔀 OAuth Coordinator [03:25:01][Q:1|A:1]: 🚀 Processing sync request: sync_1755141901570_7jcvq8myv index-B6qVxQMt.js:263:51842
+12:25:01.601 ✅ OAuth request completed in 30ms index-B6qVxQMt.js:263:66795
+12:25:01.601 🔀 OAuth Coordinator [03:25:01][Q:1|A:0]: ✅ sync request completed: sync_1755141901570_7jcvq8myv index-B6qVxQMt.js:263:51842
+12:25:01.601 ❌ Refresh token renewal failed: DOMException: The operation was aborted. 
+    N https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+    cleanupRequest https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+    queueRequest https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+index-B6qVxQMt.js:263:55513
+12:25:01.601 🔒 Security event logged: refresh_token_renewal_failed (low) 
+Object { eventId: "evt_1755141901602_ev1p4bv3", timestamp: "2025-08-14T03:25:01.602Z", eventType: "refresh_token_renewal_failed", severity: "low", source: "frontend", userId: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", sessionId: "sess_1755141901543_rzfgo7s6zv", details: {…}, context: {…}, metadata: undefined }
+index-B6qVxQMt.js:263:40412
+12:25:01.601 ❌ Refresh token renewal failed: DOMException: The operation was aborted. 
+    N https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+    cleanupRequest https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+    queueRequest https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+index-B6qVxQMt.js:263:73064
+12:25:01.601 🔄 Refresh token failed, trying silent auth as fallback... index-B6qVxQMt.js:263:71759
+12:25:01.601 🔄 Attempting token refresh with fallback chain... index-B6qVxQMt.js:265:11496
+12:25:01.603 🔓 Token decrypted successfully index-B6qVxQMt.js:263:28289
+12:25:01.603 🔓 Retrieved encrypted refresh token index-B6qVxQMt.js:263:57085
+12:25:01.603 ✅ Refresh token is valid index-B6qVxQMt.js:263:59800
+12:25:01.603 🎟️ Attempting refresh with refresh token... index-B6qVxQMt.js:265:15168
+12:25:01.604 🔓 Token decrypted successfully index-B6qVxQMt.js:263:28289
+12:25:01.605 🔓 Retrieved encrypted refresh token index-B6qVxQMt.js:263:57085
+12:25:01.605 🔄 Attempting refresh with refresh token... index-B6qVxQMt.js:263:53138
+12:25:01.605 📡 Auth Server URL: https://max.dwchem.co.kr index-B6qVxQMt.js:263:53232
+12:25:01.605 🔑 Client ID: maxlab index-B6qVxQMt.js:263:53269
+12:25:01.605 🔐 Has Client Secret: false index-B6qVxQMt.js:263:53312
+12:25:01.605 🎟️ Refresh Token Available: true index-B6qVxQMt.js:263:53369
+12:25:01.605 🎟️ Refresh Token Prefix: SpofFdXA6g... index-B6qVxQMt.js:263:53417
+12:25:01.605 🔀 OAuth Coordinator [03:25:01][Q:0|A:0]: 📝 Queuing sync request: sync_1755141901605_l8sh6qc3e 
+Object { url: "https://max.dwchem.co.kr/api/oauth/token", priority: 1 }
+index-B6qVxQMt.js:263:51793
+12:25:01.626 ✅ OAuth request completed in 21ms index-B6qVxQMt.js:263:66795
+12:25:01.626 🔀 OAuth Coordinator [03:25:01][Q:1|A:0]: ✅ sync request completed: sync_1755141901605_l8sh6qc3e index-B6qVxQMt.js:263:51842
+12:25:01.627 ❌ Refresh token renewal failed: DOMException: The operation was aborted. 
+    N https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+    cleanupRequest https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+    queueRequest https://maxlab.dwchem.co.kr/assets/index-B6qVxQMt.js:263
+index-B6qVxQMt.js:263:55513
+12:25:01.627 🔒 Security event logged: refresh_token_renewal_failed (low) 
+Object { eventId: "evt_1755141901627_atmead3d", timestamp: "2025-08-14T03:25:01.627Z", eventType: "refresh_token_renewal_failed", severity: "low", source: "frontend", userId: "21a2aaa7-444a-4038-bda3-d8bf2c4ef162", sessionId: "sess_1755141901543_rzfgo7s6zv", details: {…}, context: {…}, metadata: undefined }
+index-B6qVxQMt.js:263:40412
+12:25:01.627 ⚠️ Refresh token failed, falling back to silent auth: The operation was aborted. index-B6qVxQMt.js:265:16058
+12:25:01.627 🔇 Falling back to silent authentication... index-B6qVxQMt.js:265:16864
+12:25:01.627 🔇 Attempting silent SSO login... index-B6qVxQMt.js:265:4480
+12:25:01.627 🔀 OAuth Coordinator [03:25:01][Q:1|A:0]: 📝 Queuing silent_login request: silent_login_1755141901628_42vw7umsr 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-B6qVxQMt.js:263:51793
+12:25:01.627 ✅ Silent auth conditions met, starting... index-B6qVxQMt.js:258:20442
+12:25:01.628 🔇 Starting silent authentication... index-B6qVxQMt.js:258:16370
+12:25:01.672 🔀 OAuth Coordinator [03:25:01][Q:2|A:1]: 🚀 Processing sync request: sync_1755141901605_l8sh6qc3e index-B6qVxQMt.js:263:51842
+12:25:04.852 🔀 OAuth Coordinator [03:25:04][Q:2|A:1]: ✅ silent_login request completed: silent_login_1755141901628_42vw7umsr index-B6qVxQMt.js:263:51842
+12:25:04.852 🚫 Silent auth request aborted by coordinator index-B6qVxQMt.js:258:16089
+12:25:04.852 ✅ Silent SSO login successful index-B6qVxQMt.js:265:4639
+12:25:04.852 ✅ Silent auth completion recorded for grace period index-B6qVxQMt.js:263:78324
+12:25:04.852 🔄 Calling OAuth userinfo endpoint: https://max.dwchem.co.kr/api/oauth/userinfo index-B6qVxQMt.js:258:14663
+12:25:04.862 🔐 Storing refresh token securely... index-B6qVxQMt.js:263:57584
+12:25:04.862 🔐 Attempting to encrypt and store token (attempt 1/3)... index-B6qVxQMt.js:263:27201
+12:25:04.939 ✅ Token encrypted and stored successfully index-B6qVxQMt.js:263:27426
+12:25:04.941 🔓 Token decrypted successfully index-B6qVxQMt.js:263:28289
+12:25:04.941 🔒 Security event logged: encryption_token_encrypted_stored (low) 
+Object { eventId: "evt_1755141904941_7hhvrh0m", timestamp: "2025-08-14T03:25:04.941Z", eventType: "encryption_token_encrypted_stored", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1755141901543_rzfgo7s6zv", details: {…}, context: {…}, metadata: undefined }
+index-B6qVxQMt.js:263:40412
+12:25:04.941 ✅ Refresh token encrypted, stored, and verified securely index-B6qVxQMt.js:263:57922
+12:25:04.941 💾 Tokens stored successfully (including refresh token) index-B6qVxQMt.js:263:56533
+12:25:04.941 🔐 Saving tokens for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-B6qVxQMt.js:263:30757
+12:25:04.941 🧹 Clearing tokens for all users except: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-B6qVxQMt.js:263:32586
+12:25:04.941 ✅ Cleared tokens for 0 other users index-B6qVxQMt.js:263:32749
+12:25:04.941 🔐 Attempting to encrypt and store token (attempt 1/3)... index-B6qVxQMt.js:263:27201
+12:25:05.018 ✅ Token encrypted and stored successfully index-B6qVxQMt.js:263:27426
+12:25:05.018 ✅ Tokens saved successfully for user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162 index-B6qVxQMt.js:263:31327
+12:25:05.018 🔓 Cleared logout flags after successful silent login index-B6qVxQMt.js:265:6063
+12:25:05.018 ✅ Silent auth fallback successful index-B6qVxQMt.js:265:16979
+12:25:05.018 ✅ SSO refresh successful - circuit breaker reset index-B6qVxQMt.js:263:98827
+12:25:05.018 ✅ Token refresh successful (silent auth fallback) index-B6qVxQMt.js:263:71938
+12:25:05.018 🔄 Auth state change: idle → ready 
+Object { isAuthenticated: true, hasUser: true, stackTrace: (2) […] }
+index-B6qVxQMt.js:227:11473
+12:25:05.019 🚫 Token was refreshed recently, skipping to prevent excessive refresh attempts index-B6qVxQMt.js:258:21898
+12:25:05.023 🔐 Page not safe for token refresh, disabling auto refresh: / index-B6qVxQMt.js:265:22969
+12:25:05.023 📡 API: Getting workspace tree, parentId: undefined index-B6qVxQMt.js:777:27375
+12:25:05.070 📡 API: Workspace tree response: 200 
+Object { workspaces: (4) […], total: 4 }
+index-B6qVxQMt.js:777:27512
+12:25:08.098 🚫 Token was refreshed recently, skipping to prevent excessive refresh attempts index-B6qVxQMt.js:258:21898
