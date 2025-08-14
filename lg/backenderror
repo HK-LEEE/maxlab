@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 2025-08-14 14:46:41.842 [INFO] app.services.auth_service:63 - ✅ Created Redis session e1536a47-2da0-4ac6-ae6e-cfc7db2f3356 for user krn@test.com
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 2025-08-14 14:46:41.845 [WARNING] app.routers.auth:546 - Failed to store JWT token hash for revocation tracking: (psycopg2.errors.UndefinedColumn) column "grant_types" of relation "oauth_clients" does not exist
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: LINE 3: ...        (client_id, client_secret, redirect_uris, grant_type...
@@ -716,6 +717,8 @@
 =======
 =======
 >>>>>>> parent of 1e6da3d (log)
+=======
+>>>>>>> parent of 1e6da3d (log)
 0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.430 [DEBUG] app.core.oauth_redis_integration:218 - 🍪 Cookie header: session_id=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; session_token=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; user_id=21a2aaa7-444a-4038-bda3-d8bf2c4ef162; session_id=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; session_token=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; user_id=21a2aaa7-444a-4038-bda3-d8bf2c4ef162
 0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.430 [DEBUG] app.core.oauth_redis_integration:219 - 🍪 Referer: https://maxlab.dwchem.co.kr/
 0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.431 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f
@@ -898,6 +901,9 @@
 2|maxplatform-backend-8002  | 2025-08-14T12:06:51: 2025-08-14 12:06:51.790 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
 2|maxplatform-backend-8002  | 2025-08-14T12:06:51: 2025-08-14 12:06:51.791 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s)
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 1e6da3d (log)
+=======
 >>>>>>> parent of 1e6da3d (log)
 =======
 >>>>>>> parent of 1e6da3d (log)
