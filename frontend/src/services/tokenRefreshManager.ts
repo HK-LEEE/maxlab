@@ -365,7 +365,7 @@ export class TokenRefreshManager {
           
           // 첫 번째 에러 발생 시 차등적 재시도 정책 적용
           if (retryCount === 0) {
-            dynamicMaxRetries = this.getMaxRetries('SILENT_AUTH_ERROR', lastError);
+            dynamicMaxRetries = this.getMaxRetries('SILENT_AUTH_ERROR', lastError || undefined);
           }
           
           console.log(`❌ Silent auth attempt ${retryCount + 1}/${dynamicMaxRetries} failed:`, lastError);
@@ -384,7 +384,7 @@ export class TokenRefreshManager {
         
         // 첫 번째 에러 발생 시 차등적 재시도 정책 적용
         if (retryCount === 0) {
-          dynamicMaxRetries = this.getMaxRetries('NETWORK_ERROR', lastError);
+          dynamicMaxRetries = this.getMaxRetries('NETWORK_ERROR', lastError || undefined);
         }
         
         console.error(`❌ Silent auth retry ${retryCount + 1}/${dynamicMaxRetries} error:`, lastError);
