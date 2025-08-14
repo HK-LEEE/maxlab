@@ -142,7 +142,33 @@ apiClient.interceptors.response.use(
           throw new Error('Token refresh failed');
         }
       } catch (refreshError) {
-        console.error('❌ Token refresh error:', refreshError);
+        const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError);
+        console.error('❌ Token refresh error:', errorMessage);
+        
+        // 차등적 재시도 정책 분석 및 로깅
+        let maxRetries = 3; // 기본값
+        let reason = 'default policy';
+        
+        if (errorMessage.includes('Network Error') || 
+            errorMessage.includes('ERR_NETWORK') ||
+            errorMessage.includes('timeout') ||
+            errorMessage.includes('connection')) {
+          maxRetries = 5;
+          reason = 'network error - more tolerant policy';
+        } else if (errorMessage.includes('401') || 
+                   errorMessage.includes('unauthorized') ||
+                   errorMessage.includes('invalid_token')) {
+          maxRetries = 1;
+          reason = 'token error - immediate failure policy';
+        } else if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
+          maxRetries = 1;
+          reason = 'permission error - immediate failure policy';
+        } else if (errorMessage.includes('500') || errorMessage.includes('502') || errorMessage.includes('503')) {
+          maxRetries = 4;
+          reason = 'server error - moderate retry policy';
+        }
+        
+        console.log(`📋 API Client: Would use ${maxRetries} retries (${reason}) for error: ${errorMessage}`);
         
         // Token refresh failed, handle accordingly
         const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
@@ -150,12 +176,22 @@ apiClient.interceptors.response.use(
         if (isProcessFlowEditor) {
           // ProcessFlowEditor에서는 즉시 리다이렉트하지 않고 이벤트 발송
           window.dispatchEvent(new CustomEvent('auth:token-expired', { 
-            detail: { error, source: 'api', status, refreshFailed: true } 
+            detail: { 
+              error, 
+              source: 'api', 
+              status, 
+              refreshFailed: true,
+              errorAnalysis: { maxRetries, reason, errorMessage }
+            } 
           }));
         } else {
           // 다른 페이지에서는 자동 로그아웃 이벤트 발송
           window.dispatchEvent(new CustomEvent('auth:logout', {
-            detail: { reason: 'token_refresh_failed', source: 'api_interceptor' }
+            detail: { 
+              reason: 'token_refresh_failed', 
+              source: 'api_interceptor',
+              errorAnalysis: { maxRetries, reason, errorMessage }
+            }
           }));
         }
         
@@ -228,11 +264,41 @@ authClient.interceptors.response.use(
           throw new Error('Auth API token refresh failed');
         }
       } catch (refreshError) {
-        console.error('❌ Auth API token refresh error:', refreshError);
+        const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError);
+        console.error('❌ Auth API token refresh error:', errorMessage);
+        
+        // 차등적 재시도 정책 분석 및 로깅
+        let maxRetries = 3; // 기본값
+        let reason = 'default policy';
+        
+        if (errorMessage.includes('Network Error') || 
+            errorMessage.includes('ERR_NETWORK') ||
+            errorMessage.includes('timeout') ||
+            errorMessage.includes('connection')) {
+          maxRetries = 5;
+          reason = 'network error - more tolerant policy';
+        } else if (errorMessage.includes('401') || 
+                   errorMessage.includes('unauthorized') ||
+                   errorMessage.includes('invalid_token')) {
+          maxRetries = 1;
+          reason = 'token error - immediate failure policy';
+        } else if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
+          maxRetries = 1;
+          reason = 'permission error - immediate failure policy';
+        } else if (errorMessage.includes('500') || errorMessage.includes('502') || errorMessage.includes('503')) {
+          maxRetries = 4;
+          reason = 'server error - moderate retry policy';
+        }
+        
+        console.log(`📋 Auth Client: Would use ${maxRetries} retries (${reason}) for error: ${errorMessage}`);
         
         // For auth API failures, always trigger logout
         window.dispatchEvent(new CustomEvent('auth:logout', {
-          detail: { reason: 'auth_api_token_refresh_failed', source: 'auth_client' }
+          detail: { 
+            reason: 'auth_api_token_refresh_failed', 
+            source: 'auth_client',
+            errorAnalysis: { maxRetries, reason, errorMessage }
+          }
         }));
         
         return Promise.reject(error);

@@ -996,6 +996,38 @@ export const authService = {
     let refreshInterval: NodeJS.Timeout;
     let lastRefreshAttempt = 0;
     let consecutiveFailures = 0;
+    let lastError: string | null = null;
+    
+    // 차등적 재시도 정책: 오류 유형에 따른 maxRetries 결정
+    const getMaxRetries = (errorType: string, errorMessage?: string): number => {
+      let maxRetries = 3; // 기본값
+      let reason = 'default policy';
+      
+      if (errorType === 'NETWORK_ERROR' || 
+          errorMessage?.includes('Network Error') ||
+          errorMessage?.includes('ERR_NETWORK') ||
+          errorMessage?.includes('timeout') ||
+          errorMessage?.includes('connection')) {
+        maxRetries = 5; // 네트워크 오류는 더 관대하게
+        reason = 'network error - more tolerant retry policy';
+      } else if (errorType === 'INVALID_REFRESH_TOKEN' ||
+                 errorMessage?.includes('refresh_token_invalid') ||
+                 errorMessage?.includes('refresh_token_expired') ||
+                 errorMessage?.includes('invalid_token') ||
+                 errorMessage?.includes('401')) {
+        maxRetries = 1; // 토큰 오류는 즉시 처리
+        reason = 'token error - immediate failure policy';
+      } else if (errorMessage?.includes('403') || errorMessage?.includes('forbidden')) {
+        maxRetries = 1; // 권한 오류는 즉시 처리
+        reason = 'permission error - immediate failure policy';
+      } else if (errorMessage?.includes('500') || errorMessage?.includes('502') || errorMessage?.includes('503')) {
+        maxRetries = 4; // 서버 오류는 중간 정도
+        reason = 'server error - moderate retry policy';
+      }
+      
+      console.log(`📋 Max retries set to ${maxRetries} (${reason}) for error: ${errorMessage || errorType}`);
+      return maxRetries;
+    };
     
     const checkAndRefresh = async () => {
       try {
@@ -1032,13 +1064,21 @@ export const authService = {
           if (success) {
             console.log('✅ Auto token refresh successful');
             consecutiveFailures = 0; // 성공 시 실패 카운터 리셋
+            lastError = null; // 에러 정보 리셋
           } else {
             consecutiveFailures++;
-            console.log(`❌ Auto token refresh failed (attempt ${consecutiveFailures})`);
+            const currentError = lastError || 'unknown_error';
             
-            // 3번 연속 실패 시 로그아웃
-            if (consecutiveFailures >= 3) {
-              console.log('❌ Multiple consecutive refresh failures, logging out user');
+            // 차등적 재시도 정책 적용
+            const maxRetries = getMaxRetries('UNKNOWN', currentError);
+            
+            console.log(`❌ Auto token refresh failed (attempt ${consecutiveFailures}/${maxRetries})`);
+            console.log(`📊 Last error type: ${currentError}`);
+            
+            // 동적 실패 임계값에 도달 시 로그아웃
+            if (consecutiveFailures >= maxRetries) {
+              console.log(`❌ Reached maximum retries (${maxRetries}) for error type, logging out user`);
+              console.log(`📊 Failure pattern: ${maxRetries} consecutive failures with error: ${currentError}`);
               clearInterval(refreshInterval);
               
               // 자동 로그아웃 수행
@@ -1046,7 +1086,12 @@ export const authService = {
               
               // 로그인 페이지로 리다이렉트 (앱 수준에서 처리되도록 이벤트 발송)
               window.dispatchEvent(new CustomEvent('auth:logout', { 
-                detail: { reason: 'token_refresh_failed', attempts: consecutiveFailures } 
+                detail: { 
+                  reason: 'token_refresh_failed', 
+                  attempts: consecutiveFailures,
+                  maxRetries: maxRetries,
+                  lastError: currentError
+                } 
               }));
               return;
             }
@@ -1056,6 +1101,7 @@ export const authService = {
           if (consecutiveFailures > 0) {
             console.log('🔄 Token refresh no longer needed, resetting failure counter');
             consecutiveFailures = 0;
+            lastError = null;
           }
         }
 
@@ -1072,15 +1118,28 @@ export const authService = {
 
       } catch (error) {
         console.error('Auto token refresh check error:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        lastError = errorMessage;
         consecutiveFailures++;
         
-        // 치명적 에러 시에도 3회 실패 규칙 적용
-        if (consecutiveFailures >= 3) {
-          console.log('❌ Critical errors in token refresh, forcing logout');
+        // 차등적 재시도 정책 적용
+        const maxRetries = getMaxRetries('CRITICAL_ERROR', errorMessage);
+        
+        console.log(`❌ Critical error in token refresh (attempt ${consecutiveFailures}/${maxRetries}):`, errorMessage);
+        
+        // 동적 실패 임계값에 도달 시 로그아웃
+        if (consecutiveFailures >= maxRetries) {
+          console.log(`❌ Reached maximum retries (${maxRetries}) for critical error, forcing logout`);
+          console.log(`📊 Critical error pattern: ${maxRetries} consecutive failures with error: ${errorMessage}`);
           clearInterval(refreshInterval);
           await authService.logout();
           window.dispatchEvent(new CustomEvent('auth:logout', { 
-            detail: { reason: 'critical_error', error: error instanceof Error ? error.message : String(error) } 
+            detail: { 
+              reason: 'critical_error', 
+              error: errorMessage,
+              attempts: consecutiveFailures,
+              maxRetries: maxRetries
+            } 
           }));
         }
       }
