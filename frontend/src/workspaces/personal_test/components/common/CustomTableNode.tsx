@@ -40,6 +40,7 @@ interface CustomTableNodeData {
   statusRules: StatusRules;
   nodeSize?: '1' | '2' | '3';
   color?: string;
+  autoScroll?: boolean;
 }
 
 interface CustomTableNodeProps extends NodeProps<CustomTableNodeData> {
@@ -285,8 +286,8 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
     const timer = setTimeout(() => {
       const isMonitorPage = window.location.pathname.includes('monitor') || 
                            window.location.pathname.includes('public');
-      const globalAutoScrollValue = (window as any).autoScrollMeasurements;
-      const shouldScroll = isMonitorPage && globalAutoScrollValue;
+      // Use autoScroll from props instead of global value
+      const shouldScroll = isMonitorPage && data.autoScroll;
       
       // Debug logging for auto-scroll conditions
       // Auto-scroll debug console log removed
@@ -385,7 +386,7 @@ export const CustomTableNode = memo((props: CustomTableNodeProps) => {
     }, 100); // Small delay to ensure DOM is ready
 
     return () => clearTimeout(timer);
-  }, [tableData, actualNodeHeight, isLoading, error, id]);
+  }, [tableData, actualNodeHeight, isLoading, error, id, data.autoScroll]);
 
   // Cleanup scroll interval on unmount
   useEffect(() => {

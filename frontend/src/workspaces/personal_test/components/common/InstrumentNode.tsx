@@ -81,6 +81,7 @@ interface InstrumentNodeData {
   displayMeasurements?: string[];
   hasSpecOut?: boolean;
   nodeSize?: '1' | '2' | '3';
+  autoScroll?: boolean;
 }
 
 
@@ -321,13 +322,13 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     const timer = setTimeout(() => {
       const isMonitorPage = window.location.pathname.includes('monitor') || 
                            window.location.pathname.includes('public');
-      const globalAutoScrollValue = (window as any).autoScrollMeasurements;
-      const shouldScroll = isMonitorPage && globalAutoScrollValue;
+      // Use autoScroll from props instead of global value
+      const shouldScroll = isMonitorPage && data.autoScroll;
       
       log.debug('InstrumentNode auto-scroll check', {
         nodeId: id,
         isMonitorPage,
-        globalAutoScrollValue,
+        autoScroll: data.autoScroll,
         shouldScroll,
         hasMeasurements: !!data.measurements,
         measurementCount: data.measurements?.length || 0
@@ -390,7 +391,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [actualNodeHeight, isResizing, id, data.measurements]);
+  }, [actualNodeHeight, isResizing, id, data.measurements, data.autoScroll]);
   
   // Cleanup scroll interval on unmount
   useEffect(() => {

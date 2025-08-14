@@ -40,6 +40,7 @@ interface EquipmentNodeData {
   displayMeasurements?: string[];
   hasSpecOut?: boolean;
   nodeSize?: '1' | '2' | '3';
+  autoScroll?: boolean;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -352,8 +353,8 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     const timer = setTimeout(() => {
       const isMonitorPage = window.location.pathname.includes('monitor') || 
                            window.location.pathname.includes('public');
-      const globalAutoScrollValue = (window as any).autoScrollMeasurements;
-      const shouldScroll = isMonitorPage && globalAutoScrollValue;
+      // Use autoScroll from props instead of global value
+      const shouldScroll = isMonitorPage && data.autoScroll;
       
       // Debug logging for auto-scroll conditions
       // Auto-scroll debug console log removed
@@ -461,7 +462,7 @@ export const EquipmentNode = memo((props: NodeProps<EquipmentNodeData>) => {
     }, 250); // Debounce to prevent rapid state changes
 
     return () => clearTimeout(timer);
-  }, [actualNodeHeight, isResizing, id]); // Detect size and resize changes for scroll recalculation
+  }, [actualNodeHeight, isResizing, id, data.autoScroll, data.measurements]); // Detect size and resize changes for scroll recalculation
   
   // Cleanup scroll interval on unmount
   useEffect(() => {

@@ -69,9 +69,24 @@ export const useFlowMonitor = (workspaceId: string) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isDataLoadingRef = useRef(false);
 
-  // Set global auto-scroll state
+  // Set global auto-scroll state and update nodes with autoScroll prop
   useEffect(() => {
     (window as any).autoScrollMeasurements = autoScroll;
+    
+    // Update all nodes with the new autoScroll value
+    setNodes((currentNodes) => currentNodes.map((node) => {
+      // Only update nodes that support auto-scroll
+      if (node.type === 'equipment' || node.type === 'instrument' || node.type === 'table') {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            autoScroll: autoScroll
+          }
+        };
+      }
+      return node;
+    }));
   }, [autoScroll]);
 
   // Load process flows
@@ -724,6 +739,15 @@ export const useFlowMonitor = (workspaceId: string) => {
       };
       
       const nodesWithSavedSize = (selectedFlow.flow_data.nodes || []).map((node: any) => {
+        // Add autoScroll to all nodes that support it
+        const nodeWithAutoScroll = {
+          ...node,
+          data: {
+            ...node.data,
+            autoScroll: autoScroll // Add current autoScroll state
+          }
+        };
+        
         if (node.type === 'equipment') {
           // Use saved nodeSize from flow data, fallback to node data, then default
           const nodeSize = (selectedFlow.flow_data as any)?.nodeSize || node.data?.nodeSize || '1';
@@ -736,7 +760,7 @@ export const useFlowMonitor = (workspaceId: string) => {
           
           
           return {
-            ...node,
+            ...nodeWithAutoScroll,
             style: {
               // PRESERVE stored resized dimensions - they take priority over nodeSize defaults
               width: finalWidth,
@@ -744,18 +768,18 @@ export const useFlowMonitor = (workspaceId: string) => {
               ...node.style // Preserve other style properties
             },
             data: {
-              ...node.data,
+              ...nodeWithAutoScroll.data,
               nodeSize: nodeSize // Ensure nodeSize is in data
             }
           };
         }
-        return node;
+        return nodeWithAutoScroll;
       });
       
       setNodes(nodesWithSavedSize);
       setEdges(selectedFlow.flow_data.edges || []);
     }
-  }, [selectedFlow]);
+  }, [selectedFlow, autoScroll]);
 
   const getStatusCounts = () => {
     const counts = { ACTIVE: 0, PAUSE: 0, STOP: 0 };
