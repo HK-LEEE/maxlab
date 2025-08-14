@@ -1,0 +1,157 @@
+2|maxplatform-backend-8002  | 2025-08-14T09:58:00: 2025-08-14 09:58:00.745 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-14T09:58:00: 2025-08-14 09:58:00.746 [DEBUG] app.services.session_monitor:177 - Session check completed: 2 sessions checked (took 0.00s)
+3|maxlab-backend-8010       | 2025-08-14T09:58:15: INFO:     192.168.9.88:0 - "GET /api/v1/personal-test/process-flow/public/4MAtSwbiTlqW9h_qudexPZqRew-_hwAWlxldW0HZR18?_t=1755133443310&_r=eojmm60941e HTTP/1.1" 200 OK
+3|maxlab-backend-8010       | 2025-08-14T09:58:16: INFO:     192.168.9.88:0 - "GET /api/v1/personal-test/process-flow/public/4MAtSwbiTlqW9h_qudexPZqRew-_hwAWlxldW0HZR18/equipment/status?_t=1755133443321 HTTP/1.1" 200 OK
+3|maxlab-backend-8010       | 2025-08-14T09:58:16: INFO:     192.168.9.88:0 - "GET /api/v1/personal-test/process-flow/public/4MAtSwbiTlqW9h_qudexPZqRew-_hwAWlxldW0HZR18/measurements?_t=1755133443322 HTTP/1.1" 200 OK
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: pasred : ParseResult(scheme='https', netloc='maxlab.dwchem.co.kr', path='/oauth/callback', params='', query='', fragment='')
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: Pattern ^http://localhost:301[0-9]/oauth/callback$
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: Pattern ^http://localhost:301[0-9]/$
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: Pattern ^http://localhost:301[0-9]/login(\?.*)?$
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: Pattern ^https://[a-zA-Z0-9-]+\.dwchem\.co\.kr/oauth/callback$
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: INFO:     192.168.15.220:0 - "GET /api/oauth/sso-token-refresh?redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&state=sso_refresh_1755133104383 HTTP/1.1" 302 Found
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.432 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.432 [DEBUG] app.utils.auth:495 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.432 [DEBUG] app.utils.auth:502 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.433 [INFO] app.api.oauth_simple:776 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.433 [INFO] app.api.oauth_simple:781 - 🔍 Worker 1762322: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.433 [INFO] app.api.oauth_simple:815 - 🔍 Worker 1762322: Request cookies: []
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.433 [INFO] app.api.oauth_simple:819 - 🔍 Worker 1762322: No access_token cookie found
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.433 [INFO] app.api.oauth_simple:827 - 🔍 Worker 1762322: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.433 [INFO] app.api.oauth_simple:830 - 🔍 Worker 1762322: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.435 [INFO] app.api.oauth_simple:903 - 🔄 Worker 1762322: Final prompt decision: none
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.437 [INFO] app.api.oauth_simple:1039 - prompt=none login_required: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=sso_refresh_1755133104383&error_description=User+not+logged+in
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.438 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid%20profile%20email%20read:profile%20read:groups%20manage:workflows&prompt=none&state=sso_refresh_1755133104383 HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.448 [DEBUG] app.middleware.session_middleware:124 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-14T09:58:24: 2025-08-14 09:58:24.451 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 401
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: 2025-08-14 09:58:24,453 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
+3|maxlab-backend-8010       | 2025-08-14T09:58:24: INFO:     192.168.15.220:0 - "GET /api/v1/workspaces/tree HTTP/1.1" 401 Unauthorized
+0|maxplatform-backend-8000  | 2025-08-14T09:58:26: 2025-08-14 09:58:26.719 [DEBUG] app.middleware.session_middleware:124 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-14T09:58:26: 2025-08-14 09:58:26.721 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 401
+3|maxlab-backend-8010       | 2025-08-14T09:58:26: 2025-08-14 09:58:26,722 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
+3|maxlab-backend-8010       | 2025-08-14T09:58:26: INFO:     192.168.15.220:0 - "GET /api/v1/workspaces/tree HTTP/1.1" 401 Unauthorized
+0|maxplatform-backend-8000  | 2025-08-14T09:58:29: 2025-08-14 09:58:29.756 [DEBUG] app.middleware.session_middleware:124 - JWT token expired
+0|maxplatform-backend-8000  | 2025-08-14T09:58:29: 2025-08-14 09:58:29.757 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 401
+3|maxlab-backend-8010       | 2025-08-14T09:58:29: 2025-08-14 09:58:29,759 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
+3|maxlab-backend-8010       | 2025-08-14T09:58:29: INFO:     192.168.15.220:0 - "GET /api/v1/workspaces/tree HTTP/1.1" 401 Unauthorized
+0|maxplatform-backend-8000  | 2025-08-14T09:58:29: 2025-08-14 09:58:29.847 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T09:58:29: 2025-08-14 09:58:29.848 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T09:58:29: 2025-08-14 09:58:29.873 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T09:58:29: 2025-08-14 09:58:29.879 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/services/mother-page HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.150 [DEBUG] app.core.oauth_redis_integration:220 - 🔍 No session ID found in request cookies
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.150 [DEBUG] app.utils.auth:495 - 🔍 No Redis session found
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.150 [DEBUG] app.utils.auth:502 - 🔍 No authentication found (JWT or Redis) - proceeding with OAuth flow
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.151 [INFO] app.api.oauth_simple:776 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.151 [INFO] app.api.oauth_simple:781 - 🔍 Worker 1762322: Current user authentication status: False
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.151 [INFO] app.api.oauth_simple:815 - 🔍 Worker 1762322: Request cookies: []
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.151 [INFO] app.api.oauth_simple:819 - 🔍 Worker 1762322: No access_token cookie found
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.151 [INFO] app.api.oauth_simple:827 - 🔍 Worker 1762322: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.151 [INFO] app.api.oauth_simple:830 - 🔍 Worker 1762322: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.153 [INFO] app.api.oauth_simple:903 - 🔄 Worker 1762322: Final prompt decision: none
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.154 [INFO] app.api.oauth_simple:1039 - prompt=none login_required: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=snr8zciIbntBfzpPJhicSpULWvME3vuu3KdGd9Lh4ik&error_description=User+not+logged+in
+0|maxplatform-backend-8000  | 2025-08-14T09:58:37: 2025-08-14 09:58:37.155 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+read%3Aprofile+read%3Agroups+manage%
+
+
+09:58:37.104 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-C6ZA7B7I.js:228:5827
+09:58:37.104 🆕 New or unauthenticated user, preparing for silent auth attempt index-C6ZA7B7I.js:228:7076
+09:58:37.106 🛡️ New CSRF token generated index-C6ZA7B7I.js:263:6222
+09:58:37.106 🛡️ CSRF protection initialized with new token index-C6ZA7B7I.js:263:5768
+09:58:37.113 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-C6ZA7B7I.js:263:21207
+09:58:37.115 🔀 OAuth Coordinator [00:58:37][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-C6ZA7B7I.js:263:51842
+09:58:37.123 📍 Saving original navigation URL: https://maxlab.dwchem.co.kr/ index-C6ZA7B7I.js:851:102653
+09:58:37.123 ✅ Auth sync initialized with BroadcastChannel index-C6ZA7B7I.js:263:95165
+09:58:37.123 🔒 Initializing cross-domain logout listener index-C6ZA7B7I.js:851:105338
+09:58:37.123 📡 SSO: PostMessage listener registered index-C6ZA7B7I.js:851:108343
+09:58:37.124 🚀 Starting auth initialization (single instance guaranteed) index-C6ZA7B7I.js:851:112849
+09:58:37.124 🔍 MaxLab Infinite loop detection result: 
+Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 0 }
+index-C6ZA7B7I.js:227:8606
+09:58:37.124 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
+index-C6ZA7B7I.js:227:4366
+09:58:37.124 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-C6ZA7B7I.js:227:11473
+09:58:37.124 🔇 Attempting silent SSO login... index-C6ZA7B7I.js:265:4480
+09:58:37.124 🔀 OAuth Coordinator [00:58:37][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755133117125_z4rqtrbum 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-C6ZA7B7I.js:263:51793
+09:58:37.124 🔀 OAuth Coordinator [00:58:37][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-C6ZA7B7I.js:263:51842
+09:58:37.124 🔀 OAuth Coordinator [00:58:37][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755133117125_z4rqtrbum index-C6ZA7B7I.js:263:51842
+09:58:37.125 ✅ Silent auth conditions met, starting... index-C6ZA7B7I.js:258:20442
+09:58:37.126 🔇 Starting silent authentication... index-C6ZA7B7I.js:258:16370
+09:58:37.209 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-C6ZA7B7I.js:228:5827
+09:58:37.209 🆕 New or unauthenticated user, preparing for silent auth attempt index-C6ZA7B7I.js:228:7076
+09:58:37.211 🛡️ CSRF protection initialized with existing token index-C6ZA7B7I.js:263:5675
+09:58:37.216 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-C6ZA7B7I.js:263:21207
+09:58:37.220 🔀 OAuth Coordinator [00:58:37][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-C6ZA7B7I.js:263:51842
+09:58:37.227 ✅ Auth sync initialized with BroadcastChannel index-C6ZA7B7I.js:263:95165
+09:58:37.227 🔒 Initializing cross-domain logout listener index-C6ZA7B7I.js:851:105338
+09:58:37.227 📡 SSO: PostMessage listener registered index-C6ZA7B7I.js:851:108343
+09:58:37.227 🚀 Starting auth initialization (single instance guaranteed) index-C6ZA7B7I.js:851:112849
+09:58:37.227 🔍 MaxLab Infinite loop detection result: 
+Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 0 }
+index-C6ZA7B7I.js:227:8606
+09:58:37.227 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
+index-C6ZA7B7I.js:227:4366
+09:58:37.227 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-C6ZA7B7I.js:227:11473
+09:58:37.227 🔇 Attempting silent SSO login... index-C6ZA7B7I.js:265:4480
+09:58:37.227 🔀 OAuth Coordinator [00:58:37][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755133117228_ce2a0l4ch 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-C6ZA7B7I.js:263:51793
+09:58:37.227 🔀 OAuth Coordinator [00:58:37][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-C6ZA7B7I.js:263:51842
+09:58:37.227 🔀 OAuth Coordinator [00:58:37][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755133117228_ce2a0l4ch index-C6ZA7B7I.js:263:51842
+09:58:37.228 🚫 OAuth callback page has active flow, not safe for silent auth index-C6ZA7B7I.js:258:21571
+09:58:37.228 🚫 Silent auth not allowed on current page: /oauth/callback index-C6ZA7B7I.js:258:19642
+09:58:37.228 🔀 OAuth Coordinator [00:58:37][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755133117228_ce2a0l4ch index-C6ZA7B7I.js:263:51842
+09:58:37.228 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-C6ZA7B7I.js:265:6164
+09:58:37.229 📊 MaxLab OAuth attempt recorded: 
+Object { type: "auto", success: false, error: "Cannot attempt silent auth on current page...", aborted: false, consecutiveFailures: 1, totalAborted: 0 }
+index-C6ZA7B7I.js:227:7113
+09:58:37.229 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
+index-C6ZA7B7I.js:227:11473
+09:58:37.229 🚫 OAuth callback page has active flow, not safe for silent auth index-C6ZA7B7I.js:258:21571
+09:58:37.230 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, ssoRefreshReturnUrl: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-C6ZA7B7I.js:258:10832
+09:58:37.230 🔍 Searching for OAuth flow state with state: snr8zciI... index-C6ZA7B7I.js:228:15327
+09:58:37.230 📋 Found total flow states: 0 index-C6ZA7B7I.js:228:15444
+09:58:37.230 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-C6ZA7B7I.js:228:15532
+09:58:37.231 🚨 OAuth flow state not found for state: snr8zciI... 
+Object { searchedFlows: 0, sessionStorageKeys: (5) […] }
+index-C6ZA7B7I.js:228:17375
+09:58:37.231 🎯 Popup mode detected via window.parent (iframe scenario) index-C6ZA7B7I.js:258:13557
+09:58:37.231 🛑 User not authenticated, stopping token refresh index-C6ZA7B7I.js:265:23061
+09:58:37.231 🔄 Migrating legacy OAuth state to new state manager index-C6ZA7B7I.js:228:22298
+09:58:37.231 🔐 OAuth flow state created: 
+Object { flowId: "meaoxwkvaxj1dmwgrbd", flowType: "silent", expiresIn: "900s", forceAccountSelection: false }
+index-C6ZA7B7I.js:228:15154
+09:58:37.231 ✅ Legacy OAuth state migrated: meaoxwkvaxj1dmwgrbd index-C6ZA7B7I.js:228:22873
+09:58:37.231 🔄 Legacy OAuth state migrated: 
+Object { migrated: 1, removed: 3, errors: 0 }
+index-C6ZA7B7I.js:755:14796
+09:58:37.231 🔍 Popup mode detection started: 
+Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, ssoRefreshReturnUrl: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
+index-C6ZA7B7I.js:258:10832
+09:58:37.231 🔍 Searching for OAuth flow state with state: snr8zciI... index-C6ZA7B7I.js:228:15327
+09:58:37.231 📋 Found total flow states: 1 index-C6ZA7B7I.js:228:15444
+09:58:37.231 ✅ Found OAuth flow state: 
+Object { flowId: "meaoxwkvaxj1dmwgrbd", flowType: "silent", status: "created", hasCodeVerifier: true, codeVerifierLength: 43 }
+index-C6ZA7B7I.js:228:16981
+09:58:37.231 🎯 Popup mode detected via window.parent (iframe scenario) index-C6ZA7B7I.js:258:13557
+09:58:37.232 🔍 OAuth Callback Mode Detection: 
+Object { inPopupMode: true, isSilentAuth: false, hasCode: false, hasError: true, sessionKeys: (3) […] }
+index-C6ZA7B7I.js:755:16034
+09:58:37.232 🔍 OAuth Callback URL Analysis: 
+Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=snr8zciIbntBfzpPJhicSpULWvME3vuu3KdGd9Lh4ik&error_description=User+not+logged+in", pathname: "/oauth/callback", search: "?error=login_required&state=snr8zciIbntBfzpPJhicSpULWvME3vuu3KdGd9Lh4ik&error_description=User+not+logged+in", code: "null", state: "snr8zciI...", error: "login_required", errorDescription: "User not logged in", allParams: {…} }
+index-C6ZA7B7I.js:755:17032
+09:58:37.232 🚨 OAuth Server Error: 
+Object { error: "login_required", errorDescription: "User not logged in", fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?error=login_required&state=snr8zciIbntBfzpPJhicSpULWvME3vuu3KdGd9Lh4ik&error_description=User+not+logged+in", allParams: {…} }
+index-C6ZA7B7I.js:755:18388
