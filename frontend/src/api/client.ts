@@ -138,7 +138,15 @@ apiClient.interceptors.response.use(
           // Retry the original request
           return apiClient.request(originalRequest);
         } else {
-          console.log('❌ Token refresh failed, redirecting to login');
+          console.log('❌ Token refresh failed, redirecting to MAX Platform login');
+          
+          // Clear all auth data
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          // Redirect to MAX Platform login page
+          window.location.href = 'https://max.dwchem.co.kr/login';
+          
           throw new Error('Token refresh failed');
         }
       } catch (refreshError) {
@@ -170,8 +178,17 @@ apiClient.interceptors.response.use(
         
         console.log(`📋 API Client: Would use ${maxRetries} retries (${reason}) for error: ${errorMessage}`);
         
-        // Token refresh failed, handle accordingly
+        // 🚨 Token refresh failed - redirect to MAX Platform login
+        console.warn('🚨 Token refresh failed - clearing auth and redirecting to MAX Platform');
+        
+        // Clear all auth data
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Check if we're in a special page that shouldn't redirect immediately
         const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
+        const isPublicPage = window.location.pathname.startsWith('/public/') || 
+                            window.location.pathname.includes('/public/');
         
         if (isProcessFlowEditor) {
           // ProcessFlowEditor에서는 즉시 리다이렉트하지 않고 이벤트 발송
@@ -184,8 +201,12 @@ apiClient.interceptors.response.use(
               errorAnalysis: { maxRetries, reason, errorMessage }
             } 
           }));
+        } else if (!isPublicPage) {
+          // Non-public pages redirect to MAX Platform login
+          console.log('🔄 Redirecting to MAX Platform login page...');
+          window.location.href = 'https://max.dwchem.co.kr/login';
         } else {
-          // 다른 페이지에서는 자동 로그아웃 이벤트 발송
+          // Public pages just dispatch event without redirect
           window.dispatchEvent(new CustomEvent('auth:logout', {
             detail: { 
               reason: 'token_refresh_failed', 
@@ -260,7 +281,15 @@ authClient.interceptors.response.use(
           // Retry the original request
           return authClient.request(originalRequest);
         } else {
-          console.log('❌ Token refresh failed for auth API');
+          console.log('❌ Token refresh failed for auth API, redirecting to MAX Platform login');
+          
+          // Clear all auth data
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          // Redirect to MAX Platform login page
+          window.location.href = 'https://max.dwchem.co.kr/login';
+          
           throw new Error('Auth API token refresh failed');
         }
       } catch (refreshError) {
@@ -292,14 +321,31 @@ authClient.interceptors.response.use(
         
         console.log(`📋 Auth Client: Would use ${maxRetries} retries (${reason}) for error: ${errorMessage}`);
         
-        // For auth API failures, always trigger logout
-        window.dispatchEvent(new CustomEvent('auth:logout', {
-          detail: { 
-            reason: 'auth_api_token_refresh_failed', 
-            source: 'auth_client',
-            errorAnalysis: { maxRetries, reason, errorMessage }
-          }
-        }));
+        // 🚨 Auth API token refresh failed - redirect to MAX Platform login
+        console.warn('🚨 Auth API token refresh failed - clearing auth and redirecting to MAX Platform');
+        
+        // Clear all auth data
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Check if we're in a public page
+        const isPublicPage = window.location.pathname.startsWith('/public/') || 
+                            window.location.pathname.includes('/public/');
+        
+        if (!isPublicPage) {
+          // Non-public pages redirect to MAX Platform login
+          console.log('🔄 Redirecting to MAX Platform login page...');
+          window.location.href = 'https://max.dwchem.co.kr/login';
+        } else {
+          // Public pages just dispatch event without redirect
+          window.dispatchEvent(new CustomEvent('auth:logout', {
+            detail: { 
+              reason: 'auth_api_token_refresh_failed', 
+              source: 'auth_client',
+              errorAnalysis: { maxRetries, reason, errorMessage }
+            }
+          }));
+        }
         
         return Promise.reject(error);
       }

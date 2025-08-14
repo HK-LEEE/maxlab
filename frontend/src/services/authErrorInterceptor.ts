@@ -274,7 +274,26 @@ export class AuthErrorInterceptor {
                                currentPath.startsWith('/workspaces/personal_test/monitor/public/');
           
           if (errorData.error_code === 'AUTH_001' || errorData.error_code === 'AUTH_002') {
-            // 🚫 SIMPLIFIED: 401 에러 시 바로 MAX Platform으로 리다이렉트
+            // 🔄 Check if this is a refresh token failure by examining the error details
+            const isRefreshFailure = error.config?.url?.includes('/oauth/token') ||
+                                   error.config?.url?.includes('/auth/refresh') ||
+                                   error.response?.data?.error === 'invalid_grant' ||
+                                   error.response?.data?.detail?.includes('refresh') ||
+                                   errorData.additional_details?.originalError?.includes('refresh');
+            
+            if (isRefreshFailure) {
+              console.warn('🚨 Refresh token failed - redirecting to MAX Platform login');
+              
+              // 모든 스토리지 클리어
+              localStorage.clear();
+              sessionStorage.clear();
+              
+              // MAX Platform으로 직접 리다이렉트 (refresh 실패 시 항상)
+              window.location.href = 'https://max.dwchem.co.kr/login';
+              return { shouldRetry: false, shouldRedirect: false, errorData, recoveryAction };
+            }
+            
+            // 🚫 Regular 401 에러 처리
             // 단, Public 페이지가 아닌 경우에만 리다이렉트
             if (!isPublicPage) {
               console.warn('🚨 Authentication failed - redirecting to MAX Platform');
