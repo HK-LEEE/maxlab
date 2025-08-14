@@ -211,7 +211,7 @@ function App() {
   // Skip initialization screen on public routes
   const isInitializing = !isPublicRoute() && (initState !== 'ready' && initState !== 'error');
   
-  // Token Sync Manager - Periodic sync with MAX Platform
+  // Token Sync Manager - Sync with MAX Platform BEFORE other initializations
   useEffect(() => {
     // Skip token sync on public routes
     if (isPublicRoute()) {
@@ -219,7 +219,34 @@ function App() {
       return;
     }
     
-    // Sync tokens periodically to catch updates from MAX Platform
+    // Perform initial sync immediately and wait for it
+    const performInitialSync = async () => {
+      console.log('🔄 Performing initial token sync with MAX Platform...');
+      try {
+        const synced = await tokenSyncManager.syncTokensFromPlatform();
+        if (synced) {
+          console.log('✅ Initial token sync successful');
+          // Update auth state if token was synced
+          const accessToken = localStorage.getItem('accessToken');
+          const user = localStorage.getItem('user');
+          if (accessToken && user) {
+            try {
+              const userData = JSON.parse(user);
+              setAuth(accessToken, userData);
+            } catch (e) {
+              console.error('Failed to parse user data after sync:', e);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Initial token sync failed:', error);
+      }
+    };
+    
+    // Run initial sync immediately
+    performInitialSync();
+    
+    // Then set up periodic sync
     const syncInterval = setInterval(() => {
       tokenSyncManager.syncTokensFromPlatform().catch(error => {
         console.error('Periodic token sync failed:', error);
@@ -235,16 +262,11 @@ function App() {
     
     window.addEventListener('focus', handleFocus);
     
-    // Initial sync on mount
-    tokenSyncManager.syncTokensFromPlatform().catch(error => {
-      console.error('Initial token sync failed:', error);
-    });
-    
     return () => {
       clearInterval(syncInterval);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [setAuth]);
   
   // Auth Sync Service 초기화
   useEffect(() => {
