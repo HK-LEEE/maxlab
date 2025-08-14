@@ -138,8 +138,25 @@ apiClient.interceptors.response.use(
       originalRequest._tokenRefreshAttempted = true;
       
       try {
-        // Attempt token refresh using authService
-        console.log('🔄 Attempting automatic token refresh...');
+        // First, try to sync from MAX Platform
+        console.log('🔄 Attempting to sync token from MAX Platform first...');
+        const syncResult = await tokenSyncManager.syncTokensFromPlatform();
+        
+        if (syncResult) {
+          console.log('✅ Token synced from MAX Platform, retrying request');
+          
+          // Update the authorization header with the synced token
+          const syncedToken = localStorage.getItem('accessToken');
+          if (syncedToken) {
+            originalRequest.headers.Authorization = `Bearer ${syncedToken}`;
+          }
+          
+          // Retry the original request
+          return apiClient.request(originalRequest);
+        }
+        
+        // If sync didn't work, try normal refresh
+        console.log('🔄 MAX Platform sync unsuccessful, attempting local token refresh...');
         
         // Dynamic import to avoid circular dependency
         const { authService } = await import('../services/authService');
@@ -271,9 +288,26 @@ authClient.interceptors.response.use(
       originalRequest._tokenRefreshAttempted = true;
       
       try {
+        // First, try to sync from MAX Platform for auth client too
+        console.log('🔄 Attempting to sync token from MAX Platform for auth API...');
+        const syncResult = await tokenSyncManager.syncTokensFromPlatform();
+        
+        if (syncResult) {
+          console.log('✅ Token synced from MAX Platform for auth API, retrying request');
+          
+          // Update the authorization header with the synced token
+          const syncedToken = localStorage.getItem('accessToken');
+          if (syncedToken) {
+            originalRequest.headers.Authorization = `Bearer ${syncedToken}`;
+          }
+          
+          // Retry the original request
+          return authClient.request(originalRequest);
+        }
+        
         // For auth client, we should be more conservative about token refresh
         // since this might be the auth endpoints themselves
-        console.log('🔄 Attempting token refresh for auth API...');
+        console.log('🔄 MAX Platform sync unsuccessful, attempting token refresh for auth API...');
         
         // Dynamic import to avoid circular dependency
         const { authService } = await import('../services/authService');

@@ -21,6 +21,7 @@ import { isDevelopment, devLog } from './utils/logger';
 import AuthDiagnostics from './utils/authDiagnostics';
 import AuthInitDebugger from './utils/debugAuthInit';
 import { authSyncService } from './services/authSyncService';
+import { tokenSyncManager } from './services/tokenSyncManager';
 import { crossDomainLogout } from './utils/crossDomainLogout';
 import { instantLogoutChannel } from './utils/instantLogoutChannel';
 import { oauthLoopPrevention } from './utils/oauthInfiniteLoopPrevention';
@@ -209,6 +210,41 @@ function App() {
   // 기존 isInitializing 대신 authStore의 상태 사용
   // Skip initialization screen on public routes
   const isInitializing = !isPublicRoute() && (initState !== 'ready' && initState !== 'error');
+  
+  // Token Sync Manager - Periodic sync with MAX Platform
+  useEffect(() => {
+    // Skip token sync on public routes
+    if (isPublicRoute()) {
+      console.log('🔓 Public route detected, skipping token sync');
+      return;
+    }
+    
+    // Sync tokens periodically to catch updates from MAX Platform
+    const syncInterval = setInterval(() => {
+      tokenSyncManager.syncTokensFromPlatform().catch(error => {
+        console.error('Periodic token sync failed:', error);
+      });
+    }, 60000); // Every minute
+    
+    // Also sync on window focus
+    const handleFocus = () => {
+      tokenSyncManager.syncTokensFromPlatform().catch(error => {
+        console.error('Focus token sync failed:', error);
+      });
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    // Initial sync on mount
+    tokenSyncManager.syncTokensFromPlatform().catch(error => {
+      console.error('Initial token sync failed:', error);
+    });
+    
+    return () => {
+      clearInterval(syncInterval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
   
   // Auth Sync Service 초기화
   useEffect(() => {

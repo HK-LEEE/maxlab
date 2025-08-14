@@ -20,9 +20,13 @@ export class TokenSyncManager {
   private static instance: TokenSyncManager;
   private lastValidationTime = 0;
   private validationInterval = 30000; // 30 seconds
+  private lastSyncTime = 0;
+  private syncInterval = 30000; // 30 seconds minimum between syncs
   private isValidating = false;
+  private isSyncing = false;
   private validationQueue: Array<(result: boolean) => void> = [];
   private readonly AUTH_SERVER_URL = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
+  private readonly MAX_PLATFORM_URL = import.meta.env.VITE_MAX_PLATFORM_URL || 'https://max.dwchem.co.kr';
   private readonly CLIENT_ID = import.meta.env.VITE_CLIENT_ID || 'maxlab';
   private readonly CLIENT_SECRET = import.meta.env.VITE_CLIENT_SECRET || '';
 
@@ -44,12 +48,21 @@ export class TokenSyncManager {
     // Listen for storage events (token changes in other tabs)
     window.addEventListener('storage', this.handleStorageChange.bind(this));
     
-    // Periodic token validation
+    // Periodic token validation and sync
     setInterval(() => {
-      this.validateTokenFreshness();
+      this.syncTokensFromPlatform().catch(error => {
+        console.error('Periodic token sync failed:', error);
+      });
     }, 60000); // Check every minute
     
-    console.log('✅ Token sync manager initialized');
+    // Sync on window focus
+    window.addEventListener('focus', () => {
+      this.syncTokensFromPlatform().catch(error => {
+        console.error('Focus token sync failed:', error);
+      });
+    });
+    
+    console.log('✅ Token sync manager initialized with cross-domain sync');
   }
 
   /**
@@ -64,9 +77,119 @@ export class TokenSyncManager {
   }
 
   /**
+   * Sync tokens from MAX Platform
+   * This solves the multi-domain token mismatch issue
+   */
+  public async syncTokensFromPlatform(): Promise<boolean> {
+    if (this.isSyncing) {
+      console.log('⏳ Token sync already in progress');
+      return false;
+    }
+    
+    const now = Date.now();
+    if (now - this.lastSyncTime < this.syncInterval) {
+      console.log('⏰ Token sync throttled, too soon since last sync');
+      return false;
+    }
+    
+    this.isSyncing = true;
+    
+    try {
+      console.log('🔄 Syncing tokens from MAX Platform...');
+      
+      // Call MAX Platform to get current token
+      const response = await fetch(`${this.MAX_PLATFORM_URL}/api/auth/current-token`, {
+        method: 'GET',
+        credentials: 'include', // Important: send cookies
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`,
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.access_token) {
+          const currentToken = localStorage.getItem('accessToken');
+          
+          // Only update if token is different
+          if (currentToken !== data.access_token) {
+            console.log('✅ Received fresh token from MAX Platform, updating local storage');
+            console.log('Token sync details:', {
+              source: data.source,
+              synced: data.synced,
+              expires_in: data.expires_in
+            });
+            
+            // Update localStorage
+            localStorage.setItem('accessToken', data.access_token);
+            
+            // Update expiry time if provided
+            if (data.expires_in) {
+              const expiryTime = Date.now() + (data.expires_in * 1000);
+              localStorage.setItem('tokenExpiryTime', expiryTime.toString());
+            }
+            
+            // Log the sync event
+            securityEventLogger.logTokenEvent('token_synced_from_platform', {
+              source: data.source,
+              synced: data.synced,
+              expires_in: data.expires_in
+            });
+            
+            // Notify other components
+            window.dispatchEvent(new CustomEvent('token-synced', {
+              detail: { 
+                token: data.access_token,
+                source: 'max_platform'
+              }
+            }));
+            
+            // Broadcast to other tabs
+            authSyncService.broadcastTokenRefresh(data.access_token);
+            
+            this.lastSyncTime = now;
+            return true;
+          } else {
+            console.log('ℹ️ Token already up to date');
+          }
+        }
+      } else if (response.status === 401) {
+        console.warn('⚠️ Not authenticated with MAX Platform, need to login');
+        // Clear local tokens as they're invalid
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('tokenExpiryTime');
+        
+        // Redirect to login
+        window.location.href = `${this.MAX_PLATFORM_URL}/login?return_url=${encodeURIComponent(window.location.href)}`;
+        return false;
+      } else {
+        console.error('Token sync failed with status:', response.status);
+      }
+      
+      this.lastSyncTime = now;
+      return false;
+      
+    } catch (error) {
+      console.error('❌ Failed to sync tokens from MAX Platform:', error);
+      // Don't update lastSyncTime on error to allow retry sooner
+      return false;
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+  
+  /**
    * Validate token freshness and sync if needed
    */
   public async validateTokenFreshness(forceCheck = false): Promise<boolean> {
+    // First, try to sync from MAX Platform
+    const syncResult = await this.syncTokensFromPlatform();
+    if (syncResult) {
+      // Token was synced successfully, it's fresh
+      return true;
+    }
     const now = Date.now();
     
     // Skip if recently validated (unless forced)
