@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 2025-08-14 14:46:41.842 [INFO] app.services.auth_service:63 - ✅ Created Redis session e1536a47-2da0-4ac6-ae6e-cfc7db2f3356 for user krn@test.com
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 2025-08-14 14:46:41.845 [WARNING] app.routers.auth:546 - Failed to store JWT token hash for revocation tracking: (psycopg2.errors.UndefinedColumn) column "grant_types" of relation "oauth_clients" does not exist
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: LINE 3: ...        (client_id, client_secret, redirect_uris, grant_type...
@@ -711,3 +712,186 @@
 0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [WARNING] app.routers.auth:260 - ❌ Refresh token not found in database for user: d65db892-9691-46e3-a2c6-d962980f2f51, session: cf75f7fd-799d-4fd6-9805-97142bb60a06
 0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
 0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06, token_prefix: eyJhbGciOi...
+=======
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.430 [DEBUG] app.core.oauth_redis_integration:218 - 🍪 Cookie header: session_id=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; session_token=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; user_id=21a2aaa7-444a-4038-bda3-d8bf2c4ef162; session_id=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; session_token=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; user_id=21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.430 [DEBUG] app.core.oauth_redis_integration:219 - 🍪 Referer: https://maxlab.dwchem.co.kr/
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.431 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.431 [DEBUG] app.core.oauth_redis_integration:232 - ✅ Session found from request: 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.433 [INFO] app.utils.auth:502 - ✅ User authenticated via Redis session: admin@test.com (session upgrade)
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.433 [INFO] app.api.oauth_simple:778 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:783 - 🔍 Worker 1861549: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:785 - 🔍 Worker 1861549: Authenticated user: admin@test.com
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:817 - 🔍 Worker 1861549: Request cookies: ['session_id', 'session_token', 'user_id']
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:821 - 🔍 Worker 1861549: No access_token cookie found
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1861549: Cookie 'session_id': 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1861549: Cookie 'session_token': 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1861549: Cookie 'user_id': 21a2aaa7-444a-4038-bda3-d8bf2c4ef162...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:829 - 🔍 Worker 1861549: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.434 [INFO] app.api.oauth_simple:832 - 🔍 Worker 1861549: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.436 [INFO] app.api.oauth_simple:905 - 🔄 Worker 1861549: Final prompt decision: none
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.436 [DEBUG] app.core.oauth_redis_integration:217 - 🍪 All cookies received: ['session_id', 'session_token', 'user_id']
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.436 [DEBUG] app.core.oauth_redis_integration:218 - 🍪 Cookie header: session_id=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; session_token=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; user_id=21a2aaa7-444a-4038-bda3-d8bf2c4ef162; session_id=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; session_token=5c3b9ff6-3d73-4ef9-9ac9-796b000c672f; user_id=21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.436 [DEBUG] app.core.oauth_redis_integration:219 - 🍪 Referer: https://maxlab.dwchem.co.kr/
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.436 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.437 [DEBUG] app.core.oauth_redis_integration:232 - ✅ Session found from request: 5c3b9ff6-3d73-4ef9-9ac9-796b000c672f
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.437 [INFO] app.api.oauth_simple:940 - ✅ Worker 1861549: Redis session validated for user admin@test.com and client maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.437 [INFO] app.api.oauth_simple:1320 - prompt=none with authenticated user: immediately generating code for admin@test.com
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.440 [INFO] app.services.nonce_service:49 - Stored nonce for client maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.449 [INFO] app.api.oauth_simple:1445 - prompt=none success: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?code=zlxvWc8omawXuqwIxVmzE4YzNO0vxXoVgSX2Etpvu_E&state=-5agv5mPu8hDGrBDXve8DWnt8ur7QSOVWduO3EQX1Po
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.449 [INFO] app.api.oauth_simple:1475 - ✅ Worker 1861549: Preserved cookies in prompt=none redirect
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.450 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=-5agv5mPu8hDGrBDXve8DWnt8ur7QSOVWduO3EQX1Po&code_challenge=oEov3AbfXEjPk9FKh5vRyRdbPfqiwka0CDnuDEHWFJk&code_challenge_method=S256&prompt=none&nonce=f45b68c4ed... HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.565 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:10]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[11:29]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[30:34]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[35:78]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[79:91]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[92:144]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.566 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[145:154]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[155:161]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[162:175]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[176:219]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.567 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.572 [INFO] app.api.oauth_simple:129 - Cleaned up 301 expired/revoked tokens
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.577 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-14T03:09:18.576794', 'jti': 'a76d05d9-2ef1-4c42-8976-d22fc2899350'}}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.584 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_created | Data: {'event_type': 'refresh_token_created', 'client_id': 'maxlab', 'user_id': UUID('21a2aaa7-444a-4038-bda3-d8bf2c4ef162'), 'scope': 'openid profile email read:profile read:groups manage:workflows', 'success': True, 'ip_address': '192.168.15.220', 'user_agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) ...'}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.591 [INFO] app.core.redis_session:92 - ✅ Session created: 2a775149-37aa-440c-92f2-ff5534dcfefc for user admin@test.com
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.591 [INFO] app.core.oauth_redis_integration:74 - ✅ OAuth Redis session created: 2a775149-37aa-440c-92f2-ff5534dcfefc for user admin@test.com client maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.591 [INFO] app.api.oauth_simple:2262 - ✅ Redis session created for OAuth token: 2a775149-37aa-440c-92f2-ff5534dcfefc (user: admin@test.com, client: maxlab)
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.592 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.599 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "OPTIONS /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.607 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.831 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:10]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[11:24]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[25:38]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[39:103]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.847 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[104:113]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.848 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[114:120]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.848 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.848 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.851 [INFO] app.api.oauth_simple:2283 - Processing refresh token grant for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.851 [INFO] app.api.oauth_simple:2296 - Validating client credentials for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.851 [INFO] app.api.oauth_simple:489 - Looking up client in database: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.853 [INFO] app.api.oauth_simple:501 - Client found in database: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.853 [INFO] app.api.oauth_simple:520 - Client is_confidential: False, has_client_secret: False
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.853 [INFO] app.api.oauth_simple:527 - Client validation completed successfully: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.853 [INFO] app.api.oauth_simple:2298 - Client validation successful for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.853 [INFO] app.api.oauth_simple:2310 - Validating refresh token for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.853 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_validation | Data: {'event_type': 'refresh_token_validation', 'client_id': 'maxlab', 'user_id': None, 'scope': None, 'success': True, 'ip_address': None, 'user_agent': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.855 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_validation | Data: {'event_type': 'refresh_token_validation', 'client_id': 'maxlab', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'scope': None, 'success': True, 'ip_address': None, 'user_agent': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.855 [INFO] app.api.oauth_simple:2321 - Refresh token validation successful for client_id: maxlab, user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.855 [INFO] app.core.token_refresh_coordinator:265 - ✅ Token Refresh Coordinator initialized
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.856 [INFO] app.core.token_refresh_coordinator:57 - ✅ Acquired refresh lock for user=21a2aaa7-444a-4038-bda3-d8bf2c4ef162, client=maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.856 [INFO] app.api.oauth_simple:2346 - 🔒 Token rotation under distributed lock for client_id: maxlab, user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.856 [INFO] app.api.oauth_simple:383 - Starting graceful token rotation - old_hash: fa1da1d3b4..., user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162, client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.856 [INFO] app.api.oauth_simple:389 - Generated new refresh token - new_hash: 1c29dc8744...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.856 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-14T03:09:18.856494', 'jti': '7cea0602-f203-4f9d-a025-5ccd1f2a0861'}}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.856 [INFO] app.api.oauth_simple:396 - Generated new access token for user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.857 [INFO] app.api.oauth_simple:405 - Setting old token to 'rotating' status with grace period until 2025-08-14 03:06:28.856976
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.857 [INFO] app.api.oauth_simple:421 - Creating new refresh token with parent relationship
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.861 [INFO] app.api.oauth_simple:471 - Graceful rotation completed - old token has 2025-08-14 03:06:28.856976 grace period
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.861 [INFO] app.api.oauth_simple:472 - Token family: fa1da1d3b4... → 1c29dc8744...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.861 [DEBUG] app.core.token_refresh_coordinator:144 - 💾 Cached refresh result for user=21a2aaa7-444a-4038-bda3-d8bf2c4ef162, client=maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.862 [DEBUG] app.core.token_refresh_coordinator:104 - 🔓 Released refresh lock: token_refresh_lock:21a2aaa7-444a-4038-bda3-d8bf2c4ef162:maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.862 [ERROR] app.database:112 - 데이터베이스 세션 생성 실패: 1 validation errors:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:   {'type': 'model_attributes_type', 'loc': ('response',), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.863 [ERROR] app.database:115 - 세부 에러: Traceback (most recent call last):
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:   File "/home/app-user/maxproject/maxplatform/backend/app/database.py", line 97, in get_db
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:     yield db
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/fastapi/concurrency.py", line 27, in contextmanager_in_threadpool
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:     yield await run_in_threadpool(cm.__enter__)
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 327, in app
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:     content = await serialize_response(
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:               ^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 176, in serialize_response
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:     raise ResponseValidationError(
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: fastapi.exceptions.ResponseValidationError: 1 validation errors:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:   {'type': 'model_attributes_type', 'loc': ('response',), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.864 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 500
+0|maxplatform-backend-8000  | 2025-08-14T12:06:18: 2025-08-14 12:06:18.880 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+3|maxlab-backend-8010       | 2025-08-14T12:06:18: INFO:     192.168.15.220:0 - "GET /api/v1/workspaces/tree HTTP/1.1" 200 OK
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.870 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:10]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[11:24]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[25:38]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[39:103]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[104:113]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[114:120]
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.871 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.873 [INFO] app.api.oauth_simple:2283 - Processing refresh token grant for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.874 [INFO] app.api.oauth_simple:2296 - Validating client credentials for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.874 [INFO] app.api.oauth_simple:489 - Looking up client in database: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.875 [INFO] app.api.oauth_simple:501 - Client found in database: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.875 [INFO] app.api.oauth_simple:520 - Client is_confidential: False, has_client_secret: False
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.875 [INFO] app.api.oauth_simple:527 - Client validation completed successfully: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.875 [INFO] app.api.oauth_simple:2298 - Client validation successful for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.875 [INFO] app.api.oauth_simple:2310 - Validating refresh token for client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.875 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_validation | Data: {'event_type': 'refresh_token_validation', 'client_id': 'maxlab', 'user_id': None, 'scope': None, 'success': True, 'ip_address': None, 'user_agent': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.876 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_validation | Data: {'event_type': 'refresh_token_validation', 'client_id': 'maxlab', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'scope': None, 'success': True, 'ip_address': None, 'user_agent': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.876 [INFO] app.api.oauth_simple:2321 - Refresh token validation successful for client_id: maxlab, user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.core.token_refresh_coordinator:57 - ✅ Acquired refresh lock for user=21a2aaa7-444a-4038-bda3-d8bf2c4ef162, client=maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.api.oauth_simple:2346 - 🔒 Token rotation under distributed lock for client_id: maxlab, user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.api.oauth_simple:383 - Starting graceful token rotation - old_hash: fa1da1d3b4..., user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162, client_id: maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.api.oauth_simple:389 - Generated new refresh token - new_hash: 3cced116d5...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': '21a2aaa7-444a-4038-bda3-d8bf2c4ef162', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-14T03:09:19.877442', 'jti': '175f595d-a1da-44d4-b827-3f334f80c57f'}}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.api.oauth_simple:396 - Generated new access token for user_id: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.877 [INFO] app.api.oauth_simple:405 - Setting old token to 'rotating' status with grace period until 2025-08-14 03:06:29.877881
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.878 [INFO] app.api.oauth_simple:421 - Creating new refresh token with parent relationship
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.880 [INFO] app.api.oauth_simple:471 - Graceful rotation completed - old token has 2025-08-14 03:06:29.877881 grace period
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.880 [INFO] app.api.oauth_simple:472 - Token family: fa1da1d3b4... → 3cced116d5...
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.880 [DEBUG] app.core.token_refresh_coordinator:144 - 💾 Cached refresh result for user=21a2aaa7-444a-4038-bda3-d8bf2c4ef162, client=maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.881 [DEBUG] app.core.token_refresh_coordinator:104 - 🔓 Released refresh lock: token_refresh_lock:21a2aaa7-444a-4038-bda3-d8bf2c4ef162:maxlab
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.881 [ERROR] app.database:112 - 데이터베이스 세션 생성 실패: 1 validation errors:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:   {'type': 'model_attributes_type', 'loc': ('response',), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.882 [ERROR] app.database:115 - 세부 에러: Traceback (most recent call last):
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:   File "/home/app-user/maxproject/maxplatform/backend/app/database.py", line 97, in get_db
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:     yield db
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/fastapi/concurrency.py", line 27, in contextmanager_in_threadpool
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:     yield await run_in_threadpool(cm.__enter__)
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 327, in app
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:     content = await serialize_response(
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:               ^^^^^^^^^^^^^^^^^^^^^^^^^
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 176, in serialize_response
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:     raise ResponseValidationError(
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: fastapi.exceptions.ResponseValidationError: 1 validation errors:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:   {'type': 'model_attributes_type', 'loc': ('response',), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': None}
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19:
+0|maxplatform-backend-8000  | 2025-08-14T12:06:19: 2025-08-14 12:06:19.882 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/oauth/token HTTP/1.1" 500
+0|maxplatform-backend-8000  | 2025-08-14T12:06:20: 2025-08-14 12:06:20.847 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "OPTIONS /api/security/events HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T12:06:20: 2025-08-14 12:06:20.869 [INFO] app.api.security_events:276 - Processed 3 security events from 192.168.15.220 (user: admin@test.com)
+0|maxplatform-backend-8000  | 2025-08-14T12:06:20: 2025-08-14 12:06:20.870 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/security/events HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T12:06:37: 2025-08-14 12:06:37.893 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-14T12:06:37: 2025-08-14 12:06:37.894 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s)
+3|maxlab-backend-8010       | 2025-08-14T12:06:41: INFO:     192.168.9.87:0 - "GET /api/v1/personal-test/process-flow/public/4MAtSwbiTlqW9h_qudexPZqRew-_hwAWlxldW0HZR18?_t=1755141149012&_r=ybd4az1oguk HTTP/1.1" 200 OK
+3|maxlab-backend-8010       | 2025-08-14T12:06:41: INFO:     192.168.9.87:0 - "GET /api/v1/personal-test/process-flow/public/4MAtSwbiTlqW9h_qudexPZqRew-_hwAWlxldW0HZR18/equipment/status?_t=1755141149023 HTTP/1.1" 200 OK
+1|maxplatform-backend-8001  | 2025-08-14T12:06:44: 2025-08-14 12:06:44.897 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-14T12:06:44: 2025-08-14 12:06:44.897 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s)
+3|maxlab-backend-8010       | 2025-08-14T12:06:44: INFO:     192.168.9.87:0 - "GET /api/v1/personal-test/process-flow/public/4MAtSwbiTlqW9h_qudexPZqRew-_hwAWlxldW0HZR18/measurements?_t=1755141149023 HTTP/1.1" 200 OK
+2|maxplatform-backend-8002  | 2025-08-14T12:06:51: 2025-08-14 12:06:51.790 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-14T12:06:51: 2025-08-14 12:06:51.791 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s)
+>>>>>>> parent of 1e6da3d (log)
