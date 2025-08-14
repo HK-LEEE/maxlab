@@ -1,39 +1,16 @@
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.251 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 2bb7619e-1484-429a-adf3-2994417676d9
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.251 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.251 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.252 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 2bb7619e-1484-429a-adf3-2994417676d9
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.252 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.252 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 2bb7619e-1484-429a-adf3-2994417676d9
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.252 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'session_id'
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.252 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.252 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 2bb7619e-1484-429a-adf3-2994417676d9, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.253 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.262 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 2bb7619e-1484-429a-adf3-2994417676d9
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.262 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.262 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.262 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 2bb7619e-1484-429a-adf3-2994417676d9
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.262 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.262 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 2bb7619e-1484-429a-adf3-2994417676d9
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.263 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'session_id'
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.263 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.263 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 2bb7619e-1484-429a-adf3-2994417676d9, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:14: 2025-08-14 14:38:14.263 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.704 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.704 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.704 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.704 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.704 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.705 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.705 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'session_id'
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.705 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.705 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.706 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.711 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.711 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.711 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.711 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.712 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.712 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.712 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'session_id'
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.712 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:38:15: 2025-08-14 14:38:15.712 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: d5ea8126-42ae-4878-91cc-e738741c2d75, token_prefix: eyJhbGciOi...
+/home/app-user/maxproject/maxplatform/backend/logs/pm2-out-0.log last 15 lines:
+0|maxplatf | 2025-08-14T14:43:47: 2025-08-14 14:43:47.437 [ERROR] app.services.auth_service:77 - Failed to create tokens with Redis sync: (psycopg2.errors.UndefinedColumn) column "session_id" of relation "refresh_tokens" does not exist
+0|maxplatf | 2025-08-14T14:43:47: LINE 1: INSERT INTO refresh_tokens (id, token, user_id, session_id, ...
+0|maxplatf | 2025-08-14T14:43:47:                                                         ^
+0|maxplatf | 2025-08-14T14:43:47:
+0|maxplatf | 2025-08-14T14:43:47: [SQL: INSERT INTO refresh_tokens (id, token, user_id, session_id, device_info, ip_address, user_agent, is_active, is_revoked, created_at, expires_at, last_used_at, revoked_at) VALUES (%(id)s::UUID, %(token)s, %(user_id)s::UUID, %(session_id)s, %(device_info)s, %(ip_address)s, %(user_agent)s, %(is_active)s, %(is_revoked)s, %(created_at)s, %(expires_at)s, %(last_used_at)s, %(revoked_at)s)]
+0|maxplatf | 2025-08-14T14:43:47: [parameters: {'id': UUID('f5b744fd-66f2-4e6b-846e-2191fdcad64b'), 'token': 'eyJhbGciOi...', 'user_id': UUID('d65db892-9691-46e3-a2c6-d962980f2f51'), 'session_id': None, 'device_info': None, 'ip_address': None, 'user_agent': None, 'is_active': True, 'is_revoked': False, 'created_at': datetime.datetime(2025, 8, 14, 5, 43, 47, 434714), 'expires_at': datetime.datetime(2025, 8, 21, 5, 43, 47, 434715), 'last_used_at': None, 'revoked_at': None}]
+0|maxplatf | 2025-08-14T14:43:47: (Background on this error at: https://sqlalche.me/e/20/f405)
+0|maxplatf | 2025-08-14T14:43:47: 2025-08-14 14:43:47.437 [ERROR] app.routers.auth:570 - 토큰 생성 실패: (psycopg2.errors.UndefinedColumn) column "session_id" of relation "refresh_tokens" does not exist
+0|maxplatf | 2025-08-14T14:43:47: LINE 1: INSERT INTO refresh_tokens (id, token, user_id, session_id, ...
+0|maxplatf | 2025-08-14T14:43:47:                                                         ^
+0|maxplatf | 2025-08-14T14:43:47:
+0|maxplatf | 2025-08-14T14:43:47: [SQL: INSERT INTO refresh_tokens (id, token, user_id, session_id, device_info, ip_address, user_agent, is_active, is_revoked, created_at, expires_at, last_used_at, revoked_at) VALUES (%(id)s::UUID, %(token)s, %(user_id)s::UUID, %(session_id)s, %(device_info)s, %(ip_address)s, %(user_agent)s, %(is_active)s, %(is_revoked)s, %(created_at)s, %(expires_at)s, %(last_used_at)s, %(revoked_at)s)]
+0|maxplatf | 2025-08-14T14:43:47: [parameters: {'id': UUID('f5b744fd-66f2-4e6b-846e-2191fdcad64b'), 'token': 'eyJhbGciOi...', 'user_id': UUID('d65db892-9691-46e3-a2c6-d962980f2f51'), 'session_id': None, 'device_info': None, 'ip_address': None, 'user_agent': None, 'is_active': True, 'is_revoked': False, 'created_at': datetime.datetime(2025, 8, 14, 5, 43, 47, 434714), 'expires_at': datetime.datetime(2025, 8, 21, 5, 43, 47, 434715), 'last_used_at': None, 'revoked_at': None}]
+0|maxplatf | 2025-08-14T14:43:47: (Background on this error at: https://sqlalche.me/e/20/f405)
+0|maxplatf | 2025-08-14T14:43:47: 2025-08-14 14:43:47.438 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/login HTTP/1.1" 500
