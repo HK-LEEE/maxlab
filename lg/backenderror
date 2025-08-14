@@ -1,6 +1,13 @@
-│ │ 우선순위 1: 마이그레이션 실행                                                                                    │ │
-│ │ ALTER TABLE oauth_refresh_tokens ADD COLUMN IF NOT EXISTS session_id VARCHAR(255);                               │ │
-│ │ ALTER TABLE oauth_access_tokens ADD COLUMN IF NOT EXISTS session_id VARCHAR(255);                                │ │
-│ │ CREATE INDEX IF NOT EXISTS idx_oauth_refresh_tokens_session_scope ON oauth_refresh_tokens(user_id, client_id,    │ │
-│ │ session_id, token_status);                                                                                       │ │
-│ │                                  
+2|maxplatform-backend-8002  | 2025-08-14T14:20:34: 2025-08-14 14:20:34.952 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-14T14:20:34: 2025-08-14 14:20:34.954 [DEBUG] app.services.session_monitor:177 - Session check completed: 7 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.623 [INFO] app.routers.auth:607 - Refresh token request received
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.623 [DEBUG] app.routers.auth:193 - Attempting to verify refresh token
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.625 [WARNING] app.routers.auth:227 - Refresh token is not valid (expired/revoked) for user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.625 [WARNING] app.routers.auth:619 - Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.626 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.637 [INFO] app.routers.auth:607 - Refresh token request received
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.637 [DEBUG] app.routers.auth:193 - Attempting to verify refresh token
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.639 [WARNING] app.routers.auth:227 - Refresh token is not valid (expired/revoked) for user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.639 [WARNING] app.routers.auth:619 - Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:20:37: 2025-08-14 14:20:37.639 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
+
