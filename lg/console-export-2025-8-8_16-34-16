@@ -1,9 +1,0 @@
-17:52:50.795 🔒 Executing cross-domain logout cleanup index-BAsBJOwh.js:846:88574
-17:52:50.796 🚨 Cross-domain logout detected - clearing session index-BAsBJOwh.js:846:92428
-17:52:50.801 📨 Received auth sync event: LOGOUT index-BAsBJOwh.js:263:93055
-17:52:50.801 📨 Received logout event from other tab: cross_domain_logout index-BAsBJOwh.js:846:91865
-17:52:50.802 🚨 Logout broadcast received index-BAsBJOwh.js:846:87283
-17:52:50.802 🔒 Executing cross-domain logout cleanup index-BAsBJOwh.js:846:88574
-17:52:50.821 GET
-https://maxlab.dwchem.co.kr/login?reason=cross_domain_logout
-
