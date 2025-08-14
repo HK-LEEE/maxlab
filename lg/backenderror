@@ -12,3 +12,47 @@
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                         ]
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: [parameters: {'client_id': 'maxplatform-web', 'client_secret': 'not-used-f...', 'redirect_uris': 'https://max.dwchem.co.kr,https://maxlab.dwchem.co.kr', 'grant_types': 'password,refresh_token', 'response_types': 'token', 'scope': 'openid profile email'}]
 0|maxplatform-backend-8000  | 2025-08-14T14:46:41: (Background on this error at: https://sqlalche.me/e/20/f405)
+
+
+
+
+|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.238 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.241 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.241 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.241 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.242 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.248 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.248 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.248 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.249 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.249 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.249 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.251 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.251 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.251 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.252 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.893 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.894 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.894 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.895 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.895 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.906 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.909 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.909 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.909 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.910 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
