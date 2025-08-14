@@ -398,7 +398,8 @@ class OAuthRequestCoordinator {
    * Clean up individual request
    */
   private cleanupRequest(requestInfo: OAuthRequestInfo): void {
-    if (requestInfo.abortController) {
+    // Only abort if the request is not completed
+    if (requestInfo.abortController && requestInfo.status !== 'completed') {
       requestInfo.abortController.abort();
     }
   }
