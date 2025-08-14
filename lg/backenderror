@@ -16,43 +16,698 @@
 
 
 
-|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.237 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.238 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.241 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.241 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.241 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.242 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.248 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.248 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.248 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.249 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.249 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.249 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.251 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.251 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.251 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 23bc12bd-3fc9-482d-9ead-1f5e99b1009f, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:35: 2025-08-14 14:50:35.252 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.892 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.893 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.894 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.894 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.895 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.895 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.906 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.907 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.909 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: type object 'RefreshToken' has no attribute 'revoked'
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.909 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.909 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: e1536a47-2da0-4ac6-ae6e-cfc7db2f3356, token_prefix: eyJhbGciOi...
-0|maxplatform-backend-8000  | 2025-08-14T14:50:41: 2025-08-14 14:50:41.910 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.395 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.395 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.395 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.395 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.395 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.396 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.406 [WARNING] app.routers.auth:255 - 🔍 Token lookup failed - Total active tokens for user: 163
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.406 [DEBUG] app.routers.auth:258 -   Token 1: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:44:33.484312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.406 [DEBUG] app.routers.auth:258 -   Token 2: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:45:28.376190
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 3: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 01:33:19.504431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 4: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 00:19:13.197629
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 5: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:33:19.677213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 6: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:34:42.054818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 7: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:22:53.148175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 8: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 03:32:57.463090
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 9: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:46:17.167555
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 10: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 06:42:18.202702
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 11: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 08:36:59.594997
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 12: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 01:59:12.662710
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 13: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 09:23:36.145921
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 14: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:38.745032
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 15: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:52.858365
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.407 [DEBUG] app.routers.auth:258 -   Token 16: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:58:00.982036
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 17: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:21.927181
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 18: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:28.406075
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 19: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:22:22.699941
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 20: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:35:10.375745
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 21: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:39.739175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 22: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:10:30.305500
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 23: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:23.850254
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 24: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 01:29:39.610653
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 25: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:50:39.674758
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 26: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:51:08.419610
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 27: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:53:58.482025
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 28: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:40.714536
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 29: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:45.474981
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 30: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 04:21:49.911429
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 31: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 06:36:32.100829
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.408 [DEBUG] app.routers.auth:258 -   Token 32: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:12.216562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 33: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:13.297492
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 34: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:05:38.773173
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 35: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:20:52.199787
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 36: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:54.065441
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 37: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:27.555213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 38: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.944854
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 39: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:36.763571
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 40: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:43.070706
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 41: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.007880
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 42: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:47:11.173839
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 43: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:48:08.501562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 44: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:16.037844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 45: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:49.068888
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 46: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:56:10.634280
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.409 [DEBUG] app.routers.auth:258 -   Token 47: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:37:47.732590
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 48: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:22:18.071209
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 49: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:28:25.914800
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 50: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:35:34.922507
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 51: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:38:44.988950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 52: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:03.648867
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 53: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:34.576011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 54: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:57:49.999985
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 55: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:59:43.769942
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 56: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:05:02.283818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 57: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:06:00.505082
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 58: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:20.499449
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 59: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:29.987938
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 60: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:10:39.445247
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 61: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:13:54.966582
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.410 [DEBUG] app.routers.auth:258 -   Token 62: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:19:56.659999
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 63: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:54.861138
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 64: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:56.949603
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 65: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:24:18.651241
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 66: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:25:49.151362
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 67: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:27:58.779920
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 68: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:00.359424
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 69: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.079990
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 70: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.739398
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 71: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:53:06.556530
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 72: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:11:51.612337
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 73: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:17:07.677781
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 74: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:42.093803
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 75: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:43.170223
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 76: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:45.267400
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.411 [DEBUG] app.routers.auth:258 -   Token 77: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:30.461961
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 78: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:02:51.226609
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 79: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:03:17.836417
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 80: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:16.528008
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 81: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:28.879249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 82: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:10:59.932124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 83: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:04.746471
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 84: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:10.276041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 85: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:03.177295
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 86: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:46.078232
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 87: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:17:55.400622
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 88: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:05.628320
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 89: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:21.164293
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 90: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:33.941056
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 91: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:26:44.781158
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 92: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:30:47.738776
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.412 [DEBUG] app.routers.auth:258 -   Token 93: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:24.253349
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 94: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:49.059490
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 95: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:18.544517
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 96: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:38.996934
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 97: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:38:59.420467
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 98: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:39:41.292017
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 99: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:40:01.763877
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 100: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:41:02.720322
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 101: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:04.899116
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 102: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:11.962684
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 103: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.038172
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 104: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.693495
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 105: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:34.109281
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 106: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:18.691279
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 107: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:45:52.161312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.413 [DEBUG] app.routers.auth:258 -   Token 108: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:41.328465
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.414 [DEBUG] app.routers.auth:258 -   Token 109: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:43.567110
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.414 [DEBUG] app.routers.auth:258 -   Token 110: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:49:31.232950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.414 [DEBUG] app.routers.auth:258 -   Token 111: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:18.764514
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.414 [DEBUG] app.routers.auth:258 -   Token 112: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:51.788823
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.414 [DEBUG] app.routers.auth:258 -   Token 113: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:53:22.924783
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.415 [DEBUG] app.routers.auth:258 -   Token 114: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:58:58.839819
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.415 [DEBUG] app.routers.auth:258 -   Token 115: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 04:43:11.963730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.415 [DEBUG] app.routers.auth:258 -   Token 116: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-06 04:51:01.873592
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.415 [DEBUG] app.routers.auth:258 -   Token 117: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 00:29:34.152269
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 118: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 03:33:34.308395
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 119: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:33:27.620769
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 120: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:33.631844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 121: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:42.280679
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 122: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:28:03.222468
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 123: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:30:34.533832
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.416 [DEBUG] app.routers.auth:258 -   Token 124: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 03:43:31.539260
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 125: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 04:06:34.518319
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 126: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:08:45.056681
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 127: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:35:32.534237
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 128: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:29.251515
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 129: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:40.235732
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 130: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:58:30.463358
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 131: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:59:22.915917
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 132: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 07:28:02.255443
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 133: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 08:00:33.229439
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 134: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 05:12:04.008156
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.417 [DEBUG] app.routers.auth:258 -   Token 135: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 06:33:22.441452
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 136: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 07:17:19.633995
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 137: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 08:22:56.250272
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 138: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 22:53:01.773114
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 139: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 04:13:52.458878
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 140: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 22:32:26.355713
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 141: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 07:36:31.547607
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.418 [DEBUG] app.routers.auth:258 -   Token 142: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:10:14.280951
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 143: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:11:40.705898
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 144: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 22:23:41.133041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 145: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:18:21.773124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 146: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:41:36.615342
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 147: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:12:46.533035
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 148: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:17:45.194249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 149: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:23:32.182900
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 150: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:53:46.928508
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 151: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:49.552978
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 152: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:55.013598
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 153: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:29.148274
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 154: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:41.843470
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 155: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:34.561730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 156: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:31.334301
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.419 [DEBUG] app.routers.auth:258 -   Token 157: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:18:46.062636
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:258 -   Token 158: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:13.465755
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:258 -   Token 159: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:35.875346
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:258 -   Token 160: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:18.818081
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:258 -   Token 161: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:14.194431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:258 -   Token 162: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:15.645011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:258 -   Token 163: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:35.181140
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [WARNING] app.routers.auth:260 - ❌ Refresh token not found in database for user: d65db892-9691-46e3-a2c6-d962980f2f51, session: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.420 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.421 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.429 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.429 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.429 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.429 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.429 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.429 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.434 [WARNING] app.routers.auth:255 - 🔍 Token lookup failed - Total active tokens for user: 163
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.434 [DEBUG] app.routers.auth:258 -   Token 1: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:44:33.484312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.434 [DEBUG] app.routers.auth:258 -   Token 2: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:45:28.376190
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.434 [DEBUG] app.routers.auth:258 -   Token 3: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 01:33:19.504431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 4: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 00:19:13.197629
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 5: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:33:19.677213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 6: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:34:42.054818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 7: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:22:53.148175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 8: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 03:32:57.463090
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 9: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:46:17.167555
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 10: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 06:42:18.202702
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 11: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 08:36:59.594997
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 12: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 01:59:12.662710
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 13: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 09:23:36.145921
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 14: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:38.745032
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 15: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:52.858365
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 16: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:58:00.982036
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.435 [DEBUG] app.routers.auth:258 -   Token 17: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:21.927181
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 18: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:28.406075
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 19: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:22:22.699941
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 20: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:35:10.375745
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 21: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:39.739175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 22: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:10:30.305500
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 23: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:23.850254
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 24: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 01:29:39.610653
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 25: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:50:39.674758
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 26: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:51:08.419610
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 27: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:53:58.482025
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 28: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:40.714536
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 29: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:45.474981
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 30: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 04:21:49.911429
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.436 [DEBUG] app.routers.auth:258 -   Token 31: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 06:36:32.100829
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 32: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:12.216562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 33: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:13.297492
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 34: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:05:38.773173
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 35: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:20:52.199787
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 36: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:54.065441
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 37: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:27.555213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 38: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.944854
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 39: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:36.763571
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 40: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:43.070706
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 41: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.007880
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 42: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:47:11.173839
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.437 [DEBUG] app.routers.auth:258 -   Token 43: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:48:08.501562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 44: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:16.037844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 45: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:49.068888
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 46: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:56:10.634280
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 47: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:37:47.732590
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 48: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:22:18.071209
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 49: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:28:25.914800
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 50: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:35:34.922507
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 51: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:38:44.988950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 52: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:03.648867
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 53: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:34.576011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 54: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:57:49.999985
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 55: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:59:43.769942
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.438 [DEBUG] app.routers.auth:258 -   Token 56: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:05:02.283818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 57: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:06:00.505082
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 58: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:20.499449
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 59: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:29.987938
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 60: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:10:39.445247
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 61: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:13:54.966582
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 62: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:19:56.659999
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 63: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:54.861138
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 64: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:56.949603
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 65: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:24:18.651241
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 66: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:25:49.151362
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 67: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:27:58.779920
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 68: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:00.359424
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 69: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.079990
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 70: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.739398
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.439 [DEBUG] app.routers.auth:258 -   Token 71: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:53:06.556530
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 72: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:11:51.612337
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 73: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:17:07.677781
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 74: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:42.093803
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 75: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:43.170223
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 76: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:45.267400
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 77: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:30.461961
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 78: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:02:51.226609
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 79: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:03:17.836417
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 80: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:16.528008
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 81: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:28.879249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 82: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:10:59.932124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 83: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:04.746471
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 84: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:10.276041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.440 [DEBUG] app.routers.auth:258 -   Token 85: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:03.177295
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 86: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:46.078232
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 87: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:17:55.400622
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 88: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:05.628320
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 89: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:21.164293
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 90: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:33.941056
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 91: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:26:44.781158
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 92: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:30:47.738776
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 93: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:24.253349
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 94: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:49.059490
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 95: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:18.544517
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 96: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:38.996934
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 97: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:38:59.420467
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 98: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:39:41.292017
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.441 [DEBUG] app.routers.auth:258 -   Token 99: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:40:01.763877
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 100: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:41:02.720322
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 101: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:04.899116
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 102: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:11.962684
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 103: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.038172
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 104: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.693495
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 105: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:34.109281
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 106: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:18.691279
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 107: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:45:52.161312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 108: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:41.328465
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 109: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:43.567110
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 110: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:49:31.232950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 111: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:18.764514
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 112: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:51.788823
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.442 [DEBUG] app.routers.auth:258 -   Token 113: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:53:22.924783
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 114: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:58:58.839819
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 115: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 04:43:11.963730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 116: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-06 04:51:01.873592
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 117: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 00:29:34.152269
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 118: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 03:33:34.308395
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 119: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:33:27.620769
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 120: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:33.631844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 121: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:42.280679
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 122: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:28:03.222468
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 123: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:30:34.533832
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.443 [DEBUG] app.routers.auth:258 -   Token 124: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 03:43:31.539260
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 125: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 04:06:34.518319
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 126: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:08:45.056681
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 127: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:35:32.534237
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 128: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:29.251515
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 129: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:40.235732
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 130: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:58:30.463358
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 131: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:59:22.915917
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 132: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 07:28:02.255443
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 133: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 08:00:33.229439
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 134: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 05:12:04.008156
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.444 [DEBUG] app.routers.auth:258 -   Token 135: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 06:33:22.441452
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 136: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 07:17:19.633995
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 137: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 08:22:56.250272
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 138: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 22:53:01.773114
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 139: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 04:13:52.458878
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 140: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 22:32:26.355713
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 141: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 07:36:31.547607
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 142: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:10:14.280951
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 143: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:11:40.705898
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 144: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 22:23:41.133041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.445 [DEBUG] app.routers.auth:258 -   Token 145: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:18:21.773124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 146: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:41:36.615342
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 147: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:12:46.533035
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 148: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:17:45.194249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 149: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:23:32.182900
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 150: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:53:46.928508
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 151: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:49.552978
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 152: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:55.013598
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 153: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:29.148274
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 154: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:41.843470
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 155: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:34.561730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.446 [DEBUG] app.routers.auth:258 -   Token 156: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:31.334301
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 157: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:18:46.062636
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 158: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:13.465755
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 159: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:35.875346
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 160: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:18.818081
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 161: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:14.194431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 162: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:15.645011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [DEBUG] app.routers.auth:258 -   Token 163: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:35.181140
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.447 [WARNING] app.routers.auth:260 - ❌ Refresh token not found in database for user: d65db892-9691-46e3-a2c6-d962980f2f51, session: 7a0a734c-4c92-4e24-9556-5a4a6a087660
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.448 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.448 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: 7a0a734c-4c92-4e24-9556-5a4a6a087660, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:31: 2025-08-14 14:58:31.450 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.931 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.932 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.932 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.932 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.932 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.932 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [WARNING] app.routers.auth:255 - 🔍 Token lookup failed - Total active tokens for user: 163
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 1: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:44:33.484312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 2: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:45:28.376190
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 3: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 01:33:19.504431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 4: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 00:19:13.197629
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 5: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:33:19.677213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 6: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:34:42.054818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 7: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:22:53.148175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 8: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 03:32:57.463090
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.937 [DEBUG] app.routers.auth:258 -   Token 9: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:46:17.167555
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 10: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 06:42:18.202702
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 11: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 08:36:59.594997
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 12: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 01:59:12.662710
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 13: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 09:23:36.145921
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 14: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:38.745032
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 15: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:52.858365
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 16: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:58:00.982036
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 17: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:21.927181
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 18: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:28.406075
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 19: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:22:22.699941
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 20: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:35:10.375745
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 21: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:39.739175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 22: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:10:30.305500
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 23: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:23.850254
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.938 [DEBUG] app.routers.auth:258 -   Token 24: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 01:29:39.610653
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 25: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:50:39.674758
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 26: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:51:08.419610
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 27: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:53:58.482025
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 28: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:40.714536
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 29: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:45.474981
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 30: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 04:21:49.911429
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 31: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 06:36:32.100829
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 32: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:12.216562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 33: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:13.297492
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 34: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:05:38.773173
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 35: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:20:52.199787
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 36: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:54.065441
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 37: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:27.555213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 38: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.944854
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.939 [DEBUG] app.routers.auth:258 -   Token 39: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:36.763571
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 40: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:43.070706
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 41: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.007880
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 42: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:47:11.173839
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 43: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:48:08.501562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 44: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:16.037844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 45: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:49.068888
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 46: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:56:10.634280
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 47: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:37:47.732590
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 48: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:22:18.071209
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 49: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:28:25.914800
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 50: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:35:34.922507
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 51: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:38:44.988950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 52: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:03.648867
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 53: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:34.576011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.940 [DEBUG] app.routers.auth:258 -   Token 54: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:57:49.999985
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 55: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:59:43.769942
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 56: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:05:02.283818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 57: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:06:00.505082
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 58: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:20.499449
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 59: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:29.987938
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 60: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:10:39.445247
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 61: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:13:54.966582
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 62: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:19:56.659999
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 63: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:54.861138
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 64: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:56.949603
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 65: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:24:18.651241
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 66: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:25:49.151362
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 67: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:27:58.779920
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 68: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:00.359424
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 69: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.079990
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.941 [DEBUG] app.routers.auth:258 -   Token 70: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.739398
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 71: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:53:06.556530
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 72: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:11:51.612337
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 73: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:17:07.677781
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 74: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:42.093803
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 75: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:43.170223
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 76: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:45.267400
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 77: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:30.461961
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 78: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:02:51.226609
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 79: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:03:17.836417
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 80: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:16.528008
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 81: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:28.879249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 82: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:10:59.932124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 83: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:04.746471
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.942 [DEBUG] app.routers.auth:258 -   Token 84: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:10.276041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 85: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:03.177295
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 86: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:46.078232
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 87: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:17:55.400622
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 88: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:05.628320
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 89: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:21.164293
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 90: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:33.941056
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 91: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:26:44.781158
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 92: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:30:47.738776
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 93: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:24.253349
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 94: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:49.059490
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 95: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:18.544517
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 96: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:38.996934
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 97: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:38:59.420467
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 98: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:39:41.292017
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.943 [DEBUG] app.routers.auth:258 -   Token 99: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:40:01.763877
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 100: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:41:02.720322
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 101: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:04.899116
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 102: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:11.962684
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 103: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.038172
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 104: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.693495
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 105: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:34.109281
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 106: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:18.691279
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 107: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:45:52.161312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 108: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:41.328465
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 109: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:43.567110
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 110: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:49:31.232950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 111: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:18.764514
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 112: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:51.788823
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.944 [DEBUG] app.routers.auth:258 -   Token 113: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:53:22.924783
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 114: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:58:58.839819
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 115: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 04:43:11.963730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 116: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-06 04:51:01.873592
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 117: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 00:29:34.152269
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 118: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 03:33:34.308395
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 119: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:33:27.620769
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 120: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:33.631844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 121: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:42.280679
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 122: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:28:03.222468
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 123: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:30:34.533832
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 124: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 03:43:31.539260
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 125: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 04:06:34.518319
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 126: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:08:45.056681
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.945 [DEBUG] app.routers.auth:258 -   Token 127: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:35:32.534237
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 128: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:29.251515
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 129: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:40.235732
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 130: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:58:30.463358
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 131: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:59:22.915917
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 132: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 07:28:02.255443
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 133: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 08:00:33.229439
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 134: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 05:12:04.008156
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 135: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 06:33:22.441452
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 136: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 07:17:19.633995
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 137: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 08:22:56.250272
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 138: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 22:53:01.773114
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 139: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 04:13:52.458878
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 140: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 22:32:26.355713
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 141: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 07:36:31.547607
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.946 [DEBUG] app.routers.auth:258 -   Token 142: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:10:14.280951
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 143: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:11:40.705898
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 144: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 22:23:41.133041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 145: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:18:21.773124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 146: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:41:36.615342
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 147: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:12:46.533035
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 148: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:17:45.194249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 149: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:23:32.182900
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 150: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:53:46.928508
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 151: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:49.552978
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 152: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:55.013598
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 153: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:29.148274
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 154: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:41.843470
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 155: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:34.561730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 156: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:31.334301
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.947 [DEBUG] app.routers.auth:258 -   Token 157: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:18:46.062636
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:258 -   Token 158: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:13.465755
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:258 -   Token 159: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:35.875346
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:258 -   Token 160: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:18.818081
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:258 -   Token 161: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:14.194431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:258 -   Token 162: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:15.645011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:258 -   Token 163: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:35.181140
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [WARNING] app.routers.auth:260 - ❌ Refresh token not found in database for user: d65db892-9691-46e3-a2c6-d962980f2f51, session: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.948 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.949 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.971 [INFO] app.routers.auth:653 - 🔄 Refresh token request received - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.971 [INFO] app.routers.auth:654 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.971 [DEBUG] app.routers.auth:678 - 🚫 Token analysis failed (non-critical): cannot import name 'decode' from 'jwt' (/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/jwt/__init__.py)
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.971 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.971 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.972 [DEBUG] app.routers.auth:239 - 🏷️ Applying session-scoped token lookup - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [WARNING] app.routers.auth:255 - 🔍 Token lookup failed - Total active tokens for user: 163
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [DEBUG] app.routers.auth:258 -   Token 1: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:44:33.484312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [DEBUG] app.routers.auth:258 -   Token 2: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-17 23:45:28.376190
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [DEBUG] app.routers.auth:258 -   Token 3: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 01:33:19.504431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [DEBUG] app.routers.auth:258 -   Token 4: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-18 00:19:13.197629
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [DEBUG] app.routers.auth:258 -   Token 5: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:33:19.677213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.976 [DEBUG] app.routers.auth:258 -   Token 6: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 02:34:42.054818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 7: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:22:53.148175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 8: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 03:32:57.463090
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 9: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-21 07:46:17.167555
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 10: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 06:42:18.202702
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 11: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-29 08:36:59.594997
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 12: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 01:59:12.662710
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 13: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-30 09:23:36.145921
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 14: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:38.745032
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 15: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:57:52.858365
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 16: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:58:00.982036
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 17: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:21.927181
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 18: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 05:59:28.406075
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 19: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:22:22.699941
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 20: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-07-31 22:35:10.375745
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 21: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:39.739175
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.977 [DEBUG] app.routers.auth:258 -   Token 22: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:10:30.305500
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 23: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 00:09:23.850254
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 24: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 01:29:39.610653
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 25: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:50:39.674758
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 26: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:51:08.419610
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 27: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 02:53:58.482025
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 28: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:40.714536
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 29: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 03:32:45.474981
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 30: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 04:21:49.911429
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 31: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 06:36:32.100829
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 32: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:12.216562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 33: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:00:13.297492
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 34: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-01 07:05:38.773173
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 35: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:20:52.199787
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 36: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:54.065441
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.978 [DEBUG] app.routers.auth:258 -   Token 37: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:27.555213
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 38: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.944854
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 39: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:36.763571
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 40: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:36:43.070706
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 41: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:45:35.007880
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 42: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:47:11.173839
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 43: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:48:08.501562
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 44: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:16.037844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 45: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:55:49.068888
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 46: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-03 23:56:10.634280
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 47: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:37:47.732590
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 48: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:22:18.071209
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 49: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:28:25.914800
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 50: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:35:34.922507
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 51: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:38:44.988950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.979 [DEBUG] app.routers.auth:258 -   Token 52: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:03.648867
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 53: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:51:34.576011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 54: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:57:49.999985
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 55: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 00:59:43.769942
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 56: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:05:02.283818
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 57: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:06:00.505082
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 58: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:20.499449
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 59: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:07:29.987938
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 60: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:10:39.445247
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 61: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:13:54.966582
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 62: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:19:56.659999
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 63: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:54.861138
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 64: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:22:56.949603
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 65: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:24:18.651241
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 66: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:25:49.151362
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 67: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:27:58.779920
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.980 [DEBUG] app.routers.auth:258 -   Token 68: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:00.359424
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 69: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.079990
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 70: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:28:01.739398
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 71: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 01:53:06.556530
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 72: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:11:51.612337
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 73: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:17:07.677781
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 74: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:42.093803
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 75: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:19:43.170223
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 76: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:45.267400
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 77: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 02:27:30.461961
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 78: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:02:51.226609
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 79: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:03:17.836417
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 80: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:16.528008
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 81: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:09:28.879249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 82: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:10:59.932124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 83: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:04.746471
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.981 [DEBUG] app.routers.auth:258 -   Token 84: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:13:10.276041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 85: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:03.177295
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 86: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:16:46.078232
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 87: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:17:55.400622
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 88: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:05.628320
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 89: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:21.164293
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 90: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:21:33.941056
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 91: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:26:44.781158
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 92: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:30:47.738776
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 93: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:24.253349
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 94: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:35:49.059490
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 95: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:18.544517
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 96: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:36:38.996934
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 97: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:38:59.420467
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.982 [DEBUG] app.routers.auth:258 -   Token 98: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:39:41.292017
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 99: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:40:01.763877
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 100: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:41:02.720322
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 101: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:04.899116
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 102: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:11.962684
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 103: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.038172
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 104: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:13.693495
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 105: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:34.109281
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 106: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:44:18.691279
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 107: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:45:52.161312
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 108: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:41.328465
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 109: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:47:43.567110
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.983 [DEBUG] app.routers.auth:258 -   Token 110: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:49:31.232950
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 111: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:18.764514
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 112: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:51:51.788823
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 113: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:53:22.924783
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 114: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 03:58:58.839819
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 115: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-04 04:43:11.963730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 116: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-06 04:51:01.873592
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 117: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 00:29:34.152269
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 118: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-07 03:33:34.308395
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 119: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:33:27.620769
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 120: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:33.631844
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 121: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:27:42.280679
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 122: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:28:03.222468
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.984 [DEBUG] app.routers.auth:258 -   Token 123: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 02:30:34.533832
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 124: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 03:43:31.539260
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 125: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 04:06:34.518319
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 126: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:08:45.056681
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 127: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:35:32.534237
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 128: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:29.251515
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 129: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:36:40.235732
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 130: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:58:30.463358
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 131: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 06:59:22.915917
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 132: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 07:28:02.255443
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.985 [DEBUG] app.routers.auth:258 -   Token 133: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-08 08:00:33.229439
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 134: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 05:12:04.008156
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 135: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 06:33:22.441452
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 136: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-10 07:17:19.633995
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 137: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 08:22:56.250272
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 138: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-11 22:53:01.773114
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 139: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 04:13:52.458878
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 140: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-12 22:32:26.355713
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 141: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 07:36:31.547607
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 142: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:10:14.280951
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 143: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 09:11:40.705898
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 144: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-13 22:23:41.133041
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 145: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:18:21.773124
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.986 [DEBUG] app.routers.auth:258 -   Token 146: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:41:36.615342
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 147: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:12:46.533035
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 148: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:17:45.194249
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 149: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:23:32.182900
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 150: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:53:46.928508
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 151: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:49.552978
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 152: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 04:47:55.013598
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 153: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:29.148274
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 154: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:41.843470
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 155: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:08:34.561730
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 156: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:31.334301
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 157: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:18:46.062636
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.987 [DEBUG] app.routers.auth:258 -   Token 158: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:13.465755
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:258 -   Token 159: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:54:35.875346
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:258 -   Token 160: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:26:18.818081
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:258 -   Token 161: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:14.194431
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:258 -   Token 162: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:34:15.645011
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:258 -   Token 163: session_id=<legacy>, prefix=eyJhbGciOi..., created=2025-08-14 05:46:35.181140
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [WARNING] app.routers.auth:260 - ❌ Refresh token not found in database for user: d65db892-9691-46e3-a2c6-d962980f2f51, session: cf75f7fd-799d-4fd6-9805-97142bb60a06
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [WARNING] app.routers.auth:690 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T14:58:35: 2025-08-14 14:58:35.988 [DEBUG] app.routers.auth:691 - 🔍 Failed verification details - session_id: cf75f7fd-799d-4fd6-9805-97142bb60a06, token_prefix: eyJhbGciOi...
