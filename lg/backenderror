@@ -1,58 +1,33 @@
-|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen runpy>", line 198, in _run_module_as_main
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen runpy>", line 88, in _run_code
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/__main__.py", line 4, in <module>
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     uvicorn.main()
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 1161, in __call__
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return self.main(*args, **kwargs)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 1082, in main
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     rv = self.invoke(ctx)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:          ^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 1443, in invoke
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return ctx.invoke(self.callback, **ctx.params)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/click/core.py", line 788, in invoke
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return __callback(*args, **kwargs)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/main.py", line 416, in main
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     run(
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/main.py", line 587, in run
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     server.run()
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 61, in run
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return asyncio.run(self.serve(sockets=sockets))
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return runner.run(main)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return self._loop.run_until_complete(task)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     config.load()
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/config.py", line 467, in load
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     self.loaded_app = import_from_string(self.app)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     module = importlib.import_module(module_str)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     return _bootstrap._gcd_import(name[level:], package, level)
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/app/main.py", line 43, in <module>
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     from .api import oauth_simple, oauth_compatibility, llm_models, security_events
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/app/api/oauth_simple.py", line 1983, in <module>
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:     response: Response = None,
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11:               ^^^^^^^^
-2|maxplatform-backend-8002  | 2025-08-14T17:42:11: NameError: name 'Response' is not defined
-PM2                         | pid=1907044 msg=failed to kill - retrying in 100ms
-0|maxplatform-backend-8000  | 2025-08-14T17:42:11: WARNING:passlib.handlers.bcrypt:(trapped) error reading bcrypt version
-0|maxplatform-backend-8000  | 2025-08-14T17:42:11: Traceback (most recent call last):
-0|maxplatform-backend-8000  | 2025-08-14T17:42:11:   File "/home/app-user/maxproject/maxplatform/backend/.venv/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
-0|maxplatform-backend-8000  | 2025-08-14T17:42:11:     version = _bcrypt.__about__.__version__
+|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.666 [INFO] app.routers.auth:663 - Current token request received for cross-domain sync
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.666 [WARNING] app.routers.auth:692 - No session found for current-token request
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.667 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/current-token HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.672 [DEBUG] app.utils.auth:469 - ✅ User authenticated via JWT token: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.672 [INFO] app.api.oauth_simple:778 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.672 [INFO] app.api.oauth_simple:783 - 🔍 Worker 1908157: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:785 - 🔍 Worker 1908157: Authenticated user: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:817 - 🔍 Worker 1908157: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:819 - 🔍 Worker 1908157: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1908157: Cookie 'session_id': b4c6c3d7-49da-4b6d-9b9f-145b84636ae3...
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1908157: Cookie 'session_token': b4c6c3d7-49da-4b6d-9b9f-145b84636ae3...
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1908157: Cookie 'user_id': d65db892-9691-46e3-a2c6-d962980f2f51...
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:825 - 🔍 Worker 1908157: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkN...
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:829 - 🔍 Worker 1908157: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.673 [INFO] app.api.oauth_simple:832 - 🔍 Worker 1908157: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.674 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b4c6c3d7-49da-4b6d-9b9f-145b84636ae3
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.675 [INFO] app.api.oauth_simple:905 - 🔄 Worker 1908157: Final prompt decision: none
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.675 [DEBUG] app.core.oauth_redis_integration:217 - 🍪 All cookies received: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.675 [DEBUG] app.core.oauth_redis_integration:218 - 🍪 Cookie header: session_id=b4c6c3d7-49da-4b6d-9b9f-145b84636ae3; session_token=b4c6c3d7-49da-4b6d-9b9f-145b84636ae3; user_id=d65db892-9691-46e3-a2c6-d962980f2f51; access_token=eyJhbGciOi...; session_id=b4c6c3d7-49da-4b6d-9b9f-145b84636ae3; session_token=b4c6c3d7-49da-4b6d-9b9f-145b84636ae3; user_id=d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.676 [DEBUG] app.core.oauth_redis_integration:219 - 🍪 Referer: https://maxlab.dwchem.co.kr/
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.676 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: b4c6c3d7-49da-4b6d-9b9f-145b84636ae3
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.676 [DEBUG] app.core.oauth_redis_integration:232 - ✅ Session found from request: b4c6c3d7-49da-4b6d-9b9f-145b84636ae3
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.676 [INFO] app.api.oauth_simple:940 - ✅ Worker 1908157: Redis session validated for user krn@test.com and client maxlab
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.676 [INFO] app.api.oauth_simple:1320 - prompt=none with authenticated user: immediately generating code for krn@test.com
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.680 [INFO] app.services.nonce_service:49 - Stored nonce for client maxlab
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.684 [INFO] app.api.oauth_simple:1470 - prompt=none success: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?code=P0EhIintY7EgNfroPyjiE97gzyxogZ_C_obOHNg1P84&state=tgPWNV7AwlmSQQH7TTDyMY7ufJuxakVa4PUMrvy0cEM
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.684 [INFO] app.api.oauth_simple:1500 - ✅ Worker 1908157: Preserved cookies in prompt=none redirect
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.711 [INFO] app.utils.auth:259 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.712 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.740 [INFO] app.utils.auth:259 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T17:44:47: 2025-08-14 17:44:47.746 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/services/mother-page HTTP/1.1" 200
+1|maxplatform-backend-8001  | 2025-08-14T17:44:54: 2025-08-14 17:44:54.263 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-14T17:44:54: 2025-08-14 17:44:54.264 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s)
