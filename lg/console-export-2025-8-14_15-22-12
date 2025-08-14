@@ -1,0 +1,97 @@
+15:16:07.448 GET
+https://max.dwchem.co.kr/login
+[HTTP/2 200  3ms]
+
+15:16:07.507 GET
+https://max.dwchem.co.kr/assets/index-Di4WTHLD.css
+[HTTP/2 200  24ms]
+
+15:16:07.507 GET
+https://max.dwchem.co.kr/assets/index-vPb9P-Xz.js
+[HTTP/2 200  3ms]
+
+15:16:07.549 GET
+https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+[HTTP/2 200  263ms]
+
+15:16:07.560 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
+15:16:07.793 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-vPb9P-Xz.js:705:971
+15:16:07.793 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-vPb9P-Xz.js:529:69183
+15:16:07.793 📡 TRY start index-vPb9P-Xz.js:529:69245
+15:16:07.793 ❌ 토큰이 없어 인증되지 않은 상태 index-vPb9P-Xz.js:529:69930
+15:16:07.795 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-vPb9P-Xz.js:705:971
+15:16:07.856 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+15:16:07.857 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  220ms]
+
+15:16:07.862 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  190ms]
+
+15:16:07.863 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  195ms]
+
+15:16:10.678 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  249ms]
+
+15:16:10.944 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-vPb9P-Xz.js:529:69183
+15:16:10.944 📡 TRY start index-vPb9P-Xz.js:529:69245
+15:16:10.944 📡 사용자 정보 로드 시작 index-vPb9P-Xz.js:529:69672
+15:16:10.962 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  6ms]
+
+15:16:10.964 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  15ms]
+
+15:16:10.978 🔄 SSO: Syncing login to MAX Lab... index-vPb9P-Xz.js:529:68593
+15:16:10.982 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-vPb9P-Xz.js:705:971
+15:16:10.983 ✅ User authenticated, checking OAuth return... index-vPb9P-Xz.js:705:1270
+15:16:10.984 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNjVkYjg5Mi05NjkxLTQ2ZTMtYTJjNi1kOTYyOTgwZjJmNTEiLCJlbWFpbCI6ImtybkB0ZXN0LmNvbSIsImV4cCI6MTc1NTE1MjI5MCwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc1NTE1MjE3MCwianRpIjoiZjVhOWJhYzctYzdkZi00MWMxLThlYmYtNGZhM2IzNjYxYjk1IiwibmJmIjoxNzU1MTUyMTcwLCJpc3MiOiJtYXhwbGF0Zm9ybSIsIm5vbmNlIjoiMGIxZDI2YzM1MmVlNThhMyJ9.qmU2Erpg9KnLlsHT1CPiyoXVaboTjA20i6gLZnABNvU&user={"id":"d65db892-9691-46e3-a2c6-d962980f2f51","real_name":"카리나","display_name":"카리나","email":"krn@test.com","phone_number":"010-3333-3333","department":"","position":"","is_active":true,"is_admin":false,"is_verified":false,"created_at":"2025-07-17T23:44:33.286670","last_login_at":"2025-08-14T06:16:10.902816","login_count":220,"roles":[],"groups":[]}
+[HTTP/2 200  66ms]
+
+15:16:10.989 ✅ 사용자 정보 로드 성공: 
+Object { id: "d65db892-9691-46e3-a2c6-d962980f2f51", real_name: "카리나", display_name: "카리나", email: "krn@test.com", phone_number: "010-3333-3333", department: "", position: "", is_active: true, is_admin: false, is_verified: false, … }
+index-vPb9P-Xz.js:529:69876
+15:16:11.021 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  21ms]
+
+15:16:11.066 Features response: 
+Object { user_info: {…}, services: (2) […], categories: (2) […] }
+index-vPb9P-Xz.js:728:28607
+15:16:11.067 Features data: 
+Array [ {…}, {…} ]
+index-vPb9P-Xz.js:728:28648
+15:16:11.101 🔄 SSO Sync: Sending session data to parent window sync:11:29
+15:16:11.101 ✅ SSO Sync: Data saved to localStorage sync:25:33
+15:16:11.102 ✅ SSO: MAX Lab sync iframe loaded index-vPb9P-Xz.js:529:68855
+15:20:10.995 XHRPOST
+https://max.dwchem.co.kr/api/auth/refresh
+[HTTP/2 401  7ms]
+
+15:20:11.005 🔄 MAX Platform: Attempting token refresh... index-vPb9P-Xz.js:526:6851
+15:20:11.010 XHRPOST
+https://max.dwchem.co.kr/api/auth/refresh
+[HTTP/2 401  5ms]
+
+	
+detail	"유효하지 않은 refresh token입니다."
