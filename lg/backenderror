@@ -1,26 +1,10 @@
-3|maxlab-b | 2025-08-14T12:55:35: 2025-08-14 12:55:35,088 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
-3|maxlab-b | 2025-08-14T12:55:35: 2025-08-14 12:55:35,137 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
-3|maxlab-b | 2025-08-14T12:55:40: 2025-08-14 12:55:40,339 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
-3|maxlab-b | 2025-08-14T12:55:40: 2025-08-14 12:55:40,373 - app.core.security - ERROR - OAuth authentication failed - Invalid or expired token
-
-/home/app-user/maxproject/maxplatform/backend/logs/pm2-out-0.log last 15 lines:
-0|maxplatf | 2025-08-14T12:55:35: 2025-08-14 12:55:35.113 [INFO] app.api.oauth_simple:1320 - prompt=none with authenticated user: immediately generating code for admin@test.com
-0|maxplatf | 2025-08-14T12:55:35: 2025-08-14 12:55:35.117 [ERROR] app.api.oauth_simple:1879 - Authorization error: Cannot run the event loop while another loop is running
-0|maxplatf | 2025-08-14T12:55:35: 2025-08-14 12:55:35.121 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback&scope=openid%20profile%20email%20read:profile%20read:groups%20manage:workflows&prompt=none&state=sso_refresh_1755143735093 HTTP/1.1" 307
-0|maxplatf | 2025-08-14T12:55:35: 2025-08-14 12:55:35.134 [DEBUG] app.middleware.session_middleware:124 - JWT token expired
-0|maxplatf | 2025-08-14T12:55:35: 2025-08-14 12:55:35.136 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 401
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.336 [DEBUG] app.middleware.session_middleware:124 - JWT token expired
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.338 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 401
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.368 [DEBUG] app.middleware.session_middleware:124 - JWT token expired
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.371 [ERROR] asyncio:242 - Task was destroyed but it is pending!
-0|maxplatf | 2025-08-14T12:55:40: task: <Task pending name='Task-56' coro=<authorize.<locals>.run_security_check() running at /home/app-user/maxproject/maxplatform/backend/app/api/oauth_simple.py:1331> cb=[gather.<locals>._done_callback() at /usr/lib/python3.11/asyncio/tasks.py:764]>
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.372 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 401
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.504 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.505 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/auth/me HTTP/1.1" 200
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.525 [INFO] app.utils.auth:259 - Successfully authenticated user: 21a2aaa7-444a-4038-bda3-d8bf2c4ef162
-0|maxplatf | 2025-08-14T12:55:40: 2025-08-14 12:55:40.532 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/services/mother-page HTTP/1.1" 200
-
-0|maxplatform-backend-8000  | 2025-08-14T12:55:50: 2025-08-14 12:55:50.909 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
-0|maxplatform-backend-8000  | 2025-08-14T12:55:50: 2025-08-14 12:55:50.909 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s)
-1|maxplatform-backend-8001  | 2025-08-14T12:55:58: 2025-08-14 12:55:58.309 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
-1|maxplatform-backend-8001  | 2025-08-14T12:55:58: 2025-08-14 12:55:58.310 [DEBUG] app.services.session_monitor:177 - Session check completed: 4 sessions checked (took 0.00s
+3|maxlab-b | 2025-08-14T13:41:44: INFO:     192.168.15.220:0 - "GET /api/v1/workspaces/?skip=0&limit=1000 HTTP/1.1" 401 Unauthorized
+3|maxlab-b | 2025-08-14T13:41:44: pasred : ParseResult(scheme='https', netloc='maxlab.dwchem.co.kr', path='/oauth/callback', params='', query='', fragment='')
+3|maxlab-b | 2025-08-14T13:41:44: Pattern ^http://localhost:301[0-9]/oauth/callback$
+3|maxlab-b | 2025-08-14T13:41:44: Pattern ^http://localhost:301[0-9]/$
+3|maxlab-b | 2025-08-14T13:41:44: Pattern ^http://localhost:301[0-9]/login(\?.*)?$
+3|maxlab-b | 2025-08-14T13:41:44: Pattern ^https://[a-zA-Z0-9-]+\.dwchem\.co\.kr/oauth/callback$
+3|maxlab-b | 2025-08-14T13:41:44: INFO:     192.168.15.220:0 - "GET /api/oauth/sso-token-refresh?redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&state=sso_refresh_1755146504886 HTTP/1.1" 302 Found
+3|maxlab-b | 2025-08-14T13:41:44: INFO:     192.168.15.220:0 - "GET /api/v1/workspaces/?skip=0&limit=1000 HTTP/1.1" 401 Unauthorized
+3|maxlab-b | 2025-08-14T13:41:45: INFO:     192.168.15.220:0 - "GET /api/admin/workspaces HTTP/1.1" 404 Not Found
+3|maxlab-b | 2025-08-14T13:41:57: INFO:     192.168.15.220:0 - "GET /api/admin/workspaces HTTP/1.1" 404 Not Found
