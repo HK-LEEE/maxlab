@@ -157,11 +157,49 @@ apiClient.interceptors.response.use(
           // Retry the original request
           return apiClient.request(originalRequest);
         } else {
-          console.log('❌ Token refresh failed, redirecting to login');
-          throw new Error('Token refresh failed');
+          console.error('🔴 [MAX Lab API] Token refresh failed, redirecting to MAX Platform login');
+          
+          // 상세 로깅
+          console.error('Token refresh failure details:', {
+            timestamp: new Date().toISOString(),
+            currentUrl: window.location.href,
+            requestUrl: originalRequest?.url,
+            sessionInfo: {
+              userId: localStorage.getItem('userId'),
+              authMethod: localStorage.getItem('auth_method'),
+              hasRefreshToken: localStorage.getItem('refreshToken') !== null
+            }
+          });
+          
+          // 현재 경로 저장
+          const currentPath = window.location.pathname + window.location.search;
+          if (currentPath !== '/' && !currentPath.includes('/login')) {
+            localStorage.setItem('redirectAfterLogin', currentPath);
+          }
+          
+          // 토큰 정리
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          sessionStorage.clear();
+          
+          // MAX Platform 로그인 페이지로 리다이렉트
+          console.log('➡️ [MAX Lab API] Redirecting to MAX Platform login...');
+          window.location.href = 'https://max.dwchem.co.kr/login';
+          
+          return Promise.reject(error);
         }
-      } catch (refreshError) {
-        console.error('❌ Token refresh error:', refreshError);
+      } catch (refreshError: any) {
+        console.error('🔴 [MAX Lab API] Token refresh error:', {
+          error: refreshError?.message || refreshError,
+          timestamp: new Date().toISOString(),
+          currentUrl: window.location.href,
+          requestUrl: originalRequest?.url,
+          sessionInfo: {
+            userId: localStorage.getItem('userId'),
+            authMethod: localStorage.getItem('auth_method'),
+            hasRefreshToken: localStorage.getItem('refreshToken') !== null
+          }
+        });
         
         // Token refresh failed, handle accordingly
         const isProcessFlowEditor = window.location.pathname.includes('/process-flow/editor');
@@ -172,10 +210,20 @@ apiClient.interceptors.response.use(
             detail: { error, source: 'api', status, refreshFailed: true } 
           }));
         } else {
-          // 다른 페이지에서는 자동 로그아웃 이벤트 발송
-          window.dispatchEvent(new CustomEvent('auth:logout', {
-            detail: { reason: 'token_refresh_failed', source: 'api_interceptor' }
-          }));
+          // 현재 경로 저장
+          const currentPath = window.location.pathname + window.location.search;
+          if (currentPath !== '/' && !currentPath.includes('/login')) {
+            localStorage.setItem('redirectAfterLogin', currentPath);
+          }
+          
+          // 토큰 정리
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          sessionStorage.clear();
+          
+          // MAX Platform 로그인 페이지로 리다이렉트
+          console.warn('🔐 [MAX Lab API] Redirecting to login due to refresh error...');
+          window.location.href = 'https://max.dwchem.co.kr/login';
         }
         
         return Promise.reject(error);
@@ -243,16 +291,64 @@ authClient.interceptors.response.use(
           // Retry the original request
           return authClient.request(originalRequest);
         } else {
-          console.log('❌ Token refresh failed for auth API');
-          throw new Error('Auth API token refresh failed');
+          console.error('🔴 [MAX Lab Auth API] Token refresh failed, redirecting to MAX Platform login');
+          
+          // 상세 로깅
+          console.error('Auth API token refresh failure details:', {
+            timestamp: new Date().toISOString(),
+            currentUrl: window.location.href,
+            requestUrl: originalRequest?.url,
+            sessionInfo: {
+              userId: localStorage.getItem('userId'),
+              authMethod: localStorage.getItem('auth_method'),
+              hasRefreshToken: localStorage.getItem('refreshToken') !== null
+            }
+          });
+          
+          // 현재 경로 저장
+          const currentPath = window.location.pathname + window.location.search;
+          if (currentPath !== '/' && !currentPath.includes('/login')) {
+            localStorage.setItem('redirectAfterLogin', currentPath);
+          }
+          
+          // 토큰 정리
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          sessionStorage.clear();
+          
+          // MAX Platform 로그인 페이지로 리다이렉트
+          console.log('➡️ [MAX Lab Auth API] Redirecting to MAX Platform login...');
+          window.location.href = 'https://max.dwchem.co.kr/login';
+          
+          return Promise.reject(error);
         }
-      } catch (refreshError) {
-        console.error('❌ Auth API token refresh error:', refreshError);
+      } catch (refreshError: any) {
+        console.error('🔴 [MAX Lab Auth API] Token refresh error:', {
+          error: refreshError?.message || refreshError,
+          timestamp: new Date().toISOString(),
+          currentUrl: window.location.href,
+          requestUrl: originalRequest?.url,
+          sessionInfo: {
+            userId: localStorage.getItem('userId'),
+            authMethod: localStorage.getItem('auth_method'),
+            hasRefreshToken: localStorage.getItem('refreshToken') !== null
+          }
+        });
         
-        // For auth API failures, always trigger logout
-        window.dispatchEvent(new CustomEvent('auth:logout', {
-          detail: { reason: 'auth_api_token_refresh_failed', source: 'auth_client' }
-        }));
+        // 현재 경로 저장
+        const currentPath = window.location.pathname + window.location.search;
+        if (currentPath !== '/' && !currentPath.includes('/login')) {
+          localStorage.setItem('redirectAfterLogin', currentPath);
+        }
+        
+        // 토큰 정리
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        sessionStorage.clear();
+        
+        // MAX Platform 로그인 페이지로 리다이렉트
+        console.warn('🔐 [MAX Lab Auth API] Redirecting to login due to auth API refresh error...');
+        window.location.href = 'https://max.dwchem.co.kr/login';
         
         return Promise.reject(error);
       }
