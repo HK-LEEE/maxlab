@@ -1067,10 +1067,14 @@ export const authService = {
             lastError = null; // 에러 정보 리셋
           } else {
             consecutiveFailures++;
+            
+            // 실제 refresh 실패 시 에러 정보 수집
+            const refreshError = localStorage.getItem('last_refresh_error') || 'token_refresh_failed';
+            lastError = refreshError;
             const currentError = lastError || 'unknown_error';
             
             // 차등적 재시도 정책 적용
-            const maxRetries = getMaxRetries('UNKNOWN', currentError);
+            const maxRetries = getMaxRetries('TOKEN_REFRESH_FAILED', currentError);
             
             console.log(`❌ Auto token refresh failed (attempt ${consecutiveFailures}/${maxRetries})`);
             console.log(`📊 Last error type: ${currentError}`);
@@ -1362,5 +1366,53 @@ export const authService = {
     const array = new Uint8Array(32);
     crypto.getRandomValues(array);
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  },
+
+  // 🧪 테스트용 함수들 (개발 환경에서만 사용)
+  testUtils: {
+    simulateTokenRefreshFailure: (errorType: 'network' | 'invalid_token' | 'server_error' = 'network') => {
+      const errorMessages = {
+        network: 'Network Error: timeout',
+        invalid_token: 'invalid_token: refresh token expired',
+        server_error: 'Internal Server Error: 500'
+      };
+      
+      const errorMessage = errorMessages[errorType];
+      localStorage.setItem('last_refresh_error', errorMessage);
+      
+      console.log(`🧪 Simulating token refresh failure: ${errorMessage}`);
+      console.log('🧪 This will affect the next auto-refresh attempt');
+      console.log('🧪 You can now trigger API calls to see differential retry policy in action');
+      console.log('🧪 Use authService.testUtils.triggerRefreshCheck() to manually trigger');
+    },
+
+    triggerRefreshCheck: () => {
+      console.log('🧪 Manually triggering refresh check...');
+      
+      // 강제로 토큰 갱신이 필요한 상황으로 만들기
+      const expiredTime = Date.now() - 1000; // 1초 전 만료
+      localStorage.setItem('tokenExpiryTime', expiredTime.toString());
+      
+      console.log('🧪 Token marked as expired - next auto-refresh will show differential retry policy');
+      console.log('🧪 Make an API call or wait for auto-refresh cycle to see the logs');
+    },
+
+    resetFailureCount: () => {
+      console.log('🧪 Resetting failure counters and error state...');
+      localStorage.removeItem('last_refresh_error');
+      console.log('🧪 Error state cleared - counters will reset on next refresh attempt');
+    },
+
+    showCurrentState: () => {
+      const lastError = localStorage.getItem('last_refresh_error');
+      const tokenExpiry = localStorage.getItem('tokenExpiryTime');
+      const lastRefresh = localStorage.getItem('lastTokenRefresh');
+      
+      console.log('🧪 Current Auth State:');
+      console.log('  Last Error:', lastError || 'none');
+      console.log('  Token Expiry:', tokenExpiry ? new Date(parseInt(tokenExpiry)).toLocaleString() : 'none');
+      console.log('  Last Refresh:', lastRefresh ? new Date(parseInt(lastRefresh)).toLocaleString() : 'none');
+      console.log('  Needs Refresh:', authService.needsTokenRefresh());
+    }
   }
 };
