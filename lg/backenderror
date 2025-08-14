@@ -1,1 +1,14 @@
-ALTER TABLE refresh_tokens ADD COLUMN session_id VARCHAR(255);
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 2025-08-14 14:46:41.842 [INFO] app.services.auth_service:63 - ✅ Created Redis session e1536a47-2da0-4ac6-ae6e-cfc7db2f3356 for user krn@test.com
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 2025-08-14 14:46:41.845 [WARNING] app.routers.auth:546 - Failed to store JWT token hash for revocation tracking: (psycopg2.errors.UndefinedColumn) column "grant_types" of relation "oauth_clients" does not exist
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: LINE 3: ...        (client_id, client_secret, redirect_uris, grant_type...
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                                                              ^
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: 
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: [SQL: 
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                             INSERT INTO oauth_clients 
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                             (client_id, client_secret, redirect_uris, grant_types, 
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                              response_types, scope, is_active, is_confidential)
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                             VALUES (%(client_id)s, %(client_secret)s, %(redirect_uris)s, %(grant_types)s,
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                                     %(response_types)s, %(scope)s, true, false)
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41:                         ]
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: [parameters: {'client_id': 'maxplatform-web', 'client_secret': 'not-used-f...', 'redirect_uris': 'https://max.dwchem.co.kr,https://maxlab.dwchem.co.kr', 'grant_types': 'password,refresh_token', 'response_types': 'token', 'scope': 'openid profile email'}]
+0|maxplatform-backend-8000  | 2025-08-14T14:46:41: (Background on this error at: https://sqlalche.me/e/20/f405)
