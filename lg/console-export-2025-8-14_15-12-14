@@ -1,0 +1,120 @@
+15:07:05.928 GET
+https://max.dwchem.co.kr/login
+[HTTP/2 200  3ms]
+
+15:07:06.014 GET
+https://max.dwchem.co.kr/assets/index-Cwrq-QRY.js
+[HTTP/2 200  3ms]
+
+15:07:06.019 GET
+https://max.dwchem.co.kr/assets/index-Di4WTHLD.css
+[HTTP/2 200  23ms]
+
+15:07:06.065 GET
+https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+[HTTP/2 200  364ms]
+
+15:07:06.072 Layout was forced before the page was fully loaded. If stylesheets are not yet loaded this may cause a flash of unstyled content. node.js:417:1
+15:07:06.470 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cwrq-QRY.js:705:971
+15:07:06.470 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-Cwrq-QRY.js:529:69183
+15:07:06.470 📡 TRY start index-Cwrq-QRY.js:529:69245
+15:07:06.470 ❌ 토큰이 없어 인증되지 않은 상태 index-Cwrq-QRY.js:529:69930
+15:07:06.472 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cwrq-QRY.js:705:971
+15:07:06.542 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  424ms]
+
+15:07:06.545 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  366ms]
+
+15:07:06.547 GET
+https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+[HTTP/2 200  380ms]
+
+15:07:06.885 GET
+https://max.dwchem.co.kr/favicon.ico
+[HTTP/2 200  0ms]
+
+15:07:09.873 XHRPOST
+https://max.dwchem.co.kr/api/auth/login
+[HTTP/2 200  501ms]
+
+15:07:10.384 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-Cwrq-QRY.js:529:69183
+15:07:10.385 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  8ms]
+
+15:07:10.385 📡 TRY start index-Cwrq-QRY.js:529:69245
+15:07:10.385 📡 사용자 정보 로드 시작 index-Cwrq-QRY.js:529:69672
+15:07:10.388 XHRGET
+https://max.dwchem.co.kr/api/auth/me
+[HTTP/2 200  18ms]
+
+15:07:10.394 🔄 SSO: Syncing login to MAX Lab... index-Cwrq-QRY.js:529:68593
+15:07:10.398 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cwrq-QRY.js:705:971
+15:07:10.399 GET
+https://maxlab.dwchem.co.kr/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNjVkYjg5Mi05NjkxLTQ2ZTMtYTJjNi1kOTYyOTgwZjJmNTEiLCJlbWFpbCI6ImtybkB0ZXN0LmNvbSIsImV4cCI6MTc1NTE1MTc1MCwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc1NTE1MTYzMCwianRpIjoiZTdhNDQ3MTktNDk1Mi00ZDk4LWE4MTUtMjU2OTJhMjg2MDM4IiwibmJmIjoxNzU1MTUxNjMwLCJpc3MiOiJtYXhwbGF0Zm9ybSIsIm5vbmNlIjoiNDA1ZTNmMWU3MmVmMjVlZSJ9.AEP2RBpO_AA05O5xL6Dn0QNtNP49W9otmTrLGRQF-b0&user={"id":"d65db892-9691-46e3-a2c6-d962980f2f51","real_name":"카리나","display_name":"카리나","email":"krn@test.com","phone_number":"010-3333-3333","department":"","position":"","is_active":true,"is_admin":false,"is_verified":false,"created_at":"2025-07-17T23:44:33.286670","last_login_at":"2025-08-14T06:07:10.353366","login_count":218,"roles":[],"groups":[]}
+[HTTP/2 200  65ms]
+
+15:07:10.399 ✅ User authenticated, checking OAuth return... index-Cwrq-QRY.js:705:1270
+15:07:10.419 ✅ 사용자 정보 로드 성공: 
+Object { id: "d65db892-9691-46e3-a2c6-d962980f2f51", real_name: "카리나", display_name: "카리나", email: "krn@test.com", phone_number: "010-3333-3333", department: "", position: "", is_active: true, is_admin: false, is_verified: false, … }
+index-Cwrq-QRY.js:529:69876
+15:07:10.429 XHRGET
+https://max.dwchem.co.kr/api/services/mother-page
+[HTTP/2 200  17ms]
+
+15:07:10.460 Features response: 
+Object { user_info: {…}, services: (2) […], categories: (2) […] }
+index-Cwrq-QRY.js:728:28607
+15:07:10.460 Features data: 
+Array [ {…}, {…} ]
+index-Cwrq-QRY.js:728:28648
+15:07:10.490 🔄 SSO Sync: Sending session data to parent window sync:11:29
+15:07:10.491 ✅ SSO Sync: Data saved to localStorage sync:25:33
+15:07:10.491 ✅ SSO: MAX Lab sync iframe loaded index-Cwrq-QRY.js:529:68855
+15:11:10.424 XHRPOST
+https://max.dwchem.co.kr/api/auth/refresh
+[HTTP/2 401  11ms]
+
+15:11:10.441 XHRPOST
+https://max.dwchem.co.kr/api/auth/refresh
+[HTTP/2 401  5ms]
+
+
+
+
+
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.429 [INFO] app.routers.auth:655 - 🔄 Refresh token request received - session_id: None
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.430 [INFO] app.routers.auth:656 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.430 [DEBUG] app.routers.auth:680 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.430 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: None
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.430 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.430 [DEBUG] app.routers.auth:242 - 🌐 Using legacy token lookup (no session isolation)
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.434 [WARNING] app.routers.auth:265 - ⚠️ Refresh token is not valid (expired/revoked) for user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.434 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: name 'timezone' is not defined
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.434 [WARNING] app.routers.auth:692 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.434 [DEBUG] app.routers.auth:693 - 🔍 Failed verification details - session_id: None, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.435 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.443 [INFO] app.routers.auth:655 - 🔄 Refresh token request received - session_id: None
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.443 [INFO] app.routers.auth:656 - 🔍 Request details - endpoint: /api/auth/refresh, method: POST
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.443 [DEBUG] app.routers.auth:680 - 🚫 Token analysis failed (non-critical): module 'jwt' has no attribute 'decode'
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.444 [DEBUG] app.routers.auth:207 - 🔍 Attempting to verify refresh token - session_id: None
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.444 [DEBUG] app.routers.auth:208 - 🎟️ Token prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.444 [DEBUG] app.routers.auth:242 - 🌐 Using legacy token lookup (no session isolation)
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.446 [WARNING] app.routers.auth:265 - ⚠️ Refresh token is not valid (expired/revoked) for user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.446 [ERROR] app.routers.auth:280 - Unexpected error verifying refresh token: name 'timezone' is not defined
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.446 [WARNING] app.routers.auth:692 - ❌ Invalid refresh token provided
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.446 [DEBUG] app.routers.auth:693 - 🔍 Failed verification details - session_id: None, token_prefix: eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-14T15:11:10: 2025-08-14 15:11:10.447 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "POST /api/auth/refresh HTTP/1.1" 401
