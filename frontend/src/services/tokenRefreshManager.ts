@@ -148,7 +148,12 @@ export class TokenRefreshManager {
       if (refreshResult.success) {
         localStorage.setItem('lastTokenRefresh', now.toString());
         console.log('✅ Token refresh successful (refresh token)');
+        // 성공 시 이전 에러 정보 제거
+        localStorage.removeItem('last_refresh_error');
         return true;
+      } else {
+        // Refresh token 실패 시 에러 정보 저장
+        localStorage.setItem('last_refresh_error', refreshResult.error || 'refresh_token_failed');
       }
 
       // 2순위: Silent Auth로 갱신 시도 (fallback)
@@ -159,8 +164,16 @@ export class TokenRefreshManager {
         if (silentResult.success) {
           localStorage.setItem('lastTokenRefresh', now.toString());
           console.log('✅ Token refresh successful (silent auth fallback)');
+          // 성공 시 이전 에러 정보 제거
+          localStorage.removeItem('last_refresh_error');
           return true;
+        } else {
+          // Silent auth도 실패한 경우 에러 정보 저장
+          localStorage.setItem('last_refresh_error', silentResult.error || 'silent_auth_fallback_failed');
         }
+      } else {
+        // Refresh token 실패하고 silent auth도 없는 경우
+        localStorage.setItem('last_refresh_error', refreshResult.error || 'refresh_token_failed_no_silent_auth');
       }
 
       // 모든 갱신 방법 실패
