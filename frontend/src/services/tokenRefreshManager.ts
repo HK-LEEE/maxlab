@@ -220,29 +220,81 @@ export class TokenRefreshManager {
       return { success: true, shouldTrySilentAuth: false };
       
     } catch (error: any) {
-      console.error('❌ Refresh token renewal failed:', error);
+      const errorMessage = error.message || 'Unknown refresh token error';
+      console.error('❌ Refresh token renewal failed:', errorMessage);
+      
+      // 차등적 재시도 정책 로깅
+      const maxRetries = this.getMaxRetries('REFRESH_TOKEN_ERROR', errorMessage);
+      console.log(`📊 Refresh token error analysis: would allow ${maxRetries} retries for error type`);
       
       // Refresh token 관련 에러는 silent auth 시도하지 않음
       if (error.message === TokenRefreshError.REFRESH_TOKEN_EXPIRED || 
           error.message === TokenRefreshError.REFRESH_TOKEN_INVALID) {
-        return { success: false, shouldTrySilentAuth: true, error: error.message };
+        console.log(`📊 Token error detected: ${errorMessage} - would use immediate failure policy (${maxRetries} retries)`);
+        return { success: false, shouldTrySilentAuth: true, error: errorMessage };
       }
       
       // 네트워크 에러 등은 silent auth 시도
-      return { success: false, shouldTrySilentAuth: true, error: error.message };
+      console.log(`📊 Other error detected: ${errorMessage} - would use retry policy (${maxRetries} retries)`);
+      return { success: false, shouldTrySilentAuth: true, error: errorMessage };
     }
   }
 
   /**
    * Silent Auth를 사용한 갱신 시도 (fallback)
    */
+  // 차등적 재시도 정책: 오류 유형에 따른 maxRetries 결정
+  private getMaxRetries(errorType: string, errorMessage?: string): number {
+    let maxRetries = this.config.maxRetries; // 기본값 (3)
+    let reason = 'default policy';
+    
+    if (errorType === 'NETWORK_ERROR' || 
+        errorMessage?.includes('Network Error') ||
+        errorMessage?.includes('ERR_NETWORK') ||
+        errorMessage?.includes('timeout') ||
+        errorMessage?.includes('connection') ||
+        errorMessage?.includes('fetch')) {
+      maxRetries = 5; // 네트워크 오류는 더 관대하게
+      reason = 'network error - more tolerant retry policy';
+    } else if (errorType === 'INVALID_REFRESH_TOKEN' ||
+               errorMessage?.includes('refresh_token_invalid') ||
+               errorMessage?.includes('refresh_token_expired') ||
+               errorMessage?.includes('invalid_token') ||
+               errorMessage?.includes('401') ||
+               errorMessage?.includes('unauthorized')) {
+      maxRetries = 1; // 토큰 오류는 즉시 처리
+      reason = 'token error - immediate failure policy';
+    } else if (errorMessage?.includes('403') || 
+               errorMessage?.includes('forbidden') ||
+               errorMessage?.includes('access_denied')) {
+      maxRetries = 1; // 권한 오류는 즉시 처리
+      reason = 'permission error - immediate failure policy';
+    } else if (errorMessage?.includes('500') || 
+               errorMessage?.includes('502') || 
+               errorMessage?.includes('503') ||
+               errorMessage?.includes('server') ||
+               errorMessage?.includes('internal')) {
+      maxRetries = 4; // 서버 오류는 중간 정도
+      reason = 'server error - moderate retry policy';
+    } else if (errorMessage?.includes('oauth') || 
+               errorMessage?.includes('OAuth') ||
+               errorMessage?.includes('silent_auth_timeout')) {
+      maxRetries = 2; // OAuth 오류는 제한적으로
+      reason = 'OAuth error - limited retry policy';
+    }
+    
+    console.log(`📋 TokenRefreshManager: Max retries set to ${maxRetries} (${reason}) for error: ${errorMessage || errorType}`);
+    return maxRetries;
+  }
+
   private async tryRefreshWithSilentAuth(
     silentAuthFunction: () => Promise<{ success: boolean; token?: string; error?: string }>
   ): Promise<{ success: boolean; error?: string }> {
     let retryCount = 0;
     let lastError: string | null = null;
+    let dynamicMaxRetries = this.config.maxRetries; // 초기값, 첫 에러 발생 시 업데이트됨
 
-    while (retryCount < this.config.maxRetries) {
+    while (retryCount < dynamicMaxRetries) {
       try {
         // 🔒 CRITICAL: Check if OAuth flow or SSO refresh is in progress before retry
         const isOAuthInProgress = (
@@ -310,11 +362,18 @@ export class TokenRefreshManager {
           return { success: true };
         } else {
           lastError = result.error || 'Unknown error';
-          console.log(`❌ Silent auth attempt ${retryCount + 1} failed:`, lastError);
+          
+          // 첫 번째 에러 발생 시 차등적 재시도 정책 적용
+          if (retryCount === 0) {
+            dynamicMaxRetries = this.getMaxRetries('SILENT_AUTH_ERROR', lastError);
+          }
+          
+          console.log(`❌ Silent auth attempt ${retryCount + 1}/${dynamicMaxRetries} failed:`, lastError);
 
           // 치명적 에러는 즉시 중단
           if (this.isCriticalError(lastError)) {
             console.log('🔓 Critical auth error, stopping silent auth retries');
+            console.log(`📊 Critical error detected: ${lastError}`);
             break;
           }
 
@@ -322,7 +381,13 @@ export class TokenRefreshManager {
         }
       } catch (retryError: any) {
         lastError = retryError.message || 'Network error';
-        console.error(`❌ Silent auth retry ${retryCount + 1} error:`, lastError);
+        
+        // 첫 번째 에러 발생 시 차등적 재시도 정책 적용
+        if (retryCount === 0) {
+          dynamicMaxRetries = this.getMaxRetries('NETWORK_ERROR', lastError);
+        }
+        
+        console.error(`❌ Silent auth retry ${retryCount + 1}/${dynamicMaxRetries} error:`, lastError);
         retryCount++;
       }
     }
