@@ -4,6 +4,7 @@ import { csrfProtection } from '../services/csrfProtection';
 import { setupAxiosInterceptor } from '../services/authErrorInterceptor';
 import { securityHeaders } from '../services/securityHeaders';
 import { userIsolatedTokenStorage } from '../services/userIsolatedTokenStorage';
+import { tokenSyncManager } from '../services/tokenSyncManager';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8010',
@@ -28,6 +29,15 @@ apiClient.interceptors.request.use(async (config) => {
   // Add comprehensive security headers
   const secHeaders = securityHeaders.getSecurityHeaders(userId || undefined);
   Object.assign(config.headers, secHeaders);
+  
+  // Validate token freshness for non-auth endpoints
+  if (!config.url?.includes('/oauth/') && !config.url?.includes('/auth/')) {
+    try {
+      await tokenSyncManager.validateTokenFreshness();
+    } catch (error) {
+      console.warn('Token validation failed, proceeding with request:', error);
+    }
+  }
   
   // OAuth 토큰은 localStorage에서 가져옴 (fallback to user-isolated storage)
   let token = localStorage.getItem('accessToken');
@@ -70,6 +80,15 @@ authClient.interceptors.request.use(async (config) => {
   // Add comprehensive security headers
   const secHeaders = securityHeaders.getSecurityHeaders(userId || undefined);
   Object.assign(config.headers, secHeaders);
+  
+  // Validate token freshness for non-auth endpoints
+  if (!config.url?.includes('/oauth/') && !config.url?.includes('/auth/')) {
+    try {
+      await tokenSyncManager.validateTokenFreshness();
+    } catch (error) {
+      console.warn('Token validation failed, proceeding with request:', error);
+    }
+  }
   
   // OAuth 토큰은 localStorage에서 가져옴 (fallback to user-isolated storage)
   let token = localStorage.getItem('accessToken');
