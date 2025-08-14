@@ -4,7 +4,7 @@
  * Handles token validation and automatic refresh when needed
  */
 
-import { tokenRefreshManager } from './tokenRefreshManager';
+import { TokenRefreshManager } from './tokenRefreshManager';
 import { authSyncService } from './authSyncService';
 import { securityEventLogger } from './securityEventLogger';
 
@@ -221,7 +221,7 @@ export class TokenSyncManager {
       }
       
       // Use token refresh manager
-      const refreshManager = tokenRefreshManager.getInstance();
+      const refreshManager = TokenRefreshManager.getInstance();
       const success = await refreshManager.refreshToken(undefined, { forceRefresh: true });
       
       if (success) {
