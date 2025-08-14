@@ -1,0 +1,51 @@
+16:11:08.842 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: true, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cwrq-QRY.js:705:971
+16:11:08.846 🔐 AuthContext initAuth 시작: 
+Object { hasToken: false }
+index-Cwrq-QRY.js:529:69183
+16:11:08.846 📡 TRY start index-Cwrq-QRY.js:529:69245
+16:11:08.846 ❌ 토큰이 없어 인증되지 않은 상태 index-Cwrq-QRY.js:529:69930
+16:11:08.853 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: false, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cwrq-QRY.js:705:971
+16:11:27.451 🔐 AuthContext initAuth 시작: 
+Object { hasToken: true }
+index-Cwrq-QRY.js:529:69183
+16:11:27.451 📡 TRY start index-Cwrq-QRY.js:529:69245
+16:11:27.451 📡 사용자 정보 로드 시작 index-Cwrq-QRY.js:529:69672
+16:11:27.461 ✅ 사용자 정보 로드 성공: 
+Object { id: "d65db892-9691-46e3-a2c6-d962980f2f51", real_name: "카리나", display_name: "카리나", email: "krn@test.com", phone_number: "010-3333-3333", department: "", position: "", is_active: true, is_admin: false, is_verified: false, … }
+index-Cwrq-QRY.js:529:69876
+16:11:27.462 🔍 OAuth useEffect triggered: 
+Object { isAuthenticated: true, authLoading: false, oauthReturn: false, forceLogin: false, oauthProcessedRef: false }
+index-Cwrq-QRY.js:705:971
+16:11:27.462 ✅ User authenticated, checking OAuth return... index-Cwrq-QRY.js:705:1270
+16:11:27.480 🔄 SSO: Syncing login to MAX Lab... index-Cwrq-QRY.js:529:68593
+16:11:27.512 Features response: 
+Object { user_info: {…}, services: (2) […], categories: (2) […] }
+index-Cwrq-QRY.js:728:28607
+16:11:27.512 Features data: 
+Array [ {…}, {…} ]
+index-Cwrq-QRY.js:728:28648
+16:11:27.559 🔄 SSO Sync: Sending session data to parent window sync:11:29
+16:11:27.560 ✅ SSO Sync: Data saved to localStorage sync:25:33
+16:11:27.561 ✅ SSO: MAX Lab sync iframe loaded index-Cwrq-QRY.js:529:68855
+16:15:27.467 XHRPOST
+https://max.dwchem.co.kr/api/auth/refresh
+[HTTP/2 401  15ms]
+
+16:15:27.508 XHRPOST
+https://max.dwchem.co.kr/api/auth/refresh
+[HTTP/2 401  10ms]
+
+	
+POST
+	https://max.dwchem.co.kr/api/auth/refresh
+Status
+401
+VersionHTTP/2
+Transferred623 B (56 B size)
+Referrer Policystrict-origin-when-cross-origin
+DNS ResolutionSystem
+
