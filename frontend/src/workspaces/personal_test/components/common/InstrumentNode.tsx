@@ -483,6 +483,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         id="top-target"
         className="target"
         style={{
+          position: 'absolute',
           top: -4,
           left: '35%',
           transform: 'translateX(-50%)',
@@ -499,6 +500,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         id="top-source"
         className="source"
         style={{
+          position: 'absolute',
           top: -4,
           left: '65%',
           transform: 'translateX(-50%)',
@@ -640,6 +642,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         id="bottom-source"
         className="source"
         style={{
+          position: 'absolute',
           bottom: -4,
           left: '35%',
           transform: 'translateX(-50%)',
@@ -656,6 +659,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         id="bottom-target"
         className="target"
         style={{
+          position: 'absolute',
           bottom: -4,
           left: '65%',
           transform: 'translateX(-50%)',
