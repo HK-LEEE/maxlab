@@ -476,19 +476,37 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         }}
       />
       
+      {/* Top handles - bidirectional (both source and target) */}
       <Handle
         type="target"
         position={Position.Top}
+        id="top-target"
         className="target"
         style={{
-          top: -8,
+          top: -4,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: 10,
-          height: 10,
-          background: nodeColor,
+          width: 5,
+          height: 5,
+          background: '#FFEB3B',
           border: 'none',
           zIndex: 20
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Top}
+        id="top-source"
+        className="source"
+        style={{
+          top: -4,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 5,
+          height: 5,
+          background: '#FFEB3B',
+          border: 'none',
+          zIndex: 21
         }}
       />
       
@@ -615,19 +633,37 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
       
       </div>
       
+      {/* Bottom handles - bidirectional (both source and target) */}
       <Handle
         type="source"
         position={Position.Bottom}
+        id="bottom-source"
         className="source"
         style={{
-          bottom: -8,
+          bottom: -4,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: 10,
-          height: 10,
-          background: nodeColor,
+          width: 5,
+          height: 5,
+          background: '#FFEB3B',
           border: 'none',
           zIndex: 20
+        }}
+      />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        id="bottom-target"
+        className="target"
+        style={{
+          bottom: -4,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 5,
+          height: 5,
+          background: '#FFEB3B',
+          border: 'none',
+          zIndex: 21
         }}
       />
     </>
