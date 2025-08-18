@@ -1,295 +1,44 @@
-3|maxlab-backend-8010       | 2025-08-14T17:59:47: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ/measurements?_t=1755161987567 HTTP/1.1" 200 OK
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ?_t=1755161989579&_r=2tjzw8xrmpf HTTP/1.1" 200 OK
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: 2025-08-14 17:59:49,601 - app.core.database - ERROR - Database session error: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: 2025-08-14 17:59:49,602 - app.main - ERROR - Unhandled exception: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ/equipment/status?_t=1755161989595 HTTP/1.1" 500 Internal Server Error
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: ERROR:    Exception in ASGI application
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   + Exception Group Traceback (most recent call last):
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_utils.py", line 76, in collapse_excgroups
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   |     yield
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 177, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   |     async with anyio.create_task_group() as task_group:
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 772, in __aexit__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   |     raise BaseExceptionGroup(
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   +-+---------------- 1 ----------------
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     | Traceback (most recent call last):
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 426, in run_asgi
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     result = await app(  # type: ignore[func-returns-value]
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     return await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await super().__call__(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 187, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await self.app(scope, receive, _send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 176, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     with recv_stream, send_stream, collapse_excgroups():
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/usr/lib/python3.11/contextlib.py", line 158, in __exit__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     self.gen.throw(typ, value, traceback)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_utils.py", line 82, in collapse_excgroups
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     response = await self.dispatch_func(request, call_next)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/app/middleware/session_middleware.py", line 48, in dispatch
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     return await call_next(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |            ^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     raise app_exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await self.app(scope, receive_or_disconnect, send_no_error)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await route.handle(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     response = await f(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |                ^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     raw_response = await run_endpoint_function(
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     return await dependant.call(**values)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |   File "/home/app-user/maxproject/maxlab/backend/app/routers/personal_test_process_flow.py", line 948, in get_public_equipment_status
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |     return await get_equipment_status(
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     |                  ^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     | TypeError: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     +------------------------------------
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: 
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: During handling of the above exception, another exception occurred:
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: 
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: Traceback (most recent call last):
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 426, in run_asgi
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     result = await app(  # type: ignore[func-returns-value]
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     return await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await super().__call__(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 187, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await self.app(scope, receive, _send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 176, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     with recv_stream, send_stream, collapse_excgroups():
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/usr/lib/python3.11/contextlib.py", line 158, in __exit__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     self.gen.throw(typ, value, traceback)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_utils.py", line 82, in collapse_excgroups
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     response = await self.dispatch_func(request, call_next)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/app/middleware/session_middleware.py", line 48, in dispatch
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     return await call_next(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:            ^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     raise app_exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await self.app(scope, receive_or_disconnect, send_no_error)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await route.handle(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     response = await f(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:                ^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     raw_response = await run_endpoint_function(
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     return await dependant.call(**values)
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:   File "/home/app-user/maxproject/maxlab/backend/app/routers/personal_test_process_flow.py", line 948, in get_public_equipment_status
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:     return await get_equipment_status(
-3|maxlab-backend-8010       | 2025-08-14T17:59:49:                  ^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: TypeError: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:49: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ/measurements?_t=1755161989596 HTTP/1.1" 200 OK
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ?_t=1755161991629&_r=e7e1d2jtcmc HTTP/1.1" 200 OK
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: 2025-08-14 17:59:51,648 - app.core.database - ERROR - Database session error: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: 2025-08-14 17:59:51,648 - app.main - ERROR - Unhandled exception: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ/equipment/status?_t=1755161991639 HTTP/1.1" 500 Internal Server Error
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: ERROR:    Exception in ASGI application
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   + Exception Group Traceback (most recent call last):
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_utils.py", line 76, in collapse_excgroups
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   |     yield
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 177, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   |     async with anyio.create_task_group() as task_group:
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 772, in __aexit__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   |     raise BaseExceptionGroup(
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   +-+---------------- 1 ----------------
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     | Traceback (most recent call last):
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 426, in run_asgi
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     result = await app(  # type: ignore[func-returns-value]
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     return await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await super().__call__(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 187, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await self.app(scope, receive, _send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 176, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     with recv_stream, send_stream, collapse_excgroups():
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/usr/lib/python3.11/contextlib.py", line 158, in __exit__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     self.gen.throw(typ, value, traceback)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_utils.py", line 82, in collapse_excgroups
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     response = await self.dispatch_func(request, call_next)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/app/middleware/session_middleware.py", line 48, in dispatch
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     return await call_next(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |            ^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     raise app_exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await self.app(scope, receive_or_disconnect, send_no_error)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await route.handle(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     response = await f(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |                ^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     raw_response = await run_endpoint_function(
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     return await dependant.call(**values)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |   File "/home/app-user/maxproject/maxlab/backend/app/routers/personal_test_process_flow.py", line 948, in get_public_equipment_status
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |     return await get_equipment_status(
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     |                  ^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     | TypeError: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     +------------------------------------
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: 
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: During handling of the above exception, another exception occurred:
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: 
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: Traceback (most recent call last):
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 426, in run_asgi
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     result = await app(  # type: ignore[func-returns-value]
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     return await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await super().__call__(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 187, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await self.app(scope, receive, _send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 176, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     with recv_stream, send_stream, collapse_excgroups():
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/usr/lib/python3.11/contextlib.py", line 158, in __exit__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     self.gen.throw(typ, value, traceback)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_utils.py", line 82, in collapse_excgroups
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     response = await self.dispatch_func(request, call_next)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/app/middleware/session_middleware.py", line 48, in dispatch
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     return await call_next(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:            ^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     raise app_exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await self.app(scope, receive_or_disconnect, send_no_error)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await self.middleware_stack(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await route.handle(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await self.app(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     raise exc
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     await app(scope, receive, sender)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     response = await f(request)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:                ^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     raw_response = await run_endpoint_function(
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     return await dependant.call(**values)
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:   File "/home/app-user/maxproject/maxlab/backend/app/routers/personal_test_process_flow.py", line 948, in get_public_equipment_status
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:     return await get_equipment_status(
-3|maxlab-backend-8010       | 2025-08-14T17:59:51:                  ^^^^^^^^^^^^^^^^^^^^^
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: TypeError: get_equipment_status() got an unexpected keyword argument 'status'
-3|maxlab-backend-8010       | 2025-08-14T17:59:51: INFO:     192.168.15.220:0 - "GET /api/v1/personal-test/process-flow/public/ynYnFSgPudmhZivqNYn3mrpghr1TNLzbeKg5s6wlJDQ/measurements?_t=17
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: Traceback (most recent call last):
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:   File "/home/app-user/maxproject/maxlab/backend/app/routers/personal_test_process_flow.py", line 1168, in get_equipment_status
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:     config = await provider._load_config()
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:   File "/home/app-user/maxproject/maxlab/backend/app/services/data_providers/dynamic.py", line 185, in _load_config
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:     raise RuntimeError(f"Failed to load data source configuration for workspace {self.workspace_id}: {e}")
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: RuntimeError: Failed to load data source configuration for workspace 21ee03db-90c4-4592-b00f-c44801e0b164: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: Query(None) ('Query' object has no attribute 'bytes')
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: [SQL:
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     SELECT
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         id as data_source_id,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         source_type,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         api_url,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         mssql_connection_string,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         api_key,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         api_headers,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         is_active,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         custom_queries
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     FROM data_source_configs
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     WHERE id = $1 AND is_active = true
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     LIMIT 1
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                 ]
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: [parameters: (Query(None),)]
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: (Background on this error at: https://sqlalche.me/e/20/dbapi)
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: 2025-08-18 11:24:55,905 - app.routers.personal_test_process_flow - ERROR - ❌ Data source connection failed for workspace 21ee03db-90c4-4592-b00f-c44801e0b164
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: 2025-08-18 11:24:55,906 - app.core.database - ERROR - Database session error: 503: Cannot connect to mssql data source: Failed to load data source configuration for workspace 21ee03db-90c4-4592-b00f-c44801e0b164: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: Query(None) ('Query' object has no attribute 'bytes')
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: [SQL:
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     SELECT
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         id as data_source_id,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         source_type,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         api_url,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         mssql_connection_string,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         api_key,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         api_headers,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         is_active,
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                         custom_queries
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     FROM data_source_configs
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     WHERE id = $1 AND is_active = true
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                     LIMIT 1
+3|maxlab-backend-8010       | 2025-08-18T11:24:55:                 ]
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: [parameters: (Query(None),)]
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: (Background on this error at: https://sqlalche.me/e/20/dbapi). Please check your MSSQL server connection, credentials, and network connectivity.
+3|maxlab-backend-8010       | 2025-08-18T11:24:55: INFO:     192.168.9.87:0 - "GET /api/v1/personal-test/process-flow/public/QWEmH6gp8U7zkQQYquaoTBfsMlLQLMPXaGwcIi0BsBI/equipment/status?_t=1755484246758 HTTP/1.1" 503 Service Unavailable
+3|maxlab-backend-8010       | 2025-08-18T11:24:56: INFO:     192.168.9.87:0 - "GET /api/v1/personal-test/process-flow/public/QWEmH6gp8U7zkQQYquaoTBfsMlLQLMPXaGwcIi0BsBI/measurements?_t=1755484246758 HTTP/1.1" 200 OK
