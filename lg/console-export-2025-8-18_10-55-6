@@ -1,225 +1,104 @@
-10:54:59.944 🔄 Rehydrating auth state for initialization 
-Object { state: {…} }
-index-DnNLtkoB.js:228:5827
-10:54:59.944 📋 Authenticated user detected - will validate with server index-DnNLtkoB.js:228:6830
-10:54:59.944 📋 Rehydrated state (pending server validation): 
-Object { user: {…}, isAuthenticated: true, exclusiveOperation: null, initState: "syncing", error: null, lastSyncTime: 1755482093518, retryCount: 0, setAuthState: setAuthState(n), setAuthError: setAuthError(n), clearError: clearError(), … }
-index-DnNLtkoB.js:228:6996
-10:54:59.946 🛡️ New CSRF token generated index-DnNLtkoB.js:263:6222
-10:54:59.946 🛡️ CSRF protection initialized with new token index-DnNLtkoB.js:263:5768
-10:54:59.952 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-DnNLtkoB.js:263:21207
-10:54:59.955 ✅ Token sync manager initialized with cross-domain sync index-DnNLtkoB.js:263:45308
-10:54:59.955 🔀 OAuth Coordinator [01:54:59][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-DnNLtkoB.js:263:61958
-10:54:59.966 📍 Saving original navigation URL: https://maxlab.dwchem.co.kr/ index-DnNLtkoB.js:851:102738
-10:54:59.966 🔄 Performing initial token sync with MAX Platform... index-DnNLtkoB.js:851:104616
-10:54:59.966 🔄 Syncing tokens from MAX Platform... index-DnNLtkoB.js:263:45985
-10:54:59.967 ✅ Auth sync initialized with BroadcastChannel index-DnNLtkoB.js:263:35548
-10:54:59.967 🔒 Initializing cross-domain logout listener index-DnNLtkoB.js:851:106249
-10:54:59.967 📡 SSO: PostMessage listener registered index-DnNLtkoB.js:851:109241
-10:54:59.967 🚀 Starting auth initialization (single instance guaranteed) index-DnNLtkoB.js:851:113900
-10:54:59.967 🔄 Auth state change: idle → syncing 
-Object { isAuthenticated: true, hasUser: true, stackTrace: (3) […] }
-index-DnNLtkoB.js:227:11473
-10:54:59.967 No valid user data found index-DnNLtkoB.js:265:11134
-10:54:59.968 ❌ Server-side token validation failed: Error: Token expired
-    getCurrentUser https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:265
-    x6 https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:851
-    x6 https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:851
-    Ci https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    Sx https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    gn https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    Sx https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    gn https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    Sx https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    Fx https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    Ux https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:48
-    I https://maxlab.dwchem.co.kr/assets/index-DnNLtkoB.js:25
-index-DnNLtkoB.js:851:115306
-10:54:59.968 🧹 Clearing invalid token and auth state index-DnNLtkoB.js:851:115364
-10:54:59.968 🔄 Auth state change: idle → idle 
-Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
-index-DnNLtkoB.js:227:11473
-10:54:59.968 ❌ Auth error: server_error - Your session has expired. Please log in again. index-DnNLtkoB.js:228:110
-10:54:59.969 🔍 MaxLab Infinite loop detection result: 
-Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 0 }
-index-DnNLtkoB.js:227:8606
-10:54:59.969 🔍 MaxLab OAuth loop prevention check: 
-Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
-index-DnNLtkoB.js:227:4366
-10:54:59.969 🔄 Auth state change: error → silent_auth 
-Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
-index-DnNLtkoB.js:227:11473
-10:54:59.969 🔇 Attempting silent SSO login... index-DnNLtkoB.js:265:4480
-10:54:59.969 🔀 OAuth Coordinator [01:54:59][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755482099969_lobahqsna 
-Object { url: "silent_oauth_auth", priority: 0 }
-index-DnNLtkoB.js:263:61909
-10:54:59.969 🔀 OAuth Coordinator [01:54:59][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-DnNLtkoB.js:263:61958
-10:54:59.969 🔀 OAuth Coordinator [01:54:59][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755482099969_lobahqsna index-DnNLtkoB.js:263:61958
-10:54:59.970 ✅ Silent auth conditions met, starting... index-DnNLtkoB.js:258:20442
-10:54:59.971 🔇 Starting silent authentication... index-DnNLtkoB.js:258:16370
-10:54:59.975 Cookie “csrf_token” has been rejected for invalid domain. 2 maxlab.dwchem.co.kr
-10:54:59.975 🍪 OAuth provider cookies cleared oauthProviderLogout-DtUtMk7L.js:1:502
-10:54:59.975 🍪 OAuth provider cookies cleared index-DnNLtkoB.js:265:9208
-10:54:59.980 🔓 Token decrypted successfully index-DnNLtkoB.js:263:28289
-10:54:59.980 🔓 Retrieved encrypted refresh token index-DnNLtkoB.js:263:67201
-10:54:59.992 ✅ Received fresh token from MAX Platform, updating local storage index-DnNLtkoB.js:263:46333
-10:54:59.992 Token sync details: 
-Object { source: "redis", synced: true, expires_in: 49 }
-index-DnNLtkoB.js:263:46413
-10:54:59.993 🔒 Security event logged: token_token_synced_from_platform (low) 
-Object { eventId: "evt_1755482099994_fjtcbs2m", timestamp: "2025-08-18T01:54:59.994Z", eventType: "token_token_synced_from_platform", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1755482099953_vnq2ssi2t7q", details: {…}, context: {…}, metadata: undefined }
-index-DnNLtkoB.js:263:38708
-10:54:59.993 📤 Broadcasting auth event: TOKEN_REFRESH index-DnNLtkoB.js:263:36676
-10:54:59.993 ✅ Initial token sync successful index-DnNLtkoB.js:851:104727
-10:55:00.039 ✅ Refresh token revoked on server index-DnNLtkoB.js:263:71562
-10:55:00.039 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:26928
-10:55:00.039 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:68954
-10:55:00.039 🧹 Clearing all user tokens... index-DnNLtkoB.js:263:32906
-10:55:00.039 🧹 Clearing tokens for user: d65db892-9691-46e3-a2c6-d962980f2f51 index-DnNLtkoB.js:263:32068
-10:55:00.039 ✅ Tokens cleared for user: d65db892-9691-46e3-a2c6-d962980f2f51 index-DnNLtkoB.js:263:32432
-10:55:00.039 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:26928
-10:55:00.039 ✅ Cleared tokens for 1 users index-DnNLtkoB.js:263:33195
-10:55:00.039 🔐 User-isolated tokens cleared index-DnNLtkoB.js:263:71976
-10:55:00.039 🧹 All tokens cleared index-DnNLtkoB.js:263:72088
-10:55:00.039 🔒 Starting comprehensive security cleanup... index-DnNLtkoB.js:265:9444
-10:55:00.040 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:26928
-10:55:00.040 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:68954
-10:55:00.040 🧹 Clearing all user tokens... index-DnNLtkoB.js:263:32906
-10:55:00.040 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:26928
-10:55:00.040 ✅ Cleared tokens for 0 users index-DnNLtkoB.js:263:33195
-10:55:00.040 🔐 User-isolated tokens cleared index-DnNLtkoB.js:263:71976
-10:55:00.040 🧹 All tokens cleared index-DnNLtkoB.js:263:72088
-10:55:00.040 🧹 Clearing all user tokens... index-DnNLtkoB.js:263:32906
-10:55:00.040 🧹 Refresh token cleared from secure storage index-DnNLtkoB.js:263:26928
-10:55:00.040 ✅ Cleared tokens for 0 users index-DnNLtkoB.js:263:33195
-10:55:00.040 🔒 Starting comprehensive browser security cleanup... index-DnNLtkoB.js:263:94749
-10:55:00.040 ✅ Cleared 3 localStorage items index-DnNLtkoB.js:263:94883
-10:55:00.040 ✅ Cleared 7 sessionStorage items index-DnNLtkoB.js:263:95062
-10:55:00.040 ✅ Cleared 0 cookies index-DnNLtkoB.js:263:95237
-10:55:00.048 ✅ Cleared 0 IndexedDB databases index-DnNLtkoB.js:263:95395
-10:55:00.062 ✅ Cleared 0 cache storages index-DnNLtkoB.js:263:95580
-10:55:00.062 🔒 Security cleanup completed in 23.00ms index-DnNLtkoB.js:263:95878
-10:55:00.062 ✅ Security cleanup completed: 
-Object { localStorage: 3, sessionStorage: 7, cookies: 0, indexedDB: 0, cacheStorage: 0, duration: "23.00ms" }
-index-DnNLtkoB.js:265:10256
-10:55:00.062 🧹 Complete secure cleanup finished index-DnNLtkoB.js:265:10678
-10:55:00.062 🔄 MaxLab manual reset initiated index-DnNLtkoB.js:227:11229
-10:55:00.062 ✅ OAuth loop prevention state reset index-DnNLtkoB.js:228:2204
-10:55:00.062 ✅ User logged out successfully index-DnNLtkoB.js:228:2330
-10:55:00.067 🔄 Rehydrating auth state for initialization 
-Object { state: {…} }
-index-DnNLtkoB.js:228:5827
-10:55:00.067 🆕 New or unauthenticated user, preparing for silent auth attempt index-DnNLtkoB.js:228:7076
-10:55:00.069 🛡️ New CSRF token generated index-DnNLtkoB.js:263:6222
-10:55:00.069 🛡️ CSRF protection initialized with new token index-DnNLtkoB.js:263:5768
-10:55:00.074 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-DnNLtkoB.js:263:21207
-10:55:00.075 ✅ Token sync manager initialized with cross-domain sync index-DnNLtkoB.js:263:45308
-10:55:00.076 🔀 OAuth Coordinator [01:55:00][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-DnNLtkoB.js:263:61958
-10:55:00.082 🔄 Performing initial token sync with MAX Platform... index-DnNLtkoB.js:851:104616
-10:55:00.082 🔄 Syncing tokens from MAX Platform... index-DnNLtkoB.js:263:45985
-10:55:00.083 ✅ Auth sync initialized with BroadcastChannel index-DnNLtkoB.js:263:35548
-10:55:00.083 🔒 Initializing cross-domain logout listener index-DnNLtkoB.js:851:106249
-10:55:00.083 📡 SSO: PostMessage listener registered index-DnNLtkoB.js:851:109241
-10:55:00.083 🚀 Starting auth initialization (single instance guaranteed) index-DnNLtkoB.js:851:113900
-10:55:00.083 🔍 MaxLab Infinite loop detection result: 
-Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 0 }
-index-DnNLtkoB.js:227:8606
-10:55:00.083 🔍 MaxLab OAuth loop prevention check: 
-Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
-index-DnNLtkoB.js:227:4366
-10:55:00.083 🔄 Auth state change: idle → silent_auth 
-Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
-index-DnNLtkoB.js:227:11473
-10:55:00.083 🔇 Attempting silent SSO login... index-DnNLtkoB.js:265:4480
-10:55:00.083 🔀 OAuth Coordinator [01:55:00][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755482100083_206fir74r 
-Object { url: "silent_oauth_auth", priority: 0 }
-index-DnNLtkoB.js:263:61909
-10:55:00.083 🔀 OAuth Coordinator [01:55:00][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-DnNLtkoB.js:263:61958
-10:55:00.083 🔀 OAuth Coordinator [01:55:00][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755482100083_206fir74r index-DnNLtkoB.js:263:61958
-10:55:00.084 🚫 OAuth callback page has active flow, not safe for silent auth index-DnNLtkoB.js:258:21710
-10:55:00.084 🚫 Silent auth not allowed on current page: /oauth/callback index-DnNLtkoB.js:258:19642
-10:55:00.084 🔀 OAuth Coordinator [01:55:00][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755482100083_206fir74r index-DnNLtkoB.js:263:61958
-10:55:00.084 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-DnNLtkoB.js:265:6164
-10:55:00.084 📊 MaxLab OAuth attempt recorded: 
-Object { type: "auto", success: false, error: "Cannot attempt silent auth on current page...", aborted: false, consecutiveFailures: 1, totalAborted: 0 }
-index-DnNLtkoB.js:227:7113
-10:55:00.085 🔄 Auth state change: silent_auth → ready 
-Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
-index-DnNLtkoB.js:227:11473
-10:55:00.085 🚫 OAuth callback page has active flow, not safe for silent auth index-DnNLtkoB.js:258:21710
-10:55:00.087 🔍 Popup mode detection started: 
-Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, ssoRefreshReturnUrl: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
-index-DnNLtkoB.js:258:10832
-10:55:00.087 🔍 Searching for OAuth flow state with state: tTUKVhoS... index-DnNLtkoB.js:228:15327
-10:55:00.087 📋 Found total flow states: 0 index-DnNLtkoB.js:228:15444
-10:55:00.087 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-DnNLtkoB.js:228:15532
-10:55:00.087 🚨 OAuth flow state not found for state: tTUKVhoS... 
-Object { searchedFlows: 0, sessionStorageKeys: (2) […] }
-index-DnNLtkoB.js:228:17375
-10:55:00.087 🎯 Popup mode detected via window.parent (iframe scenario) index-DnNLtkoB.js:258:13557
-10:55:00.088 🛑 User not authenticated, stopping token refresh index-DnNLtkoB.js:265:17109
-10:55:00.088 🔍 Popup mode detection started: 
-Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, ssoRefreshReturnUrl: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
-index-DnNLtkoB.js:258:10832
-10:55:00.088 🔍 Searching for OAuth flow state with state: tTUKVhoS... index-DnNLtkoB.js:228:15327
-10:55:00.088 📋 Found total flow states: 0 index-DnNLtkoB.js:228:15444
-10:55:00.088 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-DnNLtkoB.js:228:15532
-10:55:00.088 🚨 OAuth flow state not found for state: tTUKVhoS... 
-Object { searchedFlows: 0, sessionStorageKeys: (2) […] }
-index-DnNLtkoB.js:228:17375
-10:55:00.088 🎯 Popup mode detected via window.parent (iframe scenario) index-DnNLtkoB.js:258:13557
-10:55:00.088 🔍 OAuth Callback Mode Detection: 
-Object { inPopupMode: true, isSilentAuth: false, hasCode: true, hasError: false, sessionKeys: (2) […] }
-index-DnNLtkoB.js:755:16030
-10:55:00.088 🔍 OAuth Callback URL Analysis: 
-Object { fullUrl: "https://maxlab.dwchem.co.kr/oauth/callback?code=Cr-CC0RNPlQB3m3oJA0hOE5VW1iukLghyjUAWZXDtVE&state=tTUKVhoS_yWGsOV5sRd5hxWSRGWMAAkkz4PTn_GmJA0", pathname: "/oauth/callback", search: "?code=Cr-CC0RNPlQB3m3oJA0hOE5VW1iukLghyjUAWZXDtVE&state=tTUKVhoS_yWGsOV5sRd5hxWSRGWMAAkkz4PTn_GmJA0", code: "Cr-CC0RN...", state: "tTUKVhoS...", error: null, errorDescription: null, allParams: {…} }
-index-DnNLtkoB.js:755:17028
-10:55:00.088 🎯 OAuth Callback - Popup Mode Processing Started index-DnNLtkoB.js:755:21230
-10:55:00.088 🔍 Searching for OAuth flow state with state: tTUKVhoS... index-DnNLtkoB.js:228:15327
-10:55:00.088 📋 Found total flow states: 1 index-DnNLtkoB.js:228:15444
-10:55:00.088 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-DnNLtkoB.js:228:15532
-10:55:00.088 🔍 Checking stored flow: 
-Object { key: "oauth_flow_in_progress", flowId: undefined, storedState: "undefined...", matchesSearch: false }
-index-DnNLtkoB.js:228:15815
-10:55:00.088 🚨 OAuth flow state not found for state: tTUKVhoS... 
-Object { searchedFlows: 1, sessionStorageKeys: (4) […] }
-index-DnNLtkoB.js:228:17375
-10:55:00.088 🔍 Searching for OAuth flow state with state: tTUKVhoS... index-DnNLtkoB.js:228:15327
-10:55:00.088 📋 Found total flow states: 1 index-DnNLtkoB.js:228:15444
-10:55:00.088 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-DnNLtkoB.js:228:15532
-10:55:00.088 🔍 Checking stored flow: 
-Object { key: "oauth_flow_in_progress", flowId: undefined, storedState: "undefined...", matchesSearch: false }
-index-DnNLtkoB.js:228:15815
-10:55:00.088 🚨 OAuth flow state not found for state: tTUKVhoS... 
-Object { searchedFlows: 1, sessionStorageKeys: (4) […] }
-index-DnNLtkoB.js:228:17375
-10:55:00.088 🔐 OAuth State Validation Debug: 
-Object { urlState: "tTUKVhoS...", fullState: "tTUKVhoS_yWGsOV5sRd5hxWSRGWMAAkkz4PTn_GmJA0", isForceAccountSelection: false, validationResult: {…}, flowState: null, inPopupMode: true, isSilentAuth: false, origin: "https://maxlab.dwchem.co.kr", sessionStorageOAuthKeys: (4) […] }
-index-DnNLtkoB.js:755:22510
-10:55:00.088 ❌ OAuth State Validation Failed: 
-Object { reason: "Flow state not found or expired", securityLevel: "high", canProceed: false, flowStateExists: false, possibleCauses: (5) […] }
-index-DnNLtkoB.js:755:23115
-10:55:00.098 ✅ Received fresh token from MAX Platform, updating local storage index-DnNLtkoB.js:263:46333
-10:55:00.098 Token sync details: 
-Object { source: "redis", synced: true, expires_in: 48 }
-index-DnNLtkoB.js:263:46413
-10:55:00.098 🔒 Security event logged: token_token_synced_from_platform (low) 
-Object { eventId: "evt_1755482100099_tzzcunrp", timestamp: "2025-08-18T01:55:00.099Z", eventType: "token_token_synced_from_platform", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1755482100075_632lompb81", details: {…}, context: {…}, metadata: undefined }
-index-DnNLtkoB.js:263:38708
-10:55:00.098 📤 Broadcasting auth event: TOKEN_REFRESH index-DnNLtkoB.js:263:36676
-10:55:00.098 ✅ Initial token sync successful index-DnNLtkoB.js:851:104727
-10:55:00.099 📨 Received auth sync event: TOKEN_REFRESH index-DnNLtkoB.js:263:36228
-10:55:00.099 📨 Received token refresh event from other tab index-DnNLtkoB.js:851:105648
-10:55:00.224 💾 OAuth error stored in sessionStorage for immediate detection index-DnNLtkoB.js:755:26423
-10:55:00.224 📡 OAuth error sent via BroadcastChannel index-DnNLtkoB.js:755:26933
-10:55:00.227 🔍 Popup mode detection started: 
-Object { oauthPopupMode: null, oauthWindowType: null, oauthForceAccountSelection: null, ssoRefreshReturnUrl: null, windowOpener: false, windowParent: true, windowSize: "0x0", pathname: "/oauth/callback", referrer: "https://maxlab.dwchem.co.kr/" }
-index-DnNLtkoB.js:258:10832
-10:55:00.227 🔍 Searching for OAuth flow state with state: tTUKVhoS... index-DnNLtkoB.js:228:15327
-10:55:00.227 📋 Found total flow states: 0 index-DnNLtkoB.js:228:15444
-10:55:00.227 🔍 Flow state not found in getAllFlowStates, trying direct sessionStorage search... index-DnNLtkoB.js:228:15532
-10:55:00.227 🚨 OAuth flow state not found for state: tTUKVhoS... 
-Object { searchedFlows: 0, sessionStorageKeys: (4) […] }
-index-DnNLtkoB.js:228:17375
-10:55:00.227 🎯 Popup mode detected via window.parent (iframe scenario) index-DnNLtkoB.js:258:13557
-10:55:00.373 ⏰ Token sync throttled, too soon since last sync 2 index-DnNLtkoB.js:263:45896
+3|maxlab-backend-8010       | 2025-08-18T11:00:00: INFO:     192.168.9.87:0 - "GET /api/oauth/sync?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNjVkYjg5Mi05NjkxLTQ2ZTMtYTJjNi1kOTYyOTgwZjJmNTEiLCJlbWFpbCI6ImtybkB0ZXN0LmNvbSIsImV4cCI6MTc1NTQ4MjQ2MCwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc1NTQ4MjQwMCwianRpIjoiOTgxM2U0NzYtYTljOS00ZmI3LWI1YjgtODIxN2JiNzAwMDczIiwibmJmIjoxNzU1NDgyNDAwLCJpc3MiOiJtYXhwbGF0Zm9ybSIsIm5vbmNlIjoiMmFhM2VlMTM4NjllNmEyMSJ9.8QuB09QFot3Gi-Cnki_rJw8HzMhT_seK9zciUmHJmsk&user=%7B%22id%22%3A%22d65db892-9691-46e3-a2c6-d962980f2f51%22%2C%22real_name%22%3A%22%EC%B9%B4%EB%A6%AC%EB%82%98%22%2C%22display_name%22%3A%22%EC%B9%B4%EB%A6%AC%EB%82%98%22%2C%22email%22%3A%22krn%40test.com%22%2C%22phone_number%22%3A%22010-3333-3333%22%2C%22department%22%3A%22%22%2C%22position%22%3A%22%22%2C%22is_active%22%3Atrue%2C%22is_admin%22%3Afalse%2C%22is_verified%22%3Afalse%2C%22created_at%22%3A%222025-07-17T23%3A44%3A33.286670%22%2C%22last_login_at%22%3A%222025-08-18T02%3A00%3A00.377265%22%2C%22login_count%22%3A259%2C%22roles%22%3A%5B%5D%2C%22groups%22%3A%5B%5D%7D HTTP/1.1" 200 OK
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.613 [INFO] app.routers.auth:663 - Current token request received for cross-domain sync, cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.614 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.614 [INFO] app.routers.auth:700 - Session data found: True, has oauth_tokens: True
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.614 [INFO] app.routers.auth:716 - Returning valid token from Redis session 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.615 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/current-token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.620 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.620 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:5]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[6:391]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[392:401]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[402:408]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.621 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.623 [INFO] app.api.oauth_simple:2857 - Token introspection successful for client: maxlab
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.624 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/oauth/introspect HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.661 [INFO] app.utils.auth:259 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.664 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.668 [INFO] uvicorn.access:496 - 192.168.15.220:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.691 [INFO] app.utils.auth:259 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-18T11:00:14: 2025-08-18 11:00:14.697 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/services/mother-page HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:15: 2025-08-18 11:00:15.788 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+0|maxplatform-backend-8000  | 2025-08-18T11:00:15: 2025-08-18 11:00:15.789 [DEBUG] app.services.session_monitor:177 - Session check completed: 9 sessions checked (took 0.00s)
+1|maxplatform-backend-8001  | 2025-08-18T11:00:21: 2025-08-18 11:00:21.428 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+1|maxplatform-backend-8001  | 2025-08-18T11:00:21: 2025-08-18 11:00:21.429 [DEBUG] app.services.session_monitor:177 - Session check completed: 9 sessions checked (took 0.00s)
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.014 [INFO] app.routers.auth:663 - Current token request received for cross-domain sync, cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.015 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.015 [INFO] app.routers.auth:700 - Session data found: True, has oauth_tokens: True
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.015 [INFO] app.routers.auth:716 - Returning valid token from Redis session 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.018 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/current-token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.019 [DEBUG] app.utils.auth:469 - ✅ User authenticated via JWT token: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.020 [INFO] app.api.oauth_simple:778 - OAuth authorize request: client_id=maxlab, display=None, prompt=none, redirect_uri=https://maxlab.dwchem.co.kr/oauth/callback
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.020 [INFO] app.api.oauth_simple:783 - 🔍 Worker 2421110: Current user authentication status: True
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.020 [INFO] app.api.oauth_simple:785 - 🔍 Worker 2421110: Authenticated user: krn@test.com
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.020 [INFO] app.api.oauth_simple:817 - 🔍 Worker 2421110: Request cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.020 [INFO] app.api.oauth_simple:819 - 🔍 Worker 2421110: Access token cookie found: eyJhbGciOiJIUzI1NiIs...
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.020 [INFO] app.api.oauth_simple:825 - 🔍 Worker 2421110: Cookie 'session_id': 42e13e92-99c4-4668-8e2b-18bc64ee8e66...
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.021 [INFO] app.api.oauth_simple:825 - 🔍 Worker 2421110: Cookie 'session_token': 42e13e92-99c4-4668-8e2b-18bc64ee8e66...
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.021 [INFO] app.api.oauth_simple:825 - 🔍 Worker 2421110: Cookie 'user_id': d65db892-9691-46e3-a2c6-d962980f2f51...
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.021 [INFO] app.api.oauth_simple:825 - 🔍 Worker 2421110: Cookie 'access_token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkN...
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.021 [INFO] app.api.oauth_simple:829 - 🔍 Worker 2421110: Authorization header: None
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.021 [INFO] app.api.oauth_simple:832 - 🔍 Worker 2421110: MAX_PLATFORM_FRONTEND_URL: https://max.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.022 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.023 [INFO] app.api.oauth_simple:905 - 🔄 Worker 2421110: Final prompt decision: none
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.023 [DEBUG] app.core.oauth_redis_integration:217 - 🍪 All cookies received: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.023 [DEBUG] app.core.oauth_redis_integration:218 - 🍪 Cookie header: session_id=42e13e92-99c4-4668-8e2b-18bc64ee8e66; session_token=42e13e92-99c4-4668-8e2b-18bc64ee8e66; user_id=d65db892-9691-46e3-a2c6-d962980f2f51; access_token=eyJhbGciOi...
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.023 [DEBUG] app.core.oauth_redis_integration:219 - 🍪 Referer: https://maxlab.dwchem.co.kr/
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.024 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.024 [DEBUG] app.core.oauth_redis_integration:232 - ✅ Session found from request: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.024 [INFO] app.api.oauth_simple:928 - 🔄 Worker 2421110: Upgrading standard login session to OAuth session for client maxlab
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.024 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.025 [DEBUG] app.core.redis_session:166 - ✅ Session updated: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.025 [INFO] app.api.oauth_simple:936 - ✅ Worker 2421110: Standard login session upgraded for OAuth client maxlab
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.025 [INFO] app.api.oauth_simple:1320 - prompt=none with authenticated user: immediately generating code for krn@test.com
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.029 [INFO] app.services.nonce_service:49 - Stored nonce for client maxlab
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.034 [INFO] app.api.oauth_simple:1470 - prompt=none success: redirecting to https://maxlab.dwchem.co.kr/oauth/callback?code=nlgUilZYj87bqNQaicUOHC5dDw-nmk57IB7_eMgnDoQ&state=A_0BXfqSbo5raal1X7ht69BTXQUeTOM-MmzUoTvBrCA
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.034 [INFO] app.api.oauth_simple:1500 - ✅ Worker 2421110: Preserved cookies in prompt=none redirect
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.035 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/oauth/authorize?response_type=code&client_id=maxlab&redirect_uri=https%3A%2F%2Fmaxlab.dwchem.co.kr%2Foauth%2Fcallback&scope=openid+profile+email+read%3Aprofile+read%3Agroups+manage%3Aworkflows&state=A_0BXfqSbo5raal1X7ht69BTXQUeTOM-MmzUoTvBrCA&code_challenge=UkS6h15ADtZOmbsxorjVeeMMF0VTpOJf1lvWcivXeNM&code_challenge_method=S256&prompt=none&nonce=f22967394a... HTTP/1.1" 307
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.066 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[0:10]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[11:29]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[30:34]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[35:78]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.067 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[79:91]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[92:144]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[145:154]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[155:161]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.068 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.069 [DEBUG] multipart.multipart:586 - Calling on_field_start with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.069 [DEBUG] multipart.multipart:583 - Calling on_field_name with data[162:175]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.069 [DEBUG] multipart.multipart:583 - Calling on_field_data with data[176:219]
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.069 [DEBUG] multipart.multipart:586 - Calling on_field_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.069 [DEBUG] multipart.multipart:586 - Calling on_end with no data
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.069 [INFO] app.routers.auth:663 - Current token request received for cross-domain sync, cookies: ['session_id', 'session_token', 'user_id', 'access_token']
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.070 [DEBUG] app.core.redis_session:127 - 🔍 Session retrieved: 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.070 [INFO] app.routers.auth:700 - Session data found: True, has oauth_tokens: True
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.070 [INFO] app.routers.auth:716 - Returning valid token from Redis session 42e13e92-99c4-4668-8e2b-18bc64ee8e66
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.072 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/current-token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.073 [INFO] app.api.oauth_simple:129 - Cleaned up 6 expired/revoked tokens
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.076 [INFO] app.utils.auth:289 - Auth event: access_token_created | Data: {'event_type': 'access_token_created', 'user_id': 'd65db892-9691-46e3-a2c6-d962980f2f51', 'client_id': None, 'success': True, 'additional_data': {'token_type': 'access', 'expires_at': '2025-08-18T02:01:23.076139', 'jti': '771394ea-4b16-430e-b75e-cc4d927dd3d9'}}
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.080 [INFO] app.api.oauth_simple:334 - OAuth event: refresh_token_created | Data: {'event_type': 'refresh_token_created', 'client_id': 'maxlab', 'user_id': UUID('d65db892-9691-46e3-a2c6-d962980f2f51'), 'scope': 'openid profile email read:profile read:groups manage:workflows', 'success': True, 'ip_address': '192.168.9.87', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb...'}
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.082 [INFO] app.core.redis_session:92 - ✅ Session created: 72dbdce7-2f9b-4bd5-a82c-22ea9d27f576 for user krn@test.com
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.082 [INFO] app.core.oauth_redis_integration:74 - ✅ OAuth Redis session created: 72dbdce7-2f9b-4bd5-a82c-22ea9d27f576 for user krn@test.com client maxlab
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.082 [INFO] app.api.oauth_simple:2319 - ✅ Redis session created for OAuth token: 72dbdce7-2f9b-4bd5-a82c-22ea9d27f576 (user: krn@test.com, client: maxlab)
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.082 [INFO] app.api.oauth_simple:2028 - 🍪 Cross-domain session cookie set: max_session_id=72dbdce7... domain=.dwchem.co.kr
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.083 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "POST /api/oauth/token HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.094 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/oauth/userinfo HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.120 [INFO] app.api.security_events:276 - Processed 1 security events from 192.168.9.87 (user: krn@test.com)
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.142 [INFO] app.utils.auth:259 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.143 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/auth/me HTTP/1.1" 200
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.165 [INFO] app.utils.auth:259 - Successfully authenticated user: d65db892-9691-46e3-a2c6-d962980f2f51
+0|maxplatform-backend-8000  | 2025-08-18T11:00:23: 2025-08-18 11:00:23.171 [INFO] uvicorn.access:496 - 192.168.9.87:0 - "GET /api/services/mother-page HTTP/1.1" 200
+2|maxplatform-backend-8002  | 2025-08-18T11:00:27: 2025-08-18 11:00:27.338 [DEBUG] app.services.session_monitor:116 - Starting session consistency check
+2|maxplatform-backend-8002  | 2025-08-18T11:00:27: 2025-08-18 11:00:27.340 [DEBUG] app.services.session_monitor:177 - Session check completed: 10 sessions checked (took 0.00s)
+
+
+
