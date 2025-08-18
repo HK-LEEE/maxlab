@@ -1,7 +1,7 @@
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState, useMemo } from 'react';
 import log from '../../../../utils/logger';
-import { Handle, Position, NodeResizer, useReactFlow } from 'reactflow';
-import type { NodeProps } from 'reactflow';
+import { Handle, Position, NodeResizer, useReactFlow, useEdges } from 'reactflow';
+import type { NodeProps, Edge } from 'reactflow';
 import { 
   Activity,
   AlertCircle,
@@ -106,11 +106,65 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     });
   }
   
-  // Get ReactFlow instance
+  // Get ReactFlow instance and edges
   const { setNodes, getNode } = useReactFlow();
+  const edges = useEdges();
   
   // Get current node data
   const currentNode = getNode(id);
+  
+  // Calculate which handles are connected (for monitor mode)
+  const connectedHandles = useMemo(() => {
+    if (!isMonitorPage) return null;
+    
+    const connected = {
+      topTarget: false,
+      topSource: false,
+      bottomTarget: false,
+      bottomSource: false,
+      leftTarget: false,
+      leftSource: false,
+      rightTarget: false,
+      rightSource: false
+    };
+    
+    edges.forEach(edge => {
+      if (edge.source === id) {
+        // This node is the source, check sourceHandle
+        if (edge.sourceHandle) {
+          const [position, type] = edge.sourceHandle.split('-');
+          if (position === 'top' && type === 'source') connected.topSource = true;
+          if (position === 'bottom' && type === 'source') connected.bottomSource = true;
+          if (position === 'left' && type === 'source') connected.leftSource = true;
+          if (position === 'right' && type === 'source') connected.rightSource = true;
+        } else {
+          // If no specific handle, assume any source handle could be connected
+          connected.topSource = true;
+          connected.bottomSource = true;
+          connected.leftSource = true;
+          connected.rightSource = true;
+        }
+      }
+      if (edge.target === id) {
+        // This node is the target, check targetHandle
+        if (edge.targetHandle) {
+          const [position, type] = edge.targetHandle.split('-');
+          if (position === 'top' && type === 'target') connected.topTarget = true;
+          if (position === 'bottom' && type === 'target') connected.bottomTarget = true;
+          if (position === 'left' && type === 'target') connected.leftTarget = true;
+          if (position === 'right' && type === 'target') connected.rightTarget = true;
+        } else {
+          // If no specific handle, assume any target handle could be connected
+          connected.topTarget = true;
+          connected.bottomTarget = true;
+          connected.leftTarget = true;
+          connected.rightTarget = true;
+        }
+      }
+    });
+    
+    return connected;
+  }, [edges, id, isMonitorPage]);
   
   // Get initial dimensions
   const getInitialDimensions = () => {
@@ -476,17 +530,121 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         }}
       />
       
+      {/* Top Handles - Target (left) and Source (right) */}
       <Handle
         type="target"
         position={Position.Top}
         className="target"
         style={{
           top: -8,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 10,
-          height: 10,
-          background: nodeColor,
+          left: 'calc(50% - 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Top}
+        className="source"
+        style={{
+          top: -8,
+          left: 'calc(50% + 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+
+      {/* Bottom Handles - Target (left) and Source (right) */}
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        className="target"
+        style={{
+          bottom: -8,
+          left: 'calc(50% - 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="source"
+        style={{
+          bottom: -8,
+          left: 'calc(50% + 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+
+      {/* Left Handles - Target (top) and Source (bottom) */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="target"
+        style={{
+          left: -8,
+          top: 'calc(50% - 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Left}
+        className="source"
+        style={{
+          left: -8,
+          top: 'calc(50% + 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+
+      {/* Right Handles - Target (top) and Source (bottom) */}
+      <Handle
+        type="target"
+        position={Position.Right}
+        className="target"
+        style={{
+          right: -8,
+          top: 'calc(50% - 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
+          border: 'none',
+          zIndex: 20
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="source"
+        style={{
+          right: -8,
+          top: 'calc(50% + 3px)',
+          width: 5,
+          height: 5,
+          background: '#fbbf24',
           border: 'none',
           zIndex: 20
         }}
@@ -615,21 +773,6 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
       
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="source"
-        style={{
-          bottom: -8,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 10,
-          height: 10,
-          background: nodeColor,
-          border: 'none',
-          zIndex: 20
-        }}
-      />
     </>
   );
 });

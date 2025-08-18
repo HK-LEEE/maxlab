@@ -83,20 +83,33 @@ export const useFlowEditor = (workspaceId: string) => {
       // Determine if this edge should have status representation
       const shouldShowStatus = sourceNode?.type === 'equipment' && targetNode?.type === 'equipment';
       
+      // Check if either source or target is an instrument node
+      const hasInstrumentNode = sourceNode?.type === 'instrument' || targetNode?.type === 'instrument';
+      
       // Set edge style based on node types
       const edgeStyle = shouldShowStatus 
         ? { strokeWidth: 2, stroke: '#374151' } // Default gray for equipment-to-equipment (will be updated with status colors)
         : { strokeWidth: 1, stroke: '#000000', strokeDasharray: '3,2' }; // Black dashed for equipment-to-other
       
+      // Create arrow marker for edges connected to instrument nodes
+      const markerEnd = hasInstrumentNode ? {
+        type: 'arrowclosed' as const,
+        width: 15,
+        height: 15,
+        color: '#fbbf24', // Yellow color matching instrument node handles
+      } : undefined;
+      
       const newEdge = {
         ...params,
         type: edgeType,
         style: edgeStyle,
+        markerEnd: markerEnd,
         data: { 
           type: edgeType,
           showStatus: shouldShowStatus,
           sourceNodeType: sourceNode?.type,
-          targetNodeType: targetNode?.type
+          targetNodeType: targetNode?.type,
+          hasInstrumentNode: hasInstrumentNode
         }
       };
       
