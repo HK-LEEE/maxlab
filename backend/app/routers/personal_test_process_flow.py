@@ -951,6 +951,7 @@ async def get_public_equipment_status(
             equipment_status=equipment_status,
             limit=limit,
             offset=offset,
+            data_source_id=None,
             db=db
         )
 
