@@ -476,7 +476,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         }}
       />
       
-      {/* Top handles - bidirectional (both source and target) */}
+      {/* Top handles - horizontal arrangement */}
       <Handle
         type="target"
         position={Position.Top}
@@ -484,7 +484,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         className="target"
         style={{
           top: -4,
-          left: '50%',
+          left: '35%',
           transform: 'translateX(-50%)',
           width: 5,
           height: 5,
@@ -500,13 +500,13 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         className="source"
         style={{
           top: -4,
-          left: '50%',
+          left: '65%',
           transform: 'translateX(-50%)',
           width: 5,
           height: 5,
           background: '#FFEB3B',
           border: 'none',
-          zIndex: 21
+          zIndex: 20
         }}
       />
       
@@ -633,7 +633,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
       
       </div>
       
-      {/* Bottom handles - bidirectional (both source and target) */}
+      {/* Bottom handles - horizontal arrangement */}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -641,7 +641,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         className="source"
         style={{
           bottom: -4,
-          left: '50%',
+          left: '35%',
           transform: 'translateX(-50%)',
           width: 5,
           height: 5,
@@ -657,13 +657,13 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         className="target"
         style={{
           bottom: -4,
-          left: '50%',
+          left: '65%',
           transform: 'translateX(-50%)',
           width: 5,
           height: 5,
           background: '#FFEB3B',
           border: 'none',
-          zIndex: 21
+          zIndex: 20
         }}
       />
     </>
