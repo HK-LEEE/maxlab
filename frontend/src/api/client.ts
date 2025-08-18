@@ -134,46 +134,52 @@ apiClient.interceptors.response.use(
     if (status === 401 && !originalRequest._tokenRefreshAttempted) {
       console.log(`🔒 Authentication error (401) detected:`, originalRequest?.url);
       
-      // Mark this request as having attempted token refresh to prevent infinite loops
-      originalRequest._tokenRefreshAttempted = true;
+      // Skip refresh on public routes
+      const currentPath = window.location.pathname;
+      const isPublicRoute = currentPath.startsWith('/public/flow/') || 
+                           currentPath.startsWith('/workspaces/personal_test/monitor/public/');
       
+      if (isPublicRoute) {
+        console.log('🔓 Public route - skipping authentication handling');
+        return Promise.reject(error);
+      }
+      
+      // DISABLED: No refresh token logic - immediately clean up and redirect
+      console.log('⚠️ Token expired - cleaning cache and redirecting to login');
+      
+      // Complete cache cleanup
+      const keysToRemove = [
+        'accessToken', 'refreshToken', 'tokenType', 'expiresIn', 'scope',
+        'tokenExpiryTime', 'tokenCreatedAt', 'refreshTokenExpiry',
+        'lastTokenRefresh', 'user', 'userId', 'auth_method',
+        'has_refresh_token', 'max_platform_session', 'token_renewable_via_sso',
+        'sso_sync_token', 'sso_sync_user', 'oauth_state', 'oauth_flow',
+        'redirectAfterLogin', 'pre_auth_url', 'original_navigation_url'
+      ];
+      
+      // Clean localStorage
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Clean sessionStorage
+      sessionStorage.clear();
+      
+      // Save current path for redirect after login
+      const currentPathWithQuery = window.location.pathname + window.location.search;
+      if (currentPathWithQuery !== '/' && !currentPathWithQuery.includes('/login')) {
+        localStorage.setItem('redirectAfterLogin', currentPathWithQuery);
+      }
+      
+      // Redirect to MAX Platform login
+      console.log('➡️ Redirecting to MAX Platform login page');
+      window.location.href = 'https://max.dwchem.co.kr/login';
+      
+      return Promise.reject(error);
+      
+      /* ORIGINAL REFRESH LOGIC - DISABLED
       try {
-        // First, try to sync from MAX Platform
-        console.log('🔄 Attempting to sync token from MAX Platform first...');
-        const syncResult = await tokenSyncManager.syncTokensFromPlatform();
-        
-        if (syncResult) {
-          console.log('✅ Token synced from MAX Platform, retrying request');
-          
-          // Update the authorization header with the synced token
-          const syncedToken = localStorage.getItem('accessToken');
-          if (syncedToken) {
-            originalRequest.headers.Authorization = `Bearer ${syncedToken}`;
-          }
-          
-          // Retry the original request
-          return apiClient.request(originalRequest);
-        }
-        
-        // If sync didn't work, try normal refresh
-        console.log('🔄 MAX Platform sync unsuccessful, attempting local token refresh...');
-        
-        // Dynamic import to avoid circular dependency
-        const { authService } = await import('../services/authService');
-        const refreshSuccess = await authService.refreshToken();
-        
-        if (refreshSuccess) {
-          console.log('✅ Token refresh successful, retrying original request');
-          
-          // Update the authorization header with the new token
-          const newToken = localStorage.getItem('accessToken');
-          if (newToken) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          }
-          
-          // Retry the original request
-          return apiClient.request(originalRequest);
-        } else {
+        // First, try to sync from MAX Platform...
+        ... refresh logic ...
+      } else {
           console.error('🔴 [MAX Lab API] Token refresh failed, redirecting to MAX Platform login');
           
           // 상세 로깅
@@ -245,6 +251,7 @@ apiClient.interceptors.response.use(
         
         return Promise.reject(error);
       }
+      */ // END OF DISABLED REFRESH LOGIC
     } else if (status === 403) {
       // Authorization error (403)
       
@@ -284,26 +291,50 @@ authClient.interceptors.response.use(
     if (status === 401 && !originalRequest._tokenRefreshAttempted) {
       console.log(`🔒 Auth API authentication error (401):`, originalRequest?.url);
       
-      // Mark this request as having attempted token refresh
-      originalRequest._tokenRefreshAttempted = true;
+      // Skip refresh on public routes
+      const currentPath = window.location.pathname;
+      const isPublicRoute = currentPath.startsWith('/public/flow/') || 
+                           currentPath.startsWith('/workspaces/personal_test/monitor/public/');
       
+      if (isPublicRoute) {
+        console.log('🔓 Public route - skipping authentication handling for auth API');
+        return Promise.reject(error);
+      }
+      
+      // DISABLED: No refresh token logic - immediately clean up and redirect
+      console.log('⚠️ Auth API token expired - cleaning cache and redirecting to login');
+      
+      // Complete cache cleanup
+      const keysToRemove = [
+        'accessToken', 'refreshToken', 'tokenType', 'expiresIn', 'scope',
+        'tokenExpiryTime', 'tokenCreatedAt', 'refreshTokenExpiry',
+        'lastTokenRefresh', 'user', 'userId', 'auth_method',
+        'has_refresh_token', 'max_platform_session', 'token_renewable_via_sso',
+        'sso_sync_token', 'sso_sync_user', 'oauth_state', 'oauth_flow',
+        'redirectAfterLogin', 'pre_auth_url', 'original_navigation_url'
+      ];
+      
+      // Clean localStorage
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Clean sessionStorage
+      sessionStorage.clear();
+      
+      // Save current path for redirect after login
+      const currentPathWithQuery = window.location.pathname + window.location.search;
+      if (currentPathWithQuery !== '/' && !currentPathWithQuery.includes('/login')) {
+        localStorage.setItem('redirectAfterLogin', currentPathWithQuery);
+      }
+      
+      // Redirect to MAX Platform login
+      console.log('➡️ Redirecting to MAX Platform login page');
+      window.location.href = 'https://max.dwchem.co.kr/login';
+      
+      return Promise.reject(error);
+      
+      /* ORIGINAL REFRESH LOGIC - DISABLED
       try {
-        // First, try to sync from MAX Platform for auth client too
-        console.log('🔄 Attempting to sync token from MAX Platform for auth API...');
-        const syncResult = await tokenSyncManager.syncTokensFromPlatform();
-        
-        if (syncResult) {
-          console.log('✅ Token synced from MAX Platform for auth API, retrying request');
-          
-          // Update the authorization header with the synced token
-          const syncedToken = localStorage.getItem('accessToken');
-          if (syncedToken) {
-            originalRequest.headers.Authorization = `Bearer ${syncedToken}`;
-          }
-          
-          // Retry the original request
-          return authClient.request(originalRequest);
-        }
+        // First, try to sync from MAX Platform for auth client too...
         
         // For auth client, we should be more conservative about token refresh
         // since this might be the auth endpoints themselves
@@ -386,6 +417,7 @@ authClient.interceptors.response.use(
         
         return Promise.reject(error);
       }
+      */ // END OF DISABLED REFRESH LOGIC
     } else if (status === 403) {
       console.log(`🚫 Auth API authorization error (403):`, originalRequest?.url);
       

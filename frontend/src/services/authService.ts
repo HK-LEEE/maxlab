@@ -680,6 +680,24 @@ export const authService = {
    * 인증 토큰 갱신 - Refresh Token 우선, Silent Auth 폴백
    */
   refreshToken: async (forceRefresh: boolean = false): Promise<boolean> => {
+    // DISABLED: Refresh token logic temporarily disabled - redirect to login on expiry
+    console.log('⚠️ Refresh token disabled - redirecting to login');
+    
+    // Clear all auth data
+    const keysToRemove = [
+      'accessToken', 'refreshToken', 'tokenType', 'expiresIn', 'scope',
+      'tokenExpiryTime', 'tokenCreatedAt', 'refreshTokenExpiry', 
+      'lastTokenRefresh', 'user', 'userId', 'auth_method',
+      'has_refresh_token', 'max_platform_session', 'token_renewable_via_sso'
+    ];
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    sessionStorage.clear();
+    
+    // Redirect to login
+    window.location.href = 'https://max.dwchem.co.kr/login';
+    return false;
+    
+    /* ORIGINAL REFRESH LOGIC - DISABLED
     return tokenRefreshManager.refreshToken(async () => {
       try {
         console.log('🔄 Attempting token refresh with fallback chain...');
@@ -987,6 +1005,7 @@ export const authService = {
         };
       }
     }, { forceRefresh });
+    */ // END OF DISABLED REFRESH LOGIC
   },
 
   /**
@@ -1125,6 +1144,7 @@ export const authService = {
         clearTimeout(refreshInterval);
       }
     };
+    */ // END OF DISABLED AUTO REFRESH LOGIC
   },
 
   /**

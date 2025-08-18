@@ -81,6 +81,16 @@ export class TokenSyncManager {
    * This solves the multi-domain token mismatch issue
    */
   public async syncTokensFromPlatform(): Promise<boolean> {
+    // Skip sync on public pages
+    const currentPath = window.location.pathname;
+    const isPublicRoute = currentPath.startsWith('/public/flow/') || 
+                          currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+    
+    if (isPublicRoute) {
+      console.log('🔓 Public route - skipping token sync');
+      return false;
+    }
+    
     if (this.isSyncing) {
       console.log('⏳ Token sync already in progress');
       return false;
@@ -184,6 +194,16 @@ export class TokenSyncManager {
    * Validate token freshness and sync if needed
    */
   public async validateTokenFreshness(forceCheck = false): Promise<boolean> {
+    // Skip validation on public pages
+    const currentPath = window.location.pathname;
+    const isPublicRoute = currentPath.startsWith('/public/flow/') || 
+                          currentPath.startsWith('/workspaces/personal_test/monitor/public/');
+    
+    if (isPublicRoute) {
+      console.log('🔓 Public route - skipping token validation');
+      return true; // Always return true for public routes
+    }
+    
     // First, try to sync from MAX Platform
     const syncResult = await this.syncTokensFromPlatform();
     if (syncResult) {
