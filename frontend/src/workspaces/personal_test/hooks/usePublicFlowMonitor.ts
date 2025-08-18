@@ -561,7 +561,8 @@ export const usePublicFlowMonitor = (publishToken: string) => {
       }
 
       // Update edges based on node statuses
-      const edgesToUpdate = isInitialLoad ? flowData.flow_data?.edges || [] : edges;
+      // Always use edges state which has proper data properties (offset, borderRadius, etc.)
+      const edgesToUpdate = edges.length > 0 ? edges : (flowData.flow_data?.edges || []);
       const nodeStatusMap = new Map<string, string>();
       const nodeTypeMap = new Map<string, string>();
       
