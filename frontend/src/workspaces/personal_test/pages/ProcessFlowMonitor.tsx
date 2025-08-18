@@ -52,6 +52,21 @@ const FlowCanvas: React.FC<{
 }> = React.memo(({ nodes, edges, onNodesChange, onEdgesChange, nodeTypes, edgeTypes, onNodeClick, equipmentStatusCount, activeCount }) => {
   const { fitView } = useReactFlow();
 
+  // Auto fitView when fullscreen state changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      // Add a small delay to allow the browser to complete the fullscreen transition
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 800 });
+      }, 100);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, [fitView]);
+
   return (
     <ReactFlow
       nodes={nodes}
