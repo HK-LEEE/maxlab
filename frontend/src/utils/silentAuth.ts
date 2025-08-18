@@ -350,12 +350,18 @@ export function isSafePageForTokenRefresh(): boolean {
   
   // OAuth 관련 페이지들은 토큰 갱신 불허 (with exception for safe callback state)
   const unsafePaths = [
-    '/login',
     '/logout', 
     '/oauth/authorize',
     '/signup',
     '/register'
   ];
+  
+  // Special handling for /login page
+  // Allow silent auth if user has valid token (SSO scenario)
+  if (currentPath === '/login' && localStorage.getItem('accessToken')) {
+    console.log('✅ Login page with valid token detected - allowing silent auth for SSO');
+    return true;
+  }
   
   // Special handling for /oauth/callback
   if (currentPath === '/oauth/callback') {
@@ -393,6 +399,7 @@ export function isSafePageForTokenRefresh(): boolean {
   }
 
   // 현재 페이지가 안전하지 않거나 OAuth 처리 중이면 false
+  // Note: /login is now handled separately above for SSO scenarios
   if (unsafePaths.some(path => currentPath.startsWith(path))) {
     console.log('🚫 Unsafe path for token refresh:', currentPath);
     return false;
