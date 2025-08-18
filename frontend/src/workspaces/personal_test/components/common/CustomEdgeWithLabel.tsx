@@ -210,7 +210,7 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
   markerEnd,
 }) => {
   const type = data?.type || 'step';
-  const offset = data?.offset || 20; // Default offset 20px
+  const offset = data?.offset || 30; // Default offset 30px (consistent with other components)
   const borderRadius = data?.borderRadius || 10; // Default border radius 10px
   
   // Get the appropriate path based on edge type

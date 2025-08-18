@@ -90,13 +90,15 @@ export const useFlowEditor = (workspaceId: string) => {
       
       const newEdge = {
         ...params,
-        type: edgeType,
+        type: 'custom', // Always use custom type for CustomEdgeWithLabel
         style: edgeStyle,
         data: { 
-          type: edgeType,
+          type: edgeType, // Edge rendering type (step, smoothstep, etc.)
           showStatus: shouldShowStatus,
           sourceNodeType: sourceNode?.type,
-          targetNodeType: targetNode?.type
+          targetNodeType: targetNode?.type,
+          offset: 30, // Offset from nodes
+          borderRadius: 10 // Border radius for smooth edges
         }
       };
       
@@ -321,7 +323,7 @@ export const useFlowEditor = (workspaceId: string) => {
       // Preserve existing edge data and ensure backward compatibility
       const baseEdge = {
         ...edge,
-        type: edge.type === 'bezier' ? 'default' : (edge.type || 'step')
+        type: 'custom' // Always use custom type for CustomEdgeWithLabel
       };
       
       // For existing edges without showStatus data, determine based on connected nodes
@@ -344,7 +346,18 @@ export const useFlowEditor = (workspaceId: string) => {
           ...baseEdge.data,
           showStatus: shouldShowStatus,
           sourceNodeType: sourceNode?.type,
-          targetNodeType: targetNode?.type
+          targetNodeType: targetNode?.type,
+          type: baseEdge.data?.type || edge.type || 'smoothstep', // Edge rendering type
+          offset: baseEdge.data?.offset || 30, // Default offset
+          borderRadius: baseEdge.data?.borderRadius || 10 // Default border radius
+        };
+      } else {
+        // Ensure edge data has all required properties even if showStatus exists
+        baseEdge.data = {
+          ...baseEdge.data,
+          type: baseEdge.data?.type || edge.type || 'smoothstep', // Edge rendering type
+          offset: baseEdge.data?.offset || 30, // Default offset
+          borderRadius: baseEdge.data?.borderRadius || 10 // Default border radius
         };
       }
       
