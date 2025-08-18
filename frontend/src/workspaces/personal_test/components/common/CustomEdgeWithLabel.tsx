@@ -129,30 +129,70 @@ const getParticleConfig = (style: any, animated: boolean, showStatus: boolean): 
   }
 };
 
-// Custom step path function with offset support
+// Custom step path function with offset support (90-degree angles only)
 function getStepPath(params: any): [string, number, number] {
   const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset = 20 } = params;
   const centerX = (sourceX + targetX) / 2;
   const centerY = (sourceY + targetY) / 2;
   
-  // Apply offset based on source and target positions
-  let offsetSourceY = sourceY;
-  let offsetTargetY = targetY;
-  let offsetSourceX = sourceX;
-  let offsetTargetX = targetX;
+  let path = `M ${sourceX},${sourceY}`;
   
-  // Adjust offset based on connection direction
-  if (sourcePosition === 'bottom') offsetSourceY += offset;
-  if (sourcePosition === 'top') offsetSourceY -= offset;
-  if (sourcePosition === 'right') offsetSourceX += offset;
-  if (sourcePosition === 'left') offsetSourceX -= offset;
+  // Determine the path based on source and target positions
+  // All movements are horizontal or vertical only (90-degree angles)
   
-  if (targetPosition === 'top') offsetTargetY -= offset;
-  if (targetPosition === 'bottom') offsetTargetY += offset;
-  if (targetPosition === 'left') offsetTargetX -= offset;
-  if (targetPosition === 'right') offsetTargetX += offset;
-  
-  const path = `M ${sourceX},${sourceY} L ${offsetSourceX},${offsetSourceY} L ${offsetTargetX},${offsetTargetY} L ${targetX},${targetY}`;
+  if (sourcePosition === 'bottom' && targetPosition === 'top') {
+    // Bottom to Top: go down, then horizontal, then up
+    const midY = sourceY + offset;
+    const targetMidY = targetY - offset;
+    
+    path += ` L ${sourceX},${midY}`; // Move down from source
+    path += ` L ${targetX},${midY}`; // Move horizontally
+    path += ` L ${targetX},${targetY}`; // Move up to target
+    
+  } else if (sourcePosition === 'top' && targetPosition === 'bottom') {
+    // Top to Bottom: go up, then horizontal, then down
+    const midY = sourceY - offset;
+    const targetMidY = targetY + offset;
+    
+    path += ` L ${sourceX},${midY}`; // Move up from source
+    path += ` L ${targetX},${midY}`; // Move horizontally
+    path += ` L ${targetX},${targetY}`; // Move down to target
+    
+  } else if (sourcePosition === 'right' && targetPosition === 'left') {
+    // Right to Left: go right, then vertical, then left
+    const midX = sourceX + offset;
+    const targetMidX = targetX - offset;
+    
+    path += ` L ${midX},${sourceY}`; // Move right from source
+    path += ` L ${midX},${targetY}`; // Move vertically
+    path += ` L ${targetX},${targetY}`; // Move left to target
+    
+  } else if (sourcePosition === 'left' && targetPosition === 'right') {
+    // Left to Right: go left, then vertical, then right
+    const midX = sourceX - offset;
+    const targetMidX = targetX + offset;
+    
+    path += ` L ${midX},${sourceY}`; // Move left from source
+    path += ` L ${midX},${targetY}`; // Move vertically
+    path += ` L ${targetX},${targetY}`; // Move right to target
+    
+  } else {
+    // Default case: use center point method for mixed directions
+    const midY = sourceY + (sourcePosition === 'bottom' ? offset : sourcePosition === 'top' ? -offset : 0);
+    const midX = sourceX + (sourcePosition === 'right' ? offset : sourcePosition === 'left' ? -offset : 0);
+    
+    if (sourcePosition === 'bottom' || sourcePosition === 'top') {
+      // Vertical source: move vertically first, then horizontally
+      path += ` L ${sourceX},${centerY}`; // Move to center Y
+      path += ` L ${targetX},${centerY}`; // Move horizontally to target X
+      path += ` L ${targetX},${targetY}`; // Move to target
+    } else {
+      // Horizontal source: move horizontally first, then vertically
+      path += ` L ${centerX},${sourceY}`; // Move to center X
+      path += ` L ${centerX},${targetY}`; // Move vertically to target Y
+      path += ` L ${targetX},${targetY}`; // Move to target
+    }
+  }
   
   return [path, centerX, centerY];
 }
