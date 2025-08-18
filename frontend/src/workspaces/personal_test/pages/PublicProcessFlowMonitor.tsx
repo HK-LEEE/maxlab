@@ -91,6 +91,16 @@ const FlowCanvas: React.FC<{
     };
   }, [fitView]);
 
+  // Auto fitView on initial load when nodes are available
+  useEffect(() => {
+    if (nodes.length > 0) {
+      // Add a delay to ensure DOM is ready and nodes are rendered
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 800 });
+      }, 300);
+    }
+  }, [nodes.length > 0, fitView]); // Only trigger when nodes become available
+
   return (
     <ReactFlow
       nodes={nodes}
