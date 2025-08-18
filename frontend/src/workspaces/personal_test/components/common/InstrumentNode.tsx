@@ -106,8 +106,18 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     });
   }
   
+  // Check if handles are connected (for monitoring pages)
+  const isHandleConnected = (handleId: string): boolean => {
+    if (!isMonitorPage) return true; // Show all handles in editor mode
+    const edges = getEdges();
+    return edges.some(edge => 
+      (edge.source === id && edge.sourceHandle === handleId) ||
+      (edge.target === id && edge.targetHandle === handleId)
+    );
+  };
+  
   // Get ReactFlow instance
-  const { setNodes, getNode } = useReactFlow();
+  const { setNodes, getNode, getEdges } = useReactFlow();
   
   // Get current node data
   const currentNode = getNode(id);
@@ -477,40 +487,44 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
       />
       
       {/* Top handles - horizontal arrangement */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="top-target"
-        className="target"
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: '35%',
-          transform: 'translateX(-50%)',
-          width: 5,
-          height: 5,
-          background: '#FFEB3B',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Top}
-        id="top-source"
-        className="source"
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: '65%',
-          transform: 'translateX(-50%)',
-          width: 5,
-          height: 5,
-          background: '#FFEB3B',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
+      {isHandleConnected('top-target') && (
+        <Handle
+          type="target"
+          position={Position.Top}
+          id="top-target"
+          className="target"
+          style={{
+            position: 'absolute',
+            top: -8,
+            left: '35%',
+            transform: 'translateX(-50%)',
+            width: 5,
+            height: 5,
+            background: '#FFEB3B',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
+      {isHandleConnected('top-source') && (
+        <Handle
+          type="source"
+          position={Position.Top}
+          id="top-source"
+          className="source"
+          style={{
+            position: 'absolute',
+            top: -8,
+            left: '65%',
+            transform: 'translateX(-50%)',
+            width: 5,
+            height: 5,
+            background: '#FFEB3B',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
       
       <div
         className={`
@@ -636,40 +650,44 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
       </div>
       
       {/* Bottom handles - horizontal arrangement */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="bottom-source"
-        className="source"
-        style={{
-          position: 'absolute',
-          bottom: -8,
-          left: '35%',
-          transform: 'translateX(-50%)',
-          width: 5,
-          height: 5,
-          background: '#FFEB3B',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        id="bottom-target"
-        className="target"
-        style={{
-          position: 'absolute',
-          bottom: -8,
-          left: '65%',
-          transform: 'translateX(-50%)',
-          width: 5,
-          height: 5,
-          background: '#FFEB3B',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
+      {isHandleConnected('bottom-source') && (
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          id="bottom-source"
+          className="source"
+          style={{
+            position: 'absolute',
+            bottom: -8,
+            left: '35%',
+            transform: 'translateX(-50%)',
+            width: 5,
+            height: 5,
+            background: '#FFEB3B',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
+      {isHandleConnected('bottom-target') && (
+        <Handle
+          type="target"
+          position={Position.Bottom}
+          id="bottom-target"
+          className="target"
+          style={{
+            position: 'absolute',
+            bottom: -8,
+            left: '65%',
+            transform: 'translateX(-50%)',
+            width: 5,
+            height: 5,
+            background: '#FFEB3B',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
     </>
   );
 });
