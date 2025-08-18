@@ -129,13 +129,30 @@ const getParticleConfig = (style: any, animated: boolean, showStatus: boolean): 
   }
 };
 
-// Custom step path function
+// Custom step path function with offset support
 function getStepPath(params: any): [string, number, number] {
-  const { sourceX, sourceY, targetX, targetY } = params;
+  const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset = 20 } = params;
   const centerX = (sourceX + targetX) / 2;
   const centerY = (sourceY + targetY) / 2;
   
-  const path = `M ${sourceX},${sourceY} L ${centerX},${sourceY} L ${centerX},${targetY} L ${targetX},${targetY}`;
+  // Apply offset based on source and target positions
+  let offsetSourceY = sourceY;
+  let offsetTargetY = targetY;
+  let offsetSourceX = sourceX;
+  let offsetTargetX = targetX;
+  
+  // Adjust offset based on connection direction
+  if (sourcePosition === 'bottom') offsetSourceY += offset;
+  if (sourcePosition === 'top') offsetSourceY -= offset;
+  if (sourcePosition === 'right') offsetSourceX += offset;
+  if (sourcePosition === 'left') offsetSourceX -= offset;
+  
+  if (targetPosition === 'top') offsetTargetY -= offset;
+  if (targetPosition === 'bottom') offsetTargetY += offset;
+  if (targetPosition === 'left') offsetTargetX -= offset;
+  if (targetPosition === 'right') offsetTargetX += offset;
+  
+  const path = `M ${sourceX},${sourceY} L ${offsetSourceX},${offsetSourceY} L ${offsetTargetX},${offsetTargetY} L ${targetX},${targetY}`;
   
   return [path, centerX, centerY];
 }
@@ -153,6 +170,8 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
   markerEnd,
 }) => {
   const type = data?.type || 'step';
+  const offset = data?.offset || 20; // Default offset 20px
+  const borderRadius = data?.borderRadius || 10; // Default border radius 10px
   
   // Get the appropriate path based on edge type
   let edgePath: string;
@@ -176,6 +195,8 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
         targetX,
         targetY,
         targetPosition,
+        offset,
+        borderRadius,
       });
       break;
     case 'bezier':
@@ -198,6 +219,7 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
         targetX,
         targetY,
         targetPosition,
+        offset,
       });
       break;
   }

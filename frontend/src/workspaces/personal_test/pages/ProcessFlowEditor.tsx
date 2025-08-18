@@ -677,6 +677,8 @@ const ProcessFlowEditorContent: React.FC = () => {
     style: { strokeWidth: 2, stroke: '#374151' },
     data: { 
       type: edgeType, // Pass edge type in data for CustomEdgeWithLabel
+      offset: 30, // Offset from nodes to prevent edges from being too close
+      borderRadius: 10, // Border radius for smooth step edges
       showStatus: true // Default to show status (will be overridden by onConnect logic)
     }, 
   }), [edgeType]);

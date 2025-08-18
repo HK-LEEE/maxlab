@@ -74,7 +74,11 @@ const FlowCanvas: React.FC<{
       defaultEdgeOptions={{
         type: 'custom',
         style: { strokeWidth: 2, stroke: '#374151' },
-        animated: false
+        animated: false,
+        data: {
+          offset: 30, // Offset from nodes
+          borderRadius: 10, // Border radius for smooth edges
+        }
       }}
       proOptions={{ hideAttribution: true }}
     >
