@@ -199,40 +199,11 @@ export class SilentAuth {
       clearTimeout(this.timeoutId);
     }
     
-    // 🔒 CRITICAL FIX: Don't clear OAuth state during active OAuth callback processing
-    // Check if OAuth callback is currently processing before clearing state
-    const isOAuthCallbackProcessing = sessionStorage.getItem('oauth_callback_processing');
-    const isOAuthFlowInProgress = sessionStorage.getItem('oauth_flow_in_progress');
-    
-    if (!isOAuthCallbackProcessing && !isOAuthFlowInProgress) {
-      // Safe to clean up - no active OAuth processing
-      sessionStorage.removeItem('silent_oauth_state');
-      sessionStorage.removeItem('silent_oauth_code_verifier');
-      sessionStorage.removeItem('silent_oauth_nonce');
-      sessionStorage.removeItem('oauth_max_age');
-      console.log('✅ Silent auth cleanup completed - OAuth state cleared');
-    } else {
-      // OAuth callback is processing - preserve state for validation
-      console.log('🔒 Silent auth cleanup deferred - OAuth callback processing in progress');
-      
-      // Set a flag to indicate cleanup is needed later
-      sessionStorage.setItem('silent_auth_cleanup_pending', 'true');
-      
-      // Schedule cleanup after OAuth callback completes (with timeout)
-      setTimeout(() => {
-        const stillProcessing = sessionStorage.getItem('oauth_callback_processing') || 
-                               sessionStorage.getItem('oauth_flow_in_progress');
-        
-        if (!stillProcessing && sessionStorage.getItem('silent_auth_cleanup_pending') === 'true') {
-          sessionStorage.removeItem('silent_oauth_state');
-          sessionStorage.removeItem('silent_oauth_code_verifier');
-          sessionStorage.removeItem('silent_oauth_nonce');
-          sessionStorage.removeItem('oauth_max_age');
-          sessionStorage.removeItem('silent_auth_cleanup_pending');
-          console.log('✅ Deferred silent auth cleanup completed');
-        }
-      }, 5000); // 5 second timeout for OAuth callback to complete
-    }
+    // 세션 스토리지 정리
+    sessionStorage.removeItem('silent_oauth_state');
+    sessionStorage.removeItem('silent_oauth_code_verifier');
+    sessionStorage.removeItem('silent_oauth_nonce');
+    sessionStorage.removeItem('oauth_max_age');
 
     this.iframe = null;
     this.messageHandler = null;

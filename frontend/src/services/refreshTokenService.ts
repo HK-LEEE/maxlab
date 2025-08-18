@@ -222,16 +222,38 @@ class RefreshTokenService {
    * Store tokens securely after successful authentication
    */
   async storeTokens(tokenResponse: TokenResponse): Promise<void> {
+    console.log('🔧 [DEBUG] storeTokens called with:', {
+      domain: window.location.hostname,
+      origin: window.location.origin,
+      hasAccessToken: !!tokenResponse.access_token,
+      hasRefreshToken: !!tokenResponse.refresh_token,
+      accessTokenSnippet: tokenResponse.access_token?.substring(0, 20) + '...',
+      tokenType: tokenResponse.token_type,
+      expiresIn: tokenResponse.expires_in
+    });
+    
     const currentTime = Date.now();
     const accessExpiryTime = currentTime + (tokenResponse.expires_in * 1000);
     
-    // Store access token data
-    localStorage.setItem('accessToken', tokenResponse.access_token);
-    localStorage.setItem('tokenType', tokenResponse.token_type || 'Bearer');
-    localStorage.setItem('expiresIn', tokenResponse.expires_in.toString());
-    localStorage.setItem('tokenExpiryTime', accessExpiryTime.toString());
-    localStorage.setItem('scope', tokenResponse.scope);
-    localStorage.setItem('tokenCreatedAt', currentTime.toString());
+    try {
+      // Store access token data
+      console.log('🔧 [DEBUG] Storing access token data to localStorage...');
+      localStorage.setItem('accessToken', tokenResponse.access_token);
+      localStorage.setItem('tokenType', tokenResponse.token_type || 'Bearer');
+      localStorage.setItem('expiresIn', tokenResponse.expires_in.toString());
+      localStorage.setItem('tokenExpiryTime', accessExpiryTime.toString());
+      localStorage.setItem('scope', tokenResponse.scope);
+      localStorage.setItem('tokenCreatedAt', currentTime.toString());
+      
+      console.log('✅ [DEBUG] Access token data stored, verifying...', {
+        accessTokenStored: !!localStorage.getItem('accessToken'),
+        tokenTypeStored: localStorage.getItem('tokenType'),
+        expiresInStored: localStorage.getItem('expiresIn')
+      });
+    } catch (error) {
+      console.error('❌ [DEBUG] Error storing access token data:', error);
+      throw error;
+    }
 
     // Store refresh token data if present
     if (tokenResponse.refresh_token) {

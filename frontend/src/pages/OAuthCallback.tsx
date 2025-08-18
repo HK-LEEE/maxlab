@@ -716,9 +716,6 @@ export const OAuthCallback: React.FC = () => {
             sessionStorage.removeItem('oauth_flow_in_progress');
             sessionStorage.removeItem('oauth_callback_processing');
             
-            // 🔒 CRITICAL FIX: Clean up any pending silent auth cleanup flags
-            sessionStorage.removeItem('silent_auth_cleanup_pending');
-            
             const messagePayload = {
               type: 'OAUTH_SUCCESS',
               token: tokenResponse.access_token,
@@ -1218,17 +1215,44 @@ export const OAuthCallback: React.FC = () => {
             // Check if this was a "different user login" attempt
             const wasForcedAccountSelection = sessionStorage.getItem('oauth_force_account_selection') === 'true';
             if (wasForcedAccountSelection) {
-              console.log('🔄 Different user login detected, clearing previous user data...');
+              console.log('🔄 Different user login detected - will clear previous user data AFTER storing new tokens...');
+            }
+            
+            // RefreshTokenService를 사용하여 토큰 저장 (refresh token 포함)
+            console.log('💾 [DEBUG] Starting token storage process...', {
+              domain: window.location.hostname,
+              hasAccessToken: !!tokenResponse.access_token,
+              hasRefreshToken: !!tokenResponse.refresh_token,
+              accessTokenLength: tokenResponse.access_token?.length || 0,
+              tokenType: tokenResponse.token_type,
+              expiresIn: tokenResponse.expires_in
+            });
+            
+            const { refreshTokenService } = await import('../services/refreshTokenService');
+            await refreshTokenService.storeTokens(tokenResponse);
+            
+            console.log('✅ [DEBUG] Token storage completed, verifying localStorage...', {
+              domain: window.location.hostname,
+              storedAccessToken: !!localStorage.getItem('accessToken'),
+              storedTokenType: localStorage.getItem('tokenType'),
+              storedExpiresIn: localStorage.getItem('expiresIn'),
+              allLocalStorageKeys: Object.keys(localStorage).filter(key => 
+                key.includes('token') || key.includes('Token') || key.includes('auth') || key.includes('Auth')
+              )
+            });
+            
+            // 사용자 정보 가져오기 (authService 사용)  
+            const { authService } = await import('../services/authService');
+            const userInfo = await authService.getCurrentUser();
+            
+            console.log(`👤 New user authenticated: ${userInfo.username} (${userInfo.email})`);
+            
+            // For forced account selection, clear any conflicting old user data AFTER storing new tokens
+            if (wasForcedAccountSelection) {
+              console.log('🧹 [DEBUG] Clearing conflicting old user data after successful token storage...');
               
-              // 🔧 CRITICAL FIX: Clear previous auth data but preserve popup communication keys
-              localStorage.removeItem('user');
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('refreshToken');
-              localStorage.removeItem('tokenExpiryTime');
-              localStorage.removeItem('tokenCreatedAt');
-              localStorage.removeItem('tokenType');
-              localStorage.removeItem('expiresIn');
-              localStorage.removeItem('scope');
+              // Only clear specific user-related data that might conflict, preserve the newly stored tokens
+              localStorage.removeItem('user'); // Old user info that conflicts with new user
               
               // Selective sessionStorage cleanup - preserve popup communication and OAuth flow
               const preserveKeys = [
@@ -1247,21 +1271,9 @@ export const OAuthCallback: React.FC = () => {
                 }
               });
               
-              console.log('✅ Previous user data cleared for account switching (popup communication preserved)');
-            }
-            
-            // RefreshTokenService를 사용하여 토큰 저장 (refresh token 포함)
-            const { refreshTokenService } = await import('../services/refreshTokenService');
-            await refreshTokenService.storeTokens(tokenResponse);
-            
-            // 사용자 정보 가져오기 (authService 사용)  
-            const { authService } = await import('../services/authService');
-            const userInfo = await authService.getCurrentUser();
-            
-            console.log(`👤 New user authenticated: ${userInfo.username} (${userInfo.email})`);
-            
-            // Update auth store with new user (force update for account switching)
-            if (wasForcedAccountSelection) {
+              console.log('✅ [DEBUG] Conflicting old user data cleared, tokens preserved');
+              
+              // Update auth store with new user (force update for account switching)
               const { useAuthStore } = await import('../stores/authStore');
               const { setAuth } = useAuthStore.getState();
               const newToken = localStorage.getItem('accessToken') || '';
