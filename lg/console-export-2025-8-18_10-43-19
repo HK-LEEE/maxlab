@@ -1,0 +1,77 @@
+10:43:14.048 🔄 Rehydrating auth state for initialization 
+Object { state: {…} }
+index-j3m9cnnH.js:228:5827
+10:43:14.048 🆕 New or unauthenticated user, preparing for silent auth attempt index-j3m9cnnH.js:228:7076
+10:43:14.050 🛡️ New CSRF token generated index-j3m9cnnH.js:263:6222
+10:43:14.050 🛡️ CSRF protection initialized with new token index-j3m9cnnH.js:263:5768
+10:43:14.055 WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER. index-j3m9cnnH.js:263:21207
+10:43:14.057 ✅ Token sync manager initialized with cross-domain sync index-j3m9cnnH.js:263:45308
+10:43:14.058 🔀 OAuth Coordinator [01:43:14][Q:0|A:0]: 🏗️ OAuth Request Coordinator initialized index-j3m9cnnH.js:263:61958
+10:43:14.068 🔄 Performing initial token sync with MAX Platform... index-j3m9cnnH.js:851:104616
+10:43:14.068 🔄 Syncing tokens from MAX Platform... index-j3m9cnnH.js:263:45985
+10:43:14.068 ✅ Auth sync initialized with BroadcastChannel index-j3m9cnnH.js:263:35548
+10:43:14.068 🔒 Initializing cross-domain logout listener index-j3m9cnnH.js:851:106249
+10:43:14.068 📡 SSO: PostMessage listener registered index-j3m9cnnH.js:851:109241
+10:43:14.069 🚀 Starting auth initialization (single instance guaranteed) index-j3m9cnnH.js:851:113900
+10:43:14.069 🔍 MaxLab Infinite loop detection result: 
+Object { inLoop: false, confidence: 0, indicators: [], recentAttempts: 0 }
+index-j3m9cnnH.js:227:8606
+10:43:14.069 🔍 MaxLab OAuth loop prevention check: 
+Object { type: "auto", recentAttempts: 0, recentAborted: 0, consecutiveFailures: 0, circuitBreakerOpen: false, totalAborted: 0 }
+index-j3m9cnnH.js:227:4366
+10:43:14.069 🔄 Auth state change: idle → silent_auth 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (3) […] }
+index-j3m9cnnH.js:227:11473
+10:43:14.069 🔇 Attempting silent SSO login... index-j3m9cnnH.js:265:4480
+10:43:14.069 🔀 OAuth Coordinator [01:43:14][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755481394070_d8uik66fc 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-j3m9cnnH.js:263:61909
+10:43:14.069 🔀 OAuth Coordinator [01:43:14][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-j3m9cnnH.js:263:61958
+10:43:14.069 🔀 OAuth Coordinator [01:43:14][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755481394070_d8uik66fc index-j3m9cnnH.js:263:61958
+10:43:14.070 🚫 Unsafe path for token refresh: /login index-j3m9cnnH.js:258:22098
+10:43:14.070 🚫 Silent auth not allowed on current page: /login index-j3m9cnnH.js:258:19642
+10:43:14.070 🔀 OAuth Coordinator [01:43:14][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755481394070_d8uik66fc index-j3m9cnnH.js:263:61958
+10:43:14.070 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-j3m9cnnH.js:265:6164
+10:43:14.071 📊 MaxLab OAuth attempt recorded: 
+Object { type: "auto", success: false, error: "Cannot attempt silent auth on current page...", aborted: false, consecutiveFailures: 1, totalAborted: 0 }
+index-j3m9cnnH.js:227:7113
+10:43:14.071 🔄 Auth state change: silent_auth → ready 
+Object { isAuthenticated: false, hasUser: false, stackTrace: (2) […] }
+index-j3m9cnnH.js:227:11473
+10:43:14.071 🚫 Unsafe path for token refresh: /login index-j3m9cnnH.js:258:22098
+10:43:14.073 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: false, authAttemptRef: false }
+index-j3m9cnnH.js:755:4401
+10:43:14.075 🛑 User not authenticated, stopping token refresh index-j3m9cnnH.js:265:17109
+10:43:14.075 🔥 Component mounted, current oauthLoading: false index-j3m9cnnH.js:755:5271
+10:43:14.082 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: true, hasLoggedOutRef: false, authAttemptRef: true }
+index-j3m9cnnH.js:755:4401
+10:43:14.086 🔄 Logout detected, resetting login component state index-j3m9cnnH.js:755:5677
+10:43:14.087 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-j3m9cnnH.js:755:4401
+10:43:14.089 ✅ Received fresh token from MAX Platform, updating local storage index-j3m9cnnH.js:263:46333
+10:43:14.089 Token sync details: 
+Object { source: "redis", synced: true, expires_in: 54 }
+index-j3m9cnnH.js:263:46413
+10:43:14.089 🔒 Security event logged: token_token_synced_from_platform (low) 
+Object { eventId: "evt_1755481394090_4jo6skkb", timestamp: "2025-08-18T01:43:14.090Z", eventType: "token_token_synced_from_platform", severity: "low", source: "frontend", userId: undefined, sessionId: "sess_1755481394056_q5er32csc79", details: {…}, context: {…}, metadata: undefined }
+index-j3m9cnnH.js:263:38708
+10:43:14.089 📤 Broadcasting auth event: TOKEN_REFRESH index-j3m9cnnH.js:263:36676
+10:43:14.089 ✅ Initial token sync successful index-j3m9cnnH.js:851:104727
+10:43:14.175 No valid user data found index-j3m9cnnH.js:265:11134
+10:43:14.175 🔇 Attempting silent SSO login... index-j3m9cnnH.js:265:4480
+10:43:14.175 🔀 OAuth Coordinator [01:43:14][Q:0|A:0]: 📝 Queuing silent_login request: silent_login_1755481394176_b8sqvb9iv 
+Object { url: "silent_oauth_auth", priority: 0 }
+index-j3m9cnnH.js:263:61909
+10:43:14.175 🔀 OAuth Coordinator [01:43:14][Q:1|A:0]: 🔄 Starting OAuth request queue processing index-j3m9cnnH.js:263:61958
+10:43:14.175 🔀 OAuth Coordinator [01:43:14][Q:1|A:1]: 🚀 Processing silent_login request: silent_login_1755481394176_b8sqvb9iv index-j3m9cnnH.js:263:61958
+10:43:14.175 🚫 Unsafe path for token refresh: /login index-j3m9cnnH.js:258:22098
+10:43:14.175 🚫 Silent auth not allowed on current page: /login index-j3m9cnnH.js:258:19642
+10:43:14.175 🔀 OAuth Coordinator [01:43:14][Q:1|A:0]: ✅ silent_login request completed: silent_login_1755481394176_b8sqvb9iv index-j3m9cnnH.js:263:61958
+10:43:14.175 ℹ️ Silent SSO login failed: Cannot attempt silent auth on current page index-j3m9cnnH.js:265:6164
+10:43:14.176 🔥 Login component render - current state: 
+Object { isAuthenticated: false, oauthLoading: false, silentLoginAttempting: false, hasLoggedOutRef: true, authAttemptRef: false }
+index-j3m9cnnH.js:755:4401
+
