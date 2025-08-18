@@ -129,157 +129,6 @@ const getParticleConfig = (style: any, animated: boolean, showStatus: boolean): 
   }
 };
 
-// Custom smooth step path function with offset support (rounded corners)
-function getSmoothStepPathCustom(params: any): [string, number, number] {
-  const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset = 30, borderRadius = 10 } = params;
-  const centerX = (sourceX + targetX) / 2;
-  const centerY = (sourceY + targetY) / 2;
-  
-  let path = `M ${sourceX},${sourceY}`;
-  
-  // Use quadratic bezier curves for smooth corners
-  if (sourcePosition === 'bottom' && targetPosition === 'top') {
-    const midY = sourceY + offset;
-    const targetMidY = targetY - offset;
-    
-    // Move down with curve
-    path += ` L ${sourceX},${sourceY + offset - borderRadius}`;
-    path += ` Q ${sourceX},${midY} ${sourceX + borderRadius},${midY}`;
-    
-    // Move horizontally
-    path += ` L ${targetX - borderRadius},${midY}`;
-    path += ` Q ${targetX},${midY} ${targetX},${midY - borderRadius}`;
-    
-    // Move to target
-    path += ` L ${targetX},${targetY}`;
-    
-  } else if (sourcePosition === 'top' && targetPosition === 'bottom') {
-    const midY = sourceY - offset;
-    
-    // Move up with curve
-    path += ` L ${sourceX},${sourceY - offset + borderRadius}`;
-    path += ` Q ${sourceX},${midY} ${sourceX + borderRadius},${midY}`;
-    
-    // Move horizontally
-    path += ` L ${targetX - borderRadius},${midY}`;
-    path += ` Q ${targetX},${midY} ${targetX},${midY + borderRadius}`;
-    
-    // Move to target
-    path += ` L ${targetX},${targetY}`;
-    
-  } else if (sourcePosition === 'right' && targetPosition === 'left') {
-    const midX = sourceX + offset;
-    
-    // Move right with curve
-    path += ` L ${sourceX + offset - borderRadius},${sourceY}`;
-    path += ` Q ${midX},${sourceY} ${midX},${sourceY + borderRadius}`;
-    
-    // Move vertically
-    path += ` L ${midX},${targetY - borderRadius}`;
-    path += ` Q ${midX},${targetY} ${midX - borderRadius},${targetY}`;
-    
-    // Move to target
-    path += ` L ${targetX},${targetY}`;
-    
-  } else if (sourcePosition === 'left' && targetPosition === 'right') {
-    const midX = sourceX - offset;
-    
-    // Move left with curve
-    path += ` L ${sourceX - offset + borderRadius},${sourceY}`;
-    path += ` Q ${midX},${sourceY} ${midX},${sourceY + borderRadius}`;
-    
-    // Move vertically
-    path += ` L ${midX},${targetY - borderRadius}`;
-    path += ` Q ${midX},${targetY} ${midX + borderRadius},${targetY}`;
-    
-    // Move to target
-    path += ` L ${targetX},${targetY}`;
-    
-  } else {
-    // Default case: use simple curves for mixed directions
-    if (sourcePosition === 'bottom' || sourcePosition === 'top') {
-      const midY = centerY;
-      path += ` L ${sourceX},${centerY}`;
-      path += ` L ${targetX},${centerY}`;
-      path += ` L ${targetX},${targetY}`;
-    } else {
-      const midX = centerX;
-      path += ` L ${centerX},${sourceY}`;
-      path += ` L ${centerX},${targetY}`;
-      path += ` L ${targetX},${targetY}`;
-    }
-  }
-  
-  return [path, centerX, centerY];
-}
-
-// Custom step path function with offset support (90-degree angles only)
-function getStepPath(params: any): [string, number, number] {
-  const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset = 30 } = params;
-  const centerX = (sourceX + targetX) / 2;
-  const centerY = (sourceY + targetY) / 2;
-  
-  let path = `M ${sourceX},${sourceY}`;
-  
-  // Determine the path based on source and target positions
-  // All movements are horizontal or vertical only (90-degree angles)
-  
-  if (sourcePosition === 'bottom' && targetPosition === 'top') {
-    // Bottom to Top: go down, then horizontal, then up
-    const midY = sourceY + offset;
-    const targetMidY = targetY - offset;
-    
-    path += ` L ${sourceX},${midY}`; // Move down from source
-    path += ` L ${targetX},${midY}`; // Move horizontally
-    path += ` L ${targetX},${targetY}`; // Move up to target
-    
-  } else if (sourcePosition === 'top' && targetPosition === 'bottom') {
-    // Top to Bottom: go up, then horizontal, then down
-    const midY = sourceY - offset;
-    const targetMidY = targetY + offset;
-    
-    path += ` L ${sourceX},${midY}`; // Move up from source
-    path += ` L ${targetX},${midY}`; // Move horizontally
-    path += ` L ${targetX},${targetY}`; // Move down to target
-    
-  } else if (sourcePosition === 'right' && targetPosition === 'left') {
-    // Right to Left: go right, then vertical, then left
-    const midX = sourceX + offset;
-    const targetMidX = targetX - offset;
-    
-    path += ` L ${midX},${sourceY}`; // Move right from source
-    path += ` L ${midX},${targetY}`; // Move vertically
-    path += ` L ${targetX},${targetY}`; // Move left to target
-    
-  } else if (sourcePosition === 'left' && targetPosition === 'right') {
-    // Left to Right: go left, then vertical, then right
-    const midX = sourceX - offset;
-    const targetMidX = targetX + offset;
-    
-    path += ` L ${midX},${sourceY}`; // Move left from source
-    path += ` L ${midX},${targetY}`; // Move vertically
-    path += ` L ${targetX},${targetY}`; // Move right to target
-    
-  } else {
-    // Default case: use center point method for mixed directions
-    const midY = sourceY + (sourcePosition === 'bottom' ? offset : sourcePosition === 'top' ? -offset : 0);
-    const midX = sourceX + (sourcePosition === 'right' ? offset : sourcePosition === 'left' ? -offset : 0);
-    
-    if (sourcePosition === 'bottom' || sourcePosition === 'top') {
-      // Vertical source: move vertically first, then horizontally
-      path += ` L ${sourceX},${centerY}`; // Move to center Y
-      path += ` L ${targetX},${centerY}`; // Move horizontally to target X
-      path += ` L ${targetX},${targetY}`; // Move to target
-    } else {
-      // Horizontal source: move horizontally first, then vertically
-      path += ` L ${centerX},${sourceY}`; // Move to center X
-      path += ` L ${centerX},${targetY}`; // Move vertically to target Y
-      path += ` L ${targetX},${targetY}`; // Move to target
-    }
-  }
-  
-  return [path, centerX, centerY];
-}
 
 export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
   id,
@@ -312,8 +161,7 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
       });
       break;
     case 'smoothstep':
-      // Use custom smooth step path to avoid node penetration with rounded corners
-      [edgePath, labelX, labelY] = getSmoothStepPathCustom({
+      [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
         sourceY,
         sourcePosition,
@@ -337,7 +185,7 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
       break;
     case 'step':
     default:
-      [edgePath, labelX, labelY] = getStepPath({
+      [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
         sourceY,
         sourcePosition,
@@ -345,6 +193,7 @@ export const CustomEdgeWithLabel: React.FC<EdgeProps> = ({
         targetY,
         targetPosition,
         offset,
+        borderRadius: 0, // Step edges should be sharp corners
       });
       break;
   }
