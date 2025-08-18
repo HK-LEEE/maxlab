@@ -525,8 +525,6 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
           position={Position.Top}
           id="top"
           style={{
-            top: -2.5,
-            left: 'calc(50% - 2.5px)',
             width: 5,
             height: 5,
             background: '#fbbf24',
@@ -543,8 +541,6 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
           position={Position.Bottom}
           id="bottom"
           style={{
-            top: 'calc(100% - 2.5px)',
-            left: 'calc(50% - 2.5px)',
             width: 5,
             height: 5,
             background: '#fbbf24',
@@ -561,8 +557,6 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
           position={Position.Left}
           id="left"
           style={{
-            left: -2.5,
-            top: 'calc(50% - 2.5px)',
             width: 5,
             height: 5,
             background: '#fbbf24',
@@ -579,8 +573,6 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
           position={Position.Right}
           id="right"
           style={{
-            left: 'calc(100% - 2.5px)',
-            top: 'calc(50% - 2.5px)',
             width: 5,
             height: 5,
             background: '#fbbf24',
