@@ -948,7 +948,7 @@ async def get_public_equipment_status(
         return await get_equipment_status(
             workspace_id=workspace_id,
             equipment_type=equipment_type,
-            status=equipment_status,
+            equipment_status=equipment_status,
             limit=limit,
             offset=offset,
             db=db
