@@ -118,47 +118,35 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
     if (!isMonitorPage) return null;
     
     const connected = {
-      topTarget: false,
-      topSource: false,
-      bottomTarget: false,
-      bottomSource: false,
-      leftTarget: false,
-      leftSource: false,
-      rightTarget: false,
-      rightSource: false
+      top: false,
+      bottom: false,
+      left: false,
+      right: false
     };
     
     edges.forEach(edge => {
-      if (edge.source === id) {
-        // This node is the source, check sourceHandle
+      if (edge.source === id || edge.target === id) {
+        // Check if this node is connected via any handle
         if (edge.sourceHandle) {
-          const [position, type] = edge.sourceHandle.split('-');
-          if (position === 'top' && type === 'source') connected.topSource = true;
-          if (position === 'bottom' && type === 'source') connected.bottomSource = true;
-          if (position === 'left' && type === 'source') connected.leftSource = true;
-          if (position === 'right' && type === 'source') connected.rightSource = true;
-        } else {
-          // If no specific handle, assume any source handle could be connected
-          connected.topSource = true;
-          connected.bottomSource = true;
-          connected.leftSource = true;
-          connected.rightSource = true;
+          const position = edge.sourceHandle.split('-')[0];
+          if (position === 'top') connected.top = true;
+          if (position === 'bottom') connected.bottom = true;
+          if (position === 'left') connected.left = true;
+          if (position === 'right') connected.right = true;
         }
-      }
-      if (edge.target === id) {
-        // This node is the target, check targetHandle
         if (edge.targetHandle) {
-          const [position, type] = edge.targetHandle.split('-');
-          if (position === 'top' && type === 'target') connected.topTarget = true;
-          if (position === 'bottom' && type === 'target') connected.bottomTarget = true;
-          if (position === 'left' && type === 'target') connected.leftTarget = true;
-          if (position === 'right' && type === 'target') connected.rightTarget = true;
-        } else {
-          // If no specific handle, assume any target handle could be connected
-          connected.topTarget = true;
-          connected.bottomTarget = true;
-          connected.leftTarget = true;
-          connected.rightTarget = true;
+          const position = edge.targetHandle.split('-')[0];
+          if (position === 'top') connected.top = true;
+          if (position === 'bottom') connected.bottom = true;
+          if (position === 'left') connected.left = true;
+          if (position === 'right') connected.right = true;
+        }
+        // If no specific handle, assume all handles could be connected
+        if (!edge.sourceHandle && !edge.targetHandle) {
+          connected.top = true;
+          connected.bottom = true;
+          connected.left = true;
+          connected.right = true;
         }
       }
     });
@@ -530,125 +518,77 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
         }}
       />
       
-      {/* Top Handles - Target (left) and Source (right) */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="target"
-        style={{
-          top: -8,
-          left: 'calc(50% - 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Top}
-        className="source"
-        style={{
-          top: -8,
-          left: 'calc(50% + 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
+      {/* Top Handle */}
+      {(!isMonitorPage || connectedHandles?.top) && (
+        <Handle
+          type="source"
+          position={Position.Top}
+          id="top"
+          style={{
+            top: -2.5,
+            left: 'calc(50% - 2.5px)',
+            width: 5,
+            height: 5,
+            background: '#fbbf24',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
 
-      {/* Bottom Handles - Target (left) and Source (right) */}
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        className="target"
-        style={{
-          bottom: -8,
-          left: 'calc(50% - 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="source"
-        style={{
-          bottom: -8,
-          left: 'calc(50% + 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
+      {/* Bottom Handle */}
+      {(!isMonitorPage || connectedHandles?.bottom) && (
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          id="bottom"
+          style={{
+            bottom: -2.5,
+            left: 'calc(50% - 2.5px)',
+            width: 5,
+            height: 5,
+            background: '#fbbf24',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
 
-      {/* Left Handles - Target (top) and Source (bottom) */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="target"
-        style={{
-          left: -8,
-          top: 'calc(50% - 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Left}
-        className="source"
-        style={{
-          left: -8,
-          top: 'calc(50% + 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
+      {/* Left Handle */}
+      {(!isMonitorPage || connectedHandles?.left) && (
+        <Handle
+          type="source"
+          position={Position.Left}
+          id="left"
+          style={{
+            left: -2.5,
+            top: 'calc(50% - 2.5px)',
+            width: 5,
+            height: 5,
+            background: '#fbbf24',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
 
-      {/* Right Handles - Target (top) and Source (bottom) */}
-      <Handle
-        type="target"
-        position={Position.Right}
-        className="target"
-        style={{
-          right: -8,
-          top: 'calc(50% - 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="source"
-        style={{
-          right: -8,
-          top: 'calc(50% + 3px)',
-          width: 5,
-          height: 5,
-          background: '#fbbf24',
-          border: 'none',
-          zIndex: 20
-        }}
-      />
+      {/* Right Handle */}
+      {(!isMonitorPage || connectedHandles?.right) && (
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="right"
+          style={{
+            left: 'calc(100% - 2.5px)',
+            top: 'calc(50% - 2.5px)',
+            width: 5,
+            height: 5,
+            background: '#fbbf24',
+            border: 'none',
+            zIndex: 20
+          }}
+        />
+      )}
       
       <div
         className={`
