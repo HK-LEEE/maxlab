@@ -543,7 +543,7 @@ export const InstrumentNode = memo((props: NodeProps<InstrumentNodeData>) => {
           position={Position.Bottom}
           id="bottom"
           style={{
-            bottom: -2.5,
+            top: 'calc(100% - 2.5px)',
             left: 'calc(50% - 2.5px)',
             width: 5,
             height: 5,
