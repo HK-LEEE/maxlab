@@ -557,8 +557,8 @@ export const useFlowMonitor = (workspaceId: string) => {
                       showStatus: false, // Explicitly disable status representation
                       sourceNodeType: sourceType,
                       targetNodeType: targetType,
-                      offset: edge.data?.offset || 30, // Add offset for proper edge spacing
-                      borderRadius: edge.data?.borderRadius || 10, // Add border radius for smooth edges
+                      offset: 30, // Always use fixed offset for proper edge spacing
+                      borderRadius: 10, // Always use fixed border radius for smooth edges
                     }
                   };
                 }
@@ -639,8 +639,8 @@ export const useFlowMonitor = (workspaceId: string) => {
                     showStatus: true, // Explicitly enable status representation for equipment-to-equipment
                     sourceNodeType: sourceType,
                     targetNodeType: targetType,
-                    offset: edge.data?.offset || 30, // Add offset for proper edge spacing
-                    borderRadius: edge.data?.borderRadius || 10, // Add border radius for smooth edges
+                    offset: 30, // Always use fixed offset for proper edge spacing
+                    borderRadius: 10, // Always use fixed border radius for smooth edges
                   }
                 };
               });
