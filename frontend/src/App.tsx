@@ -723,6 +723,14 @@ function App() {
           return;
         }
         
+        // Check if we're in the middle of auth redirect
+        if (sessionStorage.getItem('auth_redirect_in_progress') === 'true') {
+          console.log('🔄 Auth redirect in progress, skipping initialization');
+          setAuthState('ready');
+          setAppInitialized(true);
+          return;
+        }
+        
         // 🔒 CRITICAL FIX: Global initialization guard to prevent double initialization
         if (globalInitializationInProgress) {
           console.log('🛑 Global initialization already in progress, skipping duplicate initialization');

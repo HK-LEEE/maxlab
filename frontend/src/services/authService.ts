@@ -693,8 +693,14 @@ export const authService = {
     keysToRemove.forEach(key => localStorage.removeItem(key));
     sessionStorage.clear();
     
-    // Redirect to login
-    window.location.href = 'https://max.dwchem.co.kr/login';
+    // Set flag to prevent loading state during redirect
+    sessionStorage.setItem('auth_redirect_in_progress', 'true');
+    
+    // Small delay to ensure state updates before redirect
+    setTimeout(() => {
+      window.location.href = 'https://max.dwchem.co.kr/login';
+    }, 100);
+    
     return false;
     
     /* ORIGINAL REFRESH LOGIC - DISABLED
