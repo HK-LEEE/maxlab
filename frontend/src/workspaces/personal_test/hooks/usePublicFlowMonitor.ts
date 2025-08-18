@@ -176,7 +176,19 @@ export const usePublicFlowMonitor = (publishToken: string) => {
         });
         
         setNodes(processedNodes);
-        setEdges(flowData.flow_data.edges || []);
+        
+        // Process edges to ensure proper data properties
+        const processedEdges = (flowData.flow_data.edges || []).map((edge: any) => ({
+          ...edge,
+          type: 'custom', // Use custom edge type for CustomEdgeWithLabel
+          data: {
+            ...edge.data,
+            type: edge.data?.type || edge.type || 'smoothstep', // Default to smoothstep
+            offset: edge.data?.offset || 30, // Default offset
+            borderRadius: edge.data?.borderRadius || 10, // Default border radius
+          }
+        }));
+        setEdges(processedEdges);
       }
 
       // Fetch equipment status and measurement data individually for published flows
