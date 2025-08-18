@@ -1011,7 +1011,7 @@ export const authService = {
         };
       }
     }, { forceRefresh });
-    */ // END OF DISABLED REFRESH LOGIC
+    // END OF DISABLED REFRESH LOGIC */
   },
 
   /**
@@ -1150,7 +1150,7 @@ export const authService = {
         clearTimeout(refreshInterval);
       }
     };
-    */ // END OF DISABLED AUTO REFRESH LOGIC
+    // END OF DISABLED AUTO REFRESH LOGIC */
   },
 
   /**
