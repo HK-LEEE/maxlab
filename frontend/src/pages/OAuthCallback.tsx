@@ -519,6 +519,9 @@ export const OAuthCallback: React.FC = () => {
                   sessionStorage.removeItem('oauth_flow_in_progress');
                   sessionStorage.removeItem('oauth_callback_processing');
                   
+                  // 🔒 CRITICAL FIX: Clean up any pending silent auth cleanup flags
+                  sessionStorage.removeItem('silent_auth_cleanup_pending');
+                  
                   const messagePayload = {
                     type: 'OAUTH_SUCCESS',
                     token: tokenResponse.access_token,
@@ -712,6 +715,9 @@ export const OAuthCallback: React.FC = () => {
             sessionStorage.removeItem('oauth_nonce'); // OIDC nonce 정리
             sessionStorage.removeItem('oauth_flow_in_progress');
             sessionStorage.removeItem('oauth_callback_processing');
+            
+            // 🔒 CRITICAL FIX: Clean up any pending silent auth cleanup flags
+            sessionStorage.removeItem('silent_auth_cleanup_pending');
             
             const messagePayload = {
               type: 'OAUTH_SUCCESS',
@@ -1272,6 +1278,9 @@ export const OAuthCallback: React.FC = () => {
             sessionStorage.removeItem('oauth_nonce'); // OIDC nonce 정리
             sessionStorage.removeItem('oauth_popup_mode');
             
+            // 🔒 CRITICAL FIX: Clean up any pending silent auth cleanup flags
+            sessionStorage.removeItem('silent_auth_cleanup_pending');
+            
             setState({
               status: 'success',
               message: 'Authentication successful! Redirecting...'
@@ -1346,6 +1355,10 @@ export const OAuthCallback: React.FC = () => {
         // OAuth 플로우 상태 정리
         sessionStorage.removeItem('oauth_flow_in_progress');
         sessionStorage.removeItem('oauth_callback_processing');
+        
+        // 🔒 CRITICAL FIX: Always clean up pending silent auth cleanup flags
+        sessionStorage.removeItem('silent_auth_cleanup_pending');
+        
         // DOM에서 OAuth 처리 중 상태 제거
         document.body.removeAttribute('data-oauth-processing');
       }
