@@ -613,7 +613,8 @@ export const Login: React.FC = () => {
 
             {/* MAX Platform으로 이동 버튼 */}
             <a
-              href="https://max.dwchem.co.kr"
+              {/* Original hardcoded: href="https://max.dwchem.co.kr" */}
+              href={import.meta.env.VITE_AUTH_SERVER_URL}
               className="w-full py-4 font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center space-x-3 shadow-md"
             >
               <LogIn size={24} />
@@ -631,7 +632,8 @@ export const Login: React.FC = () => {
           <div className="mt-6 text-center text-sm text-gray-600 border-t border-gray-200 pt-4">
             MAX Platform 계정이 없으신가요?{' '}
             <a 
-              href="https://max.dwchem.co.kr/signup"
+              {/* Original hardcoded: href="https://max.dwchem.co.kr/signup" */}
+              href={`${import.meta.env.VITE_AUTH_SERVER_URL}/signup`}
               className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
             >
               MAX Platform에서 회원가입

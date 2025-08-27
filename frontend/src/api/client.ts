@@ -171,7 +171,8 @@ apiClient.interceptors.response.use(
       
       // Redirect to MAX Platform login
       console.log('➡️ Redirecting to MAX Platform login page');
-      window.location.href = 'https://max.dwchem.co.kr/login';
+      // Original hardcoded: 'https://max.dwchem.co.kr/login'
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
       
       return Promise.reject(error);
       
@@ -207,7 +208,8 @@ apiClient.interceptors.response.use(
           
           // MAX Platform 로그인 페이지로 리다이렉트
           console.log('➡️ [MAX Lab API] Redirecting to MAX Platform login...');
-          window.location.href = 'https://max.dwchem.co.kr/login';
+          // Original hardcoded: 'https://max.dwchem.co.kr/login'
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
           
           return Promise.reject(error);
         }
@@ -246,7 +248,8 @@ apiClient.interceptors.response.use(
           
           // MAX Platform 로그인 페이지로 리다이렉트
           console.warn('🔐 [MAX Lab API] Redirecting to login due to refresh error...');
-          window.location.href = 'https://max.dwchem.co.kr/login';
+          // Original hardcoded: 'https://max.dwchem.co.kr/login'
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
         }
         
         return Promise.reject(error);
@@ -328,7 +331,8 @@ authClient.interceptors.response.use(
       
       // Redirect to MAX Platform login
       console.log('➡️ Redirecting to MAX Platform login page');
-      window.location.href = 'https://max.dwchem.co.kr/login';
+      // Original hardcoded: 'https://max.dwchem.co.kr/login'
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
       
       return Promise.reject(error);
       
@@ -383,7 +387,8 @@ authClient.interceptors.response.use(
           
           // MAX Platform 로그인 페이지로 리다이렉트
           console.log('➡️ [MAX Lab Auth API] Redirecting to MAX Platform login...');
-          window.location.href = 'https://max.dwchem.co.kr/login';
+          // Original hardcoded: 'https://max.dwchem.co.kr/login'
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
           
           return Promise.reject(error);
         }
@@ -413,7 +418,8 @@ authClient.interceptors.response.use(
         
         // MAX Platform 로그인 페이지로 리다이렉트
         console.warn('🔐 [MAX Lab Auth API] Redirecting to login due to auth API refresh error...');
-        window.location.href = 'https://max.dwchem.co.kr/login';
+        // Original hardcoded: 'https://max.dwchem.co.kr/login'
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
         
         return Promise.reject(error);
       }

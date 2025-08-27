@@ -122,7 +122,8 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onClose, onLogo
       <hr className="my-1 border-gray-100" />
       {/* 🚫 SIMPLIFIED: 로그아웃 버튼 비활성화 - max.dwchem.co.kr에서만 가능 */}
       <div className="px-4 py-2 text-xs text-gray-500 italic">
-        로그아웃은 <a href="https://max.dwchem.co.kr" className="text-blue-600 underline">max.dwchem.co.kr</a>에서만 가능합니다
+        {/* Original hardcoded: href="https://max.dwchem.co.kr" */}
+        로그아웃은 <a href={import.meta.env.VITE_AUTH_SERVER_URL} className="text-blue-600 underline">{new URL(import.meta.env.VITE_AUTH_SERVER_URL).hostname}</a>에서만 가능합니다
       </div>
     </div>
   );

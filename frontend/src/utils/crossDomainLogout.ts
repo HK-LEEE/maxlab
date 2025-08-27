@@ -140,7 +140,8 @@ export class CrossDomainLogoutManager {
     // 4. PostMessage를 통한 크로스 도메인 통신
     window.addEventListener('message', async (event) => {
       // max.dwchem.co.kr에서만 메시지 수신
-      if (event.origin === 'https://max.dwchem.co.kr' && event.data?.type === 'logout') {
+      // Original hardcoded: event.origin === 'https://max.dwchem.co.kr'
+      if (event.origin === import.meta.env.VITE_AUTH_SERVER_URL && event.data?.type === 'logout') {
         // Check if silent authentication is in progress
         if (oauthRequestCoordinator.hasActiveSilentAuth()) {
           devLog.info('🔇 Cross-domain logout message received during silent auth, ignoring');
@@ -201,9 +202,8 @@ export class CrossDomainLogoutManager {
         return;
       }
 
-      const maxPlatformUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://max.dwchem.co.kr'
-        : 'http://localhost:3000';
+      // Original hardcoded: process.env.NODE_ENV === 'production' ? 'https://max.dwchem.co.kr' : 'http://localhost:3000'
+      const maxPlatformUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:3000';
 
       const response = await fetch(`${maxPlatformUrl}/api/oauth/userinfo`, {
         method: 'GET',
@@ -362,8 +362,11 @@ export class CrossDomainLogoutManager {
         document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.dwchem.co.kr;`;
         
         // Clear for specific subdomains
-        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=maxlab.dwchem.co.kr;`;
-        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=max.dwchem.co.kr;`;
+        // Original hardcoded: domain=maxlab.dwchem.co.kr; domain=max.dwchem.co.kr;
+        const maxLabDomain = new URL(import.meta.env.VITE_API_BASE_URL || 'https://maxlab.dwchem.co.kr').hostname;
+        const maxPlatformDomain = new URL(import.meta.env.VITE_AUTH_SERVER_URL || 'https://max.dwchem.co.kr').hostname;
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${maxLabDomain};`;
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${maxPlatformDomain};`;
       }
     });
     
@@ -413,7 +416,8 @@ export class CrossDomainLogoutManager {
       if (iframe.contentWindow) {
         iframe.contentWindow.postMessage(
           { type: 'logout', time: logoutTime },
-          'https://maxlab.dwchem.co.kr'
+          // Original hardcoded: 'https://maxlab.dwchem.co.kr'
+          import.meta.env.VITE_API_BASE_URL || 'https://maxlab.dwchem.co.kr'
         );
       }
     });

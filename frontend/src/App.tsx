@@ -381,10 +381,11 @@ function App() {
     
     const handleSSOMessage = async (event: MessageEvent) => {
       // 보안: 신뢰할 수 있는 오리진에서만 메시지 수락
+      // Original hardcoded: 'https://max.dwchem.co.kr', 'https://maxlab.dwchem.co.kr'
       const trustedOrigins = [
-        'https://max.dwchem.co.kr',
+        import.meta.env.VITE_AUTH_SERVER_URL,
         'https://maxplatform.dwchem.co.kr',
-        'https://maxlab.dwchem.co.kr', // 자기 자신 (iframe logout-sync)
+        import.meta.env.VITE_API_BASE_URL, // 자기 자신 (iframe logout-sync)
         'http://localhost:3000', // 개발 환경
         'http://localhost:3001', // 개발 환경 대체 포트
         'http://localhost:3010', // maxlab 개발 환경

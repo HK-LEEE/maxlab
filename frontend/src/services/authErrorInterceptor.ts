@@ -284,7 +284,8 @@ export class AuthErrorInterceptor {
               sessionStorage.clear();
               
               // MAX Platform으로 직접 리다이렉트
-              window.location.href = 'https://max.dwchem.co.kr/login';
+              // Original hardcoded: window.location.href = 'https://max.dwchem.co.kr/login';
+              window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
             } else {
               console.log('📊 Authentication error on public page - continuing without redirect');
             }
@@ -293,7 +294,8 @@ export class AuthErrorInterceptor {
             // Authentication required - MAX Platform으로 리다이렉트 (public 페이지 제외)
             if (!isPublicPage) {
               console.warn('🚨 Authentication required - redirecting to MAX Platform');
-              window.location.href = 'https://max.dwchem.co.kr/login';
+              // Original hardcoded: window.location.href = 'https://max.dwchem.co.kr/login';
+              window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
             } else {
               console.log('📊 Authentication required on public page - continuing without redirect');
             }
@@ -302,7 +304,8 @@ export class AuthErrorInterceptor {
             // Token revoked - force logout and redirect (public 페이지 제외)
             if (!isPublicPage) {
               await authService.logout();
-              window.location.href = 'https://max.dwchem.co.kr/login';
+              // Original hardcoded: window.location.href = 'https://max.dwchem.co.kr/login';
+              window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
             } else {
               console.log('📊 Token revoked on public page - continuing without redirect');
             }

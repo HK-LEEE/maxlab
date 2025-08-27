@@ -1329,8 +1329,9 @@ export class PopupOAuthLogin {
       'https://maxlab.io',
       'https://app.maxlab.io',
       'https://auth.maxlab.io',
-      'https://max.dwchem.co.kr',  // DWChem auth server
-      'https://maxlab.dwchem.co.kr'  // DWChem MaxLab instance
+      // Original hardcoded: 'https://max.dwchem.co.kr', 'https://maxlab.dwchem.co.kr'
+      import.meta.env.VITE_AUTH_SERVER_URL || 'https://max.dwchem.co.kr',  // DWChem auth server
+      import.meta.env.VITE_API_BASE_URL || 'https://maxlab.dwchem.co.kr'  // DWChem MaxLab instance
     ];
 
     // Combine based on environment

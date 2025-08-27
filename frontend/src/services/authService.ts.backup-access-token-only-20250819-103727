@@ -694,8 +694,7 @@ export const authService = {
     sessionStorage.clear();
     
     // Redirect to login
-    // Original hardcoded: window.location.href = 'https://max.dwchem.co.kr/login';
-    window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
+    window.location.href = 'https://max.dwchem.co.kr/login';
     return false;
     
     /* ORIGINAL REFRESH LOGIC - DISABLED

@@ -196,7 +196,8 @@ export class TokenRefreshManager {
         
         // MAX Platform 로그인 페이지로 리다이렉트
         console.log('➡️ [MAX Lab] Redirecting to MAX Platform login page...');
-        window.location.href = 'https://max.dwchem.co.kr/login';
+        // Original hardcoded: window.location.href = 'https://max.dwchem.co.kr/login';
+        window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
         
         return false;
       }
@@ -231,7 +232,8 @@ export class TokenRefreshManager {
       
       // MAX Platform 로그인 페이지로 리다이렉트
       console.log('➡️ [MAX Lab] Redirecting to MAX Platform login page due to critical error...');
-      window.location.href = 'https://max.dwchem.co.kr/login';
+      // Original hardcoded: window.location.href = 'https://max.dwchem.co.kr/login';
+      window.location.href = `${import.meta.env.VITE_AUTH_SERVER_URL}/login`;
       
       return false;
     } finally {

@@ -763,7 +763,7 @@ export const OAuthCallback: React.FC = () => {
               const trustedOrigins = [
                 window.location.origin,  // Same origin (max.dwchem.co.kr)
                 new URL(authUrl).origin,  // OAuth server origin
-                'https://maxlab.dwchem.co.kr', // 🔧 FIX: Explicitly add MaxLab origin for SSO callbacks
+                import.meta.env.VITE_API_BASE_URL, // 🔧 FIX: Explicitly add MaxLab origin for SSO callbacks (Original: 'https://maxlab.dwchem.co.kr')
                 ...(document.referrer ? [new URL(document.referrer).origin] : []), // Referrer if available
               ];
               
