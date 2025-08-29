@@ -302,7 +302,8 @@ export class TokenSyncManager {
     try {
       console.log('🔍 Introspecting token with auth server...');
       
-      const response = await fetch(`${this.AUTH_SERVER_URL}/api/oauth/introspect`, {
+      // 새 OAuth server 구조: /auth/introspect 엔드포인트 사용
+      const response = await fetch(`${this.AUTH_SERVER_URL}/auth/introspect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

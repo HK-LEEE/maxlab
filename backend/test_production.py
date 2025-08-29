@@ -93,11 +93,11 @@ def test_api_endpoints():
     endpoints = [
         ("/", 200),
         ("/api/v1/info", 200),
-        ("/api/oauth/validate-config", 200),
+        ("/oauth/validate-config", 200),  # OAuth 엔드포인트 경로 업데이트
         ("/api/v1/workspaces", 401),  # 인증 필요
         ("/docs", 404),  # production에서는 비활성화
-        ("/api/oauth/token", 405),  # POST만 허용
-        ("/api/oauth/userinfo", 401),  # 토큰 필요
+        ("/oauth/token", 405),  # POST만 허용 - OAuth 엔드포인트 경로 업데이트
+        ("/oauth/userinfo", 401),  # 토큰 필요 - OAuth 엔드포인트 경로 업데이트
     ]
     
     results = []
@@ -115,7 +115,7 @@ def test_post_endpoints():
     base_url = "http://127.0.0.1:8010"
     
     # OAuth token endpoint test
-    url = f"{base_url}/api/oauth/token"
+    url = f"{base_url}/oauth/token"  # OAuth 엔드포인트 경로 업데이트
     data = {
         "grant_type": "authorization_code",
         "code": "test_code",

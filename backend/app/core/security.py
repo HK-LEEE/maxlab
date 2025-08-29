@@ -326,9 +326,9 @@ async def _verify_token_with_auth_server_internal(token: str, request_id: Option
             # Create properly formatted headers
             headers = create_oauth_headers(token, request_id)
             
-            # OAuth userinfo 엔드포인트 호출 (단일 경로)
+            # OAuth userinfo 엔드포인트 호출 (새로운 /auth/* 경로로 업데이트)
             oauth_response = await client.get(
-                f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
+                f"{settings.AUTH_SERVER_URL}/auth/userinfo",
                 headers=headers
             )
             
@@ -541,9 +541,9 @@ async def _get_user_groups_from_auth_server_internal(token: str, request_id: Opt
             # Create properly formatted headers
             headers = create_oauth_headers(token, request_id)
             
-            # OAuth userinfo 엔드포인트 호출
+            # OAuth userinfo 엔드포인트 호출 (새로운 /auth/* 경로로 업데이트)
             oauth_response = await client.get(
-                f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
+                f"{settings.AUTH_SERVER_URL}/auth/userinfo",
                 headers=headers
             )
             

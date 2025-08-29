@@ -45,9 +45,9 @@ async def proxy_me(authorization: Optional[str] = Header(None)):
     
     async with httpx.AsyncClient() as client:
         try:
-            # OAuth userinfo endpoint only
+            # OAuth userinfo endpoint (새로운 /auth/* 경로로 업데이트)
             oauth_response = await client.get(
-                f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo",
+                f"{settings.AUTH_SERVER_URL}/auth/userinfo",
                 headers=headers,
                 timeout=httpx.Timeout(10.0)
             )

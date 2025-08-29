@@ -283,8 +283,9 @@ export class PopupOAuthLogin {
           });
         }
 
-        // 🔒 SECURITY: Build OAuth authorization URL
-        const authUrl = `${this.authUrl}/api/oauth/authorize?${params}`;
+        // 🔒 SECURITY: Build OAuth authorization URL (새 OAuth server 구조)
+        // OAuth server가 maxplatform/oauth-server/로 재구조화되어 /auth/* 경로 사용
+        const authUrl = `${this.authUrl}/auth/authorize?${params}`;
         console.log('🔐 Opening OAuth popup:', authUrl);
         console.log('📋 Full OAuth URL params:', params.toString());
         
@@ -958,8 +959,8 @@ export class PopupOAuthLogin {
             const redirectUri = `${window.location.origin}/oauth/callback`;
             const state = this.currentFlowState?.state || generateState();
             
-            // Force OAuth flow to get authorization code
-            const oauthUrl = `${authUrl}/api/oauth/authorize?` +
+            // Force OAuth flow to get authorization code (새 OAuth server 구조)
+            const oauthUrl = `${authUrl}/auth/authorize?` +
               `response_type=code&` +
               `client_id=maxlab&` +
               `redirect_uri=${encodeURIComponent(redirectUri)}&` +
@@ -1766,9 +1767,9 @@ export async function exchangeCodeForToken(code: string, state?: string): Promis
   // 토큰 교환 Promise 생성 및 저장
   const tokenExchangePromise = (async (): Promise<TokenResponse> => {
     try {
-      // 🔧 CRITICAL FIX: Call OAuth server directly for token exchange
+      // 🔧 CRITICAL FIX: Call OAuth server directly for token exchange (새 OAuth server 구조)
       const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL || import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
-      const tokenUrl = import.meta.env.VITE_OAUTH_TOKEN_URL || `${authServerUrl}/api/oauth/token`;
+      const tokenUrl = import.meta.env.VITE_OAUTH_TOKEN_URL || `${authServerUrl}/auth/token`;
       console.log('🔄 Calling OAuth token endpoint:', tokenUrl);
       
       const response = await fetch(tokenUrl, {
@@ -2003,9 +2004,9 @@ export function isPopupMode(): boolean {
 
 // 사용자 정보 가져오기
 export async function getUserInfo(accessToken: string): Promise<any> {
-  // 🔧 CRITICAL FIX: Call OAuth server directly for userinfo
+  // 🔧 CRITICAL FIX: Call OAuth server directly for userinfo (새 OAuth server 구조)
   const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL || import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
-  const userinfoUrl = import.meta.env.VITE_OAUTH_USERINFO_URL || `${authServerUrl}/api/oauth/userinfo`;
+  const userinfoUrl = import.meta.env.VITE_OAUTH_USERINFO_URL || `${authServerUrl}/auth/userinfo`;
   console.log('🔄 Calling OAuth userinfo endpoint:', userinfoUrl);
   
   const response = await fetch(userinfoUrl, {

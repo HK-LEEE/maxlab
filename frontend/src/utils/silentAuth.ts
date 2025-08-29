@@ -119,7 +119,8 @@ export class SilentAuth {
           sessionStorage.setItem('oauth_max_age', maxAge.toString());
         }
 
-        const silentAuthUrl = `${this.authUrl}/api/oauth/authorize?${params}`;
+        // 새 OAuth server 구조: /auth/authorize 엔드포인트 사용
+        const silentAuthUrl = `${this.authUrl}/auth/authorize?${params}`;
 
         // 숨겨진 iframe 생성
         this.iframe = document.createElement('iframe');

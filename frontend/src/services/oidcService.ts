@@ -1,6 +1,13 @@
 /**
- * OIDC (OpenID Connect) Service
- * Handles OIDC-specific functionality including discovery, JWKS verification, and enhanced authentication
+ * OIDC (OpenID Connect) 서비스
+ * 
+ * MAX Platform OAuth Server 연동을 위한 OIDC 서비스
+ * - Discovery 설정 자동 탐지 및 캐싱
+ * - JWKS 키 관리 및 토큰 검증
+ * - Single Logout (RP-Initiated Logout) 지원
+ * - 새 OAuth server 구조 (/auth/*) 대응
+ * 
+ * OIDC-specific functionality including discovery, JWKS verification, and enhanced authentication
  */
 
 import { jwtDecode } from 'jwt-decode';
@@ -78,9 +85,13 @@ class OIDCService {
   private async fetchDiscoveryConfiguration(): Promise<OIDCConfiguration> {
     console.log('🔍 Fetching OIDC Discovery configuration...');
     
-    // Try different discovery endpoints
+    // OAuth Server 재구조화: 새로운 discovery endpoints 시도
     const discoveryEndpoints = [
+      // 새 OAuth server 경로들
+      '/auth/.well-known/openid-configuration',
+      '/auth/.well-known/oauth-authorization-server',
       '/.well-known/openid-configuration',
+      // 기존 경로들 (하위호환성 - OAuth server 재구조화 이전)
       '/api/oauth/.well-known/openid-configuration',
       '/api/oauth/.well-known/oauth-authorization-server'
     ];
@@ -119,23 +130,29 @@ class OIDCService {
   }
 
   private getStaticConfiguration(): OIDCConfiguration {
-    // 🔧 CRITICAL FIX: Use OAuth server directly for all OAuth endpoints
+    // 🔧 OAuth Server 재구조화 대응: 새로운 OAuth server 경로 사용
+    // OAuth server가 maxplatform/oauth-server/ 로 이동됨
     const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL || import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
     
     return {
+      // OAuth server의 OIDC issuer URL
       issuer: this.authUrl,
-      authorization_endpoint: import.meta.env.VITE_OAUTH_AUTHORIZE_URL || `${authServerUrl}/api/oauth/authorize`, // OAuth server
-      token_endpoint: import.meta.env.VITE_OAUTH_TOKEN_URL || `${authServerUrl}/api/oauth/token`, // OAuth server
-      userinfo_endpoint: import.meta.env.VITE_OAUTH_USERINFO_URL || `${authServerUrl}/api/oauth/userinfo`, // OAuth server
-      jwks_uri: `${authServerUrl}/api/oauth/jwks`, // OAuth server
-      end_session_endpoint: import.meta.env.VITE_OAUTH_LOGOUT_URL || `${authServerUrl}/api/oauth/logout`, // OAuth server
-      revocation_endpoint: `${authServerUrl}/api/oauth/revoke`, // OAuth server
-      scopes_supported: ['openid', 'profile', 'email', 'offline_access', 'groups', 'roles'],
+      
+      // 🚀 새 OAuth server endpoints (maxplatform/oauth-server/ 구조)
+      authorization_endpoint: import.meta.env.VITE_OAUTH_AUTHORIZE_URL || `${authServerUrl}/auth/authorize`, // 새 OAuth server
+      token_endpoint: import.meta.env.VITE_OAUTH_TOKEN_URL || `${authServerUrl}/auth/token`, // 새 OAuth server  
+      userinfo_endpoint: import.meta.env.VITE_OAUTH_USERINFO_URL || `${authServerUrl}/auth/userinfo`, // 새 OAuth server
+      jwks_uri: `${authServerUrl}/auth/jwks`, // 새 OAuth server
+      end_session_endpoint: import.meta.env.VITE_OAUTH_LOGOUT_URL || `${authServerUrl}/auth/logout`, // 새 OAuth server
+      revocation_endpoint: `${authServerUrl}/auth/revoke`, // 새 OAuth server
+      
+      // 지원되는 OAuth/OIDC 스코프
+      scopes_supported: ['openid', 'profile', 'email', 'offline_access', 'groups', 'roles', 'read:profile', 'manage:experiments', 'manage:workspaces'],
       response_types_supported: ['code', 'id_token', 'token', 'code id_token', 'code token', 'id_token token', 'code id_token token'],
       grant_types_supported: ['authorization_code', 'refresh_token', 'client_credentials'],
       id_token_signing_alg_values_supported: ['RS256', 'HS256'],
       claims_supported: ['sub', 'name', 'email', 'email_verified', 'groups', 'roles', 'permissions'],
-      code_challenge_methods_supported: ['S256', 'plain']
+      code_challenge_methods_supported: ['S256', 'plain'] // PKCE 지원
     };
   }
 
@@ -271,7 +288,8 @@ class OIDCService {
       
       if (!config.end_session_endpoint) {
         console.warn('⚠️ No end_session_endpoint found, using fallback');
-        return `${this.authUrl}/api/oauth/logout`;
+        // 새 OAuth server 구조 사용
+        return `${this.authUrl}/auth/logout`;
       }
       
       const logoutUrl = new URL(config.end_session_endpoint);
@@ -295,8 +313,8 @@ class OIDCService {
       
     } catch (error) {
       console.error('❌ Single Logout preparation failed:', error);
-      // Fallback to basic logout
-      return `${this.authUrl}/api/oauth/logout`;
+      // Fallback to basic logout (새 OAuth server 구조)
+      return `${this.authUrl}/auth/logout`;
     }
   }
 
@@ -306,7 +324,8 @@ class OIDCService {
   async revokeToken(token: string, tokenTypeHint?: 'access_token' | 'refresh_token'): Promise<void> {
     try {
       const config = await this.getDiscoveryConfiguration();
-      const revokeEndpoint = config.revocation_endpoint || `${this.authUrl}/api/oauth/revoke`;
+      // 새 OAuth server 구조: /auth/* 경로 사용
+      const revokeEndpoint = config.revocation_endpoint || `${this.authUrl}/auth/revoke`;
       
       console.log('🔒 Revoking token...');
       
@@ -343,10 +362,12 @@ class OIDCService {
   async getLogoutEndpoint(): Promise<string> {
     try {
       const config = await this.getDiscoveryConfiguration();
-      return config.end_session_endpoint || `${this.authUrl}/api/oauth/logout`;
+      // 새 OAuth server 구조 사용
+      return config.end_session_endpoint || `${this.authUrl}/auth/logout`;
     } catch (error) {
       console.warn('⚠️ Failed to get logout endpoint from discovery, using fallback');
-      return `${this.authUrl}/api/oauth/logout`;
+      // 새 OAuth server 구조 사용
+      return `${this.authUrl}/auth/logout`;
     }
   }
 

@@ -29,7 +29,7 @@ async def test_oauth_server():
         print("\n=== Test 1: OAuth Server UserInfo ===")
         try:
             response = await client.get(
-                f"{OAUTH_SERVER_URL}/api/oauth/userinfo",
+                f"{OAUTH_SERVER_URL}/auth/userinfo",  # 새로운 /auth/* 경로로 업데이트
                 headers=headers
             )
             print(f"Status: {response.status_code}")

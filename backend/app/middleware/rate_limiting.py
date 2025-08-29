@@ -310,7 +310,7 @@ def setup_rate_limiting(
         exempt_paths={
             "/docs", "/redoc", "/openapi.json", "/favicon.ico",
             "/api/v1/health", "/api/v1/csrf/", "/static/",
-            "/api/v1/auth/", "/api/oauth/"
+            "/api/v1/auth/", "/oauth/", "/auth/"  # OAuth 엔드포인트 경로 업데이트
         }
     )
     

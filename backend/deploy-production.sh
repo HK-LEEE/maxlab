@@ -144,7 +144,7 @@ test_endpoint() {
 }
 
 test_endpoint "/api/v1/info" "200"
-test_endpoint "/api/oauth/validate-config" "200"
+test_endpoint "/oauth/validate-config" "200"  # OAuth 엔드포인트 경로 업데이트
 
 # 10. PM2 상태 확인
 log_info "PM2 프로세스 상태:"

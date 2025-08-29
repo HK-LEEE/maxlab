@@ -97,7 +97,7 @@ async def oauth_token_exchange(
     OAuth 2.0 Authorization Code Exchange Endpoint
     
     Authorization code를 access token으로 교환합니다.
-    MAX Platform OAuth 서버의 /api/oauth/token 엔드포인트와 호환됩니다.
+    MAX Platform OAuth 서버의 /auth/token 엔드포인트와 호환됩니다.
     """
     try:
         logger.info(f"OAuth token exchange - grant_type: {grant_type}, client_id: {client_id}")
@@ -123,8 +123,8 @@ async def oauth_token_exchange(
                 }
             )
         
-        # MAX Platform OAuth 서버에 토큰 교환 요청
-        token_endpoint = f"{settings.AUTH_SERVER_URL}/api/oauth/token"
+        # MAX Platform OAuth 서버에 토큰 교환 요청 (새로운 /auth/* 경로로 업데이트)
+        token_endpoint = f"{settings.AUTH_SERVER_URL}/auth/token"
         
         async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
             try:
@@ -224,7 +224,7 @@ async def oauth_userinfo(
     OAuth 2.0 UserInfo Endpoint
     
     Access token을 사용하여 사용자 정보를 가져옵니다.
-    MAX Platform OAuth 서버의 /api/oauth/userinfo 엔드포인트와 호환됩니다.
+    MAX Platform OAuth 서버의 /auth/userinfo 엔드포인트와 호환됩니다.
     """
     try:
         # Authorization 헤더에서 토큰 추출
@@ -247,8 +247,8 @@ async def oauth_userinfo(
                 headers={"WWW-Authenticate": "Bearer"}
             )
         
-        # MAX Platform OAuth 서버에 사용자 정보 요청
-        userinfo_endpoint = f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo"
+        # MAX Platform OAuth 서버에 사용자 정보 요청 (새로운 /auth/* 경로로 업데이트)
+        userinfo_endpoint = f"{settings.AUTH_SERVER_URL}/auth/userinfo"
         
         async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
             try:
@@ -355,7 +355,7 @@ async def revoke_token(
     OAuth 2.0 Token Revocation (RFC 7009)
     
     Access Token과 Refresh Token 모두 취소를 지원합니다.
-    MAX Platform의 /api/oauth/revoke 엔드포인트와 호환됩니다.
+    MAX Platform의 /auth/revoke 엔드포인트와 호환됩니다.
     """
     try:
         
@@ -388,8 +388,8 @@ async def revoke_token(
         # 토큰 블랙리스트 서비스 가져오기
         blacklist_service = get_token_blacklist()
         
-        # MAX Platform OAuth 서버에 revoke 요청
-        revoke_endpoint = f"{settings.AUTH_SERVER_URL}/api/oauth/revoke"
+        # MAX Platform OAuth 서버에 revoke 요청 (새로운 /auth/* 경로로 업데이트)
+        revoke_endpoint = f"{settings.AUTH_SERVER_URL}/auth/revoke"
         async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
             try:
                 # 요청 데이터 준비
@@ -551,8 +551,8 @@ async def oauth_logout(
         if state:
             logout_params["state"] = state
             
-        # MAX Platform OAuth 서버의 로그아웃 엔드포인트로 리다이렉트
-        oauth_logout_url = f"{settings.AUTH_SERVER_URL}/api/oauth/logout"
+        # MAX Platform OAuth 서버의 로그아웃 엔드포인트로 리다이렉트 (새로운 /auth/* 경로로 업데이트)
+        oauth_logout_url = f"{settings.AUTH_SERVER_URL}/auth/logout"
         if logout_params:
             query_string = "&".join([f"{k}={v}" for k, v in logout_params.items()])
             oauth_logout_url = f"{oauth_logout_url}?{query_string}"
@@ -625,8 +625,8 @@ async def oauth_logout_post(
                 }
             )
         
-        # MAX Platform OAuth 서버에 로그아웃 요청
-        logout_endpoint = f"{settings.AUTH_SERVER_URL}/api/oauth/logout"
+        # MAX Platform OAuth 서버에 로그아웃 요청 (새로운 /auth/* 경로로 업데이트)
+        logout_endpoint = f"{settings.AUTH_SERVER_URL}/auth/logout"
         
         async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
             try:
@@ -689,8 +689,8 @@ async def oauth_sync(
         
         logger.info(f"🔄 SSO Sync request received with token: {token[:20]}...")
         
-        # 1. MAX Platform OAuth 서버에서 토큰 검증
-        userinfo_endpoint = f"{settings.AUTH_SERVER_URL}/api/oauth/userinfo"
+        # 1. MAX Platform OAuth 서버에서 토큰 검증 (새로운 /auth/* 경로로 업데이트)
+        userinfo_endpoint = f"{settings.AUTH_SERVER_URL}/auth/userinfo"
         
         async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
             response = await client.get(
@@ -876,7 +876,7 @@ async def sso_token_refresh(
             auth_params["login_hint"] = session_token
         
         query_string = "&".join([f"{k}={v}" for k, v in auth_params.items()])
-        max_platform_auth_url = f"{settings.AUTH_SERVER_URL}/api/oauth/authorize?{query_string}"
+        max_platform_auth_url = f"{settings.AUTH_SERVER_URL}/auth/authorize?{query_string}"
         
         logger.info(f"🔄 Redirecting to MAX Platform for SSO token refresh: {max_platform_auth_url}")
         

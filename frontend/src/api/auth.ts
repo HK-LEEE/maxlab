@@ -1,3 +1,12 @@
+/**
+ * Auth API - MAX Platform 인증 API 클라이언트
+ * 
+ * MAX Lab에서 MAX Platform의 인증 서비스를 사용하기 위한 API
+ * - 로그인/사용자 정보 조회 (OAuth 2.0/OIDC 토큰 기반)
+ * - 관리자 기능: 사용자 및 그룹 관리
+ * - MaxLab Backend를 통한 프록시 방식 사용
+ */
+
 import { authClient } from './client';
 import type { LoginCredentials, LoginResponse } from '../types/auth';
 

@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "@anthropic-ai/claude-code": "^1.0.44"
+  },
+  "devDependencies": {
+    "axios": "^1.11.0",
+    "base64url": "^3.0.1"
   }
 }

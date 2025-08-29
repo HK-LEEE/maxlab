@@ -429,10 +429,11 @@ export const authService = {
       const accessToken = localStorage.getItem('accessToken');
       
       // Step 1: 🔥 CRITICAL: Call backend logout API first (Redis 세션 정리)
+      // OAuth Server 재구조화: 새 logout endpoint 사용
       if (accessToken) {
         try {
           const authUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8000';
-          const response = await fetch(`${authUrl}/api/auth/logout`, {
+          const response = await fetch(`${authUrl}/auth/logout`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -478,9 +479,10 @@ export const authService = {
             console.log('🔑 Attempting token revocation...');
             
             // Access token revocation
+            // OAuth Server 재구조화: 새 revoke endpoint 사용
             if (accessToken) {
               try {
-                const response = await fetch(`${authUrl}/api/oauth/revoke`, {
+                const response = await fetch(`${authUrl}/auth/revoke`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -503,9 +505,10 @@ export const authService = {
             }
             
             // Refresh token revocation
+            // OAuth Server 재구조화: 새 revoke endpoint 사용
             if (refreshToken) {
               try {
-                const response = await fetch(`${authUrl}/api/oauth/revoke`, {
+                const response = await fetch(`${authUrl}/auth/revoke`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

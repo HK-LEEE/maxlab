@@ -57,7 +57,7 @@ async def test_workspace_permissions_with_token(token: str, user_desc: str = "Us
     print("\n2. OAuth 서버 직접 조회")
     async with httpx.AsyncClient() as client:
         oauth_response = await client.get(
-            f"{AUTH_URL}/api/oauth/userinfo",
+            f"{AUTH_URL}/auth/userinfo",  # OAuth 엔드포인트 경로 업데이트
             headers={"Authorization": f"Bearer {token}"}
         )
         if oauth_response.status_code == 200:

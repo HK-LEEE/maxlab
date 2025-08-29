@@ -101,7 +101,7 @@ class OIDCValidator:
                  jwks_uri: Optional[str] = None):
         self.issuer = issuer
         self.client_id = client_id
-        self.jwks_uri = jwks_uri or f"{issuer}/api/oauth/jwks"
+        self.jwks_uri = jwks_uri or f"{issuer}/auth/jwks"  # 새로운 /auth/* 경로로 업데이트
         self.jwks_client = JWKSClient(self.jwks_uri)
         
     async def validate_id_token(self, 

@@ -17,7 +17,7 @@ async def check_oauth_userinfo(token: str):
         # OAuth userinfo 엔드포인트 호출
         print("\n=== OAuth Userinfo 응답 ===")
         response = await client.get(
-            f"{AUTH_URL}/api/oauth/userinfo",
+            f"{AUTH_URL}/auth/userinfo",  # 새로운 /auth/* 경로로 업데이트
             headers=headers
         )
         

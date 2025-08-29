@@ -94,11 +94,12 @@ class RefreshTokenService {
       console.log('🎟️ Refresh Token Prefix:', refreshToken.substring(0, 10) + '...');
       
       // 🔧 RACE CONDITION FIX: Queue OAuth sync request through coordinator
+      // 새 OAuth server 구조: /auth/token 엔드포인트 사용
       const response = await oauthRequestCoordinator.queueRequest(
         'sync',
-        `${authUrl}/api/oauth/token`,
+        `${authUrl}/auth/token`,
         async (abortSignal) => {
-          return await this.fetchWithRetry(`${authUrl}/api/oauth/token`, {
+          return await this.fetchWithRetry(`${authUrl}/auth/token`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -523,7 +524,8 @@ class RefreshTokenService {
     // Revoke access token
     if (accessToken) {
       revocationPromises.push(
-        fetch('/api/oauth/revoke', {
+        // 새 OAuth server 구조: /auth/revoke 엔드포인트 사용
+        fetch('/auth/revoke', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -542,7 +544,8 @@ class RefreshTokenService {
     // Revoke refresh token
     if (refreshToken) {
       revocationPromises.push(
-        fetch('/api/oauth/revoke', {
+        // 새 OAuth server 구조: /auth/revoke 엔드포인트 사용
+        fetch('/auth/revoke', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -783,8 +786,8 @@ class RefreshTokenService {
     try {
       console.log('🌐 Checking OAuth server connectivity...');
       
-      // OIDC discovery endpoint로 health check
-      const response = await fetch(`${authUrl}/api/oauth/.well-known/openid-configuration`, {
+      // OIDC discovery endpoint로 health check (새 OAuth server 구조)
+      const response = await fetch(`${authUrl}/auth/.well-known/openid-configuration`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json'

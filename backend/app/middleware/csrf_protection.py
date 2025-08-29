@@ -226,7 +226,7 @@ class CSRFConfig:
         self.exempt_methods = exempt_methods or {"GET", "HEAD", "OPTIONS", "TRACE"}
         self.exempt_paths = exempt_paths or {
             "/docs", "/redoc", "/openapi.json", "/favicon.ico",
-            "/api/health", "/api/ping", "/api/oauth/", "/api/auth/"
+            "/api/health", "/api/ping", "/oauth/", "/auth/"  # OAuth 엔드포인트 경로 업데이트
         }
 
     def create_middleware(self, app: ASGIApp) -> CSRFProtectionMiddleware:
